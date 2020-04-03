@@ -13,7 +13,7 @@ commit. See [PROVENANCE.md](PROVENANCE.md).
 
 ## Upstream documentation
 
-# Multi-Protocol SPDZ
+# Multi-Protocol SPDZ [![Documentation Status](https://readthedocs.org/projects/mp-spdz/badge/?version=latest)](https://mp-spdz.readthedocs.io/en/latest/?badge=latest)
 
 Software to benchmark various secure multi-party computation (MPC)
 protocols such as SPDZ, SPDZ2k, MASCOT, Overdrive, BMR garbled circuits,
