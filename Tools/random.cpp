@@ -47,10 +47,10 @@ void PRNG::ReSeed()
   InitSeed();
 }
 
-void PRNG::SeedGlobally(const PlayerBase& P)
+void PRNG::SeedGlobally(const PlayerBase& P, const vector<bool>& parties)
 {
   octet seed[SEED_SIZE];
-  Create_Random_Seed(seed, P, SEED_SIZE);
+  Create_Random_Seed(seed, P, SEED_SIZE, parties);
   SetSeed(seed);
 }
 

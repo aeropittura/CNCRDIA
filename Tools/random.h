@@ -92,7 +92,8 @@ class PRNG
    void ReSeed();
 
    // Agree securely on seed
-   void SeedGlobally(const PlayerBase& P);
+   void SeedGlobally(const PlayerBase& P,
+           const vector<bool>& parties = { });
 
    /**
     * Coordinate random seed

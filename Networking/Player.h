@@ -222,6 +222,9 @@ public:
   virtual void send_receive_all(const vector<octetStream>&,
       vector<octetStream>&) const
   { throw not_implemented(); }
+  virtual void partial_broadcast(const vector<bool>&,
+      const vector<bool>&, vector<octetStream>&) const
+  { throw not_implemented(); }
 };
 
 /**
@@ -398,6 +401,9 @@ public:
   virtual void partial_broadcast(const vector<bool>& senders,
       const vector<bool>& receivers,
       vector<octetStream>& os) const;
+  virtual void partial_broadcast_no_stats(const vector<bool>&,
+      const vector<bool>&, vector<octetStream>&) const
+  { throw runtime_error("implement partial broadcast"); }
 
   // dummy functions for compatibility
   virtual void request_receive(int i, octetStream& o) const { (void)i; (void)o; }
@@ -459,6 +465,10 @@ public:
   virtual void send_receive_all_no_stats(const vector<vector<bool>>& channels,
       const vector<octetStream>& to_send,
       vector<octetStream>& to_receive) const;
+
+  virtual void partial_broadcast_no_stats(const vector<bool>& senders,
+        const vector<bool>& receivers,
+        vector<octetStream>& os) const;
 };
 
 /**

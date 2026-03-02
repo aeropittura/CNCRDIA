@@ -14,16 +14,13 @@ Rep4<T>::Rep4(Player& P) :
 {
     assert(P.num_players() == 4);
 
-    rep_prngs[0].ReSeed();
-
-    octetStreams to_send(P), to_receive;
-    for (int i = 1; i < 3; i++)
-        to_send[P.get_player(-i)].append(rep_prngs[0].get_seed(), SEED_SIZE);
-
-    P.send_receive_all(to_send, to_receive);
-
-    for (int i = 1; i < 3; i++)
-        rep_prngs[i].SetSeed(to_receive[P.get_player(i)].get_data());
+    for (int i = 0; i < 4; i++)
+        if (i != P.my_num())
+        {
+            vector<bool> parties(4, true);
+            parties[i] = false;
+            rep_prngs.at(P.get_offset(i) - 1).SeedGlobally(P, parties);
+        }
 
     malicious = not OnlineOptions::singleton.semi_honest;
 }
@@ -82,6 +79,7 @@ void Rep4<T>::init_mul()
 
     send_os.reset(P);
     receive_os.reset(P);
+    channels.clear();
     channels.resize(P.num_players(), vector<bool>(P.num_players(), false));
 }
 
@@ -106,6 +104,7 @@ void Rep4<T>::prepare_joint_input(int sender, int backup, int receiver,
         int outsider, vector<open_type>& inputs, vector<ResTuple>& results)
 {
     channels[sender][receiver] = true;
+    channels[backup][receiver] = true;
 
     if (P.my_num() != receiver)
     {
@@ -265,6 +264,7 @@ void Rep4<T>::exchange()
     prepare_joint_input(3, 0, 2, 1, a[3]);
     prepare_joint_input(0, 2, 3, 1, a[4]);
     prepare_joint_input(1, 3, 2, 0, a[4]);
+    append_hashes(send_os);
     P.send_receive_all(channels, send_os, receive_os);
     finalize_joint_input(0, 1, 3, 2);
     finalize_joint_input(1, 2, 0, 3);
@@ -272,6 +272,7 @@ void Rep4<T>::exchange()
     finalize_joint_input(3, 0, 2, 1);
     finalize_joint_input(0, 2, 3, 1);
     finalize_joint_input(1, 3, 2, 0);
+    check_hashes(receive_os);
 }
 
 template<class T>
@@ -309,22 +310,46 @@ void Rep4<T>::must_check()
 {
     CODE_LOCATION
     octetStreams to_send(P);
-    for (int i = 1; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            to_send[P.get_player(i)].concat(send_hashes[j][P.get_player(i)].final());
+    append_hashes(to_send);
 
     octetStreams to_receive;
     P.send_receive_all(to_send, to_receive);
+    check_hashes(to_receive);
+}
 
+template<class T>
+void Rep4<T>::append_hashes(octetStreams& to_send)
+{
+    for (int i = 1; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+        {
+            int receiver = P.get_player(i);
+            auto& hash = send_hashes[j][receiver];
+            if (hash.size > 0)
+            {
+                if (not channels[P.my_num()][receiver])
+                    throw runtime_error("missing channel activation");
+                to_send[receiver].concat(hash.final());
+            }
+        }
+}
+
+template<class T>
+void Rep4<T>::check_hashes(octetStreams& to_receive)
+{
     octetStream tmp;
     for (int i = 1; i < 4; i++)
         for (int j = 0; j < 4; j++)
         {
-            to_receive[P.get_player(-i)].consume(tmp, Hash::hash_length);
-            if (receive_hashes[j][P.get_player(-i)].final() != tmp)
-                throw runtime_error(
-                        "hash mismatch for sender " + to_string(j)
-                        + " and backup " + to_string(P.get_player(-i)));
+            auto& hash = receive_hashes[j][P.get_player(-i)];
+            if (hash.size > 0)
+            {
+                to_receive[P.get_player(-i)].consume(tmp, Hash::hash_length);
+                if (hash.final() != tmp)
+                    throw runtime_error(
+                            "hash mismatch for sender " + to_string(j)
+                            + " and backup " + to_string(P.get_player(-i)));
+            }
         }
 }
 
@@ -458,9 +483,11 @@ void Rep4<T>::trunc_pr(const vector<int>& regs, int size,
     PointerVector<ResTuple> eval_results(n_inputs);
     prepare_joint_input(0, 1, 3, 2, inputs, gen_results);
     prepare_joint_input(2, 3, 1, 0, eval_inputs, eval_results);
+    append_hashes(send_os);
     P.send_receive_all(channels, send_os, receive_os);
     finalize_joint_input(0, 1, 3, 2, gen_results);
     finalize_joint_input(2, 3, 1, 0, eval_results);
+    check_hashes(receive_os);
 
     init_mul();
     for (auto& info : infos)
@@ -554,9 +581,11 @@ void Rep4<T>::split(StackedVector<T>& dest, const vector<int>& regs, int n_bits,
         x.resize(to_share.size());
     prepare_joint_input(0, 1, 3, 2, to_share, results[0]);
     prepare_joint_input(2, 3, 1, 0, to_share, results[1]);
+    append_hashes(send_os);
     P.send_receive_all(channels, send_os, receive_os);
     finalize_joint_input(0, 1, 3, 2, results[0]);
     finalize_joint_input(2, 3, 1, 0, results[1]);
+    check_hashes(receive_os);
 
     for (int k = 0; k < DIV_CEIL(n_inputs, unit); k++)
     {

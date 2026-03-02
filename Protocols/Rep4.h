@@ -62,6 +62,9 @@ class Rep4 : public ProtocolBase<T>
 
     void must_check();
 
+    void append_hashes(octetStreams& to_send);
+    void check_hashes(octetStreams& to_receive);
+
 public:
     static const bool uses_triples = false;
 
@@ -101,5 +104,6 @@ public:
 
     int get_n_relevant_players() { return 2; }
 };
+
 
 #endif /* PROTOCOLS_REP4_H_ */

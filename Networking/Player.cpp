@@ -515,15 +515,44 @@ void Player::pass_around(octetStream& o, octetStream& to_receive, int offset) co
 template<class T>
 void MultiPlayer<T>::Broadcast_Receive_no_stats(vector<octetStream>& o) const
 {
+  vector<bool> parties(num_players(), true);
+  partial_broadcast_no_stats(parties, parties, o);
+}
+
+
+template<class T>
+void MultiPlayer<T>::partial_broadcast_no_stats(
+    const vector<bool>& senders, const vector<bool>& receivers,
+    vector<octetStream>& o) const
+{
   if (o.size() != sockets.size())
     throw runtime_error("player numbers don't match");
 
   vector<Exchanger<T>> exchangers;
+  octetStream empty;
   for (int i=1; i<nplayers; i++)
     {
       int send_to = (my_num() + i) % num_players();
       int receive_from = (my_num() + num_players() - i) % num_players();
-      exchangers.push_back({sockets[send_to], o[my_num()], sockets[receive_from], o[receive_from]});
+
+      if (senders.at(send_to) and receivers.at(receive_from))
+        exchangers.push_back({sockets[send_to], o[my_num()],
+          sockets[receive_from], o[receive_from]});
+      else if (receivers.at(receive_from))
+        exchangers.push_back({0, empty,
+          sockets[receive_from], o[receive_from]});
+      else if (senders.at(send_to))
+        exchangers.push_back({sockets[send_to], o[my_num()],
+          0, o[receive_from]});
+
+      if (OnlineOptions::singleton.has_option("detailed_verbose_comm"))
+        {
+          if (senders.at(send_to))
+            cerr << "Send " << o[my_num()].get_length() << " bytes to "
+                << send_to << endl;
+          if (receivers.at(receive_from))
+            cerr << "Receiving from " << receive_from << endl;
+        }
     }
 
   int left = 1;
@@ -533,6 +562,10 @@ void MultiPlayer<T>::Broadcast_Receive_no_stats(vector<octetStream>& o) const
       for (auto& exchanger : exchangers)
         left += exchanger.round(false);
     }
+
+  for (int i = 0; i < num_players(); i++)
+    if (i != my_num() and not o.at(i).empty())
+      throw runtime_error("unexpected information from " + to_string(i));
 }
 
 void Player::unchecked_broadcast(vector<octetStream>& o) const
@@ -602,10 +635,11 @@ void Player::send_receive_all(const vector<vector<bool>>& channels,
   send_receive_all_no_stats(channels, to_send, to_receive);
 }
 
-void Player::partial_broadcast(const vector<bool>&,
-    const vector<bool>&, vector<octetStream>& os) const
+void Player::partial_broadcast(const vector<bool>& senders,
+    const vector<bool>& receivers, vector<octetStream>& os) const
 {
-  unchecked_broadcast(os);
+  TimeScope ts(comm_stats["Partial broadcasting"].add(os[my_num()]));
+  partial_broadcast_no_stats(senders, receivers, os);
 }
 
 template<class T>

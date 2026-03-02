@@ -76,6 +76,8 @@ void Rep4Input<T>::exchange()
     if (not OnlineOptions::singleton.semi_honest)
         for (int i = 0; i < 2; i++)
             hashes[i].update(to_receive[i]);
+
+    check();
 }
 
 template<class T>
