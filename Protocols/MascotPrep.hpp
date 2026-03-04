@@ -52,6 +52,7 @@ void OTPrep<T>::set_protocol(typename T::Protocol& protocol)
 template<class T>
 void MascotTriplePrep<T>::buffer_triples()
 {
+    CODE_LOCATION
 #ifdef INSECURE
 #ifdef FAKE_MASCOT_TRIPLES
     this->triples.resize(this->triples.size() + OnlineOptions::singleton.batch_size);
@@ -92,6 +93,8 @@ void MascotDabitOnlyPrep<T>::buffer_bits(false_type)
 {
     this->params.generateBits = true;
     auto& triple_generator = this->triple_generator;
+    triple_generator->set_batch_size(
+            BaseMachine::batch_size<T>(DATA_BIT, this->buffer_size));
     triple_generator->generate();
     triple_generator->unlock();
     assert(triple_generator->bits.size() != 0);
@@ -104,6 +107,8 @@ void MascotInputPrep<T>::buffer_inputs(int player)
 {
     auto& triple_generator = this->triple_generator;
     assert(triple_generator);
+    triple_generator->set_batch_size(
+            BaseMachine::input_batch_size<T>(player, this->buffer_size));
     triple_generator->generateInputs(player);
     if (this->inputs.size() <= (size_t)player)
         this->inputs.resize(player + 1);

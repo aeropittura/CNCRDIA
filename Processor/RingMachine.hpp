@@ -11,6 +11,7 @@
 #include "Processor/RingOptions.h"
 #include "Tools/ezOptionParser.h"
 #include "Math/gf2n.h"
+#include "Protocols/Spdz2kPrep.h"
 #include "OnlineMachine.hpp"
 #include "OnlineOptions.hpp"
 
@@ -30,10 +31,24 @@ HonestMajorityRingMachine<U, V>::HonestMajorityRingMachine(int argc, const char*
     RingMachine<U, V, HonestMajorityMachine>(argc, argv, opt, online_opts, nplayers);
 }
 
-inline void ring_domain_error(int R)
+inline void ring_domain_error(int R, int max)
 {
-    cerr << "not compiled for " << R << "-bit computation, " << endl;
-    cerr << "compile with -DRING_SIZE=" << R << endl;
+    cerr << "The virtual machine is not compiled for " << R
+            << "-bit computation." << endl;
+    cerr << "Compile with 'MY_CFLAGS += -DRING_SIZE=" << R
+            << "' in 'CONFIG.mine'";
+    (void) max;
+#ifndef FEWER_RINGS
+    for (int r = 0; r <= max; r += 64)
+    {
+        if (r >= R)
+        {
+            cerr << " or try " << "'-R " << r << "'";
+            break;
+        }
+    }
+#endif
+    cerr << "." << endl;
     exit(1);
 }
 
@@ -59,7 +74,7 @@ RingMachine<U, V, W>::RingMachine(int argc, const char** argv,
     X(RING_SIZE)
 #endif
 #undef X
-    ring_domain_error(R);
+    ring_domain_error(R, 192);
 }
 
 template<template<int K, int S> class U, template<class T> class V>
@@ -97,7 +112,7 @@ HonestMajorityRingMachineWithSecurity<U, V>::HonestMajorityRingMachineWithSecuri
     X(72) X(128)
 #endif
 #undef X
-    ring_domain_error(R);
+    ring_domain_error(R, 128);
 }
 
 #endif /* PROCESSOR_RINGMACHINE_HPP_ */

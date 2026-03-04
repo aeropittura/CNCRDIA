@@ -11,8 +11,9 @@ gdb_screen()
     prog=$1
     shift
     IFS=
-    name=${*/-/}
+    name=$screen_prefix${*/-/}
     IFS=' '
+    name=${name:0:70}
     screen -S :$name -d -m bash -l -c "echo $*; echo $LIBRARY_PATH; gdb $prog -ex \"run $*\""
 }
 
@@ -56,9 +57,12 @@ run_player() {
        params="$params -N $players"
     fi
     if test "$prog"; then
-	log_prefix=$prog-
+	log_prefix=$LOG_PREFIX$prog-
     fi
-    if test "$BENCH"; then
+    if test "$LOGPROT"; then
+	log_prefix=${log_prefix}single-
+    fi
+    if test "$BENCH" -o "$LOGPROT"; then
 	log_prefix=$log_prefix$bin-$(echo "$*" | sed 's/ /-/g')-N$players-
     fi
     set -o pipefail
@@ -70,7 +74,7 @@ run_player() {
       fi
       front_player=${GDB_PLAYER:-0}
       >&2 echo Running $my_prefix $SPDZROOT/$bin $i $params
-      log=logs/$log_prefix$i
+      log=logs/$log_prefix$LOG_SUFFIX$i
       $my_prefix $SPDZROOT/$bin $i $params 2>&1 |
 	  {
 	      if test "$BENCH"; then

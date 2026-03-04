@@ -45,7 +45,6 @@ int powerMod(int x,int e,int p)
   return ans;
 }
 
-
 size_t bigint::report_size(ReportType type) const
 {
   size_t res = 0;
@@ -73,18 +72,39 @@ int limb_size<int>()
   return 0;
 }
 
-bigint::bigint(const Integer& x) : bigint(SignedZ2<64>(x))
+bigint::bigint(const Integer& x)
 {
+  *this = x;
 }
 
-
-bigint::bigint(const GC::Clear& x) : bigint(SignedZ2<64>(x))
+bigint::bigint(const GC::Clear& x)
 {
+  *this = x;
+}
+
+bigint& bigint::operator =(const Integer& x)
+{
+  return *this = SignedZ2<64>(x);
+}
+
+bigint& bigint::operator =(const GC::Clear& x)
+{
+  return *this = SignedZ2<64>(x);
 }
 
 bigint::bigint(const mp_limb_t* data, size_t n_limbs)
 {
   mpz_import(get_mpz_t(), n_limbs, -1, 8, -1, 0, data);
+}
+
+void bigint::pack(octetStream& os, int length) const
+{
+  os.store(*this, length);
+}
+
+void bigint::unpack(octetStream& os, int length)
+{
+  os.get(*this, length);
 }
 
 string to_string(const bigint& x)

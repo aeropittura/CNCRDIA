@@ -51,7 +51,20 @@ class Compiler:
         self.root = os.path.dirname(__file__) + '/..'
 
     def build_option_parser(self):
-        parser = OptionParser(usage=self.usage)
+        if self.execute:
+            class MyOptionParser(OptionParser):
+                def error(self, err):
+                    if "no such option" in err:
+                        print(self.get_usage(), file=sys.stderr)
+                        print("error:", err, file=sys.stderr)
+                        print("Remember to put run-time arguments "
+                              "after '--' as shown above", file=sys.stderr)
+                        sys.exit(1)
+                    else:
+                        OptionParser.error(self, err)
+        else:
+            MyOptionParser = OptionParser
+        parser = MyOptionParser(usage=self.usage)
         parser.add_option(
             "-n",
             "--nomerge",
@@ -174,7 +187,7 @@ class Compiler:
             "--prime",
             dest="prime",
             default=defaults.prime,
-            help="use bit decomposition with a specifed prime modulus "
+            help="use bit decomposition with a specified prime modulus "
             "for non-linear computation (default: use the masking approach). "
             "Don't use this unless you're certain that you need it.",
         )
@@ -250,6 +263,12 @@ class Compiler:
             dest="verbose",
             help="more verbose output",
         )
+        parser.add_option(
+            "--papers",
+            action="store_true",
+            dest="papers",
+            help="output recommended reading",
+        )
         if self.execute:
             parser.add_option(
                 "-E",
@@ -279,16 +298,14 @@ class Compiler:
             )
         self.parser = parser
 
+    def base_protocol(self):
+        if self.options.execute:
+            return re.sub("-(prep|online)$", "", self.options.execute)
+
     def parse_args(self):
         self.options, self.args = self.parser.parse_args(self.custom_args)
         if self.options.verbose:
             self.runtime_args += ["--verbose"]
-        if self.options.execute:
-            self.options.execute = re.sub("-party.x$", "", self.options.execute)
-            for s, l in self.match.items():
-                if self.options.execute == l:
-                    self.options.execute = s
-                    break
         if self.execute:
             if not self.options.execute:
                 if len(self.args) > 1:
@@ -303,9 +320,19 @@ class Compiler:
                           file=sys.stderr)
                     exit(1)
         if self.options.execute:
-            protocol = self.options.execute
+            self.options.execute = re.sub(r"-party\.x$", "",
+                                          self.options.execute)
+            self.options.execute = re.sub("malicious-", "mal-",
+                                          self.options.execute)
+            for s, l in self.match.items():
+                if self.options.execute == l:
+                    self.options.execute = s
+                    break
+        if self.options.execute:
+            protocol = self.base_protocol()
             if protocol.find("ring") >= 0 or protocol.find("2k") >= 0 or \
-               protocol.find("brain") >= 0 or protocol == "emulate":
+               protocol.find("brain") >= 0 or protocol == "emulate" or \
+               protocol in ("astra", "trio"):
                 if not (self.options.ring or self.options.binary):
                     self.options.ring = "64"
                 if self.options.field:
@@ -326,45 +353,51 @@ class Compiler:
                         "ring option not compatible with %s" % protocol)
             if protocol == "emulate":
                 self.options.keep_cisc = ''
+            if protocol.find("bmr") >= 0 or protocol == "yao":
+                self.options.garbled = True
 
     def build_program(self, name=None):
         self.prog = Program(self.args, self.options, name=name)
         if self.options.execute:
-            if self.options.execute in \
-               ("emulate", "ring", "rep-field", "rep4-ring"):
+            if self.base_protocol() in \
+               ("emulate", "ring", "rep-field", "rep4-ring", "astra", "trio"):
                 self.prog.use_trunc_pr = True
-            if self.options.execute in ("ring", "ps-rep-ring", "sy-rep-ring"):
-                self.prog.use_split(3)
-            if self.options.execute in ("semi2k",):
-                self.prog.use_split(int(os.getenv("PLAYERS", 2)))
-            if self.options.execute in ("rep4-ring",):
-                self.prog.use_split(4)
+            if not self.prog.options.split:
+                if self.base_protocol() in (
+                        "ring", "ps-rep-ring", "sy-rep-ring", "astra", "trio"):
+                    self.prog.use_split(3)
+                if self.base_protocol() in ("ring", "astra", "trio"):
+                    self.prog.use_unsplit = 1
+                if self.options.execute in ("semi2k",):
+                    self.prog.use_split(int(os.getenv("PLAYERS", 2)))
+                if self.options.execute in ("rep4-ring",):
+                    self.prog.use_split(4)
             if self.options.execute.find("dealer") >= 0:
                 self.prog.use_edabit(True)
+            if self.base_protocol() in ("astra", "trio"):
+                self.prog.use_mulm = False
 
     def build_vars(self):
         from . import comparison, floatingpoint, instructions, library, types
 
         # add all instructions to the program VARS dictionary
-        instr_classes = [
-            t[1] for t in inspect.getmembers(instructions, inspect.isclass)
-        ]
+        instr_classes = inspect.getmembers(instructions, inspect.isclass)
 
         for mod in (types, GC_types):
             instr_classes += [
-                t[1]
+                t
                 for t in inspect.getmembers(mod, inspect.isclass)
                 if t[1].__module__ == mod.__name__
             ]
 
         instr_classes += [
-            t[1]
+            t
             for t in inspect.getmembers(library, inspect.isfunction)
-            if t[1].__module__ == library.__name__
+            if not t[0].startswith("_")
         ]
 
-        for op in instr_classes:
-            self.VARS[op.__name__] = op
+        for name, op in instr_classes:
+            self.VARS[name] = op
 
         # backward compatibility for deprecated classes
         self.VARS["sbitint"] = GC_types.sbitintvec
@@ -399,7 +432,7 @@ class Compiler:
                 class dummy:
                     def __init__(self, *args):
                         raise CompilerError(self.error)
-                dummy.error = i + " not availabe with binary circuits"
+                dummy.error = i + " not available with binary circuits"
                 if i in ("cint", "cfix"):
                     dummy.error += ". See https://mp-spdz.readthedocs.io/en/" \
                         "latest/Compiler.html#Compiler.types." + i
@@ -488,7 +521,23 @@ class Compiler:
         # make compiler modules directly accessible
         sys.path.insert(0, "%s/Compiler" % self.root)
         # create the tapes
-        exec(compile(infile.read(), infile.name, "exec"), self.VARS)
+        try:
+            exec(compile(infile.read(), infile.name, "exec"), self.VARS)
+        except UnboundLocalError:
+            raise CompilerError(
+                "The above error might mean that you attempted to assign "
+                "to a variable in a run-time loop. This is not supported "
+                "by the framework, but you can use assignment operations "
+                "to variables created outside the loop such as "
+                "'array[:] = ...' or 'array.assign(...)' for (multi-)arrays "
+                "and 'reg.update(...)' for registers.")
+        except TypeError as error:
+            if 'list indices must be' in str(error):
+                raise CompilerError(
+                    "You cannot address Python lists using run-time types "
+                    "such as regint. Use Array or MultiArray instead.")
+            else:
+                raise
 
         if changed and not self.options.debug:
             os.unlink(infile.name)
@@ -516,7 +565,7 @@ class Compiler:
         if not (hasattr(self, "compile_name") and hasattr(self, "compile_func")):
             raise CompilerError(
                 "No function to compile. "
-                "Did you decorate a function with @register_fuction(name)?"
+                "Did you decorate a function with @register_function(name)?"
             )
         self.prep_compile(self.compile_name)
         print(
@@ -538,6 +587,12 @@ class Compiler:
             print("Cost:", 0 if self.prog.req_num is None else self.prog.req_num.cost())
             print("Memory size:", dict(self.prog.allocated_mem))
 
+        comm = self.prog.expected_communication()
+        if sum(comm):
+            print(
+                "Expected communication is %g MB online and %g MB offline." % \
+                (comm[0] / 1e6, comm[1] / 1e6))
+
         return self.prog
 
     match = {
@@ -553,10 +608,18 @@ class Compiler:
             protocol = match[protocol]
         if protocol.find("bmr") == -1:
             protocol = re.sub("^mal-", "malicious-", protocol)
+        protocol = re.sub("-online$", "", protocol)
         if protocol == "emulate":
             return protocol + ".x"
         else:
             return protocol + "-party.x"
+
+    @classmethod
+    def short_protocol_name(cls, protocol):
+        for x in cls.match.items():
+            if protocol == x[1]:
+                return x[0]
+        return re.sub('^malicious-', 'mal-', protocol)
 
     def local_execution(self, args=None):
         if args is None:
@@ -601,6 +664,7 @@ class Compiler:
                 destinations.append('.')
         connections = [Connection(hostname) for hostname in hostnames]
         print("Setting up players...")
+        lockfile = ".transfer.lock"
 
         def run(i):
             dest = destinations[i]
@@ -608,6 +672,16 @@ class Compiler:
             connection.run(
                 "mkdir -p %s/{Player-Data,Programs/{Bytecode,Schedules}} " % \
                 dest)
+            dest_lockfile = "%s/%s" % (dest, lockfile)
+            try:
+                connection.run("test -e %s && exit 1; touch %s" % (
+                    (dest_lockfile,) * 2))
+            except:
+                raise Exception(
+                    "Problem with %s on %s. You cannot use the same directory "
+                    "for several instances (including the control instance). "
+                    "Remove %s on %s if this has been left behind from an "
+                    "aborted exection." % ((dest_lockfile, hostnames[i]) * 2))
             # executable
             connection.put("%s/static/%s" % (self.root, vm), dest)
             # program
@@ -626,10 +700,12 @@ class Compiler:
                                dest + "Player-Data")
             for filename in glob.glob("Player-Data/*.0"):
                 connection.put(filename, dest + "Player-Data")
+            connection.run("rm %s" % dest_lockfile)
 
         def run_with_error(i):
             try:
                 run(i)
+                copied[i] = True
             except IOError:
                 print('IO error when copying files, does %s have enough space?' %
                       hostnames[i])
@@ -643,13 +719,19 @@ class Compiler:
             out = fn(i)
             outputs[i] = out
 
+        open(lockfile, "w")
         threads = []
+        copied = [False] * len(hosts)
         for i in range(len(hosts)):
             threads.append(threading.Thread(target=run_with_error, args=(i,)))
         for thread in threads:
             thread.start()
         for thread in threads:
             thread.join()
+        os.remove(lockfile)
+        if False in copied:
+            print("Error in remote copying, see above")
+            sys.exit(1)
 
         # execution
         threads = []

@@ -16,10 +16,12 @@ class TimerWithComm : public Timer
 public:
     TimerWithComm();
     TimerWithComm(const Timer& other);
+    TimerWithComm(double time);
 
     void start(const NamedCommStats& stats = {});
     void stop(const NamedCommStats& stats = {});
 
+    size_t bytes_sent() const;
     double mb_sent() const;
     size_t rounds() const;
 

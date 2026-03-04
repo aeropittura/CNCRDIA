@@ -27,12 +27,13 @@ void TinierSharePrep<T>::init_real(Player& P)
 template<class T>
 void TinierSharePrep<T>::buffer_secret_triples()
 {
+    CODE_LOCATION
     auto& thread = ShareThread<secret_type>::s();
     auto& triple_generator = real_triple_generator;
     assert(triple_generator != 0);
     params.generateBits = false;
     vector<array<T, 3>> triples;
-    TripleShuffleSacrifice<T> sacrifice(DATA_GF2);
+    TripleShuffleSacrifice<T> sacrifice;
     size_t required;
     required = sacrifice.minimum_n_inputs_with_combining(
             BaseMachine::batch_size<T>(DATA_TRIPLE));

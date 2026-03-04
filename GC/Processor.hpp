@@ -286,7 +286,12 @@ void Processor<T>::notcb(const ::BaseInstruction& instruction)
 template<class T>
 void Processor<T>::movsb(const ::BaseInstruction& instruction)
 {
-    for (int i = 0; i < DIV_CEIL(instruction.get_n(), T::default_length); i++)
+    int n_blocks;
+    if (instruction.get_n() < unsigned(T::default_length))
+        n_blocks = 1;
+    else
+        n_blocks = DIV_CEIL(instruction.get_n(), T::default_length);
+    for (int i = 0; i < n_blocks; i++)
         S[instruction.get_r(0) + i] = S[instruction.get_r(1) + i];
 }
 
@@ -403,13 +408,28 @@ void Processor<T>::convcbitvec(const BaseInstruction& instruction,
         bits.push_back(bit);
     }
 
-    if (P)
-        sync<T>(bits, *P);
-    else if (not T::symmetric)
-        sync<T>(bits, *Thread<T>::s().P);
+    try
+    {
+        auto proto = ShareThread<T>::s().protocol;
+        auto P = ShareThread<T>::s().P;
+        // The default use case in the compiler doesn't require synchronization
+        // with function-dependent protocols, but testing does.
+        if (proto and OnlineOptions::singleton.has_option("convcbitvec_sync"))
+            proto->sync(bits, *P);
+        else
+            throw no_singleton();
+    }
+    catch (no_singleton&)
+    {
+        if (P)
+            ProtocolBase<T>::sync(bits, *P);
+        else if (not T::symmetric)
+            ProtocolBase<T>::sync(bits, *Thread<T>::s().P);
+    }
 
-    for (size_t i = 0; i < n; i++)
-        Ci[instruction.get_r(0) + i] = bits[i];
+    auto dest = Ci.iterator_for_size(instruction.get_r(0), n);
+    for (auto& bit : bits)
+        *dest++ = bit;
 }
 
 template <class T>
@@ -431,7 +451,8 @@ void Processor<T>::print_reg(int reg, int n, int size)
 }
 
 template <class T>
-void Processor<T>::print_reg_plain(Clear& value)
+template <class U>
+void Processor<T>::print_reg_plain(U& value)
 {
     out << hex << showbase << value << dec << flush;
 }
@@ -526,6 +547,11 @@ template<class T>
 template<class U>
 void Processor<T>::call_tape(const BaseInstruction& instruction, U& dynamic_memory)
 {
+    if (T::garbled)
+        throw runtime_error(
+                "calling tapes not supported with garbled circuits, "
+                        "compile with '--garbled'");
+
     auto new_arg = I.at(instruction.get_r(1)).get();
 
     PC_stack.push_back(PC);

@@ -147,6 +147,7 @@ struct CommStats
   Timer& add(const octetStream& os) { return add(os.get_length()); }
   CommStats& operator+=(const CommStats& other);
   CommStats& operator-=(const CommStats& other);
+  CommStats& imax(const CommStats& other);
 };
 
 class CommStatsWithName
@@ -159,13 +160,16 @@ public:
       name(name), stats(stats) {}
 
   Timer& add_length_only(size_t length);
-  Timer& add(const octetStream& os);
-  Timer& add(size_t length);
-  void add(const octetStream& os, const TimeScope& scope) { add(os) += scope; }
+  Timer& add(const octetStream& os, int player = -1);
+  Timer& add(size_t length, int player = -1);
+  void add(const octetStream& os, const TimeScope& scope, int player = -1)
+  { add(os, player) += scope; }
 };
 
 class NamedCommStats : public map<string, CommStats>
 {
+  using super = map<string, CommStats>;
+
 public:
   size_t sent;
   string last;
@@ -175,7 +179,8 @@ public:
   NamedCommStats& operator+=(const NamedCommStats& other);
   NamedCommStats operator+(const NamedCommStats& other) const;
   NamedCommStats operator-(const NamedCommStats& other) const;
-  void print(bool newline = false);
+  NamedCommStats& imax(const NamedCommStats& other);
+  void print(bool newline = false, const NamedCommStats& max = {});
   void reset();
   Timer& add_to_last_round(const string& name, size_t length);
   CommStatsWithName operator[](const string& name)
@@ -187,6 +192,9 @@ public:
  */
 class PlayerBase
 {
+  template<class T> friend class AstraOnlineBase;
+  template<class T> friend class AstraPrepProtocol;
+
 protected:
   int player_no;
 
@@ -213,6 +221,9 @@ public:
   { Broadcast_Receive(o); }
   virtual void send_receive_all(const vector<octetStream>&,
       vector<octetStream>&) const
+  { throw not_implemented(); }
+  virtual void partial_broadcast(const vector<bool>&,
+      const vector<bool>&, vector<octetStream>&) const
   { throw not_implemented(); }
 };
 
@@ -265,7 +276,7 @@ public:
   /**
    * Send to a specific player
    */
-  void send_to(int player,const octetStream& o) const;
+  virtual void send_to(int player,const octetStream& o) const;
   virtual void send_to_no_stats(int player,const octetStream& o) const = 0;
   /**
    * Receive from all other players.
@@ -275,7 +286,7 @@ public:
   /**
    * Receive from a specific player
    */
-  void receive_player(int i,octetStream& o) const;
+  virtual void receive_player(int i,octetStream& o) const;
   virtual void receive_player_no_stats(int i,octetStream& o) const = 0;
   virtual void receive_player(int i,FlexBuffer& buffer) const;
 
@@ -390,6 +401,9 @@ public:
   virtual void partial_broadcast(const vector<bool>& senders,
       const vector<bool>& receivers,
       vector<octetStream>& os) const;
+  virtual void partial_broadcast_no_stats(const vector<bool>&,
+      const vector<bool>&, vector<octetStream>&) const
+  { throw runtime_error("implement partial broadcast"); }
 
   // dummy functions for compatibility
   virtual void request_receive(int i, octetStream& o) const { (void)i; (void)o; }
@@ -451,6 +465,10 @@ public:
   virtual void send_receive_all_no_stats(const vector<vector<bool>>& channels,
       const vector<octetStream>& to_send,
       vector<octetStream>& to_receive) const;
+
+  virtual void partial_broadcast_no_stats(const vector<bool>& senders,
+        const vector<bool>& receivers,
+        vector<octetStream>& os) const;
 };
 
 /**
@@ -539,6 +557,8 @@ public:
 
   size_t send(const PlayerBuffer& buffer, bool block) const;
   size_t recv(const PlayerBuffer& buffer, bool block) const;
+
+  NamedCommStats get_comm_stats() const { return comm_stats; }
 };
 
 class RealTwoPartyPlayer : public VirtualTwoPartyPlayer

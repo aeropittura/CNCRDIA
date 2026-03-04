@@ -240,18 +240,26 @@ void NPartyTripleGenerator<T>::generate()
 template<class W>
 void NPartyTripleGenerator<W>::generateInputs(int player)
 {
+    CODE_LOCATION
     typedef typename W::input_type::share_type::open_type T;
 
-    auto nTriplesPerLoop = this->nTriplesPerLoop * 10;
+    auto nTriplesPerLoop = this->nTriplesPerLoop;
     auto& valueBits = this->valueBits;
     auto& share_prg = this->share_prg;
     auto& ot_multipliers = this->ot_multipliers;
     auto& nparties = this->nparties;
     auto& globalPlayer = this->globalPlayer;
 
+    if (this->thread_num >= 0)
+        nTriplesPerLoop *= 10;
+
     // extra value for sacrifice
     int toCheck = nTriplesPerLoop
             + DIV_CEIL(W::mac_key_type::size_in_bits(), T::size_in_bits());
+
+    if (OnlineOptions::singleton.has_option("verbose_input"))
+        fprintf(stderr, "generating %d input tuples\n", toCheck);
+
     valueBits.resize(1);
     this->signal_multipliers({player, toCheck});
     bool mine = player == globalPlayer.my_num();
@@ -312,6 +320,7 @@ void NPartyTripleGenerator<W>::generateInputs(int player)
 template<class T>
 void MascotTripleGenerator<T>::generateBitsGf2n()
 {
+    CODE_LOCATION
     auto& bits = this->bits;
     auto& globalPlayer = this->globalPlayer;
     auto& nTriplesPerLoop = this->nTriplesPerLoop;
@@ -382,6 +391,7 @@ void MascotTripleGenerator<T>::generateBits()
 template<class T>
 void Spdz2kTripleGenerator<T>::generateTriples()
 {
+    CODE_LOCATION
 	const int K = T::k;
 	const int S = T::s;
 	auto& uncheckedTriples = this->uncheckedTriples;
@@ -511,6 +521,7 @@ void OTTripleGenerator<U>::generatePlainTriples()
 template<class T>
 void OTTripleGenerator<T>::generatePlainBits()
 {
+    CODE_LOCATION
     assert(ot_multipliers.size() == 1);
 
     machine.set_passive();
@@ -544,6 +555,7 @@ void OTTripleGenerator<T>::generatePlainBits()
 template<class T>
 void OTTripleGenerator<T>::generateMixedTriples()
 {
+    CODE_LOCATION
     assert(ot_multipliers.size() == 1);
 
     machine.set_passive();
@@ -579,6 +591,7 @@ void OTTripleGenerator<T>::generateMixedTriples()
 template<class U>
 void OTTripleGenerator<U>::plainTripleRound(int k)
 {
+    CODE_LOCATION
     if (OnlineOptions::singleton.has_option("verbose_triples"))
         fprintf(stderr, "generating %d triples\n", nPreampTriplesPerLoop);
 
@@ -660,6 +673,7 @@ void OTTripleGenerator<U>::plainTripleRound(int k)
 template<class U>
 void SimpleMascotTripleGenerator<U>::generateTriples()
 {
+    CODE_LOCATION
     typedef typename U::open_type T;
 
     auto& timers = this->timers;
@@ -766,6 +780,7 @@ void SimpleMascotTripleGenerator<U>::generateTriples()
 template<class T>
 void MascotTripleGenerator<T>::sacrifice(typename T::MAC_Check& MC, PRNG& G)
 {
+    CODE_LOCATION
     auto& machine = this->machine;
     auto& nTriplesPerLoop = this->nTriplesPerLoop;
     auto& globalPlayer = this->globalPlayer;
@@ -826,6 +841,7 @@ template<class W>
 template<class U>
 void Spdz2kTripleGenerator<W>::sacrificeZ2k(U& MC, PRNG& G)
 {
+    CODE_LOCATION
     typedef sacri_type T;
     typedef open_type V;
     typedef typename W::prep_check_type prep_check_type;
@@ -885,6 +901,7 @@ template<int X, int L>
 void MascotTripleGenerator<T>::generateBitsFromTriples(MAC_Check& MC,
         ofstream& outputFile, gfp_<X, L>)
 {
+    CODE_LOCATION
     typedef gfp_<X, L> gfp1;
     auto& triples = this->uncheckedTriples;
     auto& nTriplesPerLoop = this->nTriplesPerLoop;

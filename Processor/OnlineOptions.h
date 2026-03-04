@@ -9,16 +9,20 @@
 #include "Tools/ezOptionParser.h"
 #include "Math/bigint.h"
 #include "Math/Setup.h"
+#include "Math/gf2n.h"
 
 class OnlineOptions
 {
     void finalize_with_error(ez::ezOptionParser& opt);
+
+    bool have_warned_about_comp_sec;
 
 public:
     static OnlineOptions singleton;
 
     bool interactive;
     int lgp;
+    int lg2;
     bigint prime;
     bool live_prep;
     int playerno;
@@ -41,6 +45,8 @@ public:
     vector<long> args;
     vector<string> options;
     string executable;
+    bool code_locations;
+    bool semi_honest;
 
     OnlineOptions();
     OnlineOptions(ez::ezOptionParser& opt, int argc, const char** argv,
@@ -48,9 +54,9 @@ public:
     OnlineOptions(ez::ezOptionParser& opt, int argc, const char** argv,
             int default_batch_size = 0, bool default_live_prep = true,
             bool variable_prime_length = false, bool security = true);
-    template<class T>
+    template<class T, class V = gf2n>
     OnlineOptions(ez::ezOptionParser& opt, int argc, const char** argv, T,
-            bool default_live_prep = true);
+            bool default_live_prep = true, V = {});
     template<class T>
     OnlineOptions(T);
     ~OnlineOptions() {}
@@ -76,6 +82,11 @@ public:
     {
         return find(options.begin(), options.end(), option) != options.end();
     }
+
+    bool has_param(const string& param);
+    int get_param(const string& param);
+
+    int comp_sec();
 };
 
 #endif /* PROCESSOR_ONLINEOPTIONS_H_ */

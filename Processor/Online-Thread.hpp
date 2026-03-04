@@ -14,6 +14,7 @@
 #include "Processor/Instruction.hpp"
 #include "Processor/Input.hpp"
 #include "Protocols/LimitedPrep.hpp"
+#include "Protocols/MalRepRingPrep.hpp"
 #include "GC/BitAdder.hpp"
 
 #include <iostream>
@@ -267,7 +268,7 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
           printf("\tClient %d about to run %d\n",num,program);
 #endif
           online_timer.start(P.total_comm());
-          online_prep_timer -= Proc.DataF.total_time();
+          online_prep_timer -= Proc.prep_time();
           Proc.reset(progs[program], job.arg);
 
           // Bits, Triples, Squares, and Inverses skipping
@@ -277,6 +278,7 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
              
           //printf("\tExecuting program");
           // Execute the program
+          BaseMachine::program = &progs[program];
           progs[program].execute(Proc);
 
           // make sure values used in other threads are safe
@@ -297,7 +299,7 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
               "in thread %d\n", program, num);
 #endif
           online_timer.stop(P.total_comm());
-          online_prep_timer += Proc.DataF.total_time();
+          online_prep_timer += Proc.prep_time();
           wait_timer.start();
           queues->finished(job, P.total_comm());
 	 wait_timer.stop();
@@ -306,10 +308,10 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
 
   // final check
   online_timer.start(P.total_comm());
-  online_prep_timer -= Proc.DataF.total_time();
+  online_prep_timer -= Proc.prep_time();
   Proc.check();
   online_timer.stop(P.total_comm());
-  online_prep_timer += Proc.DataF.total_time();
+  online_prep_timer += Proc.prep_time();
 
   if (machine.opts.file_prep_per_thread)
     Proc.DataF.prune();
@@ -354,11 +356,17 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
   queues->timers["online"] = online_timer - online_prep_timer - queues->wait_timer;
   queues->timers["prep"] = timer - queues->timers["wait"] - queues->timers["online"];
 
+  assert(Proc.share_thread.protocol);
+  queues->timers["random"] = Proc.Procp.protocol.randomness_time()
+      + Proc.Proc2.protocol.randomness_time()
+      + Proc.share_thread.protocol->randomness_time();
+
   NamedStats stats;
   stats["integer multiplications"] = Proc.Procp.protocol.counter;
   stats["integer multiplication rounds"] = Proc.Procp.protocol.rounds;
   stats["integer dot products"] = Proc.Procp.protocol.dot_counter;
   stats["probabilistic truncations"] = Proc.Procp.protocol.trunc_pr_counter;
+  stats["probabilistic truncations (big gap)"] = Proc.Procp.protocol.trunc_pr_big_counter;
   stats["probabilistic truncation rounds"] = Proc.Procp.protocol.trunc_rounds;
   stats["ANDs"] = Proc.share_thread.protocol->bit_counter;
   stats["AND rounds"] = Proc.share_thread.protocol->rounds;

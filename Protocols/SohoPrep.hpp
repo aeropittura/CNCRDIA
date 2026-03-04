@@ -37,6 +37,7 @@ void SohoPrep<T>::teardown()
 template<class T>
 void SohoPrep<T>::buffer_triples()
 {
+    CODE_LOCATION
     auto& proc = this->proc;
     assert(proc != 0);
     lock.lock();
@@ -44,6 +45,7 @@ void SohoPrep<T>::buffer_triples()
     {
         PlainPlayer P(proc->P.N, "Soho" + T::type_string());
         basic_setup(P);
+        BaseMachine::add_one_off(P.total_comm());
     }
     lock.unlock();
 
@@ -78,7 +80,7 @@ void SohoPrep<T>::buffer_triples()
 template<class T>
 void SohoPrep<T>::buffer_squares()
 {
-
+    CODE_LOCATION
     auto& proc = this->proc;
     assert(proc != 0);
     lock.lock();
@@ -86,6 +88,7 @@ void SohoPrep<T>::buffer_squares()
     {
         PlainPlayer P(proc->P.N, "Soho" + T::type_string());
         basic_setup(P);
+        BaseMachine::add_one_off(P.total_comm());
     }
     lock.unlock();
 

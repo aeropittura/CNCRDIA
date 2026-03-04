@@ -61,11 +61,13 @@ const TemiSetup<typename T::clear::FD>& TemiPrep<T>::get_setup()
 template<class T>
 void TemiPrep<T>::buffer_triples()
 {
+    CODE_LOCATION
     lock.lock();
     if (setup == 0)
     {
         PlainPlayer P(this->proc->P.N, "Temi" + T::type_string());
         basic_setup(P);
+        BaseMachine::add_one_off(P.total_comm());
     }
     lock.unlock();
 

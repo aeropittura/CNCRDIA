@@ -120,10 +120,12 @@ void SpdzWise<T>::check()
     if (results.empty())
         return;
 
+    CODE_LOCATION
     internal.init_dotprod();
     coefficients.clear();
 
-    BufferScope _(internal, results.size());
+    // need one extra in zero_check
+    BufferScope _(internal, results.size() + 1);
 
     for (auto& res : results)
     {
@@ -160,13 +162,17 @@ void SpdzWise<T>::zero_check(check_type t)
 template<class T>
 void SpdzWise<T>::buffer_random()
 {
+    CODE_LOCATION
     // proxy for initialization
     assert(mac_key != 0);
     auto batch_size = this->buffer_size;
+    if (OnlineOptions::singleton.has_option("verbose_random"))
+        fprintf(stderr, "generating %d random elements\n", batch_size);
     vector<typename T::part_type> rs;
     rs.reserve(batch_size);
     // cannot use member instance
     typename T::part_type::Honest::Protocol internal(P);
+    BufferScope scope(internal, batch_size);
     internal.init_mul();
     for (int i = 0; i < batch_size; i++)
     {
@@ -185,6 +191,7 @@ template<class T>
 void SpdzWise<T>::randoms_inst(StackedVector<T>& S,
         const Instruction& instruction)
 {
+    CODE_LOCATION
     internal.init_mul();
     for (int i = 0; i < instruction.get_size(); i++)
     {

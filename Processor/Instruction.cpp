@@ -11,6 +11,7 @@
 #include "GC/instructions.h"
 
 #include "Memory.hpp"
+#include "Instruction.hpp"
 
 #include <iomanip>
 
@@ -106,9 +107,15 @@ string BaseInstruction::get_name() const
     COMBI_INSTRUCTIONS
     default:
         stringstream ss;
-        ss << hex << get_opcode();
+        ss << showbase << hex << get_opcode();
         return ss.str();
     }
+}
+
+void BaseInstruction::bytecode_assert(bool condition) const
+{
+    if (not condition)
+        throw runtime_error("bytecode assertion violated");
 }
 
 ostream& operator<<(ostream& s, const Instruction& instr)

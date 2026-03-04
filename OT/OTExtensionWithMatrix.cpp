@@ -5,6 +5,7 @@
 
 #include "OTExtensionWithMatrix.h"
 #include "Tools/Bundle.h"
+#include "Tools/CodeLocations.h"
 
 #ifndef USE_KOS
 #include "Networking/PlayerCtSocket.h"
@@ -76,6 +77,22 @@ void OTExtensionWithMatrix::protocol_agreement()
     if (OnlineOptions::singleton.has_option("high_softspoken"))
         softspoken_k = 8;
 
+    if (OnlineOptions::singleton.has_param("softspoken"))
+        softspoken_k = OnlineOptions::singleton.get_param("softspoken");
+
+    int needed = DIV_CEIL(nbaseOTs, softspoken_k) * softspoken_k;
+
+    baseReceiverInput.resize_zero(needed);
+
+    for (int i = nbaseOTs; i < needed; i++)
+    {
+        auto zero = string(SEED_SIZE, '\0');
+        G_receiver.push_back(zero);
+        G_sender.push_back({});
+        for (int j = 0; j < 2; j++)
+            G_sender.back().push_back(zero);
+    }
+
     bundle.mine.store(softspoken_k);
 
     player->unchecked_broadcast(bundle);
@@ -129,6 +146,7 @@ void OTExtensionWithMatrix::transfer(int nOTs,
 void OTExtensionWithMatrix::extend(int nOTs_requested,
         const BitVector& newReceiverInput, bool hash)
 {
+    CODE_LOCATION
     protocol_agreement();
 
     if (use_kos())
@@ -175,7 +193,8 @@ void OTExtensionWithMatrix::soft_sender(size_t n)
         return;
 
     if (OnlineOptions::singleton.has_option("verbose_ot"))
-        fprintf(stderr, "%zu OTs as sender\n", n);
+        fprintf(stderr, "%zu OTs as sender (%s)\n", n,
+                passive_only ? "semi-honest" : "malicious");
 
     osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
     osuCrypto::SoftSpokenOT::TwoOneMaliciousSender sender(softspoken_k);
@@ -249,6 +268,7 @@ void OTExtensionWithMatrix::extend_correlated(const BitVector& newReceiverInput)
 
 void OTExtensionWithMatrix::extend_correlated(int nOTs_requested, const BitVector& newReceiverBits)
 {
+    CODE_LOCATION
 //    if (nOTs % nbaseOTs != 0)
 //        throw invalid_length(); //"nOTs must be a multiple of nbaseOTs\n");
     if (nOTs_requested == 0)

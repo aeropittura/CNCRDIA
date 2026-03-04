@@ -59,6 +59,15 @@ for dabit in ${dabit:-0 1 2}; do
 	done
     fi
 
+    test_vm rep4-ring $run_opts --semi-honest
+
+    if test "$run_opts" != -F -a `uname` != Darwin; then
+	./compile.py $compile_opts -E astra tutorial
+	for i in astra trio; do
+	    test_vm $i $run_opts
+	done
+    fi
+
     ./compile.py  $compile_opts tutorial
 
     for i in rep-field shamir sy-rep-field \
@@ -84,9 +93,16 @@ if test $dabit != 0; then
 
     ./compile.py -R 64 -Z 4 tutorial
     test_vm rep4-ring $run_opts
+    test_vm rep4-ring $run_opts --semi-honest
 
     ./compile.py -R 64 -Z ${PLAYERS:-2} tutorial
     test_vm semi2k $run_opts
+fi
+
+if test `uname` != Darwin -a -z "$run_opts"; then
+    ./compile.py -E astra tutorial
+    test_vm astra $run_opts
+    test_vm trio $run_opts
 fi
 
 ./compile.py tutorial

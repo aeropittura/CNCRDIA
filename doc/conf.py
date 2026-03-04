@@ -19,13 +19,15 @@ sys.path.insert(0, os.path.abspath('../ExternalIO'))
 
 exec(compile(open('gen-instructions.py').read(), 'gen', 'exec'))
 
+exec(compile(open('reading-table.py').read(), 'gen', 'exec'))
+
 import subprocess
 subprocess.run('./gen-readme.sh')
 
 # -- Project information -----------------------------------------------------
 
 project = u'MP-SPDZ'
-copyright = u'2024, CSIRO\'s Data61'
+copyright = u'2025, CSIRO\'s Data61'
 author = u'Marcel Keller'
 
 # The short X.Y version

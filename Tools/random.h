@@ -5,6 +5,7 @@
 #include "Tools/Hash.h"
 #include "Tools/aes.h"
 #include "Tools/avx_memcpy.h"
+#include "Tools/time-func.h"
 #include "Networking/data.h"
 
 #include <gmp.h>
@@ -14,7 +15,7 @@
 #ifndef USE_AES
   #define PIPELINES   1
   #define SEED_SIZE   randombytes_SEEDBYTES
-  #define RAND_SIZE   480
+  #define CALL_SIZE   480
 #else
 #if defined(__AES__) || !defined(__x86_64__)
   #define PIPELINES   8
@@ -22,7 +23,7 @@
   #define PIPELINES   1
 #endif
   #define SEED_SIZE   AES_BLK_SIZE
-  #define RAND_SIZE   (PIPELINES * AES_BLK_SIZE)
+  #define CALL_SIZE   (PIPELINES * AES_BLK_SIZE)
 #endif
 
 class Player;
@@ -43,6 +44,9 @@ class PlayerBase;
  */
 class PRNG
 {
+   static const int N_CACHE = 10;
+   static const int RAND_SIZE = N_CACHE * CALL_SIZE;
+
    octet seed[SEED_SIZE]; 
    octet state[RAND_SIZE] __attribute__((aligned (16)));
    octet random[RAND_SIZE] __attribute__((aligned (16)));
@@ -72,10 +76,14 @@ class PRNG
 
    public:
 
+   Timer timer;
+
    /// Construction without initialization. Usage without initialization will fail.
    PRNG();
    /// Initialize with ``SEED_SIZE`` bytes from buffer.
    PRNG(octetStream& seed);
+   /// Initialize with ``SEED_SIZE`` bytes from buffer.
+   PRNG(const string& seed);
 
    // For debugging
    void print_state() const;
@@ -84,7 +92,8 @@ class PRNG
    void ReSeed();
 
    // Agree securely on seed
-   void SeedGlobally(const PlayerBase& P);
+   void SeedGlobally(const PlayerBase& P,
+           const vector<bool>& parties = { });
 
    /**
     * Coordinate random seed
@@ -99,6 +108,8 @@ class PRNG
    void SetSeed(PRNG& G);
    void InitSeed();
    
+   bool is_initialized();
+
    /// Random bit
    bool get_bit();
    /// Random bytes
@@ -151,6 +162,9 @@ class PRNG
     * @param len byte length
     */
    void get_octets(octet* ans, int len);
+
+   // non-inlined version
+   void get_octets_call(octet* ans, int len);
 
    /**
     * Fill array with random data (compile-time length)
@@ -253,7 +267,7 @@ inline void PRNG::get_octets(octet* ans)
      cnt += L;
    }
    else
-     get_octets(ans, L);
+     get_octets_call(ans, L);
 }
 
 template<int N_BYTES>

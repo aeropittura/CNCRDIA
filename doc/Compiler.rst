@@ -37,7 +37,7 @@ Compiler.GC.types module
 		     input_tensor_via, dot_product, Matrix, Tensor,
 		     from_sint, read_from_file, receive_from_client,
 		     reveal_to_clients, write_shares_to_socket,
-		     write_to_file
+		     write_to_file, sbitint, sbitfix
 
 Compiler.library module
 -----------------------
@@ -73,7 +73,7 @@ Compiler.ml module
 .. automodule:: Compiler.ml
    :members:
    :no-undoc-members:
-   :exclude-members: Tensor
+   :exclude-members: Tensor, my_squant
    :show-inheritance:
    :inherited-members:
 .. autofunction:: approx_sigmoid
@@ -108,13 +108,13 @@ Compiler.oram module
    :exclude-members: AbstractORAM, AtLeastOneRecursionIndexStructure,
 		     AtLeastOneRecursionPackedORAMWithEmpty, BaseORAM,
 		     BaseORAMIndexStructure, EmptyException, Entry,
-		     LinearORAM, LinearPackedORAM,
+		     LinearPackedORAM,
 		     LinearPackedORAMWithEmpty, List,
 		     LocalIndexStructure, LocalPackedIndexStructure,
 		     LocalPackedORAM, OneLevelORAM, OptimalPackedORAM,
 		     OptimalPackedORAMWithEmpty,
 		     PackedIndexStructure, PackedORAMWithEmpty, RAM,
-		     RecursiveIndexStructure, RecursiveORAM,
+		     RecursiveIndexStructure,
 		     RefBucket, RefRAM, RefTrivialORAM, TreeORAM,
 		     TrivialIndexORAM, TrivialORAM,
 		     TrivialORAMIndexStructure, ValueTuple, demux,

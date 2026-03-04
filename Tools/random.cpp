@@ -5,6 +5,8 @@
 #include "Math/Z2k.hpp"
 #include "Math/gfp.h"
 #include "Tools/Subroutines.h"
+#include "Tools/benchmarking.h"
+
 #include <stdio.h>
 #include <sodium.h>
 
@@ -27,16 +29,28 @@ PRNG::PRNG(octetStream& seed) : PRNG()
   SetSeed(seed.consume(SEED_SIZE));
 }
 
+PRNG::PRNG(const string& seed) : PRNG()
+{
+  octetStream os(seed);
+  SetSeed(os.consume(SEED_SIZE));
+}
+
 void PRNG::ReSeed()
 {
-  randombytes_buf(seed, SEED_SIZE);
+  if (OnlineOptions::singleton.has_option("zero_seed"))
+    {
+      memset(seed, 0, SEED_SIZE);
+      insecure("zero seed", false);
+    }
+  else
+      randombytes_buf(seed, SEED_SIZE);
   InitSeed();
 }
 
-void PRNG::SeedGlobally(const PlayerBase& P)
+void PRNG::SeedGlobally(const PlayerBase& P, const vector<bool>& parties)
 {
   octet seed[SEED_SIZE];
-  Create_Random_Seed(seed, P, SEED_SIZE);
+  Create_Random_Seed(seed, P, SEED_SIZE, parties);
   SetSeed(seed);
 }
 
@@ -49,7 +63,7 @@ void PRNG::SeedGlobally(const Player& P, bool secure)
       octetStream os;
       if (P.my_num() == 0)
         {
-          randombytes_buf(seed, SEED_SIZE);
+          ReSeed();
           os.append(seed, SEED_SIZE);
           P.send_all(os);
         }
@@ -57,8 +71,8 @@ void PRNG::SeedGlobally(const Player& P, bool secure)
         {
           P.receive_player(0, os);
           os.consume(seed, SEED_SIZE);
+          InitSeed();
         }
-      InitSeed();
     }
 }
 
@@ -84,12 +98,12 @@ void PRNG::InitSeed()
      else
         { aes_schedule(KeySchedule,seed); }
      memset(state,0,RAND_SIZE*sizeof(octet));
-     for (int i = 0; i < PIPELINES; i++)
+     for (int i = 0; i < PIPELINES * N_CACHE; i++)
          state[i*AES_BLK_SIZE] = i;
   #else
      memcpy(state,seed,SEED_SIZE*sizeof(octet));
   #endif
-  hash();
+  cnt = RAND_SIZE;
   //cout << "SetSeed : "; print_state(); cout << endl;
 }
 
@@ -97,21 +111,25 @@ void PRNG::InitSeed()
 void PRNG::print_state() const
 {
   unsigned i;
+  cout << "seed: ";
   for (i=0; i<SEED_SIZE; i++)
     { if (seed[i]<10){ cout << "0"; }
       cout << hex << (int) seed[i]; 
     }
-  cout << "\t";
+  cout << endl;
+  cout << "randomness: ";
   for (i=0; i<RAND_SIZE; i++)
     { if (random[i]<10) { cout << "0"; }
       cout << hex << (int) random[i]; 
     }
-  cout << "\t";
+  cout << endl;
+  cout << "state: ";
   for (i=0; i<RAND_SIZE; i++)
     { if (state[i]<10) { cout << "0"; }
       cout << hex << (int) state[i];
     }
-  cout << " " << dec << cnt << " : ";
+  cout << endl;
+  cout << "cnt: " << dec << cnt << endl;
 }
 
 
@@ -124,10 +142,15 @@ void PRNG::hash()
     memcpy(random, tmp, RAND_SIZE);
     memcpy(seed, tmp + RAND_SIZE, SEED_SIZE);
   #else
-    if (useC)
-       { software_ecb_aes_128_encrypt<PIPELINES>((__m128i*)random,(__m128i*)state,KeyScheduleC); }
-    else
-       { ecb_aes_128_encrypt<PIPELINES>((__m128i*)random,(__m128i*)state,KeySchedule); }
+    for (int i = 0; i < N_CACHE; i++)
+      if (useC)
+        software_ecb_aes_128_encrypt<PIPELINES>(
+            (__m128i*) (random + i * CALL_SIZE),
+            (__m128i*) (state + i * CALL_SIZE), KeyScheduleC);
+      else
+        ecb_aes_128_encrypt<PIPELINES>(
+            (__m128i*) (random + i * CALL_SIZE),
+            (__m128i*) (state + i * CALL_SIZE), KeySchedule);
   #endif
   // This is a new random value so we have not used any of it yet
   cnt=0;
@@ -137,15 +160,17 @@ void PRNG::hash()
 
 void PRNG::next()
 {
+  timer.start();
+  hash();
   // Increment state
-  for (int i = 0; i < PIPELINES; i++)
+  for (int i = 0; i < PIPELINES * N_CACHE; i++)
     {
       int64_t* s = (int64_t*)&state[i*AES_BLK_SIZE];
-      s[0] += PIPELINES;
+      s[0] += PIPELINES * N_CACHE;
       if (s[0] == 0)
           s[1]++;
     }
-  hash();
+  timer.stop();
 }
 
 
@@ -186,8 +211,8 @@ void PRNG::get_octetStream(octetStream& ans,int len)
   ans.resize(len);
   for (int i=0; i<len; i++)
     { ans.data[i]=get_uchar(); }
-  ans.len=len;
-  ans.ptr=0;
+  ans.set_length(len);
+  ans.reset_read_head();
 }
 
 
@@ -253,4 +278,14 @@ void PRNG::get(bigint& res, int n_bits, bool positive)
   if (not positive and (get_bit()))
     mpz_neg(res.get_mpz_t(), res.get_mpz_t());
   delete[] words;
+}
+
+void PRNG::get_octets_call(octet* ans, int len)
+{
+  get_octets(ans, len);
+}
+
+bool PRNG::is_initialized()
+{
+  return initialized;
 }

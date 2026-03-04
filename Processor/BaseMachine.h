@@ -22,10 +22,15 @@ void print_usage(ostream& o, const char* name, size_t capacity);
 
 class BaseMachine
 {
+    friend class Program;
+    template<class sint, class sgf2n> friend class thread_info;
+
 protected:
     static BaseMachine* singleton;
 
     static thread_local OnDemandOTTripleSetup ot_setup;
+
+    static thread_local const Program* program;
 
     std::map<int,TimerWithComm> timer;
 
@@ -33,11 +38,17 @@ protected:
     string domain;
     string relevant_opts;
     string security;
+    string gf2n;
+    string expected_communication;
+
+    NamedCommStats one_off_comm;
 
     virtual size_t load_program(const string& threadname,
             const string& filename);
 
     static BaseMachine get_basics(string progname);
+
+    static DataPositions get_offline_data_used();
 
 public:
     static thread_local int thread_num;
@@ -52,6 +63,9 @@ public:
 
     vector<Program> progs;
 
+    bool nan_warning;
+    int mini_warning;
+
     static BaseMachine& s();
     static bool has_singleton() { return singleton != 0; }
     static bool has_program();
@@ -61,11 +75,13 @@ public:
     static string get_domain(string progname);
     static int ring_size_from_schedule(string progname);
     static int prime_length_from_schedule(string progname);
+    static int gf2n_length_from_schedule(string progname);
     static bigint prime_from_schedule(string progname);
     static int security_from_schedule(string progname);
 
     template<class T>
-    static int batch_size(Dtype type, int buffer_size = 0, int fallback = 0);
+    static int batch_size(Dtype type, int buffer_size = 0, int fallback = 0,
+            int factor = 0);
     template<class T>
     static int input_batch_size(int player, int buffer_size = 0);
     template<class T>
@@ -75,6 +91,10 @@ public:
     static int bucket_size(size_t usage);
     static int matrix_batch_size(int n_rows, int n_inner, int n_cols);
     static int matrix_requirement(int n_rows, int n_inner, int n_cols);
+
+    static bool allow_mulm();
+
+    static void add_one_off(const NamedCommStats& comm);
 
     BaseMachine();
     virtual ~BaseMachine() {}
@@ -100,6 +120,8 @@ public:
     void print_comm(Player& P, const NamedCommStats& stats);
 
     virtual const Names& get_N() { throw not_implemented(); }
+
+    virtual void gap_warning(int) { throw not_implemented(); }
 };
 
 inline OTTripleSetup BaseMachine::fresh_ot_setup(Player& P)
@@ -108,7 +130,8 @@ inline OTTripleSetup BaseMachine::fresh_ot_setup(Player& P)
 }
 
 template<class T>
-int BaseMachine::batch_size(Dtype type, int buffer_size, int fallback)
+int BaseMachine::batch_size(Dtype type, int buffer_size, int fallback,
+        int factor)
 {
     if (OnlineOptions::singleton.has_option("debug_batch_size"))
         fprintf(stderr, "batch_size buffer_size=%d fallback=%d\n", buffer_size,
@@ -123,11 +146,12 @@ int BaseMachine::batch_size(Dtype type, int buffer_size, int fallback)
     else if (fallback > 0)
         n_opts = fallback;
     else
-        n_opts = OnlineOptions::singleton.batch_size * T::default_length;
+        n_opts = OnlineOptions::singleton.batch_size
+                * max(factor, T::default_length);
 
     if (buffer_size <= 0 and has_program())
     {
-        auto files = s().progs[0].get_offline_data_used().files;
+        auto files = get_offline_data_used().files;
         auto usage = files[T::clear::field_type()];
 
         if (type == DATA_DABIT and T::LivePrep::bits_from_dabits())
@@ -170,9 +194,17 @@ int BaseMachine::batch_size(Dtype type, int buffer_size, int fallback)
         res = n_opts;
 
     if (OnlineOptions::singleton.has_option("debug_batch_size"))
+    {
         cerr << DataPositions::dtype_names[type] << " " << T::type_string()
                 << " res=" << res << " n=" << n << " n_opts=" << n_opts
-                << " buffer_size=" << buffer_size << endl;
+                << " buffer_size=" << buffer_size << " bits/dabits="
+                << T::LivePrep::bits_from_dabits() << "/"
+                << T::LivePrep::dabits_from_bits() << " has_program="
+                << has_program();
+        if (program)
+            cerr << " program=" << program->get_name();
+        cerr << endl;
+    }
 
     assert(res > 0);
     return res;
@@ -187,7 +219,7 @@ int BaseMachine::input_batch_size(int player, int buffer_size)
     if (has_program())
     {
         auto res =
-                s().progs[0].get_offline_data_used(
+                get_offline_data_used(
                         ).inputs[player][T::clear::field_type()];
         if (res > 0)
             return res;
@@ -210,7 +242,7 @@ int BaseMachine::edabit_batch_size(int n_bits, int buffer_size)
 
     if (has_program())
     {
-        n = s().progs[0].get_offline_data_used().total_edabits(n_bits);
+        n = get_offline_data_used().total_edabits(n_bits);
     }
 
     if (n > 0 and not (buffer_size > 0))

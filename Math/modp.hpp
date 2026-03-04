@@ -281,7 +281,9 @@ void Inv(modp_<L>& ans,const modp_<L>& x,const Zp_Data& ZpD)
   mpn_copyi(yy,ZpD.prA,ZpD.t);
   mpn_gcdext(g,ans.x,&sz,xx,ZpD.t,yy,ZpD.t);
   if (sz<0)
-    { mpn_sub(ans.x,ZpD.prA,ZpD.t,ans.x,-sz); 
+    {
+      assert(-sz <= L);
+      mpn_sub(ans.x,ZpD.prA,ZpD.t,ans.x,-sz);
       sz=-sz;
     }
   else
@@ -291,7 +293,6 @@ void Inv(modp_<L>& ans,const modp_<L>& x,const Zp_Data& ZpD)
 }
 
 
-// XXXX This is a crap version. Hopefully this is not time critical
 template<int L>
 void Power(modp_<L>& ans,const modp_<L>& x,int exp,const Zp_Data& ZpD)
 {
@@ -308,7 +309,6 @@ void Power(modp_<L>& ans,const modp_<L>& x,int exp,const Zp_Data& ZpD)
 }
 
 
-// XXXX This is a crap version. Hopefully this is not time critical
 template<int L>
 void Power(modp_<L>& ans,const modp_<L>& x,const bigint& exp,const Zp_Data& ZpD)
 {
@@ -332,7 +332,7 @@ void modp_<L>::output(ostream& s, const Zp_Data& ZpD, bool human, bool signed_) 
   if (human)
     { bigint te;
       to_bigint(te, ZpD);
-      if (te < ZpD.pr / 2 or not signed_)
+      if (te <= ZpD.pr_half or not signed_)
           s << te;
       else
           s << (te - ZpD.pr);

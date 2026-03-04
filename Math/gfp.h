@@ -36,8 +36,8 @@ template<class T> void generate_prime_setup(string, int, int);
 #define GFP_MOD_SZ 2
 #endif
 
-#if GFP_MOD_SZ > MAX_MOD_SZ
-#error GFP_MOD_SZ must be at most MAX_MOD_SZ
+#if 2 * GFP_MOD_SZ > MAX_MOD_SZ
+#error 2 * GFP_MOD_SZ must be at most MAX_MOD_SZ
 #endif
 
 /**
@@ -105,15 +105,14 @@ class gfp_ : public ValueInterface
   static void write_setup(int nplayers)
     { write_setup(get_prep_sub_dir<T>(nplayers)); }
   static void write_setup(string dir)
-    { write_online_setup(dir, pr()); }
+    { ZpD.write_setup(dir); }
   static void check_setup(string dir);
-  static string fake_opts() { return " -P " + to_string(pr()); }
+  static string fake_opts() { return ZpD.fake_opts(); }
 
   /**
    * Get the prime modulus
    */
-  static const bigint& pr()
-    { return ZpD.pr; }
+  static const bigint& pr(bool allow_zero = false);
   static int t()
     { return L;  }
   static Zp_Data& get_ZpD()
@@ -178,6 +177,8 @@ class gfp_ : public ValueInterface
   template<int K>
   gfp_(const SignedZ2<K>& other);
 
+  gfp_(PRNG& G);
+
   void zero_overhang();
   void check();
 
@@ -203,6 +204,7 @@ class gfp_ : public ValueInterface
   gfp_ operator+(const gfp_& x) const { gfp_ res; res.add(*this, x); return res; }
   gfp_ operator-(const gfp_& x) const { gfp_ res; res.sub(*this, x); return res; }
   gfp_ operator*(const gfp_& x) const { gfp_ res; res.mul(*this, x); return res; }
+  gfp_ operator*(int x) const { gfp_ res; res.mul(*this, x); return res; }
   gfp_ operator/(const gfp_& x) const { return *this * x.invert(); }
   gfp_& operator+=(const gfp_& x) { add(*this, x); return *this; }
   gfp_& operator-=(const gfp_& x) { sub(*this, x); return *this; }
@@ -213,6 +215,8 @@ class gfp_ : public ValueInterface
   gfp_ invert() const;
   void negate() 
     { Negate(a,a,ZpD); }
+
+  bool msb() const { throw runtime_error("msb not available"); }
 
   /**
    * Deterministic square root.
@@ -270,6 +274,9 @@ class gfp_ : public ValueInterface
   gfp_ operator>>(int i) const;
   gfp_ operator<<(const gfp_& i) const;
   gfp_ operator>>(const gfp_& i) const;
+
+  gfp_ signed_rshift(int i) const;
+  gfp_ cheap_lshift(unsigned i) const { return *this << i; }
 
   gfp_& operator&=(const gfp_& x) { *this = *this & x; return *this; }
   gfp_& operator<<=(int i) { *this << i; return *this; }
@@ -349,6 +356,12 @@ gfp_<X, L>::gfp_(const SignedZ2<K>& other)
     *this = bigint::tmp = other;
   else
     a.convert(abs(other).get(), other.size_in_limbs(), ZpD, other.negative());
+}
+
+template<int X, int L>
+gfp_<X, L>::gfp_(PRNG& G) : gfp_()
+{
+  randomize(G);
 }
 
 template <int X, int L>

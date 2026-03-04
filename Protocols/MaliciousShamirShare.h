@@ -54,13 +54,17 @@ public:
         return "M" + super::type_short();
     }
 
+    static string alt()
+    {
+        return "";
+    }
+
     MaliciousShamirShare()
     {
     }
     template<class U>
-    MaliciousShamirShare(const U& other, int my_num = 0, T alphai = {}) : super(other)
+    MaliciousShamirShare(const U& other) : super(other)
     {
-        (void) my_num, (void) alphai;
     }
 };
 

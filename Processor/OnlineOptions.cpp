@@ -9,10 +9,12 @@
 #include "Math/gfpvar.h"
 #include "Protocols/HemiOptions.h"
 #include "Protocols/config.h"
+#include "FHEOffline/config.h"
 
 #include "Math/gfp.hpp"
 
 #include <boost/filesystem.hpp>
+#include <regex>
 
 using namespace std;
 
@@ -23,6 +25,7 @@ OnlineOptions::OnlineOptions() : playerno(-1)
 {
     interactive = false;
     lgp = gfp0::MAX_N_BITS;
+    lg2 = 0;
     live_prep = true;
     batch_size = 1000;
     memtype = "empty";
@@ -38,6 +41,9 @@ OnlineOptions::OnlineOptions() : playerno(-1)
     opening_sum = 0;
     max_broadcast = 0;
     receive_threads = false;
+    code_locations = false;
+    have_warned_about_comp_sec = false;
+    semi_honest = false;
 #ifdef VERBOSE
     verbose = true;
 #else
@@ -123,6 +129,14 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
             "-o", // Flag token.
             "--options" // Flag token.
     );
+    opt.add(
+            "", // Default.
+            0, // Required?
+            0, // Number of args expected.
+            ',', // Delimiter if expecting multiple args.
+            "Output code locations of the most relevant protocols used", // Help description.
+            "--code-locations" // Flag token.
+    );
 
     if (security)
         opt.add(
@@ -130,7 +144,7 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
             0, // Required?
             1, // Number of args expected.
             0, // Delimiter if expecting multiple args.
-            ("Statistical ecurity parameter (default: " + to_string(security_parameter)
+            ("Statistical security parameter (default: " + to_string(security_parameter)
                     + ")").c_str(), // Help description.
             "-S", // Flag token.
             "--security" // Flag token.
@@ -151,6 +165,12 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
 
     opt.get("--options")->getStrings(options);
 
+    for (auto& option : options)
+        if (option.find("verbose") == 0)
+            verbose = true;
+
+    code_locations = opt.isSet("--code-locations");
+
 #ifdef THROW_EXCEPTIONS
     options.push_back("throw_exceptions");
 #endif
@@ -164,6 +184,8 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
             exit(1);
         }
     }
+    else
+        security_parameter = 1000;
 
     opt.resetArgs();
 
@@ -417,6 +439,23 @@ void OnlineOptions::finalize_with_error(ez::ezOptionParser& opt)
             lgp = prog_lgp;
     }
 
+    if (opt.get("--lg2"))
+        opt.get("--lg2")->getInt(lg2);
+
+    int prog_lg2 = BaseMachine::gf2n_length_from_schedule(progname);
+    if (prog_lg2)
+    {
+        if (prog_lg2 != lg2 and opt.isSet("lg2"))
+        {
+            cerr << "GF(2^n) mismatch between command line and program" << endl;
+            exit(1);
+        }
+
+        if (verbose)
+            cerr << "Using GF(2^" << prog_lg2 << ") as requested by program" << endl;
+        lg2 = prog_lg2;
+    }
+
     set_trunc_error(opt);
 
     auto o = opt.get("--opening-sum");
@@ -432,6 +471,7 @@ void OnlineOptions::finalize_with_error(ez::ezOptionParser& opt)
         o->getString(disk_memory);
 
     receive_threads = opt.isSet("--threads");
+    semi_honest = opt.isSet("--semi-honest");
 
     if (use_security_parameter)
     {
@@ -457,9 +497,8 @@ void OnlineOptions::set_trunc_error(ez::ezOptionParser& opt)
     if (opt.get("-E"))
     {
         opt.get("-E")->getInt(trunc_error);
-#ifdef VERBOSE
-        cerr << "Truncation error probability 2^-" << trunc_error << endl;
-#endif
+        if (verbose)
+            cerr << "Truncation error probability 2^-" << trunc_error << endl;
     }
 }
 
@@ -474,4 +513,36 @@ int OnlineOptions::prime_length()
 int OnlineOptions::prime_limbs()
 {
     return DIV_CEIL(prime_length(), 64);
+}
+
+bool OnlineOptions::has_param(const string& param)
+{
+    for (auto& x : options)
+        if (x.find(param + "=") == 0)
+            return true;
+    return false;
+}
+
+int OnlineOptions::get_param(const string& param)
+{
+    basic_regex re(param + "=([0-9]+)");
+    smatch match;
+    for (auto& x : options)
+        if (regex_match(x, match, re))
+            return atoi(match[1].str().c_str());
+    throw runtime_error("parameter not found: " + param);
+}
+
+int OnlineOptions::comp_sec()
+{
+    int res = COMP_SEC;
+    if (has_param("comp_sec"))
+        res = get_param("comp_sec");
+    if (res < 128 and not have_warned_about_comp_sec)
+    {
+        cerr << "WARNING: computational security parameter " << res
+                << " suitable for testing only" << endl;
+        have_warned_about_comp_sec = true;
+    }
+    return res;
 }

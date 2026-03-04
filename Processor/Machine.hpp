@@ -53,8 +53,9 @@ void Machine<sint, sgf2n>::init_binary_domains(int security_parameter, int lg2)
 
 template<class sint, class sgf2n>
 Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
-    const OnlineOptions opts, int lg2)
+    const OnlineOptions opts)
   : my_number(playerNames.my_num()), N(playerNames),
+    max_trunc_size(0),
     use_encryption(use_encryption), live_prep(opts.live_prep), opts(opts),
     external_clients(my_number)
 {
@@ -81,7 +82,7 @@ Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
   if (opts.prime)
     sint::clear::init_field(opts.prime);
 
-  init_binary_domains(opts.security_parameter, lg2);
+  init_binary_domains(opts.security_parameter, opts.lg2);
 
   // make directory for outputs if necessary
   mkdir_p(PREP_DIR);
@@ -132,16 +133,19 @@ Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
   auto memtype = opts.memtype;
   if (memtype.compare("old")==0)
      {
-       ifstream inpf;
-       inpf.open(memory_filename(), ios::in | ios::binary);
-       if (inpf.fail()) { throw file_error(memory_filename()); }
-       inpf >> M2 >> Mp >> Mi;
-       if (inpf.get() != 'M')
+       if (sint::real_shares(*P))
          {
-           cerr << "Invalid memory file. Run with '-m empty'." << endl;
-           exit(1);
+           ifstream inpf;
+           inpf.open(memory_filename(), ios::in | ios::binary);
+           if (inpf.fail()) { throw file_error(memory_filename()); }
+           inpf >> M2 >> Mp >> Mi;
+           if (inpf.get() != 'M')
+           {
+               cerr << "Invalid memory file. Run with '-m empty'." << endl;
+               exit(1);
+           }
+           inpf.close();
          }
-       inpf.close();
      }
   else if (!(memtype.compare("empty")==0))
      { cerr << "Invalid memory argument" << endl;
@@ -177,9 +181,9 @@ void Machine<sint, sgf2n>::prepare(const string& progname_str)
 
   /* Set up the threads */
   tinfo.resize(nthreads);
-  threads.resize(nthreads);
   queues.resize(nthreads);
   join_timer.resize(nthreads);
+  assert(threads.size() == size_t(old_n_threads));
 
   for (int i = old_n_threads; i < nthreads; i++)
     {
@@ -191,8 +195,17 @@ void Machine<sint, sgf2n>::prepare(const string& progname_str)
       tinfo[i].alphapi=&alphapi;
       tinfo[i].alpha2i=&alpha2i;
       tinfo[i].machine=this;
-      pthread_create(&threads[i],NULL,thread_info<sint, sgf2n>::Main_Func,&tinfo[i]);
+      pthread_t thread;
+      int res = pthread_create(&thread, NULL,
+          thread_info<sint, sgf2n>::Main_Func, &tinfo[i]);
+
+      if (res == 0)
+        threads.push_back(thread);
+      else
+        throw runtime_error("cannot start thread");
     }
+
+  assert(queues.size() == threads.size());
 
   // synchronize with clients before starting timer
   for (int i=old_n_threads; i<nthreads; i++)
@@ -415,8 +428,16 @@ void Machine<sint, sgf2n>::run_function(const string& name,
   result.check_type(return_type);
 
   vector<int> arg_regs(arguments.size());
-  for (auto& arg_reg : arg_regs)
-    file >> arg_reg;
+  vector<int> address_regs(arguments.size());
+  for (size_t i = 0; i < arguments.size(); i++)
+    {
+      file >> arg_regs.at(i);
+      if (arguments[i].get_memory())
+        file >> address_regs.at(i);
+    }
+
+  if (not file.good())
+    throw runtime_error("error reading file for function " + name);
 
   prepare(progname);
   auto& processor = *tinfo.at(0).processor;
@@ -447,6 +468,8 @@ void Machine<sint, sgf2n>::run_function(const string& name,
             assert(arguments[i].has_reg_type("ci"));
             processor.write_Ci(arg_regs.at(i) + j, arguments[i].get_value<long>(j));
           }
+        if (arguments[i].get_memory())
+          processor.write_Ci(address_regs.at(i), arg_regs.at(i));
       }
 
   run_tape(0, tape_number, 0, N.num_players());
@@ -476,11 +499,16 @@ void Machine<sint, sgf2n>::run_function(const string& name,
 template<class sint, class sgf2n>
 pair<DataPositions, NamedCommStats> Machine<sint, sgf2n>::stop_threads()
 {
+  // only stop actually running threads
+  nthreads = threads.size();
+
   // Tell all C-threads to stop
   for (int i=0; i<nthreads; i++)
     {
       //printf("Send kill signal to client\n");
-      queues[i]->schedule(-1);
+      auto queue = queues.at(i);
+      assert(queue);
+      queue->schedule(-1);
     }
 
   // sum actual usage
@@ -498,6 +526,7 @@ pair<DataPositions, NamedCommStats> Machine<sint, sgf2n>::stop_threads()
     }
 
   auto comm_stats = total_comm();
+  max_comm = queues.max_comm();
 
   if (OnlineOptions::singleton.verbose)
     {
@@ -509,9 +538,11 @@ pair<DataPositions, NamedCommStats> Machine<sint, sgf2n>::stop_threads()
     }
 
   for (auto& queue : queues)
-    delete queue;
+    if (queue)
+      delete queue;
 
   queues.clear();
+  threads.clear();
 
   nthreads = 0;
 
@@ -522,6 +553,12 @@ template<class sint, class sgf2n>
 void Machine<sint, sgf2n>::run(const string& progname)
 {
   prepare(progname);
+
+  if (opts.verbose and setup_timer.is_running())
+    {
+      cerr << "Setup took " << setup_timer.elapsed() << " seconds." << endl;
+      setup_timer.stop();
+    }
 
   Timer proc_timer(CLOCK_PROCESS_CPUTIME_ID);
   proc_timer.start();
@@ -564,13 +601,19 @@ void Machine<sint, sgf2n>::run(const string& progname)
     {
       cerr << "Communication details";
       if (multithread)
-        cerr << " (rounds in parallel threads counted double)";
+        cerr << " (rounds and time in parallel threads counted double)";
       cerr << ":" << endl;
-      comm_stats.print();
+      comm_stats.print(false, max_comm);
       cerr << "CPU time = " <<  proc_timer.elapsed();
       if (multithread)
         cerr << " (overall core time)";
       cerr << endl;
+      auto& P = *this->P;
+      auto one_off = TreeSum<Z2<64>>().run(
+          this->one_off_comm.sent, P).get_limb(0);
+      if (one_off)
+        cerr << "One-off global communication: " << one_off * 1e-6 << " MB"
+            << endl;
     }
 
   print_timers();
@@ -590,7 +633,8 @@ void Machine<sint, sgf2n>::run(const string& progname)
     cerr << "Full broadcast" << endl;
 #endif
 
-  if (not OnlineOptions::singleton.has_option("output_full_memory"))
+  if (not OnlineOptions::singleton.has_option("output_full_memory")
+      and OnlineOptions::singleton.disk_memory.empty())
     {
       // Reduce memory size to speed up
       unsigned max_size = 1 << 20;
@@ -600,17 +644,25 @@ void Machine<sint, sgf2n>::run(const string& progname)
         Mp.resize_s(max_size);
     }
 
-  // Write out the memory to use next time
-  ofstream outf(memory_filename(), ios::out | ios::binary);
-  outf << M2 << Mp << Mi;
-  outf << 'M';
-  outf.close();
+  if (sint::real_shares(*P) and not opts.has_option("no_memory_output"))
+    {
+      RunningTimer timer;
+      // Write out the memory to use next time
+      ofstream outf(memory_filename(), ios::out | ios::binary);
+      outf << M2 << Mp << Mi;
+      outf << 'M';
+      outf.close();
 
-  bit_memories.write_memory(N.my_num());
+      bit_memories.write_memory(N.my_num());
+
+      if (opts.has_option("time_memory_output"))
+        cerr << "Writing memory to disk took " << timer.elapsed() << " seconds"
+            << endl;
+    }
 
   if (opts.verbose)
     {
-      cerr << "Actual cost of program:" << endl;
+      cerr << "Actual preprocessing cost of program:" << endl;
       pos.print_cost();
     }
 
@@ -638,6 +690,19 @@ void Machine<sint, sgf2n>::run(const string& progname)
       if (alt.size())
         cerr << "This protocol doesn't scale well with the number of parties, "
             << "have you considered using " << alt << " instead?" << endl;
+    }
+
+  if ((nan_warning or mini_warning) and sint::real_shares(*P))
+    {
+      if (nan_warning)
+        cerr << "Outputs of 'NaN' might be related to exceeding the sfix range. ";
+      if (mini_warning)
+        cerr << pow(2, mini_warning) << " is the smallest non-zero number "
+            << "in a used fixed-point representation. ";
+      cerr << "See https://mp-spdz.readthedocs.io/en/latest/Compiler.html#Compiler.types.sfix";
+      cerr << " for details" << endl;
+      nan_warning = false;
+      mini_warning = 0;
     }
 
 #ifdef VERBOSE
@@ -690,6 +755,10 @@ void Machine<sint, sgf2n>::suggest_optimizations()
     cerr << "This program might benefit from some protocol options." << endl
         << "Consider adding the following at the beginning of your code:"
         << endl << optimizations;
+  if (sint::clear::n_bits() < max_trunc_size)
+    cerr << "The computation domain is too small "
+        << "for low-round truncation; it would need to have at least "
+        << max_trunc_size << " bits." << endl;
 #ifndef __clang__
   cerr << "This virtual machine was compiled with GCC. Recompile with "
       "'CXX = clang++' in 'CONFIG.mine' for optimal performance." << endl;
@@ -713,6 +782,17 @@ void Machine<sint, sgf2n>::check_program()
   {
     throw runtime_error("program differs between parties");
   }
+}
+
+template<class sint, class sgf2n>
+void Machine<sint, sgf2n>::gap_warning(int k)
+{
+  if (k > max_trunc_size)
+    {
+      warn_lock.lock();
+      max_trunc_size = max(k, max_trunc_size);
+      warn_lock.unlock();
+    }
 }
 
 #endif

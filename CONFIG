@@ -57,9 +57,7 @@ endif
 
 ifeq ($(OS), Linux)
 ifeq ($(ARM), 1)
-ifeq ($(shell cat /proc/cpuinfo | grep -q aes; echo $$?), 0)
-ARCH = -march=armv8.2-a+crypto
-endif
+ARCH = -mcpu=native
 endif
 endif
 
@@ -90,7 +88,7 @@ endif
 LDLIBS = -lgmpxx -lgmp -lsodium $(MY_LDLIBS)
 LDLIBS += $(BREW_LDLIBS)
 LDLIBS +=  -Wl,-rpath -Wl,$(CURDIR)/local/lib -L$(CURDIR)/local/lib
-LDLIBS += -lboost_system -lssl -lcrypto
+LDLIBS += -lssl -lcrypto
 LDLIBS += -lboost_filesystem -lboost_iostreams
 
 CFLAGS += -I./local/include
@@ -102,6 +100,7 @@ endif
 
 ifeq ($(OS), Linux)
 LDLIBS += -lrt
+LDLIBS += -z noexecstack
 endif
 
 BOOST = -lboost_thread $(MY_BOOST)

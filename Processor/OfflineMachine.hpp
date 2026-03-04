@@ -43,9 +43,12 @@ template<class W>
 template<class T, class U>
 int OfflineMachine<W>::run()
 {
-    T::clear::init_default(this->online_opts.prime_length());
+    if (this->online_opts.prime)
+        T::clear::init_field(this->online_opts.prime);
+    else
+        T::clear::init_default(this->online_opts.prime_length());
     Machine<T, U>::init_binary_domains(this->online_opts.security_parameter,
-            this->lg2);
+            this->get_lg2());
     auto binary_mac_key = read_generate_write_mac_key<
             typename T::bit_type::part_type>(P);
     typename T::bit_type::LivePrep bit_prep(usage);

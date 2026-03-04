@@ -14,6 +14,11 @@ TimerWithComm::TimerWithComm(const Timer& other) :
 {
 }
 
+TimerWithComm::TimerWithComm(double time) :
+        Timer(time)
+{
+}
+
 void TimerWithComm::start(const NamedCommStats& stats)
 {
     Timer::start();
@@ -24,6 +29,11 @@ void TimerWithComm::stop(const NamedCommStats& stats)
 {
     Timer::stop();
     total_stats += stats - last_stats;
+}
+
+size_t TimerWithComm::bytes_sent() const
+{
+    return total_stats.sent;
 }
 
 double TimerWithComm::mb_sent() const

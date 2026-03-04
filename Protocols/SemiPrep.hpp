@@ -23,9 +23,10 @@ SemiPrep<T>::SemiPrep(SubProcessor<T>* proc, DataPositions& usage) :
 template<class T>
 void SemiPrep<T>::buffer_triples()
 {
+    CODE_LOCATION
     assert(this->triple_generator);
     this->triple_generator->set_batch_size(
-            BaseMachine::batch_size<T>(DATA_TRIPLE));
+            BaseMachine::batch_size<T>(DATA_TRIPLE, this->buffer_size));
     this->triple_generator->generatePlainTriples();
     this->triple_generator->set_batch_size(OnlineOptions::singleton.batch_size);
     for (auto& x : this->triple_generator->plainTriples)
@@ -47,9 +48,10 @@ void SemiPrep<T>::buffer_dabits(ThreadQueues* queues)
 {
     if (bits_from_dabits())
     {
+        CODE_LOCATION
         assert(this->triple_generator);
         this->triple_generator->set_batch_size(
-                BaseMachine::batch_size<T>(DATA_DABIT, this->buffer_size));
+                BaseMachine::batch_size<T>(DATA_DABIT, this->buffer_size, 0, 10));
         this->triple_generator->generatePlainBits();
         for (auto& x : this->triple_generator->plainBits)
             this->dabits.push_back({x.first, x.second});

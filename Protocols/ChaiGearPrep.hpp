@@ -63,6 +63,7 @@ void ChaiGearPrep<T>::basic_setup(Player& P)
 template<class T>
 void ChaiGearPrep<T>::key_setup(Player& P, mac_key_type alphai)
 {
+    CODE_LOCATION
     Timer timer;
     timer.start();
     assert(machine);
@@ -104,6 +105,7 @@ typename ChaiGearPrep<T>::Generator& ChaiGearPrep<T>::get_generator()
         if (machine == 0)
             basic_setup(P);
         key_setup(P, proc->MC.get_alphai());
+        BaseMachine::add_one_off(P.total_comm());
     }
     lock.unlock();
     if (generator == 0)
@@ -115,6 +117,7 @@ typename ChaiGearPrep<T>::Generator& ChaiGearPrep<T>::get_generator()
 template<class T>
 void ChaiGearPrep<T>::buffer_triples()
 {
+    CODE_LOCATION
     auto& generator = get_generator();
     generator.run(false);
     assert(generator.producer);
@@ -131,6 +134,7 @@ void ChaiGearPrep<T>::buffer_triples()
 template<class T>
 void ChaiGearPrep<T>::buffer_squares()
 {
+    CODE_LOCATION
     auto& generator = get_generator();
     assert(this->proc);
     auto& setup = machine->setup.part<FD>();
@@ -152,6 +156,7 @@ void ChaiGearPrep<T>::buffer_squares()
 template<class T>
 void ChaiGearPrep<T>::buffer_inputs(int player)
 {
+    CODE_LOCATION
     auto& generator = get_generator();
     assert(this->proc);
     if (not input_producer)

@@ -6,6 +6,7 @@
 #include "GC/square64.h"
 #include "SpecificPrivateOutput.h"
 #include "Conv2dTuple.h"
+#include "Protocols/Replicated.h"
 
 #include "Processor/ProcessorBase.hpp"
 #include "GC/Processor.hpp"
@@ -111,6 +112,9 @@ Processor<sint, sgf2n>::Processor(int thread_num,Player& P,
 
   secure_prng.ReSeed();
   shared_prng.SeedGlobally(P, false);
+  vector<IntBase<octet>> seed(shared_prng.get_seed(), shared_prng.get_seed() + SEED_SIZE);
+  Procp.protocol.forward_sync(seed);
+  shared_prng.SetSeed((octet*) seed.data());
 
   setup_redirection(P.my_num(), thread_num, opts, out, sint::real_shares(P));
   Procb.out = out;
@@ -192,10 +196,11 @@ void Processor<sint, sgf2n>::dabit(const Instruction& instruction)
   {
     Procb.S[instruction.get_r(1) + i] = {};
   }
+  auto a = Procp.get_S().iterator_for_size(instruction.get_r(0), size);
   for (int i = 0; i < size; i++)
   {
     typename sint::bit_type tmp;
-    Procp.DataF.get_dabit(Procp.get_S_ref(instruction.get_r(0) + i), tmp);
+    Procp.DataF.get_dabit(*a++, tmp);
     Procb.S[instruction.get_r(1) + i / unit] ^= tmp << (i % unit);
   }
 }
@@ -246,6 +251,12 @@ void Processor<sint, sgf2n>::split(const Instruction& instruction)
   assert(share_thread.protocol != 0);
   sint::split(Procb.S, instruction.get_start(), n_bits,
       &read_Sp(instruction.get_r(0)), n_inputs, *share_thread.protocol);
+}
+
+template<class sint, class sgf2n>
+void Processor<sint, sgf2n>::unsplit(const Instruction& instruction)
+{
+  Procp.protocol.unsplit(Procp.S, Procb.S, instruction);
 }
 
 
@@ -487,25 +498,25 @@ template<class T>
 void SubProcessor<T>::muls(const vector<int>& reg)
 {
     assert(reg.size() % 4 == 0);
-    int n = reg.size() / 4;
 
     SubProcessor<T>& proc = *this;
     protocol.init_mul();
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < reg[4 * i]; j++)
-        {
-            auto& x = proc.S[reg[4 * i + 2] + j];
-            auto& y = proc.S[reg[4 * i + 3] + j];
-            protocol.prepare_mul(x, y);
-        }
-    protocol.exchange();
-    for (int i = 0; i < n; i++)
+    for (auto it = reg.begin(); it < reg.end(); it += 4)
     {
-        for (int j = 0; j < reg[4 * i]; j++)
-        {
-            proc.S[reg[4 * i + 1] + j] = protocol.finalize_mul();
-        }
-        protocol.counter += reg[4 * i];
+        for (int j = 1; j < 4; j++)
+            assert(proc.S.begin() + *(it + j) <= proc.S.end());
+        auto x = proc.S.begin() + *(it + 2);
+        auto y = proc.S.begin() + *(it + 3);
+        for (int j = 0; j < *it; j++)
+            protocol.prepare_mul(*x++, *y++);
+    }
+    protocol.exchange();
+    for (auto it = reg.begin(); it < reg.end(); it += 4)
+    {
+        auto z = proc.S.begin() + *(it + 1);
+        for (int j = 0; j < *it; j++)
+            *z++ = protocol.finalize_mul();
+        protocol.counter += *it;
     }
 
     maybe_check();
@@ -627,9 +638,6 @@ void SubProcessor<T>::matmulsm(const MemoryPart<T>& source,
     int batchStartI = 0;
     int batchStartJ = 0;
 
-    size_t sourceSize = source.size();
-    const T* sourceData = source.data();
-
     protocol.init_dotprod();
     for (auto matmulArgs = start.begin(); matmulArgs < start.end(); matmulArgs += 12) {
         auto output = S.begin() + matmulArgs[0];
@@ -643,27 +651,54 @@ void SubProcessor<T>::matmulsm(const MemoryPart<T>& source,
 
         assert(output + resultNumberOfRows * resultNumberOfColumns <= S.end());
 
+        for (int j = 0; j < resultNumberOfColumns; j += 1) {
+            auto actualSecondFactorColumn =
+                    Proc->get_Ci().at(matmulArgs[9] + j).get();
+            auto secondBase = source.begin() + secondFactorBase
+                    + actualSecondFactorColumn;
+            for (auto &x : Range(Proc->get_Ci(), matmulArgs[8],
+                    usedNumberOfFirstFactorColumns))
+                assert(
+                        secondBase + x.get() * secondFactorTotalNumberOfColumns
+                                < source.end());
+        }
+
+        vector<long> second_factors;
+        second_factors.reserve(usedNumberOfFirstFactorColumns);
+
+        for (auto& x : Range(Proc->get_Ci(), matmulArgs[8],
+                usedNumberOfFirstFactorColumns))
+            second_factors.push_back(x.get() * secondFactorTotalNumberOfColumns);
+
         for (int i = 0; i < resultNumberOfRows; i += 1) {
             auto actualFirstFactorRow = Proc->get_Ci().at(matmulArgs[6] + i).get();
+            auto firstBase = source.begin() + firstFactorBase
+                    + actualFirstFactorRow * firstFactorTotalNumberOfColumns;
+
+            for (auto& x : Range(Proc->get_Ci(), matmulArgs[7],
+                    usedNumberOfFirstFactorColumns))
+                assert(firstBase + x.get() < source.end());
 
             for (int j = 0; j < resultNumberOfColumns; j += 1) {
                 auto actualSecondFactorColumn = Proc->get_Ci().at(matmulArgs[9] + j).get();
+                auto secondBase = source.begin() + secondFactorBase
+                        + actualSecondFactorColumn;
 
 #ifdef MATMULSM_DEBUG
                 cout << "Preparing " << i << "," << j << "(buffer size: " << protocol.get_buffer_size() << ")" << endl;
 #endif
 
-                for (int k = 0; k < usedNumberOfFirstFactorColumns; k += 1) {
-                    auto actualFirstFactorColumn = Proc->get_Ci().at(matmulArgs[7] + k).get();
-                    auto actualSecondFactorRow = Proc->get_Ci().at(matmulArgs[8] + k).get();
+                auto second_it = second_factors.begin();
 
-                    auto firstAddress = firstFactorBase + actualFirstFactorRow * firstFactorTotalNumberOfColumns + actualFirstFactorColumn;
-                    auto secondAddress = secondFactorBase + actualSecondFactorRow * secondFactorTotalNumberOfColumns + actualSecondFactorColumn;
+                for (auto& x : Range(Proc->get_Ci(), matmulArgs[7],
+                        usedNumberOfFirstFactorColumns))
+                {
+                    auto actualFirstFactorColumn = x.get();
 
-                    assert(firstAddress < sourceSize);
-                    assert(secondAddress < sourceSize);
+                    auto first = firstBase + actualFirstFactorColumn;
+                    auto second = secondBase + *second_it++;
 
-                    protocol.prepare_dotprod(sourceData[firstAddress], sourceData[secondAddress]);
+                    protocol.prepare_dotprod(*first, *second);
                 }
                 protocol.next_dotprod();
 
@@ -894,9 +929,19 @@ void Conv2dTuple::post(StackedVector<T>& S, typename T::Protocol& protocol)
 template<class T>
 void SubProcessor<T>::secure_shuffle(const Instruction& instruction)
 {
-    typename T::Protocol::Shuffler(S, instruction.get_size(),
-            instruction.get_n(), instruction.get_r(0), instruction.get_r(1),
-            *this);
+    size_t n = instruction.get_size();
+    size_t unit_size = instruction.get_n();
+    size_t output_base = instruction.get_r(0);
+    size_t input_base = instruction.get_r(1);
+
+    typename T::Protocol::Shuffler shuffler(*this);
+
+    typename T::Protocol::Shuffler::shuffle_type shuffle;
+    shuffler.generate(n / unit_size, shuffle);
+
+    vector<ShuffleTuple<T>> shuffles{ShuffleTuple<T>(n, output_base,
+            input_base, unit_size, shuffle, true)};
+    shuffler.apply_multiple(S, shuffles);
 
     maybe_check();
 }
@@ -905,7 +950,10 @@ template<class T>
 size_t SubProcessor<T>::generate_secure_shuffle(const Instruction& instruction,
     ShuffleStore& shuffle_store)
 {
-    return shuffler.generate(instruction.get_n(), shuffle_store);
+    size_t n = instruction.get_n();
+    auto res = shuffle_store.add(n);
+    shuffler.generate(n, shuffle_store.get(res).second);
+    return res;
 }
 
 template<class T>
@@ -915,21 +963,18 @@ void SubProcessor<T>::apply_shuffle(const Instruction& instruction,
     const auto& args = instruction.get_start();
 
     const auto n_shuffles = args.size() / 6;
-    vector<size_t> sizes(n_shuffles, 0);
-    vector<size_t> destinations(n_shuffles, 0);
-    vector<size_t> sources(n_shuffles, 0);
-    vector<size_t> unit_sizes(n_shuffles, 0);
-    vector<size_t> shuffles(n_shuffles, 0);
-    vector<bool> reverse(n_shuffles, false);
-    for (size_t i = 0; i < n_shuffles; i++) {
-        sizes[i] = args[6 * i];
-        destinations[i] = args[6 * i + 1];
-        sources[i] = args[6 * i + 2];
-        unit_sizes[i] = args[6 * i + 3];
-        shuffles[i] = Proc->read_Ci(args[6 * i + 4]);
-        reverse[i] = args[6 * i + 5];
+    vector<ShuffleTuple<T>> shuffles;
+
+    for (size_t i = 0; i < n_shuffles; i++)
+    {
+        shuffles.push_back(
+                ShuffleTuple<T>(args[6 * i], args[6 * i + 1], args[6 * i + 2],
+                        args[6 * i + 3],
+                        shuffle_store.get(Proc->read_Ci(args[6 * i + 4])),
+                        bool(args[6 * i + 5])));
     }
-    shuffler.apply_multiple(S, sizes, destinations, sources, unit_sizes, shuffles, reverse, shuffle_store);
+
+    shuffler.apply_multiple(S, shuffles);
 
     maybe_check();
 }
@@ -946,7 +991,7 @@ void SubProcessor<T>::input_personal(const vector<int>& args)
 {
   input.reset_all(P);
   for (size_t i = 0; i < args.size(); i += 4)
-    if (args[i + 1] == P.my_num())
+    if (input.is_me(args[i + 1]))
       {
         auto begin = C.begin() + args[i + 3];
         auto end = begin + args[i];
@@ -1047,8 +1092,14 @@ void Processor<sint, sgf2n>::fixinput(const Instruction& instruction)
         throw runtime_error("unknown format for fixed-point input");
       }
 
+      if (not sint::real_shares(P))
+        return;
+
       if (binary_input.fail())
-        throw IO_Error("failure reading from " + binary_input_filename);
+        throw IO_Error(
+            "Failure reading from " + binary_input_filename
+                + ". You might need to copy it "
+                + "from the location of compilation.");
 
       if (binary_input.peek() == EOF)
         throw IO_Error("not enough inputs in " + binary_input_filename);
@@ -1084,15 +1135,16 @@ void Processor<sint, sgf2n>::fixinput(const Instruction& instruction)
 }
 
 template<class sint, class sgf2n>
-long Processor<sint, sgf2n>::sync(long x) const
+long Processor<sint, sgf2n>::sync(long x)
 {
   vector<Integer> tmp = {x};
-  ::sync<sint>(tmp, P);
+  Procp.protocol.sync(tmp, P);
   return tmp[0].get();
 }
 
 template<class sint>
-void sync(vector<Integer>& x, Player& P)
+template<class U>
+void ProtocolBase<sint>::sync(vector<U>& x, Player& P)
 {
   if (not sint::symmetric)
     {
@@ -1164,6 +1216,15 @@ void Processor<sint, sgf2n>::call_tape(int tape_number, int arg,
   PC_stack.pop_back();
   this->arg = arg_stack.back();
   arg_stack.pop_back();
+}
+
+template<class sint, class sgf2n>
+TimerWithComm Processor<sint, sgf2n>::prep_time()
+{
+  auto res = DataF.total_time();
+  res += Procp.protocol.prep_time();
+  res += Proc2.protocol.prep_time();
+  return res;
 }
 
 #endif

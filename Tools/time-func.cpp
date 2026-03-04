@@ -1,6 +1,7 @@
 
 #include "Tools/time-func.h"
 #include "Tools/Exceptions.h"
+#include "Processor/OnlineOptions.h"
 
 #include <assert.h>
 
@@ -41,7 +42,7 @@ double convert_ns_to_seconds(long long x)
 }
 
 
-double Timer::elapsed()
+double Timer::elapsed() const
 {
   long long res = elapsed_time;
   if (running)
@@ -100,4 +101,17 @@ Timer Timer::operator +(const Timer& other) const
   Timer res = *this;
   res += other;
   return res;
+}
+
+bool Timer::operator <(const Timer& other) const
+{
+  return elapsed() < other.elapsed();
+}
+
+TimeScope::~TimeScope()
+{
+  if (OnlineOptions::singleton.has_option("verbose_comm_time"))
+    fprintf(stderr, "took %f seconds\n",
+	convert_ns_to_seconds(timer.elapsed_since_last_start()));
+  timer.stop();
 }
