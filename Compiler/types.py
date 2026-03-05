@@ -3245,7 +3245,10 @@ class sint(_secret, _int):
     def concat(cls, parts):
         parts = list(parts)
         res = cls(size=sum(len(part) for part in parts))
-        args = sum(([len(part), part] for part in parts), [])
+        args = []
+        for part in parts:
+            args.append(len(part))
+            args.append(part)
         concats(res, *args)
         return res
 
