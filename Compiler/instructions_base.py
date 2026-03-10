@@ -627,14 +627,12 @@ def cisc(function, n_outputs=1):
             tape.start_new_basicblock(name='pre-' + self.name())
             size = sum(call[0][0].vector_size() for call in self.calls)
             new_regs = []
-            for i, arg in enumerate(self.args):
+            for i, arg in enumerate(self.args[n_outputs:]):
+                i += n_outputs
                 try:
-                    if i < n_outputs:
-                        new_regs.append(arg.new_vector(size=size))
-                    else:
-                        new_regs.append(type(arg).concat(
-                            call[0][i] for call in self.calls))
-                        assert new_regs[-1].vector_size() == size
+                    new_regs.append(type(arg).concat(
+                        call[0][i] for call in self.calls))
+                    assert new_regs[-1].vector_size() == size
                 except (TypeError, AttributeError):
                     if not isinstance(arg, (int, type(None))):
                         raise
@@ -642,6 +640,34 @@ def cisc(function, n_outputs=1):
                 except:
                     print([call[0][0].vector_size() for call in self.calls])
                     raise
+            if size <= program.budget:
+                new_regs = self.expand_chunk(size, new_regs)
+            else:
+                all_outputs = []
+                for base in range(0, size, program.budget):
+                    chunk_size = min(program.budget, size - base)
+                    chunk_regs = []
+                    for arg in new_regs:
+                        if isinstance(arg, (int, type(None))):
+                            chunk_regs.append(None)
+                        else:
+                            chunk_regs.append(
+                                arg.get_vector(base=base, size=chunk_size))
+                    outputs = self.expand_chunk(chunk_size, chunk_regs)
+                    all_outputs.append(outputs)
+                new_regs = [output[0].concat(output) for output in zip(*all_outputs)]
+            base = 0
+            for call in self.calls:
+                for i in range(n_outputs):
+                    reg = call[0][i]
+                    reg.copy_from_part(new_regs[i], base, reg.vector_size())
+                base += reg.vector_size()
+            tape.start_new_basicblock(name='post-' + self.name())
+
+        def expand_chunk(self, size, new_regs):
+            outputs = [arg.new_vector(size=size)
+                       for arg in self.args[:n_outputs]]
+            new_regs = outputs + new_regs
             if program.cisc_to_function and \
                (program.curr_tape.singular or program.n_running_threads):
                 if not program.use_tape_calls and not program.force_cisc_tape:
@@ -651,13 +677,7 @@ def cisc(function, n_outputs=1):
             else:
                 self.new_instructions(size, new_regs)
                 program.curr_block.n_rounds += self.n_rounds - 1
-            base = 0
-            for call in self.calls:
-                for i in range(n_outputs):
-                    reg = call[0][i]
-                    reg.copy_from_part(new_regs[i], base, reg.vector_size())
-                base += reg.vector_size()
-            tape.start_new_basicblock(name='post-' + self.name())
+            return outputs
 
         def add_usage(self, *args):
             pass
