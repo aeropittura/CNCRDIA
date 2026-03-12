@@ -38,6 +38,7 @@ class bits(Tape.Register, _structure, _bit, _binary):
     unit = 64
     PreOp = staticmethod(floatingpoint.PreOpN)
     decomposed = None
+    vec = type(None)
     @staticmethod
     def PreOR(l):
         return [1 - x for x in \
@@ -58,6 +59,8 @@ class bits(Tape.Register, _structure, _bit, _binary):
     @classmethod
     def conv(cls, other):
         if isinstance(other, cls) and cls.n == other.n:
+            return other
+        elif isinstance(other, cls.vec) and len(other.v) == cls.n:
             return other
         elif isinstance(other, MemValue):
             return cls.conv(other.read())
