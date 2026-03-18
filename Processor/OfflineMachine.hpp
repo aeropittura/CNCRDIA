@@ -162,7 +162,7 @@ void OfflineMachine<W>::generate()
         for (auto& x : usage.edabits)
             max_n_bits = max(max_n_bits, x.first.second);
 
-        for (int n_bits = 1; n_bits < max(100, max_n_bits); n_bits++)
+        for (int n_bits = 1; n_bits <= max(100, max_n_bits); n_bits++)
         {
             int batch = edabitvec<T>::MAX_SIZE;
             int total = usage.edabits[{false, n_bits}] +
