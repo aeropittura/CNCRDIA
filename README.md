@@ -89,7 +89,7 @@ parties and malicious security.
 #### TL;DR (Source from GitHub)
 
 You need to have
-Git[https://git-scm.com/book/en/v2/Getting-Started-Installing-Git] in
+[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) in
 order to clone the repository.
 
 On Linux, this requires a working toolchain and [all
@@ -142,6 +142,9 @@ to relevant reading with the option `--paper`. Use either of the following:
 ./compile.py --papers -E <protocol> <program>
 Scripts/compile-run.py --papers <protocol> <program>
 ```
+
+You can find a more systematic overview [in the
+documentation](https://mp-spdz.readthedocs.io/en/latest/reading.html).
 
 #### Preface
 
@@ -293,8 +296,8 @@ compute the preprocessing time for a particular computation.
 
 #### Requirements
 
- - GCC 7 or later (tested with up to 14) or LLVM/clang 11 or later
-   (tested with up to 20). The default is to use clang because it performs
+ - GCC 11 or later (tested with up to 15) or LLVM/clang 11 or later
+   (tested with up to 22). The default is to use clang because it performs
    better.
  - For protocols using oblivious transfer, libOTe with [the necessary
    patches](https://github.com/mkskeller/softspoken-implementation)
