@@ -1,5 +1,5 @@
-from Compiler import sorting
-from Compiler.library import MultiTimer
+from mpcl.lib import sorting
+from mpcl.lib.library import MultiTimer
 
 n = int(program.args[1])
 

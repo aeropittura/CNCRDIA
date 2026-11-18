@@ -1,6 +1,6 @@
 import pandas
 from sklearn.model_selection import train_test_split
-from Compiler import decision_tree
+from mpcl.apps import decision_tree
 
 data = pandas.read_csv(
     'https://raw.githubusercontent.com/jbrownlee/Datasets/master/adult-all.csv', header=None)

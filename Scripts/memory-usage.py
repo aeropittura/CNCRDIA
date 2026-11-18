@@ -5,8 +5,8 @@ import collections
 
 sys.path.append('.')
 
-from Compiler.program import *
-from Compiler.instructions_base import *
+from mpcl.core.program import *
+from mpcl.core.instructions_base import *
 
 if len(sys.argv) <= 1:
     print('Usage: %s <program>' % sys.argv[0])

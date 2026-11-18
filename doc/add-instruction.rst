@@ -14,7 +14,7 @@ The instructions are defined as classes in
 :download:`../Compiler/instructions.py` and
 :download:`../Compiler/GC/instructions.py`. Every class requires the
 attributes :py:obj:`opcode` and :py:obj:`arg_format` to be
-set. Consider the example of :py:class:`~Compiler.instructions.prefixsums`::
+set. Consider the example of :py:class:`~mpcl.core.instructions.prefixsums`::
 
   @base.vectorize
   class prefixsums(base.Instruction):
@@ -80,7 +80,7 @@ version, which is called as follows in the example for length
 
 At the higher level, the vector length is usually derived from the
 input using the :py:obj:`vectorize` decorator as in
-:py:func:`~Compiler.types.sint.prefix_sum`::
+:py:func:`~mpcl.core.types.sint.prefix_sum`::
 
   @vectorize
   def prefix_sum(self):
@@ -114,7 +114,7 @@ class defined in :download:`../engine/vm/instruction.h`. The arguments
 are parsed in :cpp:func:`parse_operands` defined in
 :download:`../engine/vm/instruction.hpp`. It contains a large switch
 statement covering all opcodes. Sticking to the example of
-:py:class:`~Compiler.instructions.prefixsums`, the relevant code there
+:py:class:`~mpcl.core.instructions.prefixsums`, the relevant code there
 is as follows::
 
   case PREFIXSUMS:
@@ -140,8 +140,8 @@ instruction. The main function for this is :cpp:func:`get_max_reg` in
 register that is written to for a particular register type. It
 contains two switch statements. The first one contains special
 treatment for instructions that write to more than one register type
-such as :py:class:`~Compiler.instructions.dabit`. However, for most
-instruction including :py:class:`~Compiler.instructions.prefixsums`,
+such as :py:class:`~mpcl.core.instructions.dabit`. However, for most
+instruction including :py:class:`~mpcl.core.instructions.prefixsums`,
 it checks the type currently queried against the type defined by
 :cpp:func:`get_reg_type` and returns 0 if there is a
 mismatch. :cpp:func:`get_reg_type` makes use of the fact that the
@@ -169,7 +169,7 @@ Execution is again defined by several switch statements over the
 opcode, the outermost of which is in :py:func:`Program::execute`
 defined in :download:`../engine/vm/instruction.hpp`. It uses the `X
 macro <https://en.wikipedia.org/wiki/X_macro>`_ pattern for a compact
-representation. :py:class:`~Compiler.instructions.prefixsums` is
+representation. :py:class:`~mpcl.core.instructions.prefixsums` is
 implemented in :download:`../engine/vm/instructions.h` as follows::
 
   X(PREFIXSUMS, auto dest = &Procp.get_S()[r[0]]; auto op1 = &Procp.get_S()[r[1]]; \

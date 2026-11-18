@@ -5,7 +5,7 @@ sfix.set_precision_from_args(program, adapt_ring=True)
 MultiArray.disable_index_checks()
 Array.check_indices = False
 
-from Compiler import ml
+from mpcl.apps import ml
 
 try:
     ml.set_n_threads(int(program.args[2]))

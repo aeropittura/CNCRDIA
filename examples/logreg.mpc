@@ -1,4 +1,4 @@
-from Compiler import ml
+from mpcl.apps import ml
 
 debug = False
 

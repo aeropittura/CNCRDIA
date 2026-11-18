@@ -1,7 +1,9 @@
-from Compiler import library as lib, path_oblivious_heap as poh, util
-from Compiler.path_oram import OptimalORAM, RecursivePathORAM
-from Compiler import dijkstra
-from Compiler.types import sint
+from mpcl.lib import library as lib
+from mpcl.oram import path_oblivious_heap as poh
+from mpcl.core import util
+from mpcl.oram.path_oram import OptimalORAM, RecursivePathORAM
+from mpcl.apps import dijkstra
+from mpcl.core.types import sint
 
 ### SETUP ###
 
@@ -11,7 +13,8 @@ UNIT = True
 DIJKSTRA = True
 
 # Module settings
-from Compiler import oram, path_oblivious_heap
+from mpcl.oram import oram
+from mpcl.oram import path_oblivious_heap
 
 oram.crash_on_overflow = False
 poh.CRASH_ON_EMPTY = True

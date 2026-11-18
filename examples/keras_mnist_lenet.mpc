@@ -27,7 +27,7 @@ else:
     test_labels.input_from(0)
     test_samples.input_from(0)
 
-from Compiler import ml
+from mpcl.apps import ml
 tf = ml
 
 layers = [

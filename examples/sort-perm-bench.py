@@ -1,6 +1,6 @@
-from Compiler import sorting
-from Compiler.library import MultiTimer
-from Compiler.types import _bitint
+from mpcl.lib import sorting
+from mpcl.lib.library import MultiTimer
+from mpcl.core.types import _bitint
 
 n_bits = 32
 program.set_bit_length(n_bits)

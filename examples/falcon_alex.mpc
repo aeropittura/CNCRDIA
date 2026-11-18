@@ -1,5 +1,5 @@
-from Compiler.ml import keras
-import Compiler.ml as tf
+from mpcl.apps.ml import keras
+import mpcl.apps.ml as tf
 
 try:
     n_epochs = int(program.args[1])

@@ -2,7 +2,7 @@ import networkx as nx
 
 program.set_bit_length(32)
 
-from Compiler.sparse import *
+from mpcl.apps.sparse import *
 
 G = nx.DiGraph()
 

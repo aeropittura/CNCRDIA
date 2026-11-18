@@ -4,7 +4,7 @@ program.unlimited_compilation()
 
 program.set_bit_length(32)
 
-from Compiler.sparse import *
+from mpcl.apps.sparse import *
 
 G = nx.read_adjlist(program.args[1], create_using=nx.DiGraph)
 M = SparseMatrix.from_graph(G)

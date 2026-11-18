@@ -587,8 +587,8 @@ You may prefer to not have an entirely static `.mpc` file to compile, and may wa
 
 ```python
 # hello_world.mpc
-from Compiler.library import print_ln
-from Compiler.compilerLib import Compiler
+from mpcl.lib.library import print_ln
+from mpcl.core.driver import Compiler
 
 compiler = Compiler()
 

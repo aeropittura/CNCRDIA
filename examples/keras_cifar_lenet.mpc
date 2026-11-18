@@ -3,7 +3,7 @@
 
 program.options_from_args()
 
-from Compiler import ml
+from mpcl.apps import ml
 tf = ml
 ml.set_n_threads(36)
 

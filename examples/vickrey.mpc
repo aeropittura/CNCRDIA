@@ -1,5 +1,5 @@
 import util
-from Compiler import types
+from mpcl.core import types
 
 import math
 import re

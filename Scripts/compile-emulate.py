@@ -4,7 +4,7 @@ import os, sys
 
 sys.path.insert(0, os.path.dirname(sys.argv[0]) + '/..')
 
-from Compiler.compilerLib import Compiler
+from mpcl.core.driver import Compiler
 
 compiler = Compiler(split_args=True)
 compiler.prep_compile(build=False)

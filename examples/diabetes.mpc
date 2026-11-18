@@ -14,7 +14,7 @@ y_train = sfix.input_tensor_via(0, y_train)
 X_test = sfix.input_tensor_via(0, X_test)
 y_test = sfix.input_tensor_via(0, y_test)
 
-from Compiler import ml
+from mpcl.apps import ml
 
 try:
     batch_size = int(program.args[1])

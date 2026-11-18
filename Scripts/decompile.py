@@ -4,8 +4,8 @@ import sys, os
 
 sys.path.append('.')
 
-from Compiler.instructions_base import Instruction
-from Compiler.program import *
+from mpcl.core.instructions_base import Instruction
+from mpcl.core.program import *
 
 if len(sys.argv) <= 1:
     print('Usage: %s <program>' % sys.argv[0])

@@ -1,4 +1,4 @@
-from Compiler.sparse import *
+from mpcl.apps.sparse import *
 
 n = int(program.args[1])
 m = int(program.args[2])

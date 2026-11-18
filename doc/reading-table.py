@@ -5,8 +5,8 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.abspath('..'))
 
-from Compiler.compilerLib import Compiler
-from Compiler.papers import *
+from mpcl.core.driver import Compiler
+from mpcl.apps.papers import *
 
 def protocols():
     exclude = 'no', 'bmr-program',

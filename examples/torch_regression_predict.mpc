@@ -41,7 +41,7 @@ for i in range(50):
         loss = criterion(outputs, labels)
         print('Test loss: %f' % loss)
 
-from Compiler import ml
+from mpcl.apps import ml
 
 X_train = sfix.input_tensor_via(0, X_train)
 X_test = sfix.input_tensor_via(0, X_test)

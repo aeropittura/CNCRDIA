@@ -1,6 +1,6 @@
-from Compiler.library import print_ln
-from Compiler.types import Matrix, sint
-from Compiler.compilerLib import Compiler
+from mpcl.lib.library import print_ln
+from mpcl.core.types import Matrix, sint
+from mpcl.core.driver import Compiler
 
 
 usage = "usage: %prog [options] [args]"

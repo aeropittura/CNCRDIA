@@ -3,9 +3,9 @@
 import sys, os, csv
 sys.path.insert(0, os.path.abspath('..'))
 
-from Compiler import instructions_base as base
-from Compiler import instructions
-from Compiler.GC import instructions as gc
+from mpcl.core import instructions_base as base
+from mpcl.core import instructions
+from mpcl.boolean import instructions as gc
 from itertools import chain
 import re
 

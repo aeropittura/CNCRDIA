@@ -8,10 +8,10 @@ the compiler) but the virtual machine running high-level code is
 somewhat limited makes it desirable to call high-level functionality
 from C++. MP-SPDZ supports defining functions on the high level and
 calling them from C++. Functions can have integer secrets
-(:py:class:`~Compiler.types.sint`) and (multi-)arrays thereof as
+(:py:class:`~mpcl.core.types.sint`) and (multi-)arrays thereof as
 inputs and return values as well as (multi-)arrays of binary secrets
-(types created using :py:class:`~Compiler.GC.types.sbitvec` and
-:py:class:`~Compiler.GC.types.sbitintvec`).
+(types created using :py:class:`~mpcl.boolean.types.sbitvec` and
+:py:class:`~mpcl.boolean.types.sbitintvec`).
 
 As a simple example, consider
 :download:`../examples/export-sort.py` and
@@ -136,7 +136,7 @@ Vector arguments and return values
 ----------------------------------
 
 Instead of arrays, it is also possible to use
-:py:class:`~Compiler.types.sint` vectors as demonstrated in
+:py:class:`~mpcl.core.types.sint` vectors as demonstrated in
 :download:`../examples/export-trunc.py`::
 
   @export

@@ -34,7 +34,7 @@ Putting this into ``Programs/Source/2mul.py`` and running
 
 You can see all the inputs loaded in the first few lines appear in the
 last one. The arguments are follows (see also
-:py:class:`Compiler.instructions.muls`): 8 indicates the number of
+:py:class:`mpcl.core.instructions.muls`): 8 indicates the number of
 arguments to follow, and every four arguments correspond to one
 multiplication. The first number withing every four arguments is the
 vector size, following by the result register and the input

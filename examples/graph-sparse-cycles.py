@@ -4,7 +4,7 @@ program.unlimited_compilation()
 
 program.set_bit_length(32)
 
-from Compiler.sparse import *
+from mpcl.apps.sparse import *
 
 n_cycles = int(program.args[2])
 

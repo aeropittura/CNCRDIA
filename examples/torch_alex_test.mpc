@@ -4,7 +4,7 @@
 program.options_from_args()
 program.unlimited_compilation()
 
-from Compiler import ml
+from mpcl.apps import ml
 
 try:
     ml.set_n_threads(int(program.args[1]))
@@ -79,7 +79,7 @@ with torch.no_grad():
     test_acc = (100 * correct_classified / total)
     print('Cleartext test accuracy of the network: %.2f %%' % test_acc)
 
-from Compiler import ml
+from mpcl.apps import ml
 
 layers = ml.layers_from_torch(net, test_samples.shape, 128, input_via=0)
 

@@ -37,8 +37,8 @@ Integrated Data Input
 
 If the data is available during compilation, for example as a PyTorch
 or numpy tensor, you can use
-:py:func:`Compiler.types.sfix.input_tensor_via` and
-:py:func:`Compiler.types.sint.input_tensor_via`. Consider the
+:py:func:`mpcl.core.types.sfix.input_tensor_via` and
+:py:func:`mpcl.core.types.sint.input_tensor_via`. Consider the
 following code from ``breast_logistic.mpc`` (requiring
 `scikit-learn <https://scikit-learn.org>`_)::
 
@@ -186,7 +186,7 @@ There are a number of interfaces for different algorithms.
 Logistic regression with SGD
 ============================
 
-This is available via :py:class:`~Compiler.ml.SGDLogistic`. We will
+This is available via :py:class:`~mpcl.apps.ml.SGDLogistic`. We will
 use ``breast_logistic.mpc`` as an example.
 
 After inputting the data as above, you can call the following::
@@ -206,15 +206,15 @@ add ``approx`` to use a three-piece approximate sigmoid function:
 Omitting it invokes the default sigmoid function.
 
 To check accuracy during training, you can call the following instead
-of :py:func:`~Compiler.ml.SGDLogistic.fit`::
+of :py:func:`~mpcl.apps.ml.SGDLogistic.fit`::
 
   log.fit_with_testing(X_train, y_train, X_test, y_test)
 
 This outputs losses and accuracy for both the training and test set
 after every epoch.
 
-You can use :py:func:`~Compiler.ml.SGDLogistic.predict` to predict
-labels and :py:func:`~Compiler.ml.SGDLogistic.predict_proba` to
+You can use :py:func:`~mpcl.apps.ml.SGDLogistic.predict` to predict
+labels and :py:func:`~mpcl.apps.ml.SGDLogistic.predict_proba` to
 predict probabilities. The following outputs the correctness (0 for
 correct, :math:`\pm 1` for incorrect) and a measure of how much off
 the probability estimate is::
@@ -226,10 +226,10 @@ the probability estimate is::
 Linear regression with SGD
 ==========================
 
-This is available via :py:class:`~Compiler.ml.SGDLinear`. It
+This is available via :py:class:`~mpcl.apps.ml.SGDLinear`. It
 implements an interface similar to logistic regression. The main
 difference is that there is only
-:py:func:`~Compiler.ml.SGDLinear.predict` for prediction as there is
+:py:func:`~mpcl.apps.ml.SGDLinear.predict` for prediction as there is
 no notion of labels in this case. See ``diabetes.mpc`` for an example
 of linear regression.
 
@@ -238,7 +238,7 @@ PyTorch interface
 =================
 
 MP-SPDZ supports importing sequential models from PyTorch using
-:py:func:`~Compiler.ml.layers_from_torch` as shown in
+:py:func:`~mpcl.apps.ml.layers_from_torch` as shown in
 this code snippet in ``torch_mnist_dense.mpc``::
 
   import torch.nn as nn
@@ -276,8 +276,8 @@ network for 10 epochs using 4 threads::
   Scripts/compile-emulate.py torch_mnist_dense 10 4
 
 See ``Programs/Source/torch_*.mpc`` for further examples of the
-PyTorch functionality, :py:func:`~Compiler.ml.Optimizer.fit` for
-further training options, and :py:class:`~Compiler.ml.Adam` for an
+PyTorch functionality, :py:func:`~mpcl.apps.ml.Optimizer.fit` for
+further training options, and :py:class:`~mpcl.apps.ml.Adam` for an
 alternative Optimizer.
 
 
@@ -323,7 +323,7 @@ algorithm by `Hamada et al.`_ The following example in
 ``breast_tree.mpc`` trains a tree of height five before outputting the
 difference between the prediction on a test set and the ground truth::
 
-  from Compiler.decision_tree import TreeClassifier
+  from mpcl.apps.decision_tree import TreeClassifier
   tree = TreeClassifier(max_depth=5)
   tree.fit(X_train, y_train)
   print_ln('%s', (tree.predict(X_test) - y_test.get_vector()).reveal())
@@ -441,8 +441,8 @@ and used in MP-SPDZ::
   print_ln('Secure accuracy: %s/%s', n_correct, len(test_samples))
 
 This outputs the accuracy of the network. You can use
-:py:func:`~Compiler.ml.Optimizer.eval` instead of
-:py:func:`~Compiler.ml.Optimizer.reveal_correctness` to retrieve
+:py:func:`~mpcl.apps.ml.Optimizer.eval` instead of
+:py:func:`~mpcl.apps.ml.Optimizer.reveal_correctness` to retrieve
 probability distributions or top guesses (the latter with ``top=True``)
 for any sample data.
 
@@ -457,7 +457,7 @@ Storing and loading models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Both the Keras interface and the native
-:py:class:`~Compiler.ml.Optimizer` class support an interface to
+:py:class:`~mpcl.apps.ml.Optimizer` class support an interface to
 iterate through all model parameters. The following code from
 ``torch_mnist_dense.mpc`` uses it to store the model on disk in
 secret-shared form::
@@ -494,7 +494,7 @@ Models can be exported as follows::
   optimizer.reveal_model_to_binary()
 
 if :py:obj:`optimizer` is an instance of
-:py:class:`Compiler.ml.Optimizer`. The model parameters are then
+:py:class:`mpcl.apps.ml.Optimizer`. The model parameters are then
 stored in ``Player-Data/Binary-Output-P<playerno>-0``. They can be
 imported for use in PyTorch::
 

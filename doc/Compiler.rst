@@ -5,10 +5,10 @@ High-Level Interface
    :maxdepth: 2
    :caption: Contents:
 
-Compiler.types module
----------------------
+mpcl.core.types module
+----------------------
 
-.. automodule:: Compiler.types
+.. automodule:: mpcl.core.types
    :members:
    :no-undoc-members:
    :inherited-members:
@@ -22,10 +22,10 @@ Compiler.types module
 		     SubMultiArray
 .. autoclass:: sintbit
 
-Compiler.GC.types module
-------------------------
+mpcl.boolean.types module
+-------------------------
 
-.. automodule:: Compiler.GC.types
+.. automodule:: mpcl.boolean.types
    :members:
    :no-undoc-members:
    :inherited-members:
@@ -39,20 +39,20 @@ Compiler.GC.types module
 		     reveal_to_clients, write_shares_to_socket,
 		     write_to_file, sbitint, sbitfix
 
-Compiler.library module
+mpcl.lib.library module
 -----------------------
 
-.. automodule:: Compiler.library
+.. automodule:: mpcl.lib.library
    :members:
    :no-undoc-members:
    :no-show-inheritance:
    :exclude-members: approximate_reciprocal, cint_cint_division,
 		     sint_cint_division, IntDiv, FPDiv, AppRcr, Norm
 
-Compiler.mpc\_math module
+mpcl.lib.mpc_math module
 -------------------------
 
-.. automodule:: Compiler.mpc_math
+.. automodule:: mpcl.lib.mpc_math
 .. autofunction:: atan
 .. autofunction:: acos
 .. autofunction:: asin
@@ -67,10 +67,10 @@ Compiler.mpc\_math module
 .. autofunction:: tan
 .. autofunction:: tanh
 
-Compiler.ml module
+mpcl.apps.ml module
 -------------------------
 
-.. automodule:: Compiler.ml
+.. automodule:: mpcl.apps.ml
    :members:
    :no-undoc-members:
    :exclude-members: Tensor, my_squant
@@ -78,31 +78,31 @@ Compiler.ml module
    :inherited-members:
 .. autofunction:: approx_sigmoid
 
-Compiler.decision_tree module
------------------------------
+mpcl.apps.decision_tree module
+------------------------------
 
-.. automodule:: Compiler.decision_tree
+.. automodule:: mpcl.apps.decision_tree
    :members:
    :no-undoc-members:
 
-Compiler.circuit module
+mpcl.lib.circuit module
 -----------------------
 
-.. automodule:: Compiler.circuit
+.. automodule:: mpcl.lib.circuit
    :members:
 
-Compiler.program module
------------------------
+mpcl.core.program module
+------------------------
 
-.. automodule:: Compiler.program
+.. automodule:: mpcl.core.program
    :members:
    :exclude-members: curr_block, curr_tape, free, malloc, write_bytes, Tape,
 		     max_par_tapes
 
-Compiler.oram module
---------------------
+mpcl.oram.oram module
+---------------------
 
-.. automodule:: Compiler.oram
+.. automodule:: mpcl.oram.oram
    :members:
    :no-undoc-members:
    :exclude-members: AbstractORAM, AtLeastOneRecursionIndexStructure,
@@ -122,20 +122,20 @@ Compiler.oram module
 		     gf2nBlock, intBlock
 
 
-Compiler.sqrt_oram module
--------------------------
+mpcl.oram.sqrt_oram module
+--------------------------
 
-.. automodule:: Compiler.sqrt_oram
+.. automodule:: mpcl.oram.sqrt_oram
    :members:
    :no-undoc-members:
    :exclude-members: LinearPositionMap, PositionMap, RecursivePositionMap,
 		     refresh, shuffle_the_shuffle
 
 
-Compiler.path_oblivious_heap module
------------------------------------
+mpcl.oram.path_oblivious_heap module
+------------------------------------
 
-.. automodule:: Compiler.path_oblivious_heap
+.. automodule:: mpcl.oram.path_oblivious_heap
    :members:
    :no-undoc-members:
    :inherited-members:
@@ -144,26 +144,26 @@ Compiler.path_oblivious_heap module
 		     dprint_ln, dprint_ln_if, dprint_str, indent, outdent,
 
 
-Compiler.dijkstra module
-------------------------
+mpcl.apps.dijkstra module
+-------------------------
 
-.. automodule:: Compiler.dijkstra
+.. automodule:: mpcl.apps.dijkstra
    :members:
    :no-undoc-members:
    :exclude-members: IntVectorArray, Matrix, Vector, VectorArray, VectorList
 
 
-Compiler.sorting module
+mpcl.lib.sorting module
 -----------------------
 
-.. automodule:: Compiler.sorting
+.. automodule:: mpcl.lib.sorting
    :members:
    :no-undoc-members:
 
 
-Compiler.sparse module
+mpcl.apps.sparse module
 -----------------------
 
-.. automodule:: Compiler.sparse
+.. automodule:: mpcl.apps.sparse
    :members:
    :no-undoc-members:

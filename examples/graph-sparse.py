@@ -1,6 +1,6 @@
 import networkx as nx
 
-from Compiler.sparse import *
+from mpcl.apps.sparse import *
 
 G = nx.read_adjlist(program.args[1], create_using=nx.DiGraph)
 

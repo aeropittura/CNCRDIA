@@ -1,5 +1,5 @@
-from Compiler import gs
-from Compiler.path_oram import OptimalORAM
+from mpcl.apps import gs
+from mpcl.oram.path_oram import OptimalORAM
 
 mm = gs.Matchmaker(50, oram_type=OptimalORAM)
 mm.init_hard()

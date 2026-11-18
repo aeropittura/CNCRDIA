@@ -1,4 +1,4 @@
-from Compiler import instructions_base
+from mpcl.core import instructions_base
 import sys
 
 program.bit_length = 128

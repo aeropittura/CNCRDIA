@@ -154,10 +154,10 @@ obsolete.
    :file: instructions.csv
 
 
-Compiler.instructions module
-----------------------------
+mpcl.core.instructions module
+-----------------------------
 
-.. automodule:: Compiler.instructions
+.. automodule:: mpcl.core.instructions
    :members:
    :no-undoc-members:
    :exclude-members: asm_input, sqrs,
@@ -168,10 +168,10 @@ Compiler.instructions module
 		     gconvgf2n, gldmci, gldmsi, gmulbitc, gmulbitm,
 		     gnotc, gstmci, gstmsi,
 
-Compiler.GC.instructions module
--------------------------------
+mpcl.boolean.instructions module
+--------------------------------
 
-.. automodule:: Compiler.GC.instructions
+.. automodule:: mpcl.boolean.instructions
    :members:
    :no-undoc-members:
    :exclude-members: BinaryVectorInstruction, NonVectorInstruction,

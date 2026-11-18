@@ -1,6 +1,6 @@
-from Compiler.library import get_number_of_players
-from Compiler.sqrt_oram import n_parallel
-from Compiler.util import if_else
+from mpcl.lib.library import get_number_of_players
+from mpcl.oram.sqrt_oram import n_parallel
+from mpcl.core.util import if_else
 
 
 def test_allocator():

@@ -18,7 +18,7 @@ sample.input_from(1)
 def match(db_entry, sample):
     return sum(x * x for x in (a - b for a, b in zip(db_entry, sample)))
 
-from Compiler import util
+from mpcl.core import util
 
 if n_threads is None:
     res = util.tree_reduce(lambda x, y: x.min(y), (match(db[i], sample) for i in range(n)))

@@ -16,7 +16,7 @@ confirm the issue and then increment to test the limits). Furthermore,
 the batch size for some malicious protocols can be reduced with
 ``--bucket-size 5``. Every computation thread requires
 separate resources, so consider reducing the number of threads with
-:py:func:`~Compiler.library.for_range_multithreads` and similar.
+:py:func:`~mpcl.lib.library.for_range_multithreads` and similar.
 Lastly, you can use ``--disk-memory <path>`` to use disk space instead
 of RAM for large programs.
 Use ``Scripts/memory-usage.py <program-with-args>`` to get an estimate
@@ -28,17 +28,17 @@ List indices must be integers or slices
 
 You cannot access Python lists with runtime variables because the
 lists only exists at compile time. Consider using
-:py:class:`~Compiler.types.Array`.
+:py:class:`~mpcl.core.types.Array`.
 
 
 Local variable referenced before assignment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This error can occur if you try to reassign a variable in a run-time
-loop like :py:func:`~Compiler.library.for_range`. Use
-:py:func:`~Compiler.program.Tape.Register.update` instead of assignment. See
-:py:func:`~Compiler.library.for_range` for an example.
-You can also use :py:func:`~Compiler.types.sint.iadd` instead of ``+=``.
+loop like :py:func:`~mpcl.lib.library.for_range`. Use
+:py:func:`~mpcl.core.program.Tape.Register.update` instead of assignment. See
+:py:func:`~mpcl.lib.library.for_range` for an example.
+You can also use :py:func:`~mpcl.core.types.sint.iadd` instead of ``+=``.
 
 
 ``compile.py`` takes too long or runs out of memory
@@ -46,7 +46,7 @@ You can also use :py:func:`~Compiler.types.sint.iadd` instead of ``+=``.
 
 If you use Python loops (``for``), they are unrolled at compile-time,
 resulting in potentially too much virtual machine code. Consider using
-:py:func:`~Compiler.library.for_range_opt` or similar. You can also use
+:py:func:`~mpcl.lib.library.for_range_opt` or similar. You can also use
 ``-l`` when compiling, which will replace simple loops by an optimized
 version.
 
@@ -75,7 +75,7 @@ There a number of ways to solve this:
        y.update(1)
        print_ln('x is zero')
 
-   See :py:func:`~Compiler.library.if_e` for the equivalent to
+   See :py:func:`~mpcl.lib.library.if_e` for the equivalent to
    if/else.
 3. Use conditional statements::
 
@@ -109,7 +109,7 @@ types, for example::
 
 Deciding whether to execute ``y = 1`` or ``y = 2`` would reveal ``x``,
 which contradicts the secrecy guarantee of
-:py:class:`~Compiler.types.sint`. However, you can use the following
+:py:class:`~mpcl.core.types.sint`. However, you can use the following
 to achieve the desired ``y`` without revealing ``x``::
 
   y = (x != 0).if_else(1, 2)
@@ -122,17 +122,17 @@ If your use case permits revealing ``x``, see the previous section for
 considerations on branching with run-time values.
 
 
-Incorrect results when using :py:class:`~Compiler.types.sfix`
+Incorrect results when using :py:class:`~mpcl.core.types.sfix`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is most likely caused by an overflow of the precision
 parameters because the default choice unlike accommodates numbers up
-to around 16,000. See :py:class:`~Compiler.types.sfix` for an
-introduction and :py:func:`~Compiler.types.sfix.set_precision` for how
+to around 16,000. See :py:class:`~mpcl.core.types.sfix` for an
+introduction and :py:func:`~mpcl.core.types.sfix.set_precision` for how
 to change the precision.
 
 
-Variable results when using :py:class:`~Compiler.types.sfix`
+Variable results when using :py:class:`~mpcl.core.types.sfix`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is caused the usage of probabilistic rounding, which is used to
@@ -154,11 +154,11 @@ Order of memory instructions not preserved
 
 By default, the compiler runs optimizations that in some corner case
 can introduce errors with memory accesses such as accessing an
-:py:class:`~Compiler.types.Array`. The error message does not
+:py:class:`~mpcl.core.types.Array`. The error message does not
 necessarily mean there will be errors, but the compiler cannot
 guarantee that there will not. If you encounter such errors, you
 can fix this either with ``-M`` when compiling or enable memory
-protection (:py:func:`~Compiler.program.Program.protect_memory`)
+protection (:py:func:`~mpcl.core.program.Program.protect_memory`)
 around specific memory accesses.
 
 

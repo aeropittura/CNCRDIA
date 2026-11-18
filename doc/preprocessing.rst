@@ -12,7 +12,7 @@ Generally, preprocessing is done on demand and per computation
 threads. On demand means that batches of preprocessing data are
 computed whenever there is none in storage, and a computation thread
 is a thread created by control flow instructions such as
-:py:func:`~Compiler.library.for_range_multithread`.
+:py:func:`~mpcl.lib.library.for_range_multithread`.
 
 The exceptions to the general rule are edaBit generation with
 malicious security and AND triples with malicious security and honest

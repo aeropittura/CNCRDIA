@@ -54,7 +54,7 @@ with torch.no_grad():
     test_acc = (100 * correct_classified / total)
     print('Test accuracy of the network: %.2f %%' % test_acc)
 
-from Compiler import ml
+from mpcl.apps import ml
 
 ml.set_n_threads(int(program.args[2]))
 

@@ -1,17 +1,14 @@
-from Compiler import library as lib, oram, path_oram
-from Compiler.dijkstra import HeapQ
-from Compiler.path_oblivious_heap import (
-    POHToHeapQAdapter,
-    POHVariant,
-    UniquePOHToHeapQAdapter,
-    path_oblivious_sort,
-)
-from Compiler.types import Array, sint
-from Compiler.util import log2
+from mpcl.lib import library as lib
+from mpcl.oram import oram
+from mpcl.oram import path_oram
+from mpcl.apps.dijkstra import HeapQ
+from mpcl.oram.path_oblivious_heap import POHToHeapQAdapter, POHVariant, UniquePOHToHeapQAdapter, path_oblivious_sort
+from mpcl.core.types import Array, sint
+from mpcl.core.util import log2
 
 DEBUG = True
 
-from Compiler import path_oblivious_heap
+from mpcl.oram import path_oblivious_heap
 
 path_oblivious_heap.DEBUG = False
 

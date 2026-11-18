@@ -11,8 +11,8 @@
 # (run with --help for more options)
 #
 # See the compiler documentation at https://mp-spdz.readthedocs.io
-# for details on the Compiler package
-from Compiler.compilerLib import Compiler
+# for details on the compiler (the mpcl package)
+from mpcl.core.driver import Compiler
 
 
 def compilation(compiler):

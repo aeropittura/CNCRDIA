@@ -1,0 +1,42 @@
+"""Old module names (``Compiler.*``) and their new homes.
+
+Used by the ``Compiler`` compatibility package.
+"""
+
+MODULES = {
+    'Compiler.GC': 'mpcl.boolean',
+    'Compiler.GC.instructions': 'mpcl.boolean.instructions',
+    'Compiler.GC.program': 'mpcl.boolean.program',
+    'Compiler.GC.types': 'mpcl.boolean.types',
+    'Compiler.allocator': 'mpcl.core.allocator',
+    'Compiler.circuit': 'mpcl.lib.circuit',
+    'Compiler.circuit_oram': 'mpcl.oram.circuit_oram',
+    'Compiler.comparison': 'mpcl.lib.comparison',
+    'Compiler.compilerLib': 'mpcl.core.driver',
+    'Compiler.config': 'mpcl.core.config',
+    'Compiler.cost': 'mpcl.core.cost',
+    'Compiler.decision_tree': 'mpcl.apps.decision_tree',
+    'Compiler.dijkstra': 'mpcl.apps.dijkstra',
+    'Compiler.exceptions': 'mpcl.core.exceptions',
+    'Compiler.floatingpoint': 'mpcl.lib.floatingpoint',
+    'Compiler.graph': 'mpcl.apps.graph',
+    'Compiler.gs': 'mpcl.apps.gs',
+    'Compiler.instructions': 'mpcl.core.instructions',
+    'Compiler.instructions_base': 'mpcl.core.instructions_base',
+    'Compiler.library': 'mpcl.lib.library',
+    'Compiler.ml': 'mpcl.apps.ml',
+    'Compiler.mpc_math': 'mpcl.lib.mpc_math',
+    'Compiler.non_linear': 'mpcl.lib.non_linear',
+    'Compiler.oram': 'mpcl.oram.oram',
+    'Compiler.papers': 'mpcl.apps.papers',
+    'Compiler.path_oblivious_heap': 'mpcl.oram.path_oblivious_heap',
+    'Compiler.path_oram': 'mpcl.oram.path_oram',
+    'Compiler.permutation': 'mpcl.lib.permutation',
+    'Compiler.program': 'mpcl.core.program',
+    'Compiler.sorting': 'mpcl.lib.sorting',
+    'Compiler.sparse': 'mpcl.apps.sparse',
+    'Compiler.sqrt_oram': 'mpcl.oram.sqrt_oram',
+    'Compiler.tools': 'mpcl.core.tools',
+    'Compiler.types': 'mpcl.core.types',
+    'Compiler.util': 'mpcl.core.util',
+}

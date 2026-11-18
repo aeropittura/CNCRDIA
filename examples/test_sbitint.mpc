@@ -1,6 +1,6 @@
 program.options.merge_opens = False
 
-from Compiler.GC.types import *
+from mpcl.boolean.types import *
 
 def test(a, b, value_type=None):
     try:

@@ -15,7 +15,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('../ExternalIO'))
+sys.path.insert(0, os.path.abspath('../clients'))
 
 exec(compile(open('gen-instructions.py').read(), 'gen', 'exec'))
 

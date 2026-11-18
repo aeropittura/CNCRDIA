@@ -14,8 +14,8 @@ It entails three steps: creating a constant secret sharing, revealing
 it to cleartext, and outputting it. The compilation will not execute
 any of this. Instead, it will create a description in a format
 specific to MP-SPDZ. For example,
-:py:func:`~Compiler.types.sint.reveal` triggers a call to the
-constructor of :py:obj:`~Compiler.instructions.asm_open`, which will
+:py:func:`~mpcl.core.types.sint.reveal` triggers a call to the
+constructor of :py:obj:`~mpcl.core.instructions.asm_open`, which will
 add an object thereof to a list of instructions.
 
 Run the following to retrieve the human-readable representation of the
@@ -46,14 +46,14 @@ block is more generic. More specifically::
 
   ldsi s0, 123 # 0
 
-:py:class:`~Compiler.instructions.ldsi` loads constant values to
+:py:class:`~mpcl.core.instructions.ldsi` loads constant values to
 secret registers, in this case 123 to the register :obj:`s0`.
 
 .. code::
 
   asm_open 3, True, c0, s0 # 1
 
-:py:class:`~Compiler.instructions.asm_open` reveals values in secret
+:py:class:`~mpcl.core.instructions.asm_open` reveals values in secret
 registers to be stored in cleartext registers, in this case the
 content of :obj:`s0` to :obj:`c0`. The :obj:`True` argument triggers a
 correctness check in protocols where it is available, and the 3
@@ -64,21 +64,21 @@ batchable, that is, it can execute any number of
 
   print_reg_plain c0 # 2
 
-:py:class:`~Compiler.instructions.print_reg_plain` outputs constant
+:py:class:`~mpcl.core.instructions.print_reg_plain` outputs constant
 values to the console or a file, in this case the register :obj:`c0`.
 
 .. code::
 
   print_char 10 # 3
 
-:py:class:`~Compiler.instructions.print_char` outputs a character to
+:py:class:`~mpcl.core.instructions.print_char` outputs a character to
 the console or a file, in this case the ASCII code for a new line.
 
 .. code::
 
   use 0, 7, 1 # 4
 
-:py:class:`~Compiler.instructions.use` indicates the usage of
+:py:class:`~mpcl.core.instructions.use` indicates the usage of
 preprocessing information or similar. This allows the virtual machine
 to account for resources before actually executing the program. This
 particular call indicates 1 opening (7) of sint (0). You can see the
@@ -94,18 +94,18 @@ of :download:`Compiler/program.py <../Compiler/program.py>`.
   gldms sg0, 8191 # 9
 
 These instructions read memory cells to registers, for example
-:py:class:`~Compiler.instructions.ldms`. In this context, the purpose
+:py:class:`~mpcl.core.instructions.ldms`. In this context, the purpose
 is to indicate the memory usage. The addresses are all 8191 because
 8192 is the default size for user memory given in
 :file:`Compiler/config.py`. If you use
-:py:class:`~Compiler.types.Array` or similar data-structures, these
+:py:class:`~mpcl.core.types.Array` or similar data-structures, these
 numbers will increase accordingly.
 
 .. code::
 
   active True # 10
 
-:py:class:`~Compiler.instructions.active` indicates whether the
+:py:class:`~mpcl.core.instructions.active` indicates whether the
 program is compatible with active security.
 
 The compilation above also creates
@@ -129,9 +129,9 @@ looks as follows::
 
 It consist of the instructions codes and the arguments in big-endian
 order. For example, 0x2 is the code for
-:py:class:`~Compiler.instructions.ldsi`, 0xa5 is the code for
-:py:obj:`~Compiler.instructions.asm_open`, 0xb3 is the code for
-:py:class:`~Compiler.instructions.print_reg_plain`, etc. You can also
+:py:class:`~mpcl.core.instructions.ldsi`, 0xa5 is the code for
+:py:obj:`~mpcl.core.instructions.asm_open`, 0xb3 is the code for
+:py:class:`~mpcl.core.instructions.print_reg_plain`, etc. You can also
 spot repeated occurrences of ``1f ff``, which is the hexadecimal
 representation of 8191.
 

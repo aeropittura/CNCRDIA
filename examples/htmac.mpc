@@ -32,8 +32,8 @@
     
         - To run the online phase: ./Scripts/run-online htmac-2-8-10
 """
-from Compiler.program import Program
-from Compiler import instructions_base
+from mpcl.core.program import Program
+from mpcl.core import instructions_base
 from random import randint
 import sys
 program.bit_length = 128

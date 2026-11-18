@@ -34,7 +34,7 @@ inputs = next(iter(torch.utils.data.DataLoader(ds)))[0]
 print(inputs.shape)
 outputs = net(inputs)
 
-from Compiler import ml
+from mpcl.apps import ml
 
 ml.set_n_threads(int(program.args[2]))
 

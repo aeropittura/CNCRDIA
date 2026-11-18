@@ -44,7 +44,7 @@ else:
     X_test = sfix.input_tensor_via(0, X_test)
     y_test = sint.input_tensor_via(0, y_test)
 
-from Compiler import ml
+from mpcl.apps import ml
 
 log = ml.SGDLogistic(20, 2, program)
 
