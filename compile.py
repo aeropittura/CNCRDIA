@@ -5,7 +5,7 @@
 #
 # ./compile.py input_file
 #
-# will compile Programs/Source/input_file.mpc onto
+# will compile examples/input_file.mpc (or Programs/Source/input_file.mpc) onto
 # Programs/Bytecode/input_file.bc and Programs/Schedules/input_file.sch
 #
 # (run with --help for more options)

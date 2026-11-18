@@ -110,9 +110,9 @@ Parsing
 ~~~~~~~
 
 The internal representation is done via the :cpp:class:`Instruction`
-class defined in :download:`../Processor/Instruction.h`. The arguments
+class defined in :download:`../engine/vm/instruction.h`. The arguments
 are parsed in :cpp:func:`parse_operands` defined in
-:download:`../Processor/Instruction.hpp`. It contains a large switch
+:download:`../engine/vm/instruction.hpp`. It contains a large switch
 statement covering all opcodes. Sticking to the example of
 :py:class:`~Compiler.instructions.prefixsums`, the relevant code there
 is as follows::
@@ -136,7 +136,7 @@ Resourcing
 Because the number of registers depends on the programs, the virtual
 machine has to find out the requirements for every single
 instruction. The main function for this is :cpp:func:`get_max_reg` in
-:download:`../Processor/Instruction.hpp`, which returns the maximum
+:download:`../engine/vm/instruction.hpp`, which returns the maximum
 register that is written to for a particular register type. It
 contains two switch statements. The first one contains special
 treatment for instructions that write to more than one register type
@@ -167,10 +167,10 @@ Execution
 
 Execution is again defined by several switch statements over the
 opcode, the outermost of which is in :py:func:`Program::execute`
-defined in :download:`../Processor/Instruction.hpp`. It uses the `X
+defined in :download:`../engine/vm/instruction.hpp`. It uses the `X
 macro <https://en.wikipedia.org/wiki/X_macro>`_ pattern for a compact
 representation. :py:class:`~Compiler.instructions.prefixsums` is
-implemented in :download:`../Processor/instructions.h` as follows::
+implemented in :download:`../engine/vm/instructions.h` as follows::
 
   X(PREFIXSUMS, auto dest = &Procp.get_S()[r[0]]; auto op1 = &Procp.get_S()[r[1]]; \
     sint s, \

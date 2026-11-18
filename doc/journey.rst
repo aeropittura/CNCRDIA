@@ -164,10 +164,10 @@ Execution
 
 We will now walk through what happens when executing the program above
 with Rep3 modulo :math:`2^{64}`. The main function in
-:download:`Machines/replicated-ring-party.cpp
-<../Machines/replicated-ring-party.cpp>` indirectly calls
-:func:`Machine<sint, sgf2n>::run` in :download:`Processor/Machine.hpp
-<../Processor/Machine.hpp>` with :class:`sint` being
+:download:`parties/arith/replicated-ring-party.cpp
+<../parties/arith/replicated-ring-party.cpp>` indirectly calls
+:func:`Machine<sint, sgf2n>::run` in :download:`engine/vm/machine.hpp
+<../engine/vm/machine.hpp>` with :class:`sint` being
 ``Rep3Share2<64>``. Then, the following happens:
 
 1. :file:`Programs/Schedules/journey.sch` is parsed in :func:`load_schedule`.
@@ -178,51 +178,51 @@ with Rep3 modulo :math:`2^{64}`. The main function in
    describes every instruction.
 3. :func:`Machine<sint, sgf2n>::prepare` creates a computation thread
    using :func:`pthread_create`, which runs :func:`thread_info<sint,
-   sgf2n>::Main_Func` in :download:`Processor/Online-Thread.hpp
-   <../Processor/Online-Thread.hpp>`.
+   sgf2n>::Main_Func` in :download:`engine/vm/online_thread.hpp
+   <../engine/vm/online_thread.hpp>`.
 4. :func:`Machine<sint, sgf2n>::run` calls :func:`Machine<sint,
    sgf2n>::run_tape`, which signals the thread which code to run.
 5. The computation thread waits for a signal in
    :func:`thread_info<sint, sgf2n>::Sub_Main_Func`. Once received, it
    calls :func:`Program::execute` in
-   :download:`Processor/Instruction.hpp <../Processor/Instruction.hpp>`.
+   :download:`engine/vm/instruction.hpp <../engine/vm/instruction.hpp>`.
 6. :func:`Program::execute` runs the main loop over the
    instructions. There is a switch statement acting on the instruction
    codes.
 7. ``LDSI`` is defined in ``ARITHMETIC_INSTRUCTIONS`` in
-   :download:`Processor/instructions.h
-   <../Processor/instructions.h>`. It calls :func:`sint::constant`,
-   which is defined in :download:`Protocols/Rep3Share.h
-   <../Protocols/Rep3Share.h>` for ``Rep3Share2<64>``. This is in
+   :download:`engine/vm/instructions.h
+   <../engine/vm/instructions.h>`. It calls :func:`sint::constant`,
+   which is defined in :download:`engine/protocols/replicated/rep3_share.h
+   <../engine/protocols/replicated/rep3_share.h>` for ``Rep3Share2<64>``. This is in
    turn calls :func:`Replicated::assign` in
-   :download:`Protocols/Replicated.h <../Protocols/Replicated.h>`,
+   :download:`engine/protocols/replicated/replicated.h <../engine/protocols/replicated/replicated.h>`,
    which creates a constant replicated secret sharing of 123, that is
    (123, 0) for party 0, (0, 123) for party 1, and (0, 0) for party 2.
 8. ``OPEN`` is defined in another switch statement in
    :func:`Instruction::execute` in
-   :download:`Processor/Instruction.hpp
-   <../Processor/Instruction.hpp>`, where :func:`SubProcessor::POpen`
-   in :download:`Processor/Processor.hpp <../Processor/Processor.hpp>`
+   :download:`engine/vm/instruction.hpp
+   <../engine/vm/instruction.hpp>`, where :func:`SubProcessor::POpen`
+   in :download:`engine/vm/processor.hpp <../engine/vm/processor.hpp>`
    is called. This is turn uses the four-step interface of
    :class:`MAC_Check_Base` with an instance of
    :class:`ReplicatedMC`. The communication happens in
    :func:`ReplicatedMC::exchange`, and the reconstruction (summation)
    happens :func:`ReplicatedMC::finalize`, both in
-   :download:`Protocols/ReplicatedMC.hpp
-   <../Protocols/ReplicatedMC.hpp>`. The remaining functions mainly
+   :download:`engine/protocols/replicated/replicated_mc.hpp
+   <../engine/protocols/replicated/replicated_mc.hpp>`. The remaining functions mainly
    handle copying data and serialization.
 9. ``PRINTREGPLAIN`` is also defined in the second switch statement,
    where :func:`Instruction::print` in
-   :download:`Processor/Instruction.hpp
-   <../Processor/Instruction.hpp>` is called. This function uses
+   :download:`engine/vm/instruction.hpp
+   <../engine/vm/instruction.hpp>` is called. This function uses
    :class:`SwitchableOutput`, which is used to output to console, to
    file, or not at all depending on the settings.
 10. ``PRINTCHR`` is defined in ``REGINT_INSTRUCTIONS`` in
-    :download:`Processor/instructions.h
-    <../Processor/instructions.h>`, which means that it's called via a
+    :download:`engine/vm/instructions.h
+    <../engine/vm/instructions.h>`, which means that it's called via a
     switch statement in :func:`Instruction::execute_regint` in
-    :download:`Processor/Instruction.cpp
-    <../Processor/Instruction.cpp>`. It also uses
+    :download:`engine/vm/instruction.cpp
+    <../engine/vm/instruction.cpp>`. It also uses
     :class:`SwitchableOutput`.
 11. The remaining instructions are executed similarly but not do have
     a relevant effect.

@@ -231,7 +231,7 @@ class HeapQ(object):
 def dijkstra(source, edges, e_index, oram_type, n_loops=None, int_type=None,
              debug=False):
     """ Securely compute Dijstra's algorithm on a secret graph. See
-    :download:`../Programs/Source/dijkstra_example.mpc` for an
+    :download:`../examples/dijkstra_example.mpc` for an
     explanation of the required inputs.
 
     :param source: source node (secret or clear-text integer)

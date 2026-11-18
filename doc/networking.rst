@@ -60,7 +60,7 @@ different parties (include none at all). The infrastructure makes sure
 to send and receive in parallel whenever possible.
 
 All communication is handled through two subclasses of :cpp:class:`Player`
-defined in ``Networking/Player.h``. :cpp:class:`PlainPlayer` communicates
+defined in ``engine/net/player.h``. :cpp:class:`PlainPlayer` communicates
 in cleartext while :cpp:class:`CryptoPlayer` uses TLS encryption. The
 former uses the same BSD socket for sending and receiving but the
 latter uses two different connections for sending and receiving. This

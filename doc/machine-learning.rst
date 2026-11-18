@@ -447,7 +447,7 @@ probability distributions or top guesses (the latter with ``top=True``)
 for any sample data.
 
 You can also use some networks provided within PyTorch as demonstrated
-by :download:`../Programs/Source/torch_squeeze.py`::
+by :download:`../examples/torch_squeeze.py`::
 
   model = torchvision.models.get_model('SqueezeNet1_1', weights='DEFAULT')
   layers = ml.layers_from_torch(model, ...)

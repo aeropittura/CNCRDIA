@@ -11,8 +11,8 @@ for communication between nodes. This means that you have to run
 across several machines.
 
 In the following, we will explain the example in
-:download:`../Programs/Source/multinode_example_main.py` and
-:download:`../Programs/Source/multinode_example_worker.py`.
+:download:`../examples/multinode_example_main.py` and
+:download:`../examples/multinode_example_worker.py`.
 
 First, the one main node per party, listens and accepts connections
 from the worker nodes in the same logical party::

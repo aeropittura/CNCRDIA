@@ -5,7 +5,7 @@ Lowest-Level Interface
 
 In the following, we will introduce the most protocol-independent
 interfaces by walking through `Utils/protocol-tutorial
-<../Utils/protocol-tutorial.cpp>`_. It implements the Rep3
+<../parties/examples/protocol-tutorial.cpp>`_. It implements the Rep3
 multiplication protocol independently of the usual protocol interface
 for illustration purposes.
 

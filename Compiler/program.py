@@ -315,12 +315,17 @@ class Program(object):
                     self.name = self.name[:-len(ext)]
 
             infiles = [args[0]]
-            for x in (self.programs_dir, sys.path[0] + "/Programs"):
+            # programs of the current directory, then the bundled examples
+            # (the latter used to live in Programs/Source)
+            search = (self.programs_dir + "/Source",
+                      sys.path[0] + "/Programs/Source",
+                      sys.path[0] + "/examples")
+            for x in search:
                 for ext in exts:
                     filename = args[0]
                     if not filename.endswith(ext):
                         filename += ext
-                    filename = x + "/Source/" + filename
+                    filename = x + "/" + filename
                     if os.path.abspath(filename) not in \
                        [os.path.abspath(f) for f in infiles]:
                         infiles += [filename]

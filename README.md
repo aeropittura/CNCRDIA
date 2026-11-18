@@ -83,7 +83,7 @@ echo 1 2 3 4 > Player-Data/Input-P1-0
 Scripts/compile-run.py -E mascot tutorial
 ```
 
-This runs [the tutorial](Programs/Source/tutorial.mpc) with two
+This runs [the tutorial](examples/tutorial.mpc) with two
 parties and malicious security.
 
 #### TL;DR (Source from GitHub)
@@ -103,7 +103,7 @@ On MacOS, this requires High Sierra or later. It uses
 be offered an automatic download if it is not found.
 
 The following will execute [the
-tutorial](Programs/Source/tutorial.mpc) with two parties and malicious
+tutorial](examples/tutorial.mpc) with two parties and malicious
 security.
 
 ```
@@ -123,7 +123,7 @@ Build a docker image for `mascot-party.x`:
 docker build --tag mpspdz:mascot-party --build-arg machine=mascot-party.x .
 ```
 
-Run the [the tutorial](Programs/Source/tutorial.mpc):
+Run the [the tutorial](examples/tutorial.mpc):
 
 ```
 docker run --rm -it mpspdz:mascot-party ./Scripts/compile-run.py mascot tutorial
@@ -321,14 +321,14 @@ compute the preprocessing time for a particular computation.
 
 #### Compilation
 
-1. Edit `CONFIG` or `CONFIG.mine` to your needs:
+1. Put local build settings into `CONFIG.mine` (the defaults are in `build/config.mk`):
 
     - On x86, the binaries are optimized for the CPU you are compiling
       on. For all optimizations on x86, a CPU supporting AES-NI,
       PCLMUL, AVX2, BMI2, ADX is required. This includes mainstream
       processors released 2014 or later. If you intend to run on a
       different CPU than compiling, you might need to change the `ARCH`
-      variable in `CONFIG` or `CONFIG.mine` to `-march=<cpu>`. See the
+      variable in `CONFIG.mine` to `-march=<cpu>`. See the
       [GCC
       documentation](https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html)
       for the possible options.
@@ -348,7 +348,7 @@ compute the preprocessing time for a particular computation.
 
 2. Run `make` to compile all the software (use the flag `-j` for faster
    compilation using multiple threads). See below on how to compile specific
-   parts only. Remember to run `make clean` first after changing `CONFIG`
+   parts only. Remember to run `make clean` first after changing `build/config.mk`
    or `CONFIG.mine`.
 
 # Running Computation
@@ -480,7 +480,7 @@ protocol. All protocols support at least 64-bit integers.
 
 Fixed-point numbers (`sfix`) always use 15/16-bit precision by default in
 binary circuits. This can be changed with `sfix.set_precision`. See
-[the tutorial](Programs/Source/tutorial.mpc).
+[the tutorial](examples/tutorial.mpc).
 
 If you would like to use integers of various precisions, you can use
 `sbitintvec.get_type(n)` to get a type for `n`-bit arithmetic.
@@ -606,7 +606,7 @@ You could then run this with the same args as used with `compile.py`:
 python hello_world.mpc <compile args>
 ```
 
-This is particularly useful if want to add new command line arguments specifically for your `.mpc` file. See [test_args.mpc](Programs/Source/test_args.mpc) for more details on this use case.
+This is particularly useful if want to add new command line arguments specifically for your `.mpc` file. See [test_args.mpc](examples/test_args.mpc) for more details on this use case.
 
 Note that when using this approach, all objects provided in the high level interface (e.g. sint, print_ln) need to be imported, because the `.mpc` file is interpreted directly by Python (instead of being read by `compile.py`.)
 
@@ -917,7 +917,7 @@ the certificates to have the common name `P<i>` for player
 <ssl_dir>`). The script above takes care of all this by generating
 self-signed certificates. Therefore, if you are running the programs
 on different hosts you will need to copy the certificate files.
-Note that `<ssl_dir>` must match `SSL_DIR` set in `CONFIG` or `CONFIG.mine`.
+Note that `<ssl_dir>` must match `SSL_DIR` set in `CONFIG.mine` (default in `build/config.mk`).
 Just like `SSL_DIR`, `<ssl_dir>` defaults to `Player-Data`.
 
 In the following, we will walk through running the tutorial modulo
@@ -1037,7 +1037,7 @@ based on MASCOT and two parties. The other programs work similarly.
 
 First, compile the virtual machine. In order to run with more than
 three parties, change the definition of `MAX_N_PARTIES` in
-`BMR/config.h` accordingly.
+`engine/garbled/bmr/config.h` accordingly.
 
 `make -j 8 real-bmr-party.x`
 
@@ -1177,7 +1177,7 @@ design, so most of the previous documentation does not apply. In
 particular, you cannot use `compile-run.py`.
 
 By default, the implementations is optimized for two parties. You can
-change this by defining `N_PARTIES` accordingly in `BMR/config.h`. If
+change this by defining `N_PARTIES` accordingly in `engine/garbled/bmr/config.h`. If
 you entirely delete the definition, it will be able to run for any
 number of parties albeit slower.
 

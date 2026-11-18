@@ -46,8 +46,13 @@ def fingerprint_tree(root):
             continue
         for name in sorted(os.listdir(base)):
             with open(os.path.join(base, name), 'rb') as handle:
-                digests[sub + '/' + name] = \
-                    hashlib.sha256(handle.read()).hexdigest()
+                content = handle.read()
+            if sub == 'Schedules':
+                # the schedule records the command line, including the
+                # location of compile.py; make it independent of the checkout
+                content = content.replace(
+                    os.path.join(REPO, 'compile.py').encode(), b'compile.py')
+            digests[sub + '/' + name] = hashlib.sha256(content).hexdigest()
     return digests
 
 
@@ -94,13 +99,21 @@ def run(args):
         json.dump(results, handle, indent=1, sort_keys=True)
 
 
+# outcomes that depend on the machine rather than on the code: the
+# compiler's own wall-clock limit (five minutes) and network downloads
+UNSTABLE = ('Compilation timeout reached', 'URLError', 'HTTPError')
+
+
 def normalize(results):
     """Error messages are compared without the module path of the
-    exception class, which changes when modules move."""
+    exception class, which changes when modules move.  Unstable outcomes
+    are reported as timeouts."""
     for outcome in results.values():
         if 'message' in outcome:
             outcome['message'] = re.sub(r'^([A-Za-z_][\w]*\.)+(?=\w+:)', '',
                                         outcome['message'])
+            if any(marker in outcome['message'] for marker in UNSTABLE):
+                outcome['status'] = 'timeout'
     return results
 
 

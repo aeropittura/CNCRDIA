@@ -129,7 +129,7 @@ Modulo a power of two:
   Values are stored in blocks according to the storage size above,
   all in little-endian order.
 
-For further details, have a look at ``Utils/Fake-Offline.cpp``, which
+For further details, have a look at ``parties/offline/Fake-Offline.cpp``, which
 contains code that generates preprocessing data insecurely for a range
 of protocols (underlying the binary ``Fake-Offline.x``).
 

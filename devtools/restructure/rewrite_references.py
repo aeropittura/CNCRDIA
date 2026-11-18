@@ -13,7 +13,8 @@ import re
 import subprocess
 import sys
 
-SKIP_PREFIXES = ('third_party/', 'deps/', 'Programs/Circuits', 'tests/baseline/')
+SKIP_PREFIXES = ('third_party/', 'deps/', 'Programs/Circuits', 'tests/baseline/',
+                 'devtools/restructure/')
 TEXT_SUFFIXES = ('.h', '.hpp', '.cpp', '.py', '.sh', '.rst', '.md', '.txt',
                  '.mpc', '.yml', '.yaml', 'Dockerfile', 'Doxyfile', '.mk',
                  'Makefile', '.cfg', '.toml')

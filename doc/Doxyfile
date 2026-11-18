@@ -829,7 +829,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../Networking ../Tools/octetStream.h ../Processor/Data_Files.h ../Protocols/Replicated.h ../Protocols/ReplicatedPrep.h ../Protocols/MAC_Check_Base.h ../Processor/Input.h ../ExternalIO/Client.h ../Protocols/ProtocolSet.h ../Protocols/ProtocolSetup.h ../Math/gfp.h ../Math/gfpvar.h ../Math/Z2k.h ../FHE/Ciphertext.h ../FHE/FHE_Keys.h ../FHE/FHE_Params.h ../FHE/Plaintext.h ../Tools/random.h ../Math/bigint.h ../Processor/FunctionArgument.h
+INPUT                  = ../engine/net ../engine/support/octet_stream.h ../engine/vm/data_files.h ../engine/protocols/replicated/replicated.h ../engine/protocols/common/replicated_prep.h ../engine/protocols/common/mac_check_base.h ../engine/vm/input.h ../clients/client.h ../engine/protocols/common/protocol_set.h ../engine/protocols/common/protocol_setup.h ../engine/numeric/gfp.h ../engine/numeric/gfpvar.h ../engine/numeric/z2k.h ../engine/he/core/ciphertext.h ../engine/he/core/fhe_keys.h ../engine/he/core/fhe_params.h ../engine/he/core/plaintext.h ../engine/support/random.h ../engine/numeric/bigint.h ../engine/vm/function_argument.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

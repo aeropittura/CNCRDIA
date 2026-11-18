@@ -145,9 +145,9 @@ Python Trusted Client Tutorial
 
 In this section, we will illustrate how to use the client interface to
 supplement individual parties in the secure computation. This example
-consists of :download:`../Programs/Source/personal_client_example.py`
+consists of :download:`../examples/personal_client_example.py`
 for the server side and
-:download:`../ExternalIO/personal-client-example.py` for the client
+:download:`../clients/personal-client-example.py` for the client
 side.
 
 The servers start by listening for and accepting one connection::

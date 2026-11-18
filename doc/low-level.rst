@@ -4,7 +4,7 @@ Low-Level Interface
 ===================
 
 In the following we will explain the basics of the C++ interface by
-walking trough :file:`Utils/paper-example.cpp`.
+walking trough :file:`parties/examples/paper-example.cpp`.
 
 .. default-domain:: cpp
 

@@ -1,0 +1,12 @@
+/*
+ * rep-bmr-party.cpp
+ *
+ */
+
+#include "garbled/bmr/real_program_party.hpp"
+#include "parties/shared/rep.hpp"
+
+int main(int argc, const char** argv)
+{
+    RealProgramParty<Rep3Share<gf2n_long>>(argc, argv);
+}

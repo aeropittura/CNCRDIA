@@ -42,7 +42,7 @@ registers.
 
 On the backend side, the multiplication is implemented in the
 :cpp:func:`muls` member function in
-:download:`../Processor/Processor.hpp`. Notice that
+:download:`../engine/vm/processor.hpp`. Notice that
 ``protocol.exchange()`` (where the communication happens) is only
 called once. See :ref:`low-level` for more information.
 
@@ -118,7 +118,7 @@ The actual truncation happens in the vectorized instructions starting
 with v. The only communication-relevant instruction is (v)trunc_pr,
 where truncation by 16 bits is done via a protocol defined in the
 virtual machine. For example, the implementation for Rep3 is found in
-:download:`../Protocols/Replicated.hpp`. The other vectorized
+:download:`../engine/protocols/replicated/replicated.hpp`. The other vectorized
 instructions are required to turn negative values into positive ones,
 which is a precondition for the protocol. See Protocol in 3.1 in
 `Catrina and Saxena <https://www.ifca.ai/pub/fc10/31_47.pdf>`_ for an

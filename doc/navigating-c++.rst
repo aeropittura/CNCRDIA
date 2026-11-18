@@ -167,7 +167,7 @@ implementing protocols, and contain variables and static functions to
 describes protocols.
 
 As an example, consider :cpp:class:`Rep3Share\<T>` in
-:download:`../Protocols/Rep3Share.h`. It implements a share for
+:download:`../engine/protocols/replicated/rep3_share.h`. It implements a share for
 three-party replicated secret sharing. It takes one template parameter
 for the mathematical domain because the secret sharing and the
 multiplication protocol work for any finite domain. The following
@@ -243,7 +243,7 @@ The main function for the protocol-specific virtual machines is
 defined in the file of the appropriate name in the ``Machines``
 directory. For example, the virtual machine for three-party replicated
 secret sharing over prime fields is defined in
-:download:`../Machines/replicated-field-party.cpp`, and the main function
+:download:`../parties/arith/replicated-field-party.cpp`, and the main function
 looks as follows::
 
   int main(int argc, const char** argv)
@@ -257,12 +257,12 @@ complete share type for integer and :math:`\mathrm{GF}(2^n)`,
 respectively. The defaults are :cpp:class:`Rep3Share\<gfp_\<0, 2>>` and
 :cpp:class:`Rep3Share\<gf2n_long>` in the example. To choose that,
 the constructor of :cpp:class:`FieldMachine` (in
-:download:`../Processor/FieldMachine.hpp`) contains code to the length
+:download:`../engine/vm/field_machine.hpp`) contains code to the length
 for :cpp:class:`gfp_` (the second parameter, the first is always
 0). For protocols modulo a power of two other than SPDZ2k, this
 happens in the constructor of :cpp:class:`RingMachine` or
 :cpp:class:`HonestMajorityRingMachineWithSecurity` in
-:download:`../Processor/RingMachine.hpp`. The purpose of all this is
+:download:`../engine/vm/ring_machine.hpp`. The purpose of all this is
 to fix the mathematical domains throughout for maximum performance.
 
 The includes are structured in a way that all relevant templated code

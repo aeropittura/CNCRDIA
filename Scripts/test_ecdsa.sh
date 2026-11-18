@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 echo SECURE = -DINSECURE >> CONFIG.mine
-touch -r CONFIG CONFIG.mine
-touch ECDSA/Fake-ECDSA.cpp
+touch -r build/config.mk CONFIG.mine
+touch parties/ecdsa/Fake-ECDSA.cpp
 
 make -j4 ecdsa Fake-ECDSA.x
 

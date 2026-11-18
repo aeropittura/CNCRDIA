@@ -246,7 +246,7 @@ Illegal instruction
 
 By default, the binaries are optimized for the machine they are
 compiled on. If you try to run them an another one, make sure set
-``ARCH`` in ``CONFIG`` accordingly. Furthermore, if you run on an x86
+``ARCH`` in ``CONFIG.mine`` accordingly. Furthermore, if you run on an x86
 processor without AVX (produced before 2011), you need to set
 ``AVX_OT = 0`` to run dishonest-majority protocols.
 

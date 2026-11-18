@@ -14,8 +14,8 @@ inputs and return values as well as (multi-)arrays of binary secrets
 :py:class:`~Compiler.GC.types.sbitintvec`).
 
 As a simple example, consider
-:download:`../Programs/Source/export-sort.py` and
-:download:`../Utils/export-sort.cpp`. The Python part looks as follows::
+:download:`../examples/export-sort.py` and
+:download:`../parties/export/export-sort.cpp`. The Python part looks as follows::
 
   @export
   def sort(x):
@@ -31,7 +31,7 @@ code example <low-level>`:
 
 .. code-block:: cpp
 
-  #include "Machines/maximal.hpp"
+  #include "parties/shared/maximal.hpp"
 
   int main(int argc, const char** argv)
   {
@@ -137,7 +137,7 @@ Vector arguments and return values
 
 Instead of arrays, it is also possible to use
 :py:class:`~Compiler.types.sint` vectors as demonstrated in
-:download:`../Programs/Source/export-trunc.py`::
+:download:`../examples/export-trunc.py`::
 
   @export
   def trunc_pr(x):
@@ -148,7 +148,7 @@ Instead of arrays, it is also possible to use
 
   trunc_pr(sint(0, size=1000))
 
-The calling C++ code in :download:`../Utils/export-trunc.cpp` looks as
+The calling C++ code in :download:`../parties/export/export-trunc.cpp` looks as
 follows:
 
 .. code-block:: cpp
@@ -174,7 +174,7 @@ Binary values
 -------------
 
 It is possible to input and output binary secrets with an
-array. Consider :download:`../Programs/Source/export-b2a.py`, which
+array. Consider :download:`../examples/export-b2a.py`, which
 converts arithmetic to binary shares::
 
   @export
@@ -218,7 +218,7 @@ vectors for the inputs. This is due to the fact
 ``share_type::bit_type`` can only hold up to 64 bits, so for longer
 bit lengths several entries have to be used.
 
-Lastly, :download:`../Programs/Source/export-a2b.py` covers the other
+Lastly, :download:`../examples/export-a2b.py` covers the other
 direction::
 
   @export
@@ -229,7 +229,7 @@ direction::
 
   a2b(sint(size=10), sbitvec.get_type(16).Array(10))
 
-The calling C++ code in :download:`../Utils/export-a2b.cpp` has to
+The calling C++ code in :download:`../parties/export/export-a2b.cpp` has to
 initialize the binary shares even when they are only used for output:
 
 .. code-block::
@@ -255,7 +255,7 @@ initialize the binary shares even when they are only used for output:
 C++ compilation
 ---------------
 
-The easiest way is to include ``Machines/maximal.hpp`` as in the first
+The easiest way is to include ``parties/shared/maximal.hpp`` as in the first
 example and put the C++ in code ``Utils/<name>.cpp`` and calling
 ``make <name>.x`` in the main directory. If using oblivious transfer
 or homomorphic encryption, add the following line to ``Makefile``::
@@ -264,8 +264,8 @@ or homomorphic encryption, add the following line to ``Makefile``::
 
 Most of the examples work slightly differently, however, in order to
 distribute the compilation load. Most notably,
-:download:`../Utils/export-a2b.cpp`, which supports several protocols,
-only includes ``Machines/minimal.hpp`` and "outsources" the virtual
+:download:`../parties/export/export-a2b.cpp`, which supports several protocols,
+only includes ``parties/shared/minimal.hpp`` and "outsources" the virtual
 machine for the various protocols to ``Machines/export-*.cpp``, which
 are all compiled separately.
 

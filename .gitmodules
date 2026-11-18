@@ -1,24 +1,24 @@
 [submodule "SimpleOT"]
-	path = deps/SimpleOT
+	path = third_party/SimpleOT
 	url = https://github.com/mkskeller/SimpleOT
 [submodule "Programs/Circuits"]
 	path = Programs/Circuits
 	url = https://github.com/mkskeller/bristol-fashion
 [submodule "simde"]
-	path = deps/simde
+	path = third_party/simde
 	url = https://github.com/simd-everywhere/simde
 [submodule "deps/libOTe"]
-	path = deps/libOTe
+	path = third_party/libOTe
 	url = https://github.com/mkskeller/softspoken-implementation
 [submodule "deps/libOTe2"]
-	path = deps/libOTe2
+	path = third_party/libOTe2
 	url = https://github.com/mkskeller/libOTe
 [submodule "deps/SimplestOT_C"]
-	path = deps/SimplestOT_C
+	path = third_party/SimplestOT_C
 	url = https://github.com/mkskeller/SimplestOT_C
 [submodule "deps/sse2neon"]
-	path = deps/sse2neon
+	path = third_party/sse2neon
 	url = https://github.com/DLTcollab/sse2neon
 [submodule "deps/secure-join"]
-	path = deps/secure-join
+	path = third_party/secure-join
 	url = https://github.com/mkskeller/secure-join
