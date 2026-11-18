@@ -15,10 +15,10 @@ done
 ./stream-fake-mascot-triples.x &
 pid=$!
 
-Scripts/mascot.sh test_thread_mul -f -o debug_file_signature || exit 1
+launch/mascot.sh test_thread_mul -f -o debug_file_signature || exit 1
 
 kill $pid
 
 ./stream-fake-mascot-triples.x &
 
-Scripts/mascot.sh test_thread_mul -f -o debug_file_signature || exit 1
+launch/mascot.sh test_thread_mul -f -o debug_file_signature || exit 1

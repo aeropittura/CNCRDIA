@@ -27,7 +27,7 @@ function test_vm
     ulimit -c unlimited
     vm=$1
     shift
-    if ! Scripts/$vm.sh tutorial $* > /dev/null ||
+    if ! launch/$vm.sh tutorial $* > /dev/null ||
 	    ! grep 'weighted average: 2.333' logs/tutorial-0; then
 	for i in $(seq 4 -1 0); do
 	    echo == Party $i

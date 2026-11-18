@@ -22,7 +22,7 @@ protocol_links = set()
 
 for protocol in sorted(protocols()):
     protocol = Compiler.short_protocol_name(protocol)
-    assert os.path.exists('../Scripts/%s.sh' % protocol)
+    assert os.path.exists('../launch/%s.sh' % protocol)
     reading = reading_for_protocol(protocol)
     assert reading
     out.writerow([protocol, reading])

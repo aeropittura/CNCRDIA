@@ -671,7 +671,7 @@ class Compiler:
                 raise CompilerError(
                     "Cannot produce %s. " % executable + \
                     "Note that compilation requires a few GB of RAM.")
-        vm = "%s/Scripts/%s.sh" % (self.root, self.options.execute)
+        vm = "%s/launch/%s.sh" % (self.root, self.options.execute)
         sys.stdout.flush()
         print("Running program...", file=sys.stderr)
         sys.stderr.flush()

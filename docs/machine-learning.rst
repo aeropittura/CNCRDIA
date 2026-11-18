@@ -83,9 +83,9 @@ vertically::
 
 The three approaches in this section can be run as follows::
 
-  Scripts/compile-run.py -E ring breast_logistic
-  Scripts/compile-run.py -E ring breast_logistic horizontal
-  Scripts/compile-run.py -E ring breast_logistic vertical
+  launch/compile-run.py -E ring breast_logistic
+  launch/compile-run.py -E ring breast_logistic horizontal
+  launch/compile-run.py -E ring breast_logistic vertical
 
 In the last variants, the labels are all input via party 0.
 
@@ -201,7 +201,7 @@ add ``approx`` to use a three-piece approximate sigmoid function:
 
 .. code-block:: console
 
-  Scripts/compile-emulate.py breast_logistic approx
+  launch/compile-emulate.py breast_logistic approx
 
 Omitting it invokes the default sigmoid function.
 
@@ -273,7 +273,7 @@ softmax, and cross-entropy loss. The number of epochs and threads is
 taken from the command line. For example, the following trains the
 network for 10 epochs using 4 threads::
 
-  Scripts/compile-emulate.py torch_mnist_dense 10 4
+  launch/compile-emulate.py torch_mnist_dense 10 4
 
 See ``Programs/Source/torch_*.mpc`` for further examples of the
 PyTorch functionality, :py:func:`~mpcl.apps.ml.Optimizer.fit` for
@@ -332,7 +332,7 @@ You can run the example as follows:
 
 .. code-block:: console
 
-  Scripts/compile-emulate.py breast_tree
+  launch/compile-emulate.py breast_tree
 
 It is also possible to output the accuracy after every level::
 
@@ -360,7 +360,7 @@ Nearest rounding can then be activated as follows:
 
 .. code-block:: console
 
-  Scripts/compile-emulate.py breast_tree nearest
+  launch/compile-emulate.py breast_tree nearest
 
 .. _`Hamada et al.`: https://arxiv.org/abs/2112.12906
 
@@ -515,7 +515,7 @@ if :py:obj:`net` is a PyTorch module with the correct meta-parameters.
 This demonstrates that the parameters are stored with double precision
 in the canonical order.
 
-There are a number of scripts in ``Scripts``, namely
+There are a number of scripts in ``launch``, namely
 ``torch_cifar_alex_import.py``, ``torch_mnist_dense_import.py``, and
 ``torch_mnist_lenet_import.py``, which import the models output by
 ``torch_alex_test.mpc``, ``torch_mnist_dense.mpc``, and
@@ -523,11 +523,11 @@ There are a number of scripts in ``Scripts``, namely
 
 .. code-block:: console
 
-  $ Scripts/compile-emulate.py torch_mnist_lenet_predict
+  $ launch/compile-emulate.py torch_mnist_lenet_predict
   ...
   Secure accuracy: 9822/10000
   ...
-  $ Scripts/torch_mnist_lenet_import.py
+  $ launch/torch_mnist_lenet_import.py
   Test accuracy of the network: 98.22 %
 
 The accuracy values might vary as the model is freshly trained, but

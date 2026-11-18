@@ -12,7 +12,7 @@ void check_ssl_file(string filename)
     if (not ifstream(filename))
         exit_error("Cannot access " + filename
                         + ". Have you set up SSL?\n"
-                        "You can use `Scripts/setup-ssl.sh <nparties>`.");
+                        "You can use `launch/setup-ssl.sh <nparties>`.");
 }
 
 void ssl_error(string side, string other, string me, exception& e)
@@ -25,7 +25,7 @@ void ssl_error(string side, string other, string me, exception& e)
             << " and run `c_rehash <directory>` on its location." << endl
             << "The certificates should be the same on every host. "
             << "Also make sure that it's still valid. Certificates generated "
-            << "with `Scripts/setup-ssl.sh` expire after a month." << endl;
+            << "with `launch/setup-ssl.sh` expire after a month." << endl;
     cerr << "See also "
             "https://mp-spdz.readthedocs.io/en/latest/troubleshooting.html"
             "#handshake-failures" << endl;

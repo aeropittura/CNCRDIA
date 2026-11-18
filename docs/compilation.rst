@@ -2,7 +2,7 @@ Compilation Process
 -------------------
 
 The easiest way of using MP-SPDZ is using ``compile.py`` or
-``Scripts/compile-run.py`` as
+``launch/compile-run.py`` as
 described below. If you would like to run compilation directly from
 Python, see :ref:`direct-compilation`.
 
@@ -29,13 +29,13 @@ This can be compiled and run using
 .. code-block:: bash
 
    ./compile.py <progname> <n_loops>
-   Scripts/<protocol>.sh <progname>-<n_loops>
+   launch/<protocol>.sh <progname>-<n_loops>
 
 or
 
 .. code-block:: bash
 
-   Scripts/compile-run.py <protocol> <progname> <n_loops>
+   launch/compile-run.py <protocol> <progname> <n_loops>
 
 
 Compiler options

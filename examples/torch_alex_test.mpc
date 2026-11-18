@@ -85,7 +85,7 @@ layers = ml.layers_from_torch(net, test_samples.shape, 128, input_via=0)
 
 optimizer = ml.SGD(layers)
 
-# output to be used in Scripts/torch_cifar_alex_import.py
+# output to be used in launch/torch_cifar_alex_import.py
 optimizer.reveal_model_to_binary()
 
 n_correct, loss = optimizer.reveal_correctness(test_samples, test_labels, 128)

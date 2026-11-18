@@ -30,7 +30,7 @@ The virtual machines offer the option ``--code-locations`` to output
 the most relevant locations in the code that are used by
 computation. For example::
 
-  Scripts/compile-run.py ring tutorial -- --code-locations
+  launch/compile-run.py ring tutorial -- --code-locations
 
 will output::
 

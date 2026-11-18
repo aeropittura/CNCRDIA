@@ -54,5 +54,5 @@ optimizer.fit(
 for var in optimizer.trainable_variables:
     var.write_to_file()
 
-# output to be used in Scripts/torch_mnist_lenet_import.py
+# output to be used in launch/torch_mnist_lenet_import.py
 optimizer.reveal_model_to_binary()

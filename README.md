@@ -11,6 +11,13 @@ they describe upstream history, not development activity by the importer.
 Repository presentation and this disclosure are introduced in the first imported
 commit. See [PROVENANCE.md](PROVENANCE.md).
 
+After the import, the code base is being reorganised and reworked (see
+[PROVENANCE.md](PROVENANCE.md#modifications-after-the-import)). The new layout
+is described in [ARCHITECTURE.md](ARCHITECTURE.md). Binary names, command-line
+options, bytecode and file formats are unchanged, so the upstream documentation
+below still applies. Where it names a source file, look up its new location in
+`devtools/restructure/moved-files.txt`.
+
 ## Upstream documentation
 
 # Multi-Protocol SPDZ [![Documentation Status](https://app.readthedocs.org/projects/mp-spdz/badge/?version=latest)](https://mp-spdz.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://dev.azure.com/data61/MP-SPDZ/_apis/build/status/data61.MP-SPDZ?branchName=master)](https://dev.azure.com/data61/MP-SPDZ/_build/latest?definitionId=7&branchName=master) [![Gitter](https://badges.gitter.im/MP-SPDZ/community.svg)](https://gitter.im/MP-SPDZ/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -77,10 +84,10 @@ then execute the following from
 the top folder:
 
 ```
-Scripts/tldr.sh
+launch/tldr.sh
 echo 1 2 3 4 > Player-Data/Input-P0-0
 echo 1 2 3 4 > Player-Data/Input-P1-0
-Scripts/compile-run.py -E mascot tutorial
+launch/compile-run.py -E mascot tutorial
 ```
 
 This runs [the tutorial](examples/tutorial.mpc) with two
@@ -110,7 +117,7 @@ security.
 make setup
 echo 1 2 3 4 > Player-Data/Input-P0-0
 echo 1 2 3 4 > Player-Data/Input-P1-0
-Scripts/compile-run.py mascot tutorial
+launch/compile-run.py mascot tutorial
 ```
 
 On strong enough hardware setups (several cores and GB of RAM), you
@@ -126,7 +133,7 @@ docker build --tag mpspdz:mascot-party --build-arg machine=mascot-party.x .
 Run the [the tutorial](examples/tutorial.mpc):
 
 ```
-docker run --rm -it mpspdz:mascot-party ./Scripts/compile-run.py mascot tutorial
+docker run --rm -it mpspdz:mascot-party ./launch/compile-run.py mascot tutorial
 ```
 
 See the [`Dockerfile`](./Dockerfile) for examples of how it can be used.
@@ -140,7 +147,7 @@ blocks in a black-box manner. You can have the compiler output links
 to relevant reading with the option `--paper`. Use either of the following:
 ```
 ./compile.py --papers -E <protocol> <program>
-Scripts/compile-run.py --papers <protocol> <program>
+launch/compile-run.py --papers <protocol> <program>
 ```
 
 You can find a more systematic overview [in the
@@ -366,8 +373,8 @@ There are three ways of running computation:
 
    ```
    ./compile.py <program> <argument>
-   Scripts/mascot.sh <program>-<argument> [<runtime-arg>...]
-   Scripts/mascot.sh <program>-<argument> [<runtime-arg>...]
+   launch/mascot.sh <program>-<argument> [<runtime-arg>...]
+   launch/mascot.sh <program>-<argument> [<runtime-arg>...]
    ```
 
 2. One-command local execution. This compiles the program and the
@@ -378,7 +385,7 @@ There are three ways of running computation:
    well as required options.
 
    ```
-   Scripts/compile-run.py -E mascot <program> <argument> -- [<runtime-arg>...]
+   launch/compile-run.py -E mascot <program> <argument> -- [<runtime-arg>...]
    ```
 
 3. One-command remote execution. This compiles the program and the
@@ -386,7 +393,7 @@ There are three ways of running computation:
    all necessary input and certificate files via SSH.
 
    ```
-   Scripts/compile-run.py -H HOSTS -E mascot <program> <argument> -- [<runtime-arg>...]
+   launch/compile-run.py -H HOSTS -E mascot <program> <argument> -- [<runtime-arg>...]
    ```
 
    `HOSTS` has to be a text file in the following format:
@@ -568,7 +575,7 @@ SCALE-MAMBA, you can run the following:
 ```
 make Programs/Circuits
 ./compile.py aes_circuit
-Scripts/semi.sh aes_circuit
+launch/semi.sh aes_circuit
 ```
 
 This downloads the circuit, compiles it to MP-SPDZ bytecode, and runs
@@ -612,7 +619,7 @@ Note that when using this approach, all objects provided in the high level inter
 
 Furthermore, this only covers compilation, so you will need to run execution separately, for example:
 ```
-Scripts/mascot.sh hello_world
+launch/mascot.sh hello_world
 ```
 
 Also note that programs in the above form are not compatible with `compile.py` and `compile-run.py`.
@@ -631,13 +638,13 @@ $ mkdir myprogs
 $ cd myprogs
 $ mkdir -p Programs/Source
 $ vi Programs/Source/test.mpc
-$ ../MP-SPDZ/compile.py test.mpc
+$ ../CNCRDIA/compile.py test.mpc
 $ ls Programs/
 Bytecode  Public-Input  Schedules  Source
-$ ../MP-SPDZ/Scripts/setup-ssl.sh
+$ ../CNCRDIA/launch/setup-ssl.sh
 $ ls
 Player-Data Programs
-$ ../MP-SPDZ/Scripts/rep-field.sh test
+$ ../CNCRDIA/launch/rep-field.sh test
 ```
 
 ### TensorFlow inference
@@ -665,7 +672,7 @@ python3 squeezenet_main.py --in ./SampleImages/n02109961_36.JPEG --scalingFac 12
 cd ../../../..
 cp EzPC/Athos/Networks/SqueezeNetImgNet/SqNetImgNet_img_input.inp Player-Data/Input-Binary-P0-0
 ./compile.py -R 64 tf EzPC/Athos/Networks/SqueezeNetImgNet/graphDef.bin 1 trunc_pr split
-Scripts/ring.sh tf-EzPC_Athos_Networks_SqueezeNetImgNet_graphDef.bin-1-trunc_pr-split
+launch/ring.sh tf-EzPC_Athos_Networks_SqueezeNetImgNet_graphDef.bin-1-trunc_pr-split
 ```
 
 This requires TensorFlow and the axel command-line utility to be
@@ -790,7 +797,7 @@ party. Omitting `-I` leads to inputs being read from
 Or, you can use a script to do run two parties in non-interactive mode
 automatically:
 
-`Scripts/mascot.sh tutorial`
+`launch/mascot.sh tutorial`
 
 To run a program on two different machines, `mascot-party.x`
 needs to be passed the machine where the first party is running,
@@ -907,7 +914,7 @@ information.
 MP-SPDZ uses OpenSSL for secure channels. You can generate the
 necessary certificates and keys as follows:
 
-`Scripts/setup-ssl.sh [<number of parties> <ssl_dir>]`
+`launch/setup-ssl.sh [<number of parties> <ssl_dir>]`
 
 The programs expect the keys and certificates to be in
 `SSL_DIR/P<i>.key` and `SSL_DIR/P<i>.pem`, respectively, and
@@ -944,7 +951,7 @@ Finally, run the three parties as follows:
 
 or
 
-`Scripts/ring.sh tutorial`
+`launch/ring.sh tutorial`
 
 The `-I` argument enables interactive inputs, and in the tutorial party 0 and 1
 will be asked to provide three numbers. Otherwise, and when using the
@@ -972,7 +979,7 @@ communicating revealed values back from the online phase to the
 offline phase. Alternatively, you need to run a virtual machine for
 both phases simultaneously while facilitating the transmission of
 information between the phases through named pipes in
-`Player-Data`. `Scripts/{astra,trio}.sh` run both phases with the
+`Player-Data`. `launch/{astra,trio}.sh` run both phases with the
 necessary setup. This only works only on Linux as macOS does not seem
 to offer the same functionality for named pipes.
 
@@ -983,18 +990,18 @@ instead. This can be achieved be either running `./compile.py -E
 beginning of the high-level program. You can also use the integrated
 execution, either
 ```
-Scripts/compile-run.py [astra|trio] <progname> <args>...
+launch/compile-run.py [astra|trio] <progname> <args>...
 ```
 or
 ```
-Scripts/compile-run.py [astra|trio]-prep <progname> <args>...
-Scripts/compile-run.py [astra|trio]-online <progname> <args>...
+launch/compile-run.py [astra|trio]-prep <progname> <args>...
+launch/compile-run.py [astra|trio]-online <progname> <args>...
 ```
 Alternatively, compile first and then run the phases separately:
 ```
 ./compile.py -E [astra|trio] <progname> <args>...
-Scripts/[astra|trio]-prep.sh <progname-with-args>
-Scripts/[astra|trio]-online.sh <progname-with-args>
+launch/[astra|trio]-prep.sh <progname-with-args>
+launch/[astra|trio]-online.sh <progname-with-args>
 ```
 
 ## Dealer model
@@ -1053,7 +1060,7 @@ Finally, run the two parties as follows:
 
 or
 
-`Scripts/real-bmr.sh tutorial`
+`launch/real-bmr.sh tutorial`
 
 The `-I` enable interactive inputs, and in the tutorial party 0 and 1
 will be asked to provide three numbers. Otherwise, and when using the
@@ -1097,13 +1104,13 @@ This requires the INSECURE flag to be set before compilation as explained above.
 
 Run the command below. **If you haven't added `MY_CFLAGS = -DINSECURE` to `CONFIG.mine` before compiling, it will fail.**
 
-`Scripts/setup-online.sh`
+`launch/setup-online.sh`
 
 This sets up parameters for the online phase for 2 parties with a 128-bit prime field and 128-bit binary field, and creates fake offline data (multiplication triples etc.) for these parameters.
 
 Parameters can be customised by running
 
-`Scripts/setup-online.sh <nparties> <nbitsp> [<nbits2>]`
+`launch/setup-online.sh <nparties> <nbitsp> [<nbits2>]`
 
 
 #### To compile a program
@@ -1124,7 +1131,7 @@ To run the above program with two parties on one machine, run:
 
 Or, you can use a script to do the above automatically:
 
-`Scripts/mascot.sh -F tutorial`
+`launch/mascot.sh -F tutorial`
 
 MASCOT is one of the protocols that use SPDZ for the online phase, and
 `-F` causes the programs to read preprocessing material from files.
@@ -1189,9 +1196,9 @@ make -j 8 bmr
 
 After compiling the mpc file:
 
-- Run everything locally: `Scripts/bmr-program-run.sh <program>
+- Run everything locally: `launch/bmr-program-run.sh <program>
 <number of parties>`.
-- Run on different hosts: `Scripts/bmr-program-run-remote.sh <program>
+- Run on different hosts: `launch/bmr-program-run-remote.sh <program>
 <host1> <host2> [...]`
 
 #### Oblivious RAM
@@ -1204,7 +1211,7 @@ Circuit ORAM or linear scan without ORAM.
 compiler to remove dead code. This is useful for more complex programs
 such as this one.
 3) Run `gc_oram` in the virtual machines as explained above, for
-example: `Scripts/bmr-program-run.sh gc_oram 2`.
+example: `launch/bmr-program-run.sh gc_oram 2`.
 
 This only works with the partially insecure BMR implementation, so you
 cannot use any other protocol with it including Yao or any full BMR

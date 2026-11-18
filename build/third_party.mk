@@ -7,7 +7,7 @@ setup: maybe-boost linux-machine-setup
 endif
 
 mac-setup: mac-machine-setup
-	Scripts/get-brew.sh
+	launch/get-brew.sh
 	brew install openssl boost libsodium gmp yasm ntl cmake
 
 linux-machine-setup:

@@ -20,7 +20,7 @@ sfix.set_precision(12, 31)
 layers = []
 named = {}
 
-exec(subprocess.check_output(['Scripts/process-tf.py', program.args[1]]))
+exec(subprocess.check_output(['launch/process-tf.py', program.args[1]]))
 
 opt = ml.Optimizer()
 opt.set_layers_with_inputs(layers)

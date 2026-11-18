@@ -9,7 +9,7 @@ every party must be reachable under at least one TCP port. The default
 is to set this port to a base plus the player number. This allows for
 easily running all parties on the same host. The base defaults to 5000,
 which can be changed with the command-line option
-``--portnumbase``. However, the scripts in ``Scripts`` use a random
+``--portnumbase``. However, the scripts in ``launch`` use a random
 base port number, which can be changed using the same option.
 
 There are two ways of communicating hosts and
@@ -42,7 +42,7 @@ change this by either using ``--encrypted/-e`` or
 
 If using encryption, the certificates (``Player-Data/*.pem``) must be
 the same on all hosts, and you have to run ``c_rehash Player-Data`` on
-all of them. ``Scripts/setup-ssl.sh`` can be used to generate the
+all of them. ``launch/setup-ssl.sh`` can be used to generate the
 necessary certificates. The common name has to be ``P<player number>``
 for computing parties and ``C<client number>`` for clients.
 

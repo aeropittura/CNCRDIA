@@ -33,11 +33,11 @@ Unknown prime modulus
 
     or::
 
-      Scripts/<protocol>.sh -P <prime> ...
+      launch/<protocol>.sh -P <prime> ...
 
-    If using ``Scripts/compile-run.py``, put it after a double dash::
+    If using ``launch/compile-run.py``, put it after a double dash::
 
-      Scripts/compile-run.py <compiler-args> -- -P <prime> <execution-options>
+      launch/compile-run.py <compiler-args> -- -P <prime> <execution-options>
 
 Known prime modulus
     `Damgård et al. <https://doi.org/10.1007/11681878_15>`_ have

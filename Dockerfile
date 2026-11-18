@@ -83,7 +83,7 @@ RUN echo "CXX = ${cxx}" >> CONFIG.mine \
 # ssl keys
 ARG cryptoplayers=
 ENV PLAYERS ${cryptoplayers}
-RUN ./Scripts/setup-ssl.sh "${cryptoplayers}" ${ssl_dir}
+RUN ./launch/setup-ssl.sh "${cryptoplayers}" ${ssl_dir}
 
 RUN make clean-deps boost libote
 
@@ -132,7 +132,7 @@ RUN make clean && make ${machine} && cp ${machine} /usr/local/bin/
 #                                                                              #
 # Test it:                                                                     #
 #                                                                              #
-#   docker run --rm -it mpspdz:replicated-ring ./Scripts/ring.sh tutorial      #
+#   docker run --rm -it mpspdz:replicated-ring ./launch/ring.sh tutorial      #
 ################################################################################
 FROM machine as program
 

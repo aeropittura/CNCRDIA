@@ -24,3 +24,24 @@ Commit dates remain the original upstream dates and do not date the import work.
 Library APIs, package names, licenses, source headers, and upstream credits are
 preserved. Upstream signatures are omitted because rewritten commits have new
 IDs and cannot retain valid upstream signatures. No upstream endorsement is implied.
+
+## Modifications after the import
+
+The statements above describe the imported history up to the upstream
+revision named at the top. The commits that follow it modify the imported
+code. They are a derivative work of MP-SPDZ, distributed under the same
+licences (see [License.txt](License.txt)), and are not endorsed by the
+upstream authors.
+
+- The source tree is reorganised (C++ runtime in `engine/`, executables in
+  `parties/`, compiler in the `mpcl` package, and so on; see
+  [ARCHITECTURE.md](ARCHITECTURE.md)), and files are renamed.
+  `devtools/restructure/moved-files.txt` maps every old path to its new one.
+- The Python package `Compiler` is renamed `mpcl`. `Compiler` remains as a
+  compatibility alias.
+- The build is split into `build/*.mk`.
+- Behaviour is checked against a baseline recorded from the unmodified
+  upstream revision (`tests/`).
+
+Copyright notices and the licence files are kept. Where a file was moved or
+changed, its upstream history remains available through the imported commits.

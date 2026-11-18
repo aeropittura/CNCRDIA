@@ -16,6 +16,6 @@ are thus provided in separate files:
 - Coproto
 
 The binaries also include code from libstdc++ and libgcc. They have
-been produced using `Scripts/build.sh` and standard clang from
+been produced using `launch/build.sh` and standard clang from
 Rocky Linux 8 and therefore satisfy the [GCC Runtime Library
 Exception](https://www.gnu.org/licenses/gcc-exception-3.1.en.html).

@@ -19,7 +19,7 @@ separate resources, so consider reducing the number of threads with
 :py:func:`~mpcl.lib.library.for_range_multithreads` and similar.
 Lastly, you can use ``--disk-memory <path>`` to use disk space instead
 of RAM for large programs.
-Use ``Scripts/memory-usage.py <program-with-args>`` to get an estimate
+Use ``launch/memory-usage.py <program-with-args>`` to get an estimate
 of the memory usage of a specific program.
 
 
@@ -211,13 +211,13 @@ If you run on different hosts, the certificates
 party ``<i>`` requires ``Player-Data/P<i>.key`` that must match
 ``Player-Data/P<i>.pem``, that is, they have to be generated to
 together.  The easiest way of setting this up is to run
-``Scripts/setup-ssl.sh`` on one host and then copy all
+``launch/setup-ssl.sh`` on one host and then copy all
 ``Player-Data/*.{pem,key}`` to all other hosts. This is *not* secure
 but it suffices for experiments. A secure setup would generate every
 key pair locally and then distributed only the public keys.  Finally,
 run ``c_rehash Player-Data`` on all hosts. The certificates generated
-by ``Scripts/setup-ssl.sh`` expire after a month, so you need to
-regenerate them. The same holds for ``Scripts/setup-client.sh`` if you
+by ``launch/setup-ssl.sh`` expire after a month, so you need to
+regenerate them. The same holds for ``launch/setup-client.sh`` if you
 use the client facility.
 
 
@@ -340,7 +340,7 @@ you can run the following::
 
 You can then run the following script call::
 
-  prefix=gdb_screen Scripts/<protocol>.sh ... -o throw_exceptions
+  prefix=gdb_screen launch/<protocol>.sh ... -o throw_exceptions
 
 This runs every party in the background using the screen utility. You
 can get a party to the foreground using::
@@ -352,7 +352,7 @@ sequence "Ctrl-a d" to return to your usual terminal.
 
 If running the different parties separately, you can also use::
 
-  . Scripts/run-common.sh
+  . launch/run-common.sh
   gdb_front ./<protocol>-party.x ... -o throw_exceptions
 
 If the virtual machine aborts due to an error, GDB will indicate where

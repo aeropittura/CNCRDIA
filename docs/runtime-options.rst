@@ -3,11 +3,11 @@ Run-Time Options
 
 This section explains the command-line arguments with the virtual
 machines (``<protocol>-party.x`` or
-``Scripts/<protocol>.sh``). You can also use them with
-``Scripts/compile-run.py`` by specifying them after an additional
+``launch/<protocol>.sh``). You can also use them with
+``launch/compile-run.py`` by specifying them after an additional
 ``--``::
 
-  Scripts/compile-run.py <protocol> <compile-time-args> -- <run-time-args>
+  launch/compile-run.py <protocol> <compile-time-args> -- <run-time-args>
 
 
 Efficiency trade-offs

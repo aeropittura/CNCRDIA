@@ -28,6 +28,6 @@ steps:
   - script:
       make replicated-{ring,field}-party.x rep4-ring-party.x shamir mascot-party.x sy spdz2k-party.x semi-he yao semi2k-party.x semi-party.x dealer-ring-party.x cowgear-party.x chaigear-party.x fd
   - script:
-      Scripts/setup-ssl.sh 4
+      launch/setup-ssl.sh 4
   - script:
-      skip_binary=1 slim=1 Scripts/test_tutorial.sh -X
+      skip_binary=1 slim=1 launch/test_tutorial.sh -X

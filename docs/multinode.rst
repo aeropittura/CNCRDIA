@@ -7,7 +7,7 @@ Multinode Computation Example
 Multinode computation refers to the possibility of distributing a
 every party across several nodes. MP-SPDZ uses the client interface
 for communication between nodes. This means that you have to run
-``Scripts/setup-clients.sh`` and distribute the certificates to run it
+``launch/setup-clients.sh`` and distribute the certificates to run it
 across several machines.
 
 In the following, we will explain the example in
@@ -62,7 +62,7 @@ party, five threads per worker node, and 1000 operations per thread as
 follows::
 
   for i in $(seq 0 3); do
-    Scripts/compile-run.py ring multinode_example_worker 5 1000 $i localhost & true
+    launch/compile-run.py ring multinode_example_worker 5 1000 $i localhost & true
   done
 
-  Scripts/compile-run.py ring multinode_example_main 4 5 1000
+  launch/compile-run.py ring multinode_example_main 4 5 1000

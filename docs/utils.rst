@@ -5,7 +5,7 @@ Bytecode Utilities
 Memory usage
 ------------
 
-``Scripts/memory-usage.py <program-with-args>`` gives you an estimate
+``launch/memory-usage.py <program-with-args>`` gives you an estimate
 of the minimum RAM usage per party. The range is relatively large due
 to fact the bytecode is independent of the secret sharing.
 
@@ -13,7 +13,7 @@ to fact the bytecode is independent of the secret sharing.
 Preprocessing usage
 -------------------
 
-``Scripts/prep-usage.py <program-with-args>`` gives you an upper limit
+``launch/prep-usage.py <program-with-args>`` gives you an upper limit
 for the usage of preprocessing data such as triples. Note that the
 exact number depends on the protocol in various ways, and that the
 usage is sometimes unpredictable resulting in ``inf`` given. For an
@@ -24,7 +24,7 @@ the ``--verbose`` argument.
 Human-readable bytecode/circuit representation
 ----------------------------------------------
 
-``Scripts/decompile.py <program-with-args>`` produces human-readable
+``launch/decompile.py <program-with-args>`` produces human-readable
 version of the bytecode in ``Programs/Bytecode``. The filename format
 is ``Programs/Bytecode/<program-with-args>-<tapeid>.asm``. For
 example, after compiling and decompiling the tutorial, you will find

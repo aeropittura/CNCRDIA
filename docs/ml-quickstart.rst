@@ -35,19 +35,19 @@ can run it either insecurely:
 
 .. code-block:: console
 
-  Scripts/compile-emulate.py foo
+  launch/compile-emulate.py foo
 
 or securely with three parties on the same machine:
 
 .. code-block:: console
 
-  Scripts/compile-run.py -E ring foo
+  launch/compile-run.py -E ring foo
 
 The first call should give the following output:
 
 .. code-block:: console
 
-  $ Scripts/compile-emulate.py foo
+  $ launch/compile-emulate.py foo
   Default bit length for compilation: 63
   Default security parameter for compilation: 40
   Compiling file Programs/Source/foo.mpc

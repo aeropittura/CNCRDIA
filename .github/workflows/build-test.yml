@@ -39,6 +39,6 @@ jobs:
       - name: build
         run: make -j2 replicated-{ring,field}-party.x rep4-ring-party.x shamir mascot-party.x sy spdz2k-party.x semi-he yao semi2k-party.x semi-party.x dealer-ring-party.x cowgear-party.x chaigear-party.x fd
       - name: certificates
-        run: Scripts/setup-ssl.sh
+        run: launch/setup-ssl.sh
       - name: tutorial test
-        run: skip_binary=1 slim=1 Scripts/test_tutorial.sh -X
+        run: skip_binary=1 slim=1 launch/test_tutorial.sh -X
