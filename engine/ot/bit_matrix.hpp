@@ -1,10 +1,9 @@
 /*
- * BitMatrix.hpp
+ * ot/bit_matrix.hpp
  *
  */
 
-#ifndef OT_BITMATRIX_HPP_
-#define OT_BITMATRIX_HPP_
+#pragma once
 
 #include "ot/bit_matrix.h"
 #include "support/bit_vector.h"
@@ -171,5 +170,3 @@ void Slice<U>::unpack(octetStream& os)
     for (size_t i = start; i < end; i++)
         bm.squares[i].unpack(os);
 }
-
-#endif /* OT_BITMATRIX_HPP_ */

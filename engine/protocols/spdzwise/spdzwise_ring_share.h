@@ -1,10 +1,9 @@
 /*
- * SpdzWiseRingShare.h
+ * protocols/spdzwise/spdzwise_ring_share.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISERINGSHARE_H_
-#define PROTOCOLS_SPDZWISERINGSHARE_H_
+#pragma once
 
 #include "protocols/spdzwise/spdzwise_share.h"
 #include "protocols/replicated/malicious_rep3_share.h"
@@ -87,5 +86,3 @@ public:
         }
     }
 };
-
-#endif /* PROTOCOLS_SPDZWISERINGSHARE_H_ */

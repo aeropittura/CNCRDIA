@@ -1,10 +1,9 @@
 /*
- * SemiInput.h
+ * protocols/semi/semi_input.h
  *
  */
 
-#ifndef PROTOCOLS_SEMIINPUT_H_
-#define PROTOCOLS_SEMIINPUT_H_
+#pragma once
 
 #include "protocols/replicated/replicated_input.h"
 #include "protocols/semi/hemi.h"
@@ -53,5 +52,3 @@ public:
     void exchange();
     void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
 };
-
-#endif /* PROTOCOLS_SEMIINPUT_H_ */

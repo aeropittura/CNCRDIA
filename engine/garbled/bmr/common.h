@@ -1,10 +1,9 @@
 /*
- * common.h
+ * garbled/bmr/common.h
  *
  */
 
-#ifndef CIRCUIT_INC_COMMON_H_
-#define CIRCUIT_INC_COMMON_H_
+#pragma once
 
 #include <cstdint>
 #include <cstring>
@@ -40,5 +39,3 @@ public:
 	uint8_t operator[](int i) { return rep[i]; }
 	bool call(bool left, bool right) { return rep[2 * left + right]; }
 };
-
-#endif /* CIRCUIT_INC_COMMON_H_ */

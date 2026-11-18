@@ -1,5 +1,5 @@
 /*
- * mal-rep-ecdsa-party.cpp
+ * parties/ecdsa/mal-rep-ecdsa-party.cpp
  *
  */
 

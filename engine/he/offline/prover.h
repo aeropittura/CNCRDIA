@@ -1,5 +1,4 @@
-#ifndef _Prover
-#define _Prover
+#pragma once
 
 #include "he/offline/proof.h"
 #include "support/memory_usage.h"
@@ -45,5 +44,3 @@ public:
   size_t report_size(ReportType type);
   void report_size(ReportType type, MemoryUsage& res);
 };
-
-#endif

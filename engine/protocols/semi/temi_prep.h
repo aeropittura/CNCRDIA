@@ -1,10 +1,9 @@
 /*
- * TemiPrep.h
+ * protocols/semi/temi_prep.h
  *
  */
 
-#ifndef PROTOCOLS_TEMIPREP_H_
-#define PROTOCOLS_TEMIPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "he/offline/temi_setup.h"
@@ -72,5 +71,3 @@ public:
 
     vector<TemiMultiplier<T>*>& get_multipliers();
 };
-
-#endif /* PROTOCOLS_TEMIPREP_H_ */

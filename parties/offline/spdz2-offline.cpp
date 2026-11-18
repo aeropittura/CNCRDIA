@@ -1,5 +1,5 @@
 /*
- * spdz2-offline.cpp
+ * parties/offline/spdz2-offline.cpp
  *
  */
 

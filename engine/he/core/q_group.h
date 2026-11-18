@@ -1,5 +1,4 @@
-#ifndef _QGroup
-#define _QGroup
+#pragma once
 
 /* This class holds the data needed to represent
 	Gal/G_2
@@ -44,5 +43,3 @@ class QGroup
    // For 0 <= n < ord returns the nth element
    int nth_element(int n) const;
 };
-
-#endif

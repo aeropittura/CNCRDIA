@@ -1,10 +1,9 @@
 /*
- * ReplicatedParty.h
+ * boolean/share_party.h
  *
  */
 
-#ifndef GC_SHAREPARTY_H_
-#define GC_SHAREPARTY_H_
+#pragma once
 
 #include "boolean/share_secret.h"
 #include "boolean/processor.h"
@@ -46,5 +45,3 @@ inline ShareParty<T>& ShareParty<T>::s()
 }
 
 }
-
-#endif /* GC_SHAREPARTY_H_ */

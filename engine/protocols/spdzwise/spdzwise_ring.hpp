@@ -1,7 +1,9 @@
 /*
- * SpdzWiseRing.cpp
+ * protocols/spdzwise/spdzwise_ring.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdzwise/spdzwise_ring.h"
 

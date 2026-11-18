@@ -1,10 +1,9 @@
 /*
- * PostSacrifice.cpp
+ * protocols/replicated/post_sacrifice.hpp
  *
  */
 
-#ifndef PROTOCOLS_POSTSACRIFIE_HPP_
-#define PROTOCOLS_POSTSACRIFIE_HPP_
+#pragma once
 
 #include "protocols/replicated/post_sacrifice.h"
 
@@ -85,5 +84,3 @@ void PostSacrifice<T>::check()
     operands.erase(operands.begin(), operands.begin() + buffer_size);
     results.clear();
 }
-
-#endif

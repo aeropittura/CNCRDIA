@@ -1,10 +1,9 @@
 /*
- * vargfp.h
+ * numeric/gfpvar.h
  *
  */
 
-#ifndef MATH_GFPVAR_H_
-#define MATH_GFPVAR_H_
+#pragma once
 
 #include "numeric/modp.h"
 #include "numeric/zp_data.h"
@@ -220,5 +219,3 @@ istream& operator >>(istream& i, gfpvar_<X, L>& x)
     x.input(i, true);
     return i;
 }
-
-#endif /* MATH_GFPVAR_H_ */

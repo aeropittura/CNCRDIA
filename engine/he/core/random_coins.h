@@ -1,5 +1,4 @@
-#ifndef _Random_Coins
-#define _Random_Coins
+#pragma once
 
 /*  Randomness used to encrypt */
 
@@ -106,6 +105,3 @@ class Random_Coins
   size_t report_size(ReportType type)
   { return uu.report_size(type) + vv.report_size(type) + ww.report_size(type); }
 };
-
-
-#endif

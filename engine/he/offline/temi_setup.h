@@ -1,10 +1,9 @@
 /*
- * TemiSetup.h
+ * he/offline/temi_setup.h
  *
  */
 
-#ifndef FHEOFFLINE_TEMISETUP_H_
-#define FHEOFFLINE_TEMISETUP_H_
+#pragma once
 
 #include "he/core/fhe_keys.h"
 #include "he/offline/simple_machine.h"
@@ -30,5 +29,3 @@ public:
 
     void key_and_mac_generation(Player& P, MachineBase&, int, true_type);
 };
-
-#endif /* FHEOFFLINE_TEMISETUP_H_ */

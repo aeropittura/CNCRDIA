@@ -1,10 +1,9 @@
 /*
- * OutputRedirection.h
+ * support/switchable_output.h
  *
  */
 
-#ifndef TOOLS_SWITCHABLEOUTPUT_H_
-#define TOOLS_SWITCHABLEOUTPUT_H_
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -73,5 +72,3 @@ public:
             x.output(*out, true, true);
     }
 };
-
-#endif /* TOOLS_SWITCHABLEOUTPUT_H_ */

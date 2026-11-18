@@ -1,10 +1,9 @@
 /*
- * RealGarbleWire.h
+ * garbled/bmr/real_garble_wire.h
  *
  */
 
-#ifndef BMR_REALGARBLEWIRE_H_
-#define BMR_REALGARBLEWIRE_H_
+#pragma once
 
 #include "garbled/bmr/register.h"
 
@@ -76,5 +75,3 @@ public:
 	void last_round(RealProgramParty<T>& party, Inputter& inputter,
 			Protocol& second_protocol, vector<T>& wires);
 };
-
-#endif /* BMR_REALGARBLEWIRE_H_ */

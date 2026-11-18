@@ -1,10 +1,9 @@
 /*
- * Rep3Share.h
+ * protocols/replicated/rep3_share.h
  *
  */
 
-#ifndef PROTOCOLS_REP3SHARE_H_
-#define PROTOCOLS_REP3SHARE_H_
+#pragma once
 
 #include "numeric/fixed_vec.h"
 #include "numeric/integer.h"
@@ -189,5 +188,3 @@ public:
 
 template<class T>
 false_type Rep3Share<T>::variable_players;
-
-#endif /* PROTOCOLS_REP3SHARE_H_ */

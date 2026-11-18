@@ -1,10 +1,9 @@
 /*
- * PairwiseMachine.h
+ * he/offline/pairwise_machine.h
  *
  */
 
-#ifndef FHEOFFLINE_PAIRWISEMACHINE_H_
-#define FHEOFFLINE_PAIRWISEMACHINE_H_
+#pragma once
 
 #include "he/offline/pairwise_generator.h"
 #include "he/offline/simple_machine.h"
@@ -54,5 +53,3 @@ public:
     template <class T>
     void set_mac_key(T alphai);
 };
-
-#endif /* FHEOFFLINE_PAIRWISEMACHINE_H_ */

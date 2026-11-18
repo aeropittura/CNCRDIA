@@ -1,5 +1,5 @@
 /*
- * ShareInterface.cpp
+ * protocols/common/share_interface.cpp
  *
  */
 

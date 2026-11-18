@@ -1,10 +1,9 @@
 /*
- * Memory.h
+ * boolean/memory.h
  *
  */
 
-#ifndef GC_MEMORY_H_
-#define GC_MEMORY_H_
+#pragma once
 
 #include <vector>
 #include <sstream>
@@ -97,5 +96,3 @@ inline ostream& operator<<(ostream& s, const Memory<T>& memory)
 }
 
 } /* namespace GC */
-
-#endif /* GC_MEMORY_H_ */

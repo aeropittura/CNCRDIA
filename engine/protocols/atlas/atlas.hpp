@@ -1,10 +1,9 @@
 /*
- * Atlas.hpp
+ * protocols/atlas/atlas.hpp
  *
  */
 
-#ifndef PROTOCOLS_ATLAS_HPP_
-#define PROTOCOLS_ATLAS_HPP_
+#pragma once
 
 #include "protocols/atlas/atlas.h"
 #include "protocols/common/buffer_scope.h"
@@ -140,5 +139,3 @@ T Atlas<T>::get_random()
     BufferScope scope(shamir, this->buffer_size);
     return shamir.get_random();
 }
-
-#endif /* PROTOCOLS_ATLAS_HPP_ */

@@ -1,10 +1,9 @@
 /*
- * AstraShare.h
+ * protocols/astra_trio/astra_share.h
  *
  */
 
-#ifndef PROTOCOLS_ASTRASHARE_H_
-#define PROTOCOLS_ASTRASHARE_H_
+#pragma once
 
 #include "numeric/z2k.h"
 #include "numeric/fixed_vec.h"
@@ -443,5 +442,3 @@ template<int K>
 using AstraShare2 = AstraShare<SignedZ2<K>>;
 template<int K>
 using AstraPrepShare2 = AstraPrepShare<SignedZ2<K>>;
-
-#endif /* PROTOCOLS_ASTRASHARE_H_ */

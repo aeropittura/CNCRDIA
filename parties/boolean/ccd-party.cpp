@@ -1,5 +1,5 @@
 /*
- * ccd-party.cpp
+ * parties/boolean/ccd-party.cpp
  *
  */
 

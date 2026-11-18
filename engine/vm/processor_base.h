@@ -1,10 +1,9 @@
 /*
- * ProcessorBase.h
+ * vm/processor_base.h
  *
  */
 
-#ifndef PROCESSOR_PROCESSORBASE_H_
-#define PROCESSOR_PROCESSORBASE_H_
+#pragma once
 
 #include <stack>
 #include <string>
@@ -67,5 +66,3 @@ public:
   void setup_redirection(int my_nu, int thread_num, OnlineOptions& opts,
       SwitchableOutput& out, bool real = true);
 };
-
-#endif /* PROCESSOR_PROCESSORBASE_H_ */

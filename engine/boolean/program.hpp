@@ -1,10 +1,9 @@
 /*
- * Program.cpp
+ * boolean/program.hpp
  *
  */
 
-#ifndef GC_PROGRAM_HPP_
-#define GC_PROGRAM_HPP_
+#pragma once
 
 #include "boolean/program.h"
 #include "boolean/instruction_inline.h"
@@ -164,5 +163,3 @@ BreakType Program::execute_with_errors(Processor<T>& Proc, U& dynamic_memory,
 }
 
 } /* namespace GC */
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Party.cpp
+ * garbled/bmr/party.cpp
  *
  */
 

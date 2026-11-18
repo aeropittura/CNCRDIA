@@ -1,10 +1,9 @@
 /*
- * Access.h
+ * boolean/access.h
  *
  */
 
-#ifndef GC_ACCESS_H_
-#define GC_ACCESS_H_
+#pragma once
 
 #include "boolean/clear.h"
 
@@ -44,5 +43,3 @@ struct ClearWriteAccess
 };
 
 } /* namespace GC */
-
-#endif /* GC_ACCESS_H_ */

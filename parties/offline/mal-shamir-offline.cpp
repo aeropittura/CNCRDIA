@@ -1,5 +1,5 @@
 /*
- * mal-shamir-offline.cpp
+ * parties/offline/mal-shamir-offline.cpp
  *
  */
 

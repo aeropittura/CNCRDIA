@@ -1,10 +1,9 @@
 /*
- * HemiOptions.h
+ * protocols/semi/hemi_options.h
  *
  */
 
-#ifndef PROTOCOLS_HEMIOPTIONS_H_
-#define PROTOCOLS_HEMIOPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 
@@ -38,5 +37,3 @@ public:
         opt.resetArgs();
     }
 };
-
-#endif /* PROTOCOLS_HEMIOPTIONS_H_ */

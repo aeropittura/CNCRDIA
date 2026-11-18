@@ -1,10 +1,9 @@
 /*
- * MaliciousRepPrep.cpp
+ * protocols/replicated/malicious_rep_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSREPPREP_HPP_
-#define PROTOCOLS_MALICIOUSREPPREP_HPP_
+#pragma once
 
 #include "protocols/replicated/malicious_rep_prep.h"
 #include "protocols/common/buffer_scope.h"
@@ -246,5 +245,3 @@ void MaliciousRepPrep<T>::buffer_inputs(int player)
     assert(proc);
     this->buffer_inputs_as_usual(player, proc);
 }
-
-#endif

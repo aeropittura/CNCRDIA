@@ -1,7 +1,9 @@
 /*
- * PrivateOutput.cpp
+ * vm/private_output.hpp
  *
  */
+
+#pragma once
 
 #include "vm/private_output.h"
 #include "vm/processor.h"

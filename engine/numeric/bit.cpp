@@ -1,5 +1,5 @@
 /*
- * Bit.cpp
+ * numeric/bit.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * SpdzWire.h
+ * garbled/bmr/spdz_wire.h
  *
  */
 
-#ifndef BMR_SPDZWIRE_H_
-#define BMR_SPDZWIRE_H_
+#pragma once
 
 #include "protocols/common/share.h"
 #include "garbled/bmr/key.h"
@@ -36,5 +35,3 @@ public:
 };
 
 typedef DualWire<Share<gf2n_long>> SpdzWire;
-
-#endif /* BMR_SPDZWIRE_H_ */

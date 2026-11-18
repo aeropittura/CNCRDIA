@@ -1,10 +1,9 @@
 /*
- * ShuffleSacrifice.h
+ * protocols/common/shuffle_sacrifice.h
  *
  */
 
-#ifndef PROTOCOLS_SHUFFLESACRIFICE_H_
-#define PROTOCOLS_SHUFFLESACRIFICE_H_
+#pragma once
 
 #include <vector>
 #include <array>
@@ -110,5 +109,3 @@ public:
             bool strict, int player, SubProcessor<T>& proc, int begin, int end,
             LimitedPrep<BT>& personal_prep, const void* supply = 0);
 };
-
-#endif /* PROTOCOLS_SHUFFLESACRIFICE_H_ */

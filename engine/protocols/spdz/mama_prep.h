@@ -1,10 +1,9 @@
 /*
- * MamaPrep.h
+ * protocols/spdz/mama_prep.h
  *
  */
 
-#ifndef PROTOCOLS_MAMAPREP_H_
-#define PROTOCOLS_MAMAPREP_H_
+#pragma once
 
 #include "protocols/spdz/mascot_prep.h"
 
@@ -22,5 +21,3 @@ public:
 
     void buffer_triples();
 };
-
-#endif /* PROTOCOLS_MAMAPREP_H_ */

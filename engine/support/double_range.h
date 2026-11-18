@@ -1,10 +1,9 @@
 /*
- * DoubleRange.h
+ * support/double_range.h
  *
  */
 
-#ifndef TOOLS_DOUBLERANGE_H_
-#define TOOLS_DOUBLERANGE_H_
+#pragma once
 
 template<class T>
 class DoubleIterator
@@ -61,5 +60,3 @@ public:
             S.iterator_for_size(right + size, 0)};
     }
 };
-
-#endif /* TOOLS_DOUBLERANGE_H_ */

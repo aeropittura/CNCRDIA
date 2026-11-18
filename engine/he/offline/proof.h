@@ -1,5 +1,4 @@
-#ifndef _Proof
-#define _Proof
+#pragma once
 
 #include <math.h>
 #include <vector>
@@ -210,5 +209,3 @@ public:
     debugging();
   }
 };
-
-#endif

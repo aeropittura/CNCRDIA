@@ -1,5 +1,5 @@
 /*
- * Diagonal.cpp
+ * ot/bit_diagonal.cpp
  *
  */
 

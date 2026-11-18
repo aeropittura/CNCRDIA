@@ -1,10 +1,9 @@
 /*
- * ranges.h
+ * support/ranges.h
  *
  */
 
-#ifndef TOOLS_RANGES_H_
-#define TOOLS_RANGES_H_
+#pragma once
 
 template<class T>
 class BlockRange
@@ -89,5 +88,3 @@ public:
         return {end_, element};
     }
 };
-
-#endif /* TOOLS_RANGES_H_ */

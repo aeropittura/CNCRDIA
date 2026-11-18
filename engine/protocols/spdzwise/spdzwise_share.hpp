@@ -1,10 +1,9 @@
 /*
- * SpdzWiseShare.hpp
+ * protocols/spdzwise/spdzwise_share.hpp
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISESHARE_HPP_
-#define PROTOCOLS_SPDZWISESHARE_HPP_
+#pragma once
 
 #include "protocols/spdzwise/spdzwise_share.h"
 
@@ -56,5 +55,3 @@ void SpdzWiseShare<T>::pack(octetStream& os, open_type factor) const
 {
     this->get_share().pack(os, factor);
 }
-
-#endif /* PROTOCOLS_SPDZWISESHARE_HPP_ */

@@ -1,5 +1,5 @@
 /*
- * CowGearOptions.cpp
+ * protocols/spdz/cowgear_options.cpp
  *
  */
 

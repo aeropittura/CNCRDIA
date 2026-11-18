@@ -1,10 +1,9 @@
 /*
- * FakeMC.h
+ * protocols/fake/fake_mc.h
  *
  */
 
-#ifndef PROTOCOLS_FAKEMC_H_
-#define PROTOCOLS_FAKEMC_H_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 
@@ -27,5 +26,3 @@ public:
         return *this;
     }
 };
-
-#endif /* PROTOCOLS_FAKEMC_H_ */

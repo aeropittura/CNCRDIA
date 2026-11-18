@@ -1,10 +1,9 @@
 /*
- * CheckVector.h
+ * support/check_vector.h
  *
  */
 
-#ifndef TOOLS_CHECKVECTOR_H_
-#define TOOLS_CHECKVECTOR_H_
+#pragma once
 
 #include <vector>
 #include <span>
@@ -155,5 +154,3 @@ public:
         assert(size_t(index.get()) < size());
     }
 };
-
-#endif /* TOOLS_CHECKVECTOR_H_ */

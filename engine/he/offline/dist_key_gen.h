@@ -1,10 +1,9 @@
 /*
- * DistKeyGen.h
+ * he/offline/dist_key_gen.h
  *
  */
 
-#ifndef FHEOFFLINE_DISTKEYGEN_H_
-#define FHEOFFLINE_DISTKEYGEN_H_
+#pragma once
 
 #include "he/core/random_coins.h"
 #include "he/core/rq_element.h"
@@ -49,5 +48,3 @@ public:
     void finalize(FHE_PK& pk, FHE_SK& sk);
     void check_equality(const DistKeyGen& other);
 };
-
-#endif /* FHEOFFLINE_DISTKEYGEN_H_ */

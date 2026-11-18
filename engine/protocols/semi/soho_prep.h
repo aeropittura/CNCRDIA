@@ -1,10 +1,9 @@
 /*
- * SohoPrep.h
+ * protocols/semi/soho_prep.h
  *
  */
 
-#ifndef PROTOCOLS_SOHOPREP_H_
-#define PROTOCOLS_SOHOPREP_H_
+#pragma once
 
 /**
  * Semi-honest preprocessing with somewhat homomorphic encryption
@@ -34,5 +33,3 @@ public:
     void buffer_squares();
     void buffer_bits();
 };
-
-#endif /* PROTOCOLS_SOHOPREP_H_ */

@@ -1,5 +1,5 @@
 /*
- * Fake-ECDSA.cpp
+ * parties/ecdsa/Fake-ECDSA.cpp
  *
  */
 

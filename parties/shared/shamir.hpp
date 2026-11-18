@@ -1,10 +1,9 @@
 /*
- * ShamirMachine.cpp
+ * parties/shared/shamir.hpp
  *
  */
 
-#ifndef MACHINE_SHAMIR_HPP_
-#define MACHINE_SHAMIR_HPP_
+#pragma once
 
 #include "protocols/shamir/shamir_options.h"
 #include "protocols/shamir/shamir_share.h"
@@ -46,5 +45,3 @@ ShamirMachineSpec<T>::ShamirMachineSpec(int argc, const char** argv)
     opts = {opt, argc, argv};
     HonestMajorityFieldMachine<T>(argc, argv, opt, opts.nparties);
 }
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * ShareVector.h
+ * protocols/common/share_vector.h
  *
  */
 
-#ifndef PROTOCOLS_SHAREVECTOR_H_
-#define PROTOCOLS_SHAREVECTOR_H_
+#pragma once
 
 #include "he/core/addable_vector.h"
 #include "protocols/common/share.h"
@@ -53,5 +52,3 @@ public:
 
     void fft(const FFT_Data& fftd);
 };
-
-#endif /* PROTOCOLS_SHAREVECTOR_H_ */

@@ -1,10 +1,9 @@
 /*
- * fixint.h
+ * numeric/fixint.h
  *
  */
 
-#ifndef MATH_FIXINT_H_
-#define MATH_FIXINT_H_
+#pragma once
 
 #include "numeric/z2k.h"
 
@@ -117,5 +116,3 @@ fixint<L>& operator%=(fixint<L>& x, const bigint& y)
 {
     return x = (bigint::tmp = x) % y;
 }
-
-#endif /* MATH_FIXINT_H_ */

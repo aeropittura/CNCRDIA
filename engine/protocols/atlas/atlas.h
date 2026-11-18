@@ -1,10 +1,9 @@
 /*
- * Atla.h
+ * protocols/atlas/atlas.h
  *
  */
 
-#ifndef PROTOCOLS_ATLAS_H_
-#define PROTOCOLS_ATLAS_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 
@@ -71,5 +70,3 @@ public:
 
     T get_random();
 };
-
-#endif /* PROTOCOLS_ATLAS_H_ */

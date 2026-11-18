@@ -1,5 +1,5 @@
 /*
- * soho-party.cpp
+ * parties/arith/soho-party.cpp
  *
  */
 

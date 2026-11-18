@@ -1,10 +1,9 @@
 /*
- * Secret_inline.h
+ * boolean/secret_inline.h
  *
  */
 
-#ifndef GC_SECRET_INLINE_H_
-#define GC_SECRET_INLINE_H_
+#pragma once
 
 #include "garbled/bmr/config.h"
 #include "boolean/secret.h"
@@ -91,5 +90,3 @@ inline void Secret<T>::resize_regs(size_t n)
 }
 
 } /* namespace GC */
-
-#endif /* GC_SECRET_INLINE_H_ */

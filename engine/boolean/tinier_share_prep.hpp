@@ -1,10 +1,9 @@
 /*
- * TinierSharePrep.cpp
+ * boolean/tinier_share_prep.hpp
  *
  */
 
-#ifndef GC_TINIERSHARE_PREP_HPP_
-#define GC_TINIERSHARE_PREP_HPP_
+#pragma once
 
 #include "boolean/tinier_share_prep.h"
 
@@ -89,5 +88,3 @@ void GC::TinierSharePrep<T>::buffer_bits()
 }
 
 }
-
-#endif

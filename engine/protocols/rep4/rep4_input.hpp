@@ -1,7 +1,9 @@
 /*
- * Rep4Input.cpp
+ * protocols/rep4/rep4_input.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/rep4/rep4_input.h"
 

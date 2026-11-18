@@ -1,10 +1,9 @@
 /*
- * YaoEvaluator.h
+ * garbled/yao/yao_evaluator.h
  *
  */
 
-#ifndef YAO_YAOEVALUATOR_H_
-#define YAO_YAOEVALUATOR_H_
+#pragma once
 
 #include "garbled/yao/yao_gate.h"
 #include "garbled/yao/yao_eval_master.h"
@@ -74,5 +73,3 @@ inline YaoEvaluator& YaoEvaluator::s()
 	else
 		throw runtime_error("singleton unavailable");
 }
-
-#endif /* YAO_YAOEVALUATOR_H_ */

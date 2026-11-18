@@ -1,6 +1,5 @@
 
-#ifndef _OTVOLE
-#define _OTVOLE
+#pragma once
 
 #include "numeric/z2k.h"
 #include "ot/ot_extension.h"
@@ -82,5 +81,3 @@ public:
     int n_challenges() { return NUM_VOLE_CHALLENGES; }
     int get_challenge(PRNG& G, int) { return G.get_uint(this->S); }
 };
-
-#endif

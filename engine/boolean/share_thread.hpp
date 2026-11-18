@@ -1,10 +1,9 @@
 /*
- * MalicousRepParty.cpp
+ * boolean/share_thread.hpp
  *
  */
 
-#ifndef GC_SHARETHREAD_HPP_
-#define GC_SHARETHREAD_HPP_
+#pragma once
 
 #include "boolean/share_thread.h"
 #include "boolean/share_party.h"
@@ -350,5 +349,3 @@ TimerWithComm ShareThread<T>::prep_time()
 }
 
 } /* namespace GC */
-
-#endif

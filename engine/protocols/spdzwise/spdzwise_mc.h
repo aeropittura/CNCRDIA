@@ -1,10 +1,9 @@
 /*
- * SpdzWiseMC.h
+ * protocols/spdzwise/spdzwise_mc.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISEMC_H_
-#define PROTOCOLS_SPDZWISEMC_H_
+#pragma once
 
 #include "protocols/replicated/malicious_rep_mc.h"
 
@@ -59,5 +58,3 @@ public:
         inner_MC.CheckFor(value, shares, P);
     }
 };
-
-#endif /* PROTOCOLS_SPDZWISEMC_H_ */

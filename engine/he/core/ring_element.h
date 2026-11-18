@@ -1,5 +1,4 @@
-#ifndef _Ring_Element
-#define _Ring_Element
+#pragma once
 
 /* Defines an element of the ring modulo a prime pr
  *   - Note here pr is an odd prime
@@ -210,6 +209,3 @@ void Ring_Element::from(const Generator<T>& generator)
     }
   change_rep(t);
 }
-
-#endif
-

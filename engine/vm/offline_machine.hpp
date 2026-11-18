@@ -1,10 +1,9 @@
 /*
- * DishonestMajorityOfflineMachine.hpp
+ * vm/offline_machine.hpp
  *
  */
 
-#ifndef PROCESSOR_OFFLINEMACHINE_HPP_
-#define PROCESSOR_OFFLINEMACHINE_HPP_
+#pragma once
 
 #include "vm/offline_machine.h"
 #include "protocols/common/mac_key.hpp"
@@ -191,5 +190,3 @@ const Names& OfflineMachine<W>::get_N()
 {
     return playerNames;
 }
-
-#endif /* PROCESSOR_OFFLINEMACHINE_HPP_ */

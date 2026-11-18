@@ -1,5 +1,5 @@
 /*
- * AtlasSecret.cpp
+ * boolean/atlas_secret.cpp
  *
  */
 

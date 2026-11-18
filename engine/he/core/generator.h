@@ -1,10 +1,9 @@
 /*
- * Generator.h
+ * he/core/generator.h
  *
  */
 
-#ifndef FHE_GENERATOR_H_
-#define FHE_GENERATOR_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -57,5 +56,3 @@ public:
     Generator<bigint>* clone() const { return new WriteConversionIterator(*this); }
     void get(bigint& x) const { tmp = x; v[i].convert_destroy(tmp, ZpD); i++; }
 };
-
-#endif /* FHE_GENERATOR_H_ */

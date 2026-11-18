@@ -1,10 +1,9 @@
 /*
- * sockets.h
+ * net/ssl_sockets.h
  *
  */
 
-#ifndef CRYPTO_SSL_SOCKETS_H_
-#define CRYPTO_SSL_SOCKETS_H_
+#pragma once
 
 #include "support/int.h"
 #include "support/time_func.h"
@@ -119,5 +118,3 @@ inline size_t receive_all_or_nothing(ssl_socket* socket, octet* data, size_t len
     receive(socket, data, length);
     return length;
 }
-
-#endif /* CRYPTO_SSL_SOCKETS_H_ */

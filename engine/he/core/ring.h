@@ -1,5 +1,4 @@
-#ifndef _Ring
-#define _Ring
+#pragma once
 
 /* Class to define the basic ring we are working with
  * and any associated data
@@ -44,6 +43,3 @@ class Ring
 };
 
 void init(Ring& Rg, int m, bool generate_poly = false);
-
-#endif
-

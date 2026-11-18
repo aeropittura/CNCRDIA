@@ -1,10 +1,9 @@
 /*
- * edabit.h
+ * protocols/common/edabit.h
  *
  */
 
-#ifndef PROTOCOLS_EDABIT_H_
-#define PROTOCOLS_EDABIT_H_
+#pragma once
 
 #include "support/fixed_vector.h"
 
@@ -141,5 +140,3 @@ public:
         b.unpack(os);
     }
 };
-
-#endif /* PROTOCOLS_EDABIT_H_ */

@@ -1,11 +1,8 @@
 /*
- * config.h
+ * numeric/config.h
  *
  */
 
-#ifndef MATH_CONFIG_H_
-#define MATH_CONFIG_H_
+#pragma once
 
 //#define MAX_MOD_SZ 6
-
-#endif /* MATH_CONFIG_H_ */

@@ -1,10 +1,9 @@
 /*
- * ThreadStats.h
+ * vm/thread_stats.h
  *
  */
 
-#ifndef PROCESSOR_THREADSTATS_H_
-#define PROCESSOR_THREADSTATS_H_
+#pragma once
 
 #include "net/player.h"
 #include "support/execution_stats.h"
@@ -24,5 +23,3 @@ public:
 
     ThreadStats operator-(const ThreadStats& other) const;
 };
-
-#endif /* PROCESSOR_THREADSTATS_H_ */

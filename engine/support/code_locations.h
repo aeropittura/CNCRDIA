@@ -1,10 +1,9 @@
 /*
- * CodeLocations.h
+ * support/code_locations.h
  *
  */
 
-#ifndef TOOLS_CODELOCATIONS_H_
-#define TOOLS_CODELOCATIONS_H_
+#pragma once
 
 #include "support/lock.h"
 #include "support/time_func.h"
@@ -44,5 +43,3 @@ public:
 
 #define CODE_LOCATION LocationScope location_scope(__FILE__, __LINE__, __PRETTY_FUNCTION__);
 #define CODE_LOCATION_NO_SCOPE CodeLocations::maybe_output(__FILE__, __LINE__, __PRETTY_FUNCTION__);
-
-#endif /* TOOLS_CODELOCATIONS_H_ */

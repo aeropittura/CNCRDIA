@@ -1,5 +1,5 @@
 /*
- * ShamirMachine.cpp
+ * protocols/shamir/shamir_options.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * HighGearShare.h
+ * protocols/spdz/highgear_share.h
  *
  */
 
-#ifndef PROTOCOLS_HIGHGEARSHARE_H_
-#define PROTOCOLS_HIGHGEARSHARE_H_
+#pragma once
 
 #include "protocols/spdz/chaigear_share.h"
 
@@ -39,5 +38,3 @@ public:
 
 template<class T>
 const false_type HighGearShare<T>::covert;
-
-#endif /* PROTOCOLS_HIGHGEARSHARE_H_ */

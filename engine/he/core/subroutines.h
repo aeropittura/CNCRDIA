@@ -1,5 +1,4 @@
-#ifndef FHE_SUBROUTINES_H_
-#define FHE_SUBROUTINES_H_
+#pragma once
 
 
 #include "numeric/zp_data.h"
@@ -28,5 +27,3 @@ modp Find_Primitive_Root_2m(int m,const vector<int>& poly,const Zp_Data& ZpD);
  * is  F=X^{m/2}+1
  */
 modp Find_Primitive_Root_2power(int m,const Zp_Data& ZpD);
-
-#endif

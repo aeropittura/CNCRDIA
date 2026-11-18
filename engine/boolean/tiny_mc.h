@@ -1,10 +1,9 @@
 /*
- * TinyMC.h
+ * boolean/tiny_mc.h
  *
  */
 
-#ifndef GC_TINYMC_H_
-#define GC_TINYMC_H_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 #include "vm/online_options.h"
@@ -85,5 +84,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_TINYMC_H_ */

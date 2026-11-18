@@ -1,10 +1,9 @@
 /*
- * Server.h
+ * garbled/bmr/transport/server.h
  *
  */
 
-#ifndef NETWORK_INC_SERVER_H_
-#define NETWORK_INC_SERVER_H_
+#pragma once
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -52,5 +51,3 @@ private:
 };
 
 }
-
-#endif /* NETWORK_INC_SERVER_H_ */

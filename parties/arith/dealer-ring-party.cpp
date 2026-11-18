@@ -1,5 +1,5 @@
 /*
- * dealer-ring-party.cpp
+ * parties/arith/dealer-ring-party.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * CcdSecret.h
+ * boolean/ccd_secret.h
  *
  */
 
-#ifndef GC_CCDSECRET_H_
-#define GC_CCDSECRET_H_
+#pragma once
 
 #include "boolean/tiny_secret.h"
 #include "boolean/ccd_share.h"
@@ -68,5 +67,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_CCDSECRET_H_ */

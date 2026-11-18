@@ -1,10 +1,9 @@
 /*
- * Waksman.h
+ * support/waksman.h
  *
  */
 
-#ifndef TOOLS_WAKSMAN_H_
-#define TOOLS_WAKSMAN_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -40,5 +39,3 @@ public:
         return nr * n_elements - n_elements + 1;
     }
 };
-
-#endif /* TOOLS_WAKSMAN_H_ */

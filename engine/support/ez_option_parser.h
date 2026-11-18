@@ -16,8 +16,7 @@ v0.2.1 20130506 Allow disabling doublespace of OPTIONS usage descriptions.
 v0.2.2 20140504 Jose Santiago added compiler warning fixes.
                 Bruce Shankle added a crash fix in description printing.
 */
-#ifndef EZ_OPTION_PARSER_H
-#define EZ_OPTION_PARSER_H
+#pragma once
 
 #include <stdlib.h>
 #include <vector>
@@ -2160,4 +2159,3 @@ void ezOptionParser::prettyPrint(std::string & out) {
 };
 }
 /* ################################################################### */
-#endif /* EZ_OPTION_PARSER_H */

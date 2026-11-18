@@ -1,5 +1,4 @@
-#ifndef _Player
-#define _Player
+#pragma once
 
 /* Class to create a player, for KeyGen, Offline and Online phases.
  *
@@ -628,5 +627,3 @@ public:
   void exchange(octetStream& o) const { P.exchange(P.get_player(offset), o); }
   void pass_around(octetStream& o, int _ = 1) const { (void)_; P.pass_around(o, offset); }
 };
-
-#endif

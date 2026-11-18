@@ -1,10 +1,9 @@
 /*
- * Conv2dTuple.h
+ * vm/conv2d_tuple.h
  *
  */
 
-#ifndef PROCESSOR_CONV2DTUPLE_H_
-#define PROCESSOR_CONV2DTUPLE_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -39,5 +38,3 @@ public:
     template<class T>
     void run_matrix(SubProcessor<T>& processor);
 };
-
-#endif /* PROCESSOR_CONV2DTUPLE_H_ */

@@ -1,10 +1,9 @@
 /*
- * ShamirInput.h
+ * protocols/shamir/shamir_input.h
  *
  */
 
-#ifndef PROTOCOLS_SHAMIRINPUT_H_
-#define PROTOCOLS_SHAMIRINPUT_H_
+#pragma once
 
 #include "vm/input.h"
 #include "protocols/shamir/shamir.h"
@@ -90,5 +89,3 @@ public:
     void add_mine(const typename T::open_type& input, int n_bits = -1);
     void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
 };
-
-#endif /* PROTOCOLS_SHAMIRINPUT_H_ */

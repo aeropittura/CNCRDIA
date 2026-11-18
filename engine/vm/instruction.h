@@ -1,5 +1,4 @@
-#ifndef _Instruction
-#define _Instruction
+#pragma once
 
 /* Class to read and decode an instruction
  */
@@ -435,6 +434,3 @@ public:
   template<class T>
   typename T::clear sanitize(SubProcessor<T>& proc, int reg) const;
 };
-
-#endif
-

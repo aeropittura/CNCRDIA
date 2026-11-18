@@ -1,10 +1,9 @@
 /*
- * Shamir.cpp
+ * protocols/shamir/shamir.hpp
  *
  */
 
-#ifndef PROTOCOLS_SHAMIR_HPP_
-#define PROTOCOLS_SHAMIR_HPP_
+#pragma once
 
 #include "protocols/shamir/shamir.h"
 #include "protocols/shamir/shamir_input.h"
@@ -287,5 +286,3 @@ vector<T> Shamir<T>::get_randoms(PRNG& G, int t)
                 random.size(), random.size() / hyper.size(), hyper.size());
     return random;
 }
-
-#endif

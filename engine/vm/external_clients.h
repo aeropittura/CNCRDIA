@@ -1,5 +1,4 @@
-#ifndef _ExternalClients
-#define _ExternalClients
+#pragma once
 
 #include "net/sockets.h"
 #include "net/ssl_sockets.h"
@@ -53,5 +52,3 @@ class ExternalClients
 
   int get_party_num();
 };
-
-#endif

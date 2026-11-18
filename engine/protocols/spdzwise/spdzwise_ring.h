@@ -1,10 +1,9 @@
 /*
- * SpdzWiseRing.h
+ * protocols/spdzwise/spdzwise_ring.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISERING_H_
-#define PROTOCOLS_SPDZWISERING_H_
+#pragma once
 
 #include "protocols/spdzwise/spdzwise.h"
 #include "protocols/replicated/post_sacrifice.h"
@@ -29,5 +28,3 @@ public:
 
     void zero_check(check_type t);
 };
-
-#endif /* PROTOCOLS_SPDZWISERING_H_ */

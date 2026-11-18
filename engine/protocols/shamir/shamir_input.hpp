@@ -1,10 +1,9 @@
 /*
- * ShamirInput.cpp
+ * protocols/shamir/shamir_input.hpp
  *
  */
 
-#ifndef PROTOCOLS_SHAMIRINPUT_HPP_
-#define PROTOCOLS_SHAMIRINPUT_HPP_
+#pragma once
 
 #include "protocols/shamir/shamir_input.h"
 #include "protocols/shamir/shamir_options.h"
@@ -160,5 +159,3 @@ void IndividualInput<T>::finalize_other(int player, T& target, octetStream& o,
     (void) player;
     target.unpack(o, n_bits);
 }
-
-#endif

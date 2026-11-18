@@ -1,10 +1,9 @@
 /*
- * YaoHalfGate.h
+ * garbled/yao/yao_half_gate.h
  *
  */
 
-#ifndef YAO_YAOHALFGATE_H_
-#define YAO_YAOHALFGATE_H_
+#pragma once
 
 #include "garbled/bmr/key.h"
 #include "garbled/yao/yao_garble_wire.h"
@@ -93,5 +92,3 @@ inline void YaoHalfGate::eval(YaoEvalWire& out, const Key* hashes,
 		WE ^= TE ^ left.key();
 	out.set(WG ^ WE);
 }
-
-#endif /* YAO_YAOHALFGATE_H_ */

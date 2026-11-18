@@ -1,10 +1,9 @@
 /*
- * PrivateOutput.h
+ * vm/private_output.h
  *
  */
 
-#ifndef PROCESSOR_PRIVATEOUTPUT_H_
-#define PROCESSOR_PRIVATEOUTPUT_H_
+#pragma once
 
 #include <deque>
 using namespace std;
@@ -28,5 +27,3 @@ public:
     void exchange();
     typename T::clear finalize(int player);
 };
-
-#endif /* PROCESSOR_PRIVATEOUTPUT_H_ */

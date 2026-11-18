@@ -1,10 +1,9 @@
 /*
- * SecureShuffle.hpp
+ * protocols/common/secure_shuffle.hpp
  *
  */
 
-#ifndef PROTOCOLS_SECURESHUFFLE_HPP_
-#define PROTOCOLS_SECURESHUFFLE_HPP_
+#pragma once
 
 #include "protocols/common/secure_shuffle.h"
 #include "support/waksman.h"
@@ -546,6 +545,3 @@ void SecureShuffle<T>::waksman_round_finish(vector<T> &toShuffle, size_t unit_si
 
     swap(tmp, toShuffle);
 }
-
-
-#endif /* PROTOCOLS_SECURESHUFFLE_HPP_ */

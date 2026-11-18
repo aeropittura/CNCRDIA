@@ -1,5 +1,5 @@
 /*
- * fake-spdz-ecdsa-party.cpp
+ * parties/ecdsa/mascot-ecdsa-party.cpp
  *
  */
 

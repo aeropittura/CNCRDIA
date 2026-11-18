@@ -1,5 +1,4 @@
-#ifndef __AES_H
-#define __AES_H
+#pragma once
 
 #include "net/data.h"
 #include "support/cpu_support.h"
@@ -120,7 +119,3 @@ inline void aes_encrypt( octet* C, const octet* M,const octet* RK )
 
 inline __m128i aes_encrypt( __m128i M,const octet* RK )
 { return aes_128_encrypt(M,RK); }
-
-
-#endif
-

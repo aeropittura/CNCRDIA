@@ -1,10 +1,9 @@
 /*
- * MaliciousRingPrep.hpp
+ * protocols/common/malicious_ring_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSRINGPREP_HPP_
-#define PROTOCOLS_MALICIOUSRINGPREP_HPP_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -55,5 +54,3 @@ void MaliciousDabitOnlyPrep<T>::buffer_dabits(ThreadQueues* queues, false_type, 
                 queues);
     }
 }
-
-#endif /* PROTOCOLS_MALICIOUSRINGPREP_HPP_ */

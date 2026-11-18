@@ -1,10 +1,9 @@
 /*
- * Coordinator.h
+ * support/coordinator.h
  *
  */
 
-#ifndef TOOLS_COORDINATOR_H_
-#define TOOLS_COORDINATOR_H_
+#pragma once
 
 #include "net/player.h"
 #include "support/signal.h"
@@ -39,5 +38,3 @@ public:
     void wait(const string& id);
     void finished();
 };
-
-#endif /* TOOLS_COORDINATOR_H_ */

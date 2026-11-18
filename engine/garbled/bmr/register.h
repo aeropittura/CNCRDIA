@@ -1,10 +1,9 @@
 /*
- * Register.h
+ * garbled/bmr/register.h
  *
  */
 
-#ifndef PROTOCOL_SRC_REGISTER_H_
-#define PROTOCOL_SRC_REGISTER_H_
+#pragma once
 
 #include <vector>
 #include <utility>
@@ -534,5 +533,3 @@ void KeyTuple<I>::unserialize(T& output) {
 		for (unsigned int j = 0; j < keys[i].size(); j++)
 			output.unserialize(keys[i][j]);
 }
-
-#endif /* PROTOCOL_SRC_REGISTER_H_ */

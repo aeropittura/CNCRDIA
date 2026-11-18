@@ -1,10 +1,9 @@
 /*
- * BitMatrix.h
+ * ot/bit_matrix.h
  *
  */
 
-#ifndef OT_BITMATRIX_H_
-#define OT_BITMATRIX_H_
+#pragma once
 
 #include "support/intrinsics.h"
 #include "support/exceptions.h"
@@ -197,5 +196,3 @@ public:
 };
 
 typedef Slice<BitMatrix> BitMatrixSlice;
-
-#endif /* OT_BITMATRIX_H_ */

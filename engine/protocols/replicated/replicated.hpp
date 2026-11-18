@@ -1,10 +1,9 @@
 /*
- * Replicated.cpp
+ * protocols/replicated/replicated.hpp
  *
  */
 
-#ifndef PROTOCOLS_REPLICATED_HPP_
-#define PROTOCOLS_REPLICATED_HPP_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 #include "vm/processor.h"
@@ -705,5 +704,3 @@ void Replicated<T>::unsplit_finish(StackedVector<T>& dest,
         }
     }
 }
-
-#endif

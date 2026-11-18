@@ -1,10 +1,9 @@
 /*
- * Receiver.h
+ * net/receiver.h
  *
  */
 
-#ifndef NETWORKING_RECEIVER_H_
-#define NETWORKING_RECEIVER_H_
+#pragma once
 
 #include <pthread.h>
 
@@ -57,5 +56,3 @@ public:
     void request(octetStream& os);
     void wait(octetStream& os);
 };
-
-#endif /* NETWORKING_RECEIVER_H_ */

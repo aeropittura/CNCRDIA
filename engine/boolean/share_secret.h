@@ -1,10 +1,9 @@
 /*
- * ReplicatedSecret.h
+ * boolean/share_secret.h
  *
  */
 
-#ifndef GC_SHARESECRET_H_
-#define GC_SHARESECRET_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -308,5 +307,3 @@ public:
 };
 
 }
-
-#endif /* GC_SHARESECRET_H_ */

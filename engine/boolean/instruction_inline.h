@@ -1,10 +1,9 @@
 /*
- * Instruction_inline.h
+ * boolean/instruction_inline.h
  *
  */
 
-#ifndef GC_INSTRUCTION_INLINE_H_
-#define GC_INSTRUCTION_INLINE_H_
+#pragma once
 
 #include "garbled/bmr/config.h"
 
@@ -28,5 +27,3 @@ inline bool fallback_code(const Instruction& instruction, Processor<T>& processo
 }
 
 } /* namespace GC */
-
-#endif /* GC_INSTRUCTION_INLINE_H_ */

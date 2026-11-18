@@ -1,7 +1,9 @@
 /*
- * Client.cpp
+ * clients/client.hpp
  *
  */
+
+#pragma once
 
 #include "clients/client.h"
 

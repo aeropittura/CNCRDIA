@@ -1,5 +1,4 @@
-#ifndef _bigint
-#define _bigint
+#pragma once
 
 #include <iostream>
 using namespace std;
@@ -345,6 +344,3 @@ inline int Hwt(int N)
 
 template <class T>
 int limb_size();
-
-#endif
-

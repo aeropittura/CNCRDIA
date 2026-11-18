@@ -1,10 +1,9 @@
 /*
- * Lock.h
+ * support/lock.h
  *
  */
 
-#ifndef TOOLS_LOCK_H_
-#define TOOLS_LOCK_H_
+#pragma once
 
 #include <pthread.h>
 
@@ -35,5 +34,3 @@ public:
         lock.unlock();
     }
 };
-
-#endif /* TOOLS_LOCK_H_ */

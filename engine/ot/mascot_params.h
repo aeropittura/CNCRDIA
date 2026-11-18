@@ -1,10 +1,9 @@
 /*
- * MascotParams.h
+ * ot/mascot_params.h
  *
  */
 
-#ifndef OT_MASCOTPARAMS_H_
-#define OT_MASCOTPARAMS_H_
+#pragma once
 
 #include "support/offline_machine_base.h"
 
@@ -26,5 +25,3 @@ public:
 
     void set_passive();
 };
-
-#endif /* OT_MASCOTPARAMS_H_ */

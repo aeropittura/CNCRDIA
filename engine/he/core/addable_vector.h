@@ -1,10 +1,9 @@
 /*
- * AddableVector.h
+ * he/core/addable_vector.h
  *
  */
 
-#ifndef FHEOFFLINE_ADDABLEVECTOR_H_
-#define FHEOFFLINE_ADDABLEVECTOR_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -212,5 +211,3 @@ AddableMatrix<T> AddableMatrix<T>::mul_by_X_i(int i,
         res[j] = (*this)[j].mul_by_X_i(i, pk);
     return res;
 }
-
-#endif /* FHEOFFLINE_ADDABLEVECTOR_H_ */

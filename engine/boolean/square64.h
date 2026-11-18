@@ -1,10 +1,9 @@
 /*
- * square64.h
+ * boolean/square64.h
  *
  */
 
-#ifndef GC_SQUARE64_H_
-#define GC_SQUARE64_H_
+#pragma once
 
 #include <string.h>
 #include <cstdint>
@@ -33,5 +32,3 @@ union square64
 
     void print();
 };
-
-#endif /* GC_SQUARE64_H_ */

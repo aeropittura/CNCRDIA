@@ -1,10 +1,9 @@
 /*
- * VectorProtocol.h
+ * boolean/vector_protocol.h
  *
  */
 
-#ifndef GC_VECTORPROTOCOL_H_
-#define GC_VECTORPROTOCOL_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 
@@ -36,5 +35,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_VECTORPROTOCOL_H_ */

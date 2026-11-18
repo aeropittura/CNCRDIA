@@ -1,5 +1,4 @@
-#ifndef OT_TRIPLESETUP_H_
-#define OT_TRIPLESETUP_H_
+#pragma once
 
 #include "net/player.h"
 #include "ot/base_ot.h"
@@ -146,5 +145,3 @@ public:
         return setups[&P]->get_fresh();
     }
 };
-
-#endif

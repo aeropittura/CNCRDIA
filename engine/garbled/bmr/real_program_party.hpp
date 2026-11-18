@@ -1,7 +1,9 @@
 /*
- * RealProgramParty.cpp
+ * garbled/bmr/real_program_party.hpp
  *
  */
+
+#pragma once
 
 #include "garbled/bmr/real_program_party.h"
 

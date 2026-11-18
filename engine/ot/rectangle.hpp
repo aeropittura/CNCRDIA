@@ -1,10 +1,9 @@
 /*
- * Rectangle.cpp
+ * ot/rectangle.hpp
  *
  */
 
-#ifndef OT_RECTANGLE_HPP_
-#define OT_RECTANGLE_HPP_
+#pragma once
 
 #include "ot/rectangle.h"
 #include "numeric/z2k.h"
@@ -120,5 +119,3 @@ void Rectangle<U, V>::print(int i, int j)
 	(void) j;
 	cout << dec << i << ": " << hex << rows[i] << endl;
 }
-
-#endif

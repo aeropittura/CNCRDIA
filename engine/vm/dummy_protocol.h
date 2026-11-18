@@ -1,10 +1,9 @@
 /*
- * DummyProtocol.h
+ * vm/dummy_protocol.h
  *
  */
 
-#ifndef PROCESSOR_DUMMYPROTOCOL_H_
-#define PROCESSOR_DUMMYPROTOCOL_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -288,5 +287,3 @@ public:
         (void) player, (void) source;
     }
 };
-
-#endif /* PROCESSOR_DUMMYPROTOCOL_H_ */

@@ -1,10 +1,9 @@
 /*
- * Diagonal.h
+ * ot/bit_diagonal.h
  *
  */
 
-#ifndef OT_BITDIAGONAL_H_
-#define OT_BITDIAGONAL_H_
+#pragma once
 
 #include "numeric/square.h"
 #include "numeric/bit_vec.h"
@@ -20,5 +19,3 @@ public:
     void pack(octetStream& os) const;
     void unpack(octetStream& os);
 };
-
-#endif /* OT_BITDIAGONAL_H_ */

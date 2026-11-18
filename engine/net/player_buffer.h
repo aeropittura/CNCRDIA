@@ -1,10 +1,9 @@
 /*
- * PlayerBuffer.h
+ * net/player_buffer.h
  *
  */
 
-#ifndef NETWORKING_PLAYERBUFFER_H_
-#define NETWORKING_PLAYERBUFFER_H_
+#pragma once
 
 #include "support/int.h"
 
@@ -24,5 +23,3 @@ public:
     {
     }
 };
-
-#endif /* NETWORKING_PLAYERBUFFER_H_ */

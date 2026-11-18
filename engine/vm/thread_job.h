@@ -1,10 +1,9 @@
 /*
- * ThreadJob.h
+ * vm/thread_job.h
  *
  */
 
-#ifndef PROCESSOR_THREADJOB_H_
-#define PROCESSOR_THREADJOB_H_
+#pragma once
 
 #include "vm/data_files.h"
 #include "numeric/modp.h"
@@ -215,5 +214,3 @@ public:
         input = &choices;
     }
 };
-
-#endif /* PROCESSOR_THREADJOB_H_ */

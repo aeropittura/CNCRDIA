@@ -1,5 +1,4 @@
-#ifndef PROCESSOR_MACHINE_HPP_
-#define PROCESSOR_MACHINE_HPP_
+#pragma once
 
 #include "vm/machine.h"
 
@@ -827,5 +826,3 @@ void Machine<sint, sgf2n>::gap_warning(int k)
       warn_lock.unlock();
     }
 }
-
-#endif

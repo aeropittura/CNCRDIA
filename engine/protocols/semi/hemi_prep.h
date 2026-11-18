@@ -1,10 +1,9 @@
 /*
- * HemiPrep.h
+ * protocols/semi/hemi_prep.h
  *
  */
 
-#ifndef PROTOCOLS_HEMIPREP_H_
-#define PROTOCOLS_HEMIPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "he/offline/multiplier.h"
@@ -60,5 +59,3 @@ public:
     void buffer_bits();
     void buffer_dabits(ThreadQueues* queues);
 };
-
-#endif /* PROTOCOLS_HEMIPREP_H_ */

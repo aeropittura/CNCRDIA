@@ -1,10 +1,9 @@
 /*
- * SemiPrep2k.h
+ * protocols/semi/semi_prep2k.h
  *
  */
 
-#ifndef PROTOCOLS_SEMIPREP2K_H_
-#define PROTOCOLS_SEMIPREP2K_H_
+#pragma once
 
 #include "protocols/semi/semi_prep.h"
 #include "protocols/replicated/rep_ring_only_edabit_prep.h"
@@ -64,5 +63,3 @@ public:
         b = a & 1;
     }
 };
-
-#endif /* PROTOCOLS_SEMIPREP2K_H_ */

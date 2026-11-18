@@ -1,10 +1,9 @@
 /*
- * MamaRectangle.h
+ * ot/mama_rectangle.h
  *
  */
 
-#ifndef OT_MAMARECTANGLE_H_
-#define OT_MAMARECTANGLE_H_
+#pragma once
 
 #include "numeric/fixed_vec.h"
 #include "numeric/gfp.h"
@@ -89,5 +88,3 @@ public:
             squares[i].to(result[i]);
     }
 };
-
-#endif /* OT_MAMARECTANGLE_H_ */

@@ -1,10 +1,9 @@
 /*
- * Diagonalizer.h
+ * he/core/diagonalizer.h
  *
  */
 
-#ifndef FHE_DIAGONALIZER_H_
-#define FHE_DIAGONALIZER_H_
+#pragma once
 
 #include "numeric/gfpvar.h"
 #include "he/core/ciphertext.h"
@@ -32,5 +31,3 @@ public:
     MatrixVector dediag(const vector<Plaintext_<FFT_Data>>& plaintexts,
             int n_matrices);
 };
-
-#endif /* FHE_DIAGONALIZER_H_ */

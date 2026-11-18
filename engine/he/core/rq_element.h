@@ -1,5 +1,4 @@
-#ifndef _Rq_Element
-#define _Rq_Element
+#pragma once
 
 /* An Rq Element is something held modulo Q_0 = p0 or Q_1 = p0*p1
  *
@@ -203,5 +202,3 @@ void Rq_Element::from(const Generator<T>& generator, int level)
     }
   a[0].from(generator);
 }
-
-#endif

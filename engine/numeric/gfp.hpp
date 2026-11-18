@@ -1,5 +1,4 @@
-#ifndef MATH_GFP_HPP_
-#define MATH_GFP_HPP_
+#pragma once
 
 #include "numeric/gfp.h"
 #include "numeric/gfpvar.h"
@@ -237,5 +236,3 @@ bool gfp_<X, L>::get_bit(int i) const
     assert(i == 0);
     return bigint::tmp.get_ui() & 1;
 }
-
-#endif

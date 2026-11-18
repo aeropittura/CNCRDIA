@@ -1,10 +1,9 @@
 /*
- * PairwiseGenerator.h
+ * he/offline/pairwise_generator.h
  *
  */
 
-#ifndef FHEOFFLINE_PAIRWISEGENERATOR_H_
-#define FHEOFFLINE_PAIRWISEGENERATOR_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -54,5 +53,3 @@ public:
     void report_size(ReportType type, MemoryUsage& res);
     size_t report_sent();
 };
-
-#endif /* FHEOFFLINE_PAIRWISEGENERATOR_H_ */

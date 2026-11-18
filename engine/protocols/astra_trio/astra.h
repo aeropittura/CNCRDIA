@@ -1,10 +1,9 @@
 /*
- * Astra.h
+ * protocols/astra_trio/astra.h
  *
  */
 
-#ifndef PROTOCOLS_ASTRA_H_
-#define PROTOCOLS_ASTRA_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 
@@ -299,5 +298,3 @@ public:
             StackedVector<typename T::bit_type>& source,
             const Instruction& instruction);
 };
-
-#endif /* PROTOCOLS_ASTRA_H_ */

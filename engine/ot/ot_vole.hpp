@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ot/config.h"
 
 #include "ot/ot_vole.h"

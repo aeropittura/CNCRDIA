@@ -1,10 +1,9 @@
 /*
- * VectorProtocol.cpp
+ * boolean/vector_protocol.hpp
  *
  */
 
-#ifndef GC_VECTORPROTOCOL_HPP_
-#define GC_VECTORPROTOCOL_HPP_
+#pragma once
 
 #include "boolean/vector_protocol.h"
 
@@ -65,5 +64,3 @@ void VectorProtocol<T>::finalize_mult(T& res, int n)
 }
 
 } /* namespace GC */
-
-#endif

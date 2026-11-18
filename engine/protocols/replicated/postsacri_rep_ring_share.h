@@ -1,10 +1,9 @@
 /*
- * PostSacriRepRingShare.h
+ * protocols/replicated/postsacri_rep_ring_share.h
  *
  */
 
-#ifndef PROTOCOLS_POSTSACRIREPRINGSHARE_H_
-#define PROTOCOLS_POSTSACRIREPRINGSHARE_H_
+#pragma once
 
 #include "protocols/replicated/malicious_rep3_share.h"
 #include "protocols/replicated/malrep_ring_share.h"
@@ -70,5 +69,3 @@ public:
         super::split(dest, regs, n_bits, source, n_inputs, protocol);
     }
 };
-
-#endif /* PROTOCOLS_POSTSACRIREPRINGSHARE_H_ */

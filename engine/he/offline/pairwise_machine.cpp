@@ -1,5 +1,5 @@
 /*
- * PairwiseMachine.cpp
+ * he/offline/pairwise_machine.cpp
  *
  */
 

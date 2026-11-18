@@ -1,5 +1,5 @@
 /*
- * gf2n_longlong.cpp
+ * numeric/gf2nlong.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * MascotMayKey.hpp
+ * ot/mascot_mac_key.hpp
  *
  */
 
-#ifndef OT_MASCOTMACKEY_HPP_
-#define OT_MASCOTMACKEY_HPP_
+#pragma once
 
 #include "ot/mascot_mac_key.h"
 #include "ot/ot_multiplier.hpp"
@@ -82,5 +81,3 @@ void MascotMacKey<T>::read_or_generate(Player& P)
     share_type::set_mac_key(key);
     write_mac_key<typename share_type::part_type>(P.N, key);
 }
-
-#endif /* OT_MASCOTMACKEY_HPP_ */

@@ -1,10 +1,9 @@
 /*
- * SpdzWiseRingPrep.h
+ * protocols/spdzwise/spdzwise_ring_prep.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISERINGPREP_H_
-#define PROTOCOLS_SPDZWISERINGPREP_H_
+#pragma once
 
 #include "protocols/spdzwise/spdzwise_prep.h"
 #include "protocols/replicated/rep_ring_only_edabit_prep.h"
@@ -60,5 +59,3 @@ public:
         b = a.get_share() & 1;
     }
 };
-
-#endif /* PROTOCOLS_SPDZWISERINGPREP_H_ */

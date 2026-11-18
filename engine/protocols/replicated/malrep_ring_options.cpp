@@ -1,5 +1,5 @@
 /*
- * MalRepRingOptions.cpp
+ * protocols/replicated/malrep_ring_options.cpp
  *
  */
 

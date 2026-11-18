@@ -1,5 +1,5 @@
 /*
- * hemi-party.cpp
+ * parties/arith/hemi-party.cpp
  *
  */
 

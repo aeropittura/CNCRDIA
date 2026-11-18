@@ -1,10 +1,9 @@
 /*
- * DabitSacrifice.h
+ * protocols/common/dabit_sacrifice.h
  *
  */
 
-#ifndef PROTOCOLS_DABITSACRIFICE_H_
-#define PROTOCOLS_DABITSACRIFICE_H_
+#pragma once
 
 #include "vm/base_machine.h"
 
@@ -39,5 +38,3 @@ public:
             vector<dabit<T>>& check_dabits, SubProcessor<T>& proc,
             ThreadQueues* queues = 0);
 };
-
-#endif /* PROTOCOLS_DABITSACRIFICE_H_ */

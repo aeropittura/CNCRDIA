@@ -1,10 +1,9 @@
 /*
- * ShareInterface.h
+ * protocols/common/share_interface.h
  *
  */
 
-#ifndef PROTOCOLS_SHAREINTERFACE_H_
-#define PROTOCOLS_SHAREINTERFACE_H_
+#pragma once
 
 #include <vector>
 #include <string>
@@ -96,5 +95,3 @@ public:
     template<class T>
     static string proto_fake_opts() { return T::fake_opts(); }
 };
-
-#endif /* PROTOCOLS_SHAREINTERFACE_H_ */

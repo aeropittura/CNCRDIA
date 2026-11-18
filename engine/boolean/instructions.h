@@ -1,10 +1,9 @@
 /*
- * instructions.h
+ * boolean/instructions.h
  *
  */
 
-#ifndef GC_INSTRUCTIONS_H_
-#define GC_INSTRUCTIONS_H_
+#pragma once
 
 #include "support/callgrind.h"
 #include "boolean/instruction.h"
@@ -164,5 +163,3 @@
     X(CALL_ARG, ) \
 
 #define INSTRUCTIONS BIT_INSTRUCTIONS GC_INSTRUCTIONS
-
-#endif /* GC_INSTRUCTIONS_H_ */

@@ -1,5 +1,5 @@
 /*
- * TripleMachine.cpp
+ * ot/mascot_params.cpp
  *
  */
 

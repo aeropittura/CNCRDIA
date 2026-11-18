@@ -1,10 +1,9 @@
 /*
- * SimpleEncCommit.h
+ * he/offline/simple_enc_commit.h
  *
  */
 
-#ifndef FHEOFFLINE_SIMPLEENCCOMMIT_H_
-#define FHEOFFLINE_SIMPLEENCCOMMIT_H_
+#pragma once
 
 #include "he/offline/enc_commit.h"
 #include "he/offline/proof.h"
@@ -189,5 +188,3 @@ public:
             map<string, Timer>& timers, MachineBase& machine,
             PairwiseGenerator<FD>& generator, bool diagonal = false);
 };
-
-#endif /* FHEOFFLINE_SIMPLEENCCOMMIT_H_ */

@@ -1,5 +1,5 @@
 /*
- * mascot-offline.cpp
+ * parties/offline/mascot-offline.cpp
  *
  */
 

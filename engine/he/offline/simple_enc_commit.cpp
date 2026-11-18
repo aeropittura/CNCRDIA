@@ -1,5 +1,5 @@
 /*
- * SimpleEncCommit.cpp
+ * he/offline/simple_enc_commit.cpp
  *
  */
 

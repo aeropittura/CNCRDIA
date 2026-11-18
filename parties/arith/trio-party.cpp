@@ -1,5 +1,5 @@
 /*
- * trio-party.cpp
+ * parties/arith/trio-party.cpp
  *
  */
 

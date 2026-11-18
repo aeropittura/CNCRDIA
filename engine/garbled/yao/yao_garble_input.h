@@ -1,10 +1,9 @@
 /*
- * YaoGarbleInput.h
+ * garbled/yao/yao_garble_input.h
  *
  */
 
-#ifndef YAO_YAOGARBLEINPUT_H_
-#define YAO_YAOGARBLEINPUT_H_
+#pragma once
 
 #include "garbled/yao/yao_garbler.h"
 
@@ -25,5 +24,3 @@ public:
         garbler.receiver_input_keys.push_back({});
     }
 };
-
-#endif /* YAO_YAOGARBLEINPUT_H_ */

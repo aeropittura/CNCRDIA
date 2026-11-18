@@ -1,10 +1,9 @@
 /*
- * Rep4.h
+ * protocols/rep4/rep4.h
  *
  */
 
-#ifndef PROTOCOLS_REP4_H_
-#define PROTOCOLS_REP4_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 
@@ -104,6 +103,3 @@ public:
 
     int get_n_relevant_players() { return 2; }
 };
-
-
-#endif /* PROTOCOLS_REP4_H_ */

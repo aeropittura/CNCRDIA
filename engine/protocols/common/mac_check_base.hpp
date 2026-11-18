@@ -1,10 +1,9 @@
 /*
- * MAC_Check_Base.hpp
+ * protocols/common/mac_check_base.hpp
  *
  */
 
-#ifndef PROTOCOLS_MAC_CHECK_BASE_HPP_
-#define PROTOCOLS_MAC_CHECK_BASE_HPP_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 
@@ -103,5 +102,3 @@ void MAC_Check_Base<T>::stop_exchange(const Player& P)
 {
     POpen_End(values, secrets, P);
 }
-
-#endif /* PROTOCOLS_MAC_CHECK_BASE_HPP_ */

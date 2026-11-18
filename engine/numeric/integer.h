@@ -1,10 +1,9 @@
 /*
- * Integer.h
+ * numeric/integer.h
  *
  */
 
-#ifndef INTEGER_H_
-#define INTEGER_H_
+#pragma once
 
 #include <iostream>
 using namespace std;
@@ -218,5 +217,3 @@ inline void to_gfp(Integer& res, const bigint& x)
 }
 
 #include "numeric/integer.hpp"
-
-#endif /* INTEGER_H_ */

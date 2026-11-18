@@ -1,10 +1,9 @@
 /*
- * MalicousRepParty.h
+ * boolean/share_thread.h
  *
  */
 
-#ifndef GC_SHARETHREAD_H_
-#define GC_SHARETHREAD_H_
+#pragma once
 
 #include "boolean/thread.h"
 #include "vm/data_files.h"
@@ -83,5 +82,3 @@ bool GC::ShareThread<T>::has_singleton()
 }
 
 } /* namespace GC */
-
-#endif /* GC_SHARETHREAD_H_ */

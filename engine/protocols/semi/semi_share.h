@@ -1,10 +1,9 @@
 /*
- * SemiShare.h
+ * protocols/semi/semi_share.h
  *
  */
 
-#ifndef PROTOCOLS_SEMISHARE_H_
-#define PROTOCOLS_SEMISHARE_H_
+#pragma once
 
 #include "protocols/common/beaver.h"
 #include "protocols/semi/semi.h"
@@ -176,5 +175,3 @@ public:
 
 template<class T>
 false_type SemiShare<T>::is_clear;
-
-#endif /* PROTOCOLS_SEMISHARE_H_ */

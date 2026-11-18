@@ -1,5 +1,5 @@
 /*
- * YaoWire.cpp
+ * garbled/yao/yao_garble_wire.cpp
  *
  */
 

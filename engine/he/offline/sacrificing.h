@@ -1,10 +1,9 @@
 /*
- * Checking.h
+ * he/offline/sacrificing.h
  *
  */
 
-#ifndef FHEOFFLINE_CHECKING_H_
-#define FHEOFFLINE_CHECKING_H_
+#pragma once
 
 #include "net/player.h"
 #include "protocols/common/mac_check.h"
@@ -63,5 +62,3 @@ inline string file_completion(const T& dummy = {})
   (void)dummy;
   return { T::type_char() };
 }
-
-#endif /* FHEOFFLINE_CHECKING_H_ */

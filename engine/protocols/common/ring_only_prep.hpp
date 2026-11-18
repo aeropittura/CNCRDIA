@@ -1,7 +1,9 @@
 /*
- * RingOnlyPrep.cpp
+ * protocols/common/ring_only_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/common/ring_only_prep.h"
 

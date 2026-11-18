@@ -1,10 +1,9 @@
 /*
- * FakeShare.h
+ * protocols/fake/fake_share.h
  *
  */
 
-#ifndef PROTOCOLS_FAKESHARE_H_
-#define PROTOCOLS_FAKESHARE_H_
+#pragma once
 
 #include "boolean/fake_secret.h"
 #include "protocols/common/share_interface.h"
@@ -69,5 +68,3 @@ public:
             int n_bits, const This* source, int n_inputs,
             GC::FakeSecret::Protocol& protocol);
 };
-
-#endif /* PROTOCOLS_FAKESHARE_H_ */

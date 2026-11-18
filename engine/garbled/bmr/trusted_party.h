@@ -1,10 +1,9 @@
 /*
- * TrustedParty.h
+ * garbled/bmr/trusted_party.h
  *
  */
 
-#ifndef PROTOCOL_TRUSTEDPARTY_H_
-#define PROTOCOL_TRUSTEDPARTY_H_
+#pragma once
 
 
 #include "garbled/bmr/boolean_circuit.h"
@@ -124,5 +123,3 @@ inline TrustedProgramParty& TrustedProgramParty::s()
 	else
 		throw runtime_error("no singleton");
 }
-
-#endif /* PROTOCOL_TRUSTEDPARTY_H_ */

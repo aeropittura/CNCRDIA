@@ -1,10 +1,9 @@
 /*
- * AtlasShare.h
+ * protocols/atlas/atlas_share.h
  *
  */
 
-#ifndef PROTOCOLS_ATLASSHARE_H_
-#define PROTOCOLS_ATLASSHARE_H_
+#pragma once
 
 #include "protocols/shamir/shamir_share.h"
 
@@ -52,5 +51,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_ATLASSHARE_H_ */

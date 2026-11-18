@@ -1,10 +1,9 @@
 /*
- * AstraSecret.h
+ * boolean/astra_secret.h
  *
  */
 
-#ifndef GC_ASTRASECRET_H_
-#define GC_ASTRASECRET_H_
+#pragma once
 
 #include "boolean/share_secret.h"
 #include "protocols/astra_trio/astra_mc.h"
@@ -92,5 +91,3 @@ template<class T>
 const int AstraSecret<T>::default_length;
 
 }
-
-#endif /* GC_ASTRASECRET_H_ */

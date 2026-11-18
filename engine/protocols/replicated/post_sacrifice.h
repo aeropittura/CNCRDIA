@@ -1,10 +1,9 @@
 /*
- * PostSacrifice.h
+ * protocols/replicated/post_sacrifice.h
  *
  */
 
-#ifndef PROTOCOLS_POSTSACRIFICE_H_
-#define PROTOCOLS_POSTSACRIFICE_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 
@@ -41,5 +40,3 @@ public:
 
     virtual void randoms(T& res, int n_bits) { randomizer.randoms(res, n_bits); }
 };
-
-#endif /* PROTOCOLS_POSTSACRIFICE_H_ */

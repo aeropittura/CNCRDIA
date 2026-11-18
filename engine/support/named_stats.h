@@ -1,10 +1,9 @@
 /*
- * NamedStats.h
+ * support/named_stats.h
  *
  */
 
-#ifndef TOOLS_NAMEDSTATS_H_
-#define TOOLS_NAMEDSTATS_H_
+#pragma once
 
 #include <map>
 #include <string>
@@ -18,5 +17,3 @@ public:
 
     void print();
 };
-
-#endif /* TOOLS_NAMEDSTATS_H_ */

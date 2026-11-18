@@ -1,10 +1,9 @@
 /*
- * SPDZ2k.h
+ * protocols/spdz2k/spdz2k.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZ2K_H_
-#define PROTOCOLS_SPDZ2K_H_
+#pragma once
 
 #include "protocols/spdz/spdz.h"
 
@@ -25,5 +24,3 @@ public:
         SPDZ<T>::exchange();
     }
 };
-
-#endif /* PROTOCOLS_SPDZ2K_H_ */

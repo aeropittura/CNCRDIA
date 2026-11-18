@@ -1,10 +1,9 @@
 /*
- * DealerInput.hpp
+ * protocols/dealer/dealer_input.hpp
  *
  */
 
-#ifndef PROTOCOLS_DEALERINPUT_HPP_
-#define PROTOCOLS_DEALERINPUT_HPP_
+#pragma once
 
 #include "protocols/dealer/dealer_input.h"
 
@@ -279,5 +278,3 @@ array<T, N> DealerInput<T>::finalize_no_check()
     res[N - 1] = finalize_no_check<IS_KING, false>();
     return res;
 }
-
-#endif /* PROTOCOLS_DEALERINPUT_HPP_ */

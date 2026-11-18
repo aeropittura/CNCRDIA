@@ -1,10 +1,9 @@
 /*
- * Bundle.h
+ * support/bundle.h
  *
  */
 
-#ifndef TOOLS_BUNDLE_H_
-#define TOOLS_BUNDLE_H_
+#pragma once
 
 #include "net/player.h"
 
@@ -53,5 +52,3 @@ public:
             x.reset_write_head();
     }
 };
-
-#endif /* TOOLS_BUNDLE_H_ */

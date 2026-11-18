@@ -1,10 +1,9 @@
 /*
- * OnlineOptions.h
+ * vm/online_options.h
  *
  */
 
-#ifndef PROCESSOR_ONLINEOPTIONS_H_
-#define PROCESSOR_ONLINEOPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 #include "numeric/bigint.h"
@@ -88,5 +87,3 @@ public:
 
     int comp_sec();
 };
-
-#endif /* PROCESSOR_ONLINEOPTIONS_H_ */

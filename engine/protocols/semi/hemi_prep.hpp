@@ -1,10 +1,9 @@
 /*
- * HemiPrep.hpp
+ * protocols/semi/hemi_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_HEMIPREP_HPP_
-#define PROTOCOLS_HEMIPREP_HPP_
+#pragma once
 
 #include "protocols/semi/hemi_prep.h"
 #include "he/offline/pairwise_machine.h"
@@ -176,5 +175,3 @@ void HemiPrep<T>::buffer_dabits(ThreadQueues* queues)
     else
         SemiHonestRingPrep<T>::buffer_dabits(queues);
 }
-
-#endif

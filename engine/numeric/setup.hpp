@@ -1,10 +1,9 @@
 /*
- * Setup.hpp
+ * numeric/setup.hpp
  *
  */
 
-#ifndef MATH_SETUP_HPP_
-#define MATH_SETUP_HPP_
+#pragma once
 
 #include "numeric/gfp.h"
 
@@ -55,5 +54,3 @@ void read_setup(const string& dir_prefix, int lgp = -1)
     if (OnlineOptions::singleton.verbose)
         cerr << "Using prime modulus " << T::pr() << endl;
 }
-
-#endif /* MATH_SETUP_HPP_ */

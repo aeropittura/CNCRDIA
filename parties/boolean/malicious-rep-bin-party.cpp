@@ -1,5 +1,5 @@
 /*
- * malicious-rep-bin-party.cpp
+ * parties/boolean/malicious-rep-bin-party.cpp
  *
  */
 

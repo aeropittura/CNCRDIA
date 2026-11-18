@@ -1,10 +1,9 @@
 /*
- * Instruction.h
+ * boolean/instruction.h
  *
  */
 
-#ifndef PROCESSOR_GC_INSTRUCTION_H_
-#define PROCESSOR_GC_INSTRUCTION_H_
+#pragma once
 
 #include <vector>
 #include <iostream>
@@ -102,5 +101,3 @@ enum
     GENSECSHUFFLEB = 0x232,
     DELSHUFFLEB = 0x233,
 };
-
-#endif /* PROCESSOR_GC_INSTRUCTION_H_ */

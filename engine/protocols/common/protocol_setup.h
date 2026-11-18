@@ -1,10 +1,9 @@
 /*
- * ProtocolSetup.h
+ * protocols/common/protocol_setup.h
  *
  */
 
-#ifndef PROTOCOLS_PROTOCOLSETUP_H_
-#define PROTOCOLS_PROTOCOLSETUP_H_
+#pragma once
 
 #include "net/player.h"
 
@@ -130,5 +129,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_PROTOCOLSETUP_H_ */

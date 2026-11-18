@@ -1,10 +1,9 @@
 /*
- * ThreadQueues.h
+ * vm/thread_queues.h
  *
  */
 
-#ifndef PROCESSOR_THREADQUEUES_H_
-#define PROCESSOR_THREADQUEUES_H_
+#pragma once
 
 #include "support/wait_queue.h"
 #include "vm/thread_job.h"
@@ -59,5 +58,3 @@ public:
     ThreadStats total_stats();
     NamedCommStats max_comm();
 };
-
-#endif /* PROCESSOR_THREADQUEUES_H_ */

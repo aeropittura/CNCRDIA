@@ -1,10 +1,9 @@
 /*
- * ProtocolSet.h
+ * protocols/common/protocol_set.h
  *
  */
 
-#ifndef PROTOCOLS_PROTOCOLSET_H_
-#define PROTOCOLS_PROTOCOLSET_H_
+#pragma once
 
 #include "vm/processor.h"
 #include "vm/machine.h"
@@ -178,5 +177,3 @@ public:
         binary.check();
     }
 };
-
-#endif /* PROTOCOLS_PROTOCOLSET_H_ */

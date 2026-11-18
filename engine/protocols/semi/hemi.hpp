@@ -1,10 +1,9 @@
 /*
- * Hemi.hpp
+ * protocols/semi/hemi.hpp
  *
  */
 
-#ifndef PROTOCOLS_HEMI_HPP_
-#define PROTOCOLS_HEMI_HPP_
+#pragma once
 
 #include "protocols/semi/hemi.h"
 #include "protocols/common/share_matrix.h"
@@ -371,5 +370,3 @@ TimerWithComm Hemi<T>::prep_time()
         res += prep.second->prep_timer;
     return res;
 }
-
-#endif /* PROTOCOLS_HEMI_HPP_ */

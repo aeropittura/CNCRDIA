@@ -1,7 +1,9 @@
 /*
- * mal-rep-ecdsa-party.cpp
+ * ecdsa/hm_ecdsa_party.hpp
  *
  */
+
+#pragma once
 
 #include "net/server.h"
 #include "net/crypto_player.h"

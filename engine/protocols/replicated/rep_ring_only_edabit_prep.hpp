@@ -1,10 +1,9 @@
 /*
- * RepRingOnlyEdabitPrep.cpp
+ * protocols/replicated/rep_ring_only_edabit_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_REPRINGONLYEDABITPREP_HPP_
-#define PROTOCOLS_REPRINGONLYEDABITPREP_HPP_
+#pragma once
 
 #include "protocols/replicated/rep_ring_only_edabit_prep.h"
 #include "boolean/bit_adder.h"
@@ -56,5 +55,3 @@ void RepRingOnlyEdabitPrep<T>::buffer_edabits(int n_bits, ThreadQueues*)
 
     this->push_edabits(this->edabits[{false, n_bits}], wholes, sums);
 }
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * NoProtocol.h
+ * protocols/common/no_protocol.h
  *
  */
 
-#ifndef PROCESSOR_NOPROTOCOL_H_
-#define PROCESSOR_NOPROTOCOL_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 #include "protocols/common/mac_check_base.h"
@@ -121,5 +120,3 @@ public:
         throw runtime_error("no finalizing of someone else's input");
     }
 };
-
-#endif /* PROCESSOR_NOPROTOCOL_H_ */

@@ -1,10 +1,9 @@
 /*
- * YaoEvalInput.h
+ * garbled/yao/yao_eval_input.h
  *
  */
 
-#ifndef YAO_YAOEVALINPUT_H_
-#define YAO_YAOEVALINPUT_H_
+#pragma once
 
 #include "garbled/yao/yao_evaluator.h"
 
@@ -29,5 +28,3 @@ public:
 		evaluator.player.receive(os);
 	}
 };
-
-#endif /* YAO_YAOEVALINPUT_H_ */

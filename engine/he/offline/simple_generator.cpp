@@ -1,5 +1,5 @@
 /*
- * SimpleThread.cpp
+ * he/offline/simple_generator.cpp
  *
  */
 

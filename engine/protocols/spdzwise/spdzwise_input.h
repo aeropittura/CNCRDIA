@@ -1,10 +1,9 @@
 /*
- * SpdzWiseInput.h
+ * protocols/spdzwise/spdzwise_input.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISEINPUT_H_
-#define PROTOCOLS_SPDZWISEINPUT_H_
+#pragma once
 
 #include "protocols/replicated/replicated_input.h"
 
@@ -39,5 +38,3 @@ public:
     void exchange();
     T finalize(int player, int n_bits = -1);
 };
-
-#endif /* PROTOCOLS_SPDZWISEINPUT_H_ */

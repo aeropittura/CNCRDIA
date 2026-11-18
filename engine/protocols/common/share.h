@@ -1,6 +1,5 @@
 
-#ifndef _Share
-#define _Share
+#pragma once
 
 /* Class for holding a share of either a T or gfp element */ 
 
@@ -258,5 +257,3 @@ inline void Share_<T, V>::assign(const open_type& aa, int my_num,
   cout << "load " << hex << mac << " = " << aa << " * " << alphai << endl;
 #endif
 }
-
-#endif

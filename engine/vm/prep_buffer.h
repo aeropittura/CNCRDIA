@@ -1,10 +1,9 @@
 /*
- * PrepBuffer.h
+ * vm/prep_buffer.h
  *
  */
 
-#ifndef PROCESSOR_PREPBUFFER_H_
-#define PROCESSOR_PREPBUFFER_H_
+#pragma once
 
 #include "support/buffer.h"
 
@@ -40,5 +39,3 @@ public:
         }
     }
 };
-
-#endif /* PROCESSOR_PREPBUFFER_H_ */

@@ -1,10 +1,9 @@
 /*
- * ThreadMaster.h
+ * boolean/thread_master.h
  *
  */
 
-#ifndef GC_THREADMASTER_H_
-#define GC_THREADMASTER_H_
+#pragma once
 
 #include "boolean/thread.h"
 #include "boolean/program.h"
@@ -66,5 +65,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_THREADMASTER_H_ */

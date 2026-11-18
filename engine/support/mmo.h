@@ -1,10 +1,9 @@
 /*
- * MMO.h
+ * support/mmo.h
  *
  */
 
-#ifndef TOOLS_MMO_H_
-#define TOOLS_MMO_H_
+#pragma once
 
 #include "support/aes.h"
 #include "garbled/bmr/key.h"
@@ -84,5 +83,3 @@ inline void MMO::hash(Key* output, const Key* input)
 {
     encrypt_and_xor<N>(&output->r, &input->r, IV[0]);
 }
-
-#endif /* TOOLS_MMO_H_ */

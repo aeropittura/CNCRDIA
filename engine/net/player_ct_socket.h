@@ -1,10 +1,9 @@
 /*
- * PlayerSocket.h
+ * net/player_ct_socket.h
  *
  */
 
-#ifndef NETWORKING_PLAYERCTSOCKET_H_
-#define NETWORKING_PLAYERCTSOCKET_H_
+#pragma once
 
 #include "net/player.h"
 #include "support/lock.h"
@@ -173,5 +172,3 @@ public:
         }
     }
 };
-
-#endif /* NETWORKING_PLAYERCTSOCKET_H_ */

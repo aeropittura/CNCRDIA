@@ -1,7 +1,9 @@
 /*
- * Rep.cpp
+ * parties/shared/rep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/replicated/malrep_ring_prep.h"
 #include "protocols/replicated/semi_rep3_prep.h"

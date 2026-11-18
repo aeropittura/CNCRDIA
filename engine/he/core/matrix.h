@@ -1,6 +1,5 @@
 
-#ifndef _myHNF
-#define _myHNF
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -43,5 +42,3 @@ matrix inv(const matrix& A);
 // Finds a pseudo-inverse of a matrix A modulo 2
 //   - Input matrix is assumed to have more rows than columns
 void pinv(imatrix& Ai,const imatrix& A);
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * FixedVec.h
+ * numeric/fixed_vec.h
  *
  */
 
-#ifndef MATH_FIXEDVEC_H_
-#define MATH_FIXEDVEC_H_
+#pragma once
 
 #include <string>
 #include <array>
@@ -443,5 +442,3 @@ ostream& operator<<(ostream& os, const FixedVec<T, L>& v)
     }
     return os;
 }
-
-#endif /* MATH_FIXEDVEC_H_ */

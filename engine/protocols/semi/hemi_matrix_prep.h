@@ -1,10 +1,9 @@
 /*
- * HemiMatrixPrep.h
+ * protocols/semi/hemi_matrix_prep.h
  *
  */
 
-#ifndef PROTOCOLS_HEMIMATRIXPREP_H_
-#define PROTOCOLS_HEMIMATRIXPREP_H_
+#pragma once
 
 #include "protocols/common/share_matrix.h"
 #include "protocols/common/replicated_prep.h"
@@ -51,5 +50,3 @@ public:
 
     void buffer_triples();
 };
-
-#endif /* PROTOCOLS_HEMIMATRIXPREP_H_ */

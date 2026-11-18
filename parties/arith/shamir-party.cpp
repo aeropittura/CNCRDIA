@@ -1,5 +1,5 @@
 /*
- * shamir-party.cpp
+ * parties/arith/shamir-party.cpp
  *
  */
 

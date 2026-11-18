@@ -1,10 +1,9 @@
 /*
- * CommonParty.h
+ * garbled/bmr/common_party.h
  *
  */
 
-#ifndef BMR_COMMONPARTY_H_
-#define BMR_COMMONPARTY_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -119,5 +118,3 @@ inline CommonParty& CommonParty::s()
     else
         throw runtime_error("no singleton");
 }
-
-#endif /* BMR_COMMONPARTY_H_ */

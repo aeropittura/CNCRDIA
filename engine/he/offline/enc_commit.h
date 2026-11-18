@@ -1,5 +1,4 @@
-#ifndef _EncCommit
-#define _EncCommit
+#pragma once
 
 /* Runs the EncCommit protocol
  *  - Input is the condition
@@ -150,6 +149,3 @@ void generate_mac_key(typename FD::T& key_share, Ciphertext& key, const FD& Fiel
   P.Check_Broadcast();
   key_share = mess.element(0);
 }
-
-#endif
-

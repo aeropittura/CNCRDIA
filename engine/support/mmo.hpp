@@ -1,8 +1,10 @@
 /*
- * MMO.cpp
+ * support/mmo.hpp
  *
  *
  */
+
+#pragma once
 
 #include "support/mmo.h"
 #include "numeric/gfp.hpp"

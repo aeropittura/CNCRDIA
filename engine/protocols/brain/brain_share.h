@@ -1,10 +1,9 @@
 /*
- * BrainShare.h
+ * protocols/brain/brain_share.h
  *
  */
 
-#ifndef PROTOCOLS_BRAINSHARE_H_
-#define PROTOCOLS_BRAINSHARE_H_
+#pragma once
 
 #include "protocols/replicated/rep3_share.h"
 #include "protocols/semi/semi_share.h"
@@ -54,5 +53,3 @@ public:
         FixedVec<T, 2>::operator=(other);
     }
 };
-
-#endif /* PROTOCOLS_BRAINSHARE_H_ */

@@ -1,5 +1,5 @@
 /*
- * DishonestMajorityMachine.cpp
+ * vm/dishonest_majority_machine.cpp
  *
  */
 

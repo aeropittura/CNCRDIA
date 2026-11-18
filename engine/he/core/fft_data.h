@@ -1,5 +1,4 @@
-#ifndef _FFT_Data
-#define _FFT_Data
+#pragma once
 
 #include "numeric/modp.h"
 #include "numeric/zp_data.h"
@@ -79,6 +78,3 @@ class FFT_Data
 
   friend void BFFT(vector<modp>& ans,const vector<modp>& a,const FFT_Data& FFTD,bool forward);
 };
-
-#endif
-

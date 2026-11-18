@@ -1,10 +1,9 @@
 /*
- * YaoWire.h
+ * garbled/yao/yao_wire.h
  *
  */
 
-#ifndef YAO_YAOWIRE_H_
-#define YAO_YAOWIRE_H_
+#pragma once
 
 #include "garbled/bmr/key.h"
 #include "garbled/bmr/register.h"
@@ -43,5 +42,3 @@ inline ostream& operator<<(ostream& o, const YaoWire& wire)
     o << wire.key_;
 	return o;
 }
-
-#endif /* YAO_YAOWIRE_H_ */

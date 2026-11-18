@@ -1,10 +1,9 @@
 /*
- * MaliciousRepPO.cpp
+ * protocols/replicated/malicious_rep_po.hpp
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSREPPO_HPP_
-#define PROTOCOLS_MALICIOUSREPPO_HPP_
+#pragma once
 
 #include "protocols/replicated/malicious_rep_po.h"
 
@@ -54,5 +53,3 @@ typename T::clear MaliciousRepPO<T>::finalize()
 {
     return finalize(secrets.next());
 }
-
-#endif

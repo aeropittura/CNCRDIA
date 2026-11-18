@@ -1,5 +1,5 @@
 /*
- * paper-example.cpp
+ * parties/examples/paper-example.cpp
  *
  * Working example similar to Figure 2 in https://eprint.iacr.org/2020/521
  *

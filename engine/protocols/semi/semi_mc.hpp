@@ -1,10 +1,9 @@
 /*
- * SemiMC.cpp
+ * protocols/semi/semi_mc.hpp
  *
  */
 
-#ifndef PROTOCOLS_SEMIMC_HPP_
-#define PROTOCOLS_SEMIMC_HPP_
+#pragma once
 
 #include "protocols/semi/semi_mc.h"
 
@@ -115,5 +114,3 @@ void DirectSemiMC<T>::POpen_End(vector<typename T::open_type>& values,
     P.receive_all(oss);
     direct_add_openings<typename T::open_type>(values, P, oss);
 }
-
-#endif

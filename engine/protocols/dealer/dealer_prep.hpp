@@ -1,10 +1,9 @@
 /*
- * DealerPrep.hpp
+ * protocols/dealer/dealer_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_DEALERPREP_HPP_
-#define PROTOCOLS_DEALERPREP_HPP_
+#pragma once
 
 #include "protocols/dealer/dealer_prep.h"
 #include "boolean/semi_secret.h"
@@ -293,5 +292,3 @@ DealerInput<typename T::bit_type>& DealerPrep<T>::get_bit_input()
 
     return *bit_input_;
 }
-
-#endif /* PROTOCOLS_DEALERPREP_HPP_ */

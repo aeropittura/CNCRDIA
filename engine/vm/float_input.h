@@ -1,10 +1,9 @@
 /*
- * FloatInput.h
+ * vm/float_input.h
  *
  */
 
-#ifndef PROCESSOR_FLOATINPUT_H_
-#define PROCESSOR_FLOATINPUT_H_
+#pragma once
 
 #include "numeric/bigint.h"
 #include "vm/instruction.h"
@@ -24,5 +23,3 @@ public:
 
     void read(std::istream& in, const ArgVector::value_type* params);
 };
-
-#endif /* PROCESSOR_FLOATINPUT_H_ */

@@ -1,10 +1,9 @@
 /*
- * EvalSecret.h
+ * boolean/secret.h
  *
  */
 
-#ifndef GC_SECRET_H_
-#define GC_SECRET_H_
+#pragma once
 
 #include "boolean/config.h"
 #include "garbled/bmr/config.h"
@@ -226,5 +225,3 @@ inline ostream& operator<<(ostream& o, const Secret<T>& secret)
 }
 
 } /* namespace GC */
-
-#endif /* GC_SECRET_H_ */

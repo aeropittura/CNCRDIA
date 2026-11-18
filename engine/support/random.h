@@ -1,5 +1,4 @@
-#ifndef _random
-#define _random
+#pragma once
 
 #include "support/octet_stream.h"
 #include "support/hash.h"
@@ -357,5 +356,3 @@ void PRNG::random_permutation(size_t n, T& perm)
       swap(perm[j], perm[k + j]);
     }
 }
-
-#endif

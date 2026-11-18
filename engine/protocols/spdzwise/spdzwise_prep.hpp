@@ -1,7 +1,9 @@
 /*
- * SpdzWisePrep.cpp
+ * protocols/spdzwise/spdzwise_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdzwise/spdzwise_prep.h"
 #include "protocols/spdzwise/spdzwise_ring_prep.h"

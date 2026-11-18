@@ -1,5 +1,5 @@
 /*
- * gc-emulate.cpp
+ * parties/tools/gc-emulate.cpp
  *
  */
 

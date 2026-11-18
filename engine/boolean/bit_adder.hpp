@@ -1,10 +1,9 @@
 /*
- * BitAdder.cpp
+ * boolean/bit_adder.hpp
  *
  */
 
-#ifndef GC_BITADDER_HPP_
-#define GC_BITADDER_HPP_
+#pragma once
 
 #include "boolean/bit_adder.h"
 
@@ -170,5 +169,3 @@ void BitAdder::multi_add(vector<vector<T> >& res,
 
     add(res, my_summands, begin, end, proc, length, 0);
 }
-
-#endif

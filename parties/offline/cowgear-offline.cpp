@@ -1,5 +1,5 @@
 /*
- * cowgear-offline.cpp
+ * parties/offline/cowgear-offline.cpp
  *
  */
 

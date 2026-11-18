@@ -1,6 +1,5 @@
 
-#ifndef _Processor
-#define _Processor
+#pragma once
 
 /* This is a representation of a processing element
  */
@@ -323,6 +322,3 @@ class Processor : public ArithmeticProcessor
   template<class T> friend class SPDZ;
   template<class T> friend class SubProcessor;
 };
-
-#endif
-

@@ -1,10 +1,9 @@
 /*
- * PairwiseSetup.h
+ * he/offline/pairwise_setup.h
  *
  */
 
-#ifndef FHEOFFLINE_PAIRWISESETUP_H_
-#define FHEOFFLINE_PAIRWISESETUP_H_
+#pragma once
 
 #include "he/core/fhe_params.h"
 #include "he/core/plaintext.h"
@@ -63,5 +62,3 @@ public:
 
     void set_alphai(T alphai);
 };
-
-#endif /* FHEOFFLINE_PAIRWISESETUP_H_ */

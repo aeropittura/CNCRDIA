@@ -1,10 +1,9 @@
 /*
- * RepRingOnlyEdabitPrep.h
+ * protocols/replicated/rep_ring_only_edabit_prep.h
  *
  */
 
-#ifndef PROTOCOLS_REPRINGONLYEDABITPREP_H_
-#define PROTOCOLS_REPRINGONLYEDABITPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -29,5 +28,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_REPRINGONLYEDABITPREP_H_ */

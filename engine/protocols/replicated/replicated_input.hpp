@@ -1,10 +1,9 @@
 /*
- * ReplicatedInput.cpp
+ * protocols/replicated/replicated_input.hpp
  *
  */
 
-#ifndef PROTOCOLS_REPLICATEDINPUT_HPP_
-#define PROTOCOLS_REPLICATEDINPUT_HPP_
+#pragma once
 
 #include "protocols/replicated/replicated_input.h"
 #include "vm/processor.h"
@@ -209,5 +208,3 @@ T PrepLessInput<T>::finalize_mine()
 {
     return this->shares.next();
 }
-
-#endif

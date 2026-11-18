@@ -1,5 +1,5 @@
 /*
- * brain-party.cpp
+ * parties/arith/brain-party.cpp
  *
  */
 

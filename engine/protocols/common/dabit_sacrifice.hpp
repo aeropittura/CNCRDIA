@@ -1,10 +1,9 @@
 /*
- * DabitSacrifice.cpp
+ * protocols/common/dabit_sacrifice.hpp
  *
  */
 
-#ifndef PROTOCOLS_DABITSACRIFICE_HPP_
-#define PROTOCOLS_DABITSACRIFICE_HPP_
+#pragma once
 
 #include "protocols/common/dabit_sacrifice.h"
 #include "protocols/common/buffer_scope.h"
@@ -149,5 +148,3 @@ void DabitSacrifice<T>::sacrifice_and_check_bits(vector<dabit<T> >& dabits,
     proc.MC.CheckFor(0, check_for_zero, proc.P);
     dabits.insert(dabits.end(), to_check.begin(), to_check.end());
 }
-
-#endif

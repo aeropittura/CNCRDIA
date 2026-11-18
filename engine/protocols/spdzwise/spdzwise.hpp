@@ -1,7 +1,9 @@
 /*
- * SpdzWise.cpp
+ * protocols/spdzwise/spdzwise.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdzwise/spdzwise.h"
 

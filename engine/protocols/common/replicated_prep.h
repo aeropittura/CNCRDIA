@@ -1,10 +1,9 @@
 /*
- * ReplicatedPrep.h
+ * protocols/common/replicated_prep.h
  *
  */
 
-#ifndef PROTOCOLS_REPLICATEDPREP_H_
-#define PROTOCOLS_REPLICATEDPREP_H_
+#pragma once
 
 #include "net/player.h"
 #include "vm/data_files.h"
@@ -435,5 +434,3 @@ public:
     void buffer_squares() { ReplicatedRingPrep<T>::buffer_squares(); }
     void buffer_bits() { SemiHonestRingPrep<T>::buffer_bits(); }
 };
-
-#endif /* PROTOCOLS_REPLICATEDPREP_H_ */

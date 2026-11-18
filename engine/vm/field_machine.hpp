@@ -1,10 +1,9 @@
 /*
- * ReplicatedFieldMachine.hpp
+ * vm/field_machine.hpp
  *
  */
 
-#ifndef PROCESSOR_FIELDMACHINE_HPP_
-#define PROCESSOR_FIELDMACHINE_HPP_
+#pragma once
 
 #include "vm/field_machine.h"
 #include "vm/honest_majority_machine.h"
@@ -61,5 +60,3 @@ FieldMachine<T, V, W, X>::FieldMachine(int argc, const char** argv,
         exit(1);
     }
 }
-
-#endif /* PROCESSOR_FIELDMACHINE_HPP_ */

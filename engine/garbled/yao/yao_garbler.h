@@ -1,10 +1,9 @@
 /*
- * YaoGarbler.h
+ * garbled/yao/yao_garbler.h
  *
  */
 
-#ifndef YAO_YAOGARBLER_H_
-#define YAO_YAOGARBLER_H_
+#pragma once
 
 #include "garbled/yao/yao_garble_wire.h"
 #include "garbled/yao/yao_and_job.h"
@@ -82,5 +81,3 @@ inline YaoGarbler& YaoGarbler::s()
 	else
 		throw runtime_error("singleton unavailable");
 }
-
-#endif /* YAO_YAOGARBLER_H_ */

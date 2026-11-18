@@ -1,10 +1,9 @@
 /*
- * mpn_fixed.h
+ * numeric/mpn_fixed.h
  *
  */
 
-#ifndef MATH_MPN_FIXED_H_
-#define MATH_MPN_FIXED_H_
+#pragma once
 
 #include <gmp.h>
 #include <string.h>
@@ -471,5 +470,3 @@ inline int mpn_cmp_fixed<uint32_t, 1>(const uint32_t* x, const uint32_t* y)
 {
 	return *x != *y;
 }
-
-#endif /* MATH_MPN_FIXED_H_ */

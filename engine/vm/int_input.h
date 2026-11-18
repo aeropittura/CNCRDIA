@@ -1,10 +1,9 @@
 /*
- * IntInput.h
+ * vm/int_input.h
  *
  */
 
-#ifndef PROCESSOR_INTINPUT_H_
-#define PROCESSOR_INTINPUT_H_
+#pragma once
 
 #include <iostream>
 
@@ -24,5 +23,3 @@ public:
 
     void read(std::istream& in, const ArgVector::value_type* params);
 };
-
-#endif /* PROCESSOR_INTINPUT_H_ */

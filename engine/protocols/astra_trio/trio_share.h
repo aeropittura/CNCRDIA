@@ -1,10 +1,9 @@
 /*
- * TrioShare.h
+ * protocols/astra_trio/trio_share.h
  *
  */
 
-#ifndef PROTOCOLS_TRIOSHARE_H_
-#define PROTOCOLS_TRIOSHARE_H_
+#pragma once
 
 #include "protocols/astra_trio/astra_share.h"
 
@@ -186,5 +185,3 @@ template<int K>
 using TrioShare2 = TrioShare<SignedZ2<K>>;
 template<int K>
 using TrioPrepShare2 = TrioPrepShare<SignedZ2<K>>;
-
-#endif /* PROTOCOLS_TRIOSHARE_H_ */

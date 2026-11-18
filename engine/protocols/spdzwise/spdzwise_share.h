@@ -1,10 +1,9 @@
 /*
- * SpdzWiseShare.h
+ * protocols/spdzwise/spdzwise_share.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISESHARE_H_
-#define PROTOCOLS_SPDZWISESHARE_H_
+#pragma once
 
 #include "protocols/common/share.h"
 #include "protocols/spdzwise/spdzwise.h"
@@ -91,5 +90,3 @@ public:
 template<class T> class MaliciousRep3Share;
 template<class T>
 using SpdzWiseRepFieldShare = SpdzWiseShare<MaliciousRep3Share<T>>;
-
-#endif /* PROTOCOLS_SPDZWISESHARE_H_ */

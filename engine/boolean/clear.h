@@ -1,10 +1,9 @@
 /*
- * Clear.h
+ * boolean/clear.h
  *
  */
 
-#ifndef GC_CLEAR_H_
-#define GC_CLEAR_H_
+#pragma once
 
 #include "numeric/integer.h"
 
@@ -25,5 +24,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_CLEAR_H_ */

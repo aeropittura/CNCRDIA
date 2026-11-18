@@ -1,5 +1,5 @@
 /*
- * cnc-offline.cpp
+ * parties/offline/cnc-offline.cpp
  *
  */
 

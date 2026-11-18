@@ -1,10 +1,9 @@
 /*
- * BitVec.h
+ * numeric/bit_vec.h
  *
  */
 
-#ifndef MATH_BITVEC_H_
-#define MATH_BITVEC_H_
+#pragma once
 
 #include "numeric/integer.h"
 #include "numeric/field_types.h"
@@ -122,5 +121,3 @@ BitVec_<T>::BitVec_(PRNG& G)
 {
     randomize(G);
 }
-
-#endif /* MATH_BITVEC_H_ */

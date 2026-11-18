@@ -1,7 +1,9 @@
 /*
- * BrainPrep.cpp
+ * protocols/brain/brain_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/brain/brain_prep.h"
 #include "vm/processor.h"

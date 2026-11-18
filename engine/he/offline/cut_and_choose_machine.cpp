@@ -1,5 +1,5 @@
 /*
- * CutAndChooseMachine.cpp
+ * he/offline/cut_and_choose_machine.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * MaliciousRepPrep.cpp
+ * boolean/rep_prep.hpp
  *
  */
 
-#ifndef GC_REPPREP_HPP_
-#define GC_REPPREP_HPP_
+#pragma once
 
 #include "boolean/rep_prep.h"
 #include "boolean/share_thread.h"
@@ -102,5 +101,3 @@ void RepPrep<T>::buffer_inputs(int player)
 }
 
 } /* namespace GC */
-
-#endif

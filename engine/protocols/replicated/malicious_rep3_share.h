@@ -1,10 +1,9 @@
 /*
- * MaliciousRep3Share.h
+ * protocols/replicated/malicious_rep3_share.h
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSREP3SHARE_H_
-#define PROTOCOLS_MALICIOUSREP3SHARE_H_
+#pragma once
 
 #include "protocols/replicated/rep3_share.h"
 #include "protocols/semi/semi_share.h"
@@ -69,5 +68,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_MALICIOUSREP3SHARE_H_ */

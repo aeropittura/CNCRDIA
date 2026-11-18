@@ -1,10 +1,9 @@
 /*
- * BufferScope.h
+ * protocols/common/buffer_scope.h
  *
  */
 
-#ifndef PROTOCOLS_BUFFERSCOPE_H_
-#define PROTOCOLS_BUFFERSCOPE_H_
+#pragma once
 
 template<class T> class BufferPrep;
 template<class T> class Preprocessing;
@@ -32,5 +31,3 @@ public:
         prep.buffer_size = bak;
     }
 };
-
-#endif /* PROTOCOLS_BUFFERSCOPE_H_ */

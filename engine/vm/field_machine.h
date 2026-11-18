@@ -1,10 +1,9 @@
 /*
- * DishonestMajorityFieldMachine.h
+ * vm/field_machine.h
  *
  */
 
-#ifndef PROCESSOR_FIELDMACHINE_H_
-#define PROCESSOR_FIELDMACHINE_H_
+#pragma once
 
 #include "vm/ring_machine.h"
 #include "vm/honest_majority_machine.h"
@@ -45,5 +44,3 @@ public:
         FieldMachine<T, V, X, W>(argc, argv, opt, online_opts);
     }
 };
-
-#endif /* PROCESSOR_FIELDMACHINE_H_ */

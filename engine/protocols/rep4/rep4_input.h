@@ -1,10 +1,9 @@
 /*
- * Rep4Input.h
+ * protocols/rep4/rep4_input.h
  *
  */
 
-#ifndef PROTOCOLS_REP4INPUT_H_
-#define PROTOCOLS_REP4INPUT_H_
+#pragma once
 
 #include "protocols/replicated/replicated_input.h"
 
@@ -38,5 +37,3 @@ public:
 
     void check();
 };
-
-#endif /* PROTOCOLS_REP4INPUT_H_ */

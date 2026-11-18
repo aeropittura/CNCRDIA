@@ -1,10 +1,9 @@
 /*
- * F2.h
+ * boolean/f2_vector.h
  *
  */
 
-#ifndef GC_F2VECTOR_H_
-#define GC_F2VECTOR_H_
+#pragma once
 
 #include "support/bit_vector.h"
 #include "boolean/f3.h"
@@ -124,5 +123,3 @@ public:
         a = G.get_doubleword();
     }
 };
-
-#endif /* GC_F2VECTOR_H_ */

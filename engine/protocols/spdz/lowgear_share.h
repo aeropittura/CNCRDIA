@@ -1,10 +1,9 @@
 /*
- * LowGearShare.h
+ * protocols/spdz/lowgear_share.h
  *
  */
 
-#ifndef PROTOCOLS_LOWGEARSHARE_H_
-#define PROTOCOLS_LOWGEARSHARE_H_
+#pragma once
 
 #include "protocols/spdz/cowgear_share.h"
 
@@ -39,5 +38,3 @@ public:
 
 template<class T>
 const false_type LowGearShare<T>::covert;
-
-#endif /* PROTOCOLS_LOWGEARSHARE_H_ */

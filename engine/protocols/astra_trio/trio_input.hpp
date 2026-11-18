@@ -1,10 +1,9 @@
 /*
- * TrioInput.hpp
+ * protocols/astra_trio/trio_input.hpp
  *
  */
 
-#ifndef PROTOCOLS_TRIOINPUT_HPP_
-#define PROTOCOLS_TRIOINPUT_HPP_
+#pragma once
 
 #include "protocols/astra_trio/trio_input.h"
 
@@ -26,5 +25,3 @@ T TrioInput<T>::finalize_offset(int offset)
     }
     return res;
 }
-
-#endif /* PROTOCOLS_TRIOINPUT_HPP_ */

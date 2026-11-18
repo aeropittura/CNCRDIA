@@ -1,10 +1,9 @@
 /*
- * AtlasPrep.h
+ * protocols/atlas/atlas_prep.h
  *
  */
 
-#ifndef PROTOCOLS_ATLASPREP_H_
-#define PROTOCOLS_ATLASPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -39,5 +38,3 @@ public:
             this->inputs.at(player).push_back({shares[i], opened[i]});
     }
 };
-
-#endif /* PROTOCOLS_ATLASPREP_H_ */

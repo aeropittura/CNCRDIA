@@ -1,10 +1,9 @@
 /*
- * Party.h
+ * garbled/bmr/party.h
  *
  */
 
-#ifndef PROTOCOL_PARTY_H_
-#define PROTOCOL_PARTY_H_
+#pragma once
 
 #include "garbled/bmr/register.h"
 #include "garbled/bmr/garbled_gate.h"
@@ -217,5 +216,3 @@ inline ProgramPartySpec<T>& ProgramPartySpec<T>::s()
 	else
 		throw runtime_error("no singleton");
 }
-
-#endif /* PROTOCOL_PARTY_H_ */

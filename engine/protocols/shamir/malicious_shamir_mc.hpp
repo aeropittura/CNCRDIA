@@ -1,10 +1,9 @@
 /*
- * MaliciousShamirMC.cpp
+ * protocols/shamir/malicious_shamir_mc.hpp
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUS_SHAMIR_M_C_HPP_
-#define PROTOCOLS_MALICIOUS_SHAMIR_M_C_HPP_
+#pragma once
 
 #include "protocols/shamir/malicious_shamir_mc.h"
 
@@ -61,5 +60,3 @@ typename T::open_type MaliciousShamirMC<T>::reconstruct(
     }
     return value;
 }
-
-#endif

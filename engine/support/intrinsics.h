@@ -1,10 +1,9 @@
 /*
- * intrinsics.h
+ * support/intrinsics.h
  *
  */
 
-#ifndef TOOLS_INTRINSICS_H_
-#define TOOLS_INTRINSICS_H_
+#pragma once
 
 #ifdef __x86_64__
 #include <immintrin.h>
@@ -19,5 +18,3 @@
 #include "sse2neon/sse2neon.h"
 #endif
 #endif
-
-#endif /* TOOLS_INTRINSICS_H_ */

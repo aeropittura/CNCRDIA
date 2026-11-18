@@ -1,10 +1,9 @@
 /*
- * CcdPrep.h
+ * boolean/ccd_prep.h
  *
  */
 
-#ifndef GC_CCDPREP_H_
-#define GC_CCDPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -99,5 +98,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_CCDPREP_H_ */

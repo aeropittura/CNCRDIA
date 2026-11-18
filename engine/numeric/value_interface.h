@@ -1,10 +1,9 @@
 /*
- * ValueInterface.h
+ * numeric/value_interface.h
  *
  */
 
-#ifndef MATH_VALUEINTERFACE_H_
-#define MATH_VALUEINTERFACE_H_
+#pragma once
 
 #include "support/exceptions.h"
 #include "numeric/setup.h"
@@ -49,5 +48,3 @@ public:
 
     void randomize_part(PRNG&, int) { throw not_implemented(); }
 };
-
-#endif /* MATH_VALUEINTERFACE_H_ */

@@ -1,10 +1,9 @@
 /*
- * AstraInput.h
+ * protocols/astra_trio/astra_input.h
  *
  */
 
-#ifndef PROTOCOLS_ASTRAINPUT_H_
-#define PROTOCOLS_ASTRAINPUT_H_
+#pragma once
 
 #include "vm/input.h"
 
@@ -62,5 +61,3 @@ public:
     T finalize(int player, int n_bits = -1) final;
     T finalize_offset(int player);
 };
-
-#endif /* PROTOCOLS_ASTRAINPUT_H_ */

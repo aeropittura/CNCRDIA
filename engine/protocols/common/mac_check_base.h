@@ -1,10 +1,9 @@
 /*
- * MAC_Check_Base.h
+ * protocols/common/mac_check_base.h
  *
  */
 
-#ifndef PROTOCOLS_MAC_CHECK_BASE_H_
-#define PROTOCOLS_MAC_CHECK_BASE_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -79,5 +78,3 @@ public:
 
     void set_random_element(const T&) {}
 };
-
-#endif /* PROTOCOLS_MAC_CHECK_BASE_H_ */

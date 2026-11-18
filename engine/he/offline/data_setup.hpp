@@ -1,10 +1,9 @@
 /*
- * DataSetup.hpp
+ * he/offline/data_setup.hpp
  *
  */
 
-#ifndef FHEOFFLINE_DATASETUP_HPP_
-#define FHEOFFLINE_DATASETUP_HPP_
+#pragma once
 
 #include "net/player.h"
 #include "support/bundle.h"
@@ -99,5 +98,3 @@ void secure_init(T& setup, Player& P, U& machine, V, int sec, bool read_only = f
 {
     secure_init(setup, P, machine, sec, V(), read_only, V::prime_field);
 }
-
-#endif /* FHEOFFLINE_DATASETUP_HPP_ */

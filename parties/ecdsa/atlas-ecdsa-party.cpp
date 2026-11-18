@@ -1,5 +1,5 @@
 /*
- * atlas-ecdsa-party.cpp
+ * parties/ecdsa/atlas-ecdsa-party.cpp
  *
  */
 

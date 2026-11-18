@@ -1,10 +1,9 @@
 /*
- * maximal.hpp
+ * parties/shared/maximal.hpp
  *
  */
 
-#ifndef MACHINES_MAXIMAL_HPP_
-#define MACHINES_MAXIMAL_HPP_
+#pragma once
 
 #include "parties/shared/minimal.hpp"
 
@@ -32,5 +31,3 @@
 #include "protocols/spdzwise/spdzwise_share.hpp"
 #include "protocols/spdzwise/spdzwise_rep3_shuffler.hpp"
 #include "protocols/semi/temi_prep.hpp"
-
-#endif /* MACHINES_MAXIMAL_HPP_ */

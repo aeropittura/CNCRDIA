@@ -1,5 +1,5 @@
 /*
- * l2h-example.cpp
+ * parties/examples/l2h-example.cpp
  *
  */
 

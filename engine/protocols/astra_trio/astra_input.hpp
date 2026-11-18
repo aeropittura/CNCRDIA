@@ -1,7 +1,9 @@
 /*
- * AstraInput.cpp
+ * protocols/astra_trio/astra_input.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/astra_trio/astra_input.h"
 

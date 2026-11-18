@@ -1,7 +1,9 @@
 /*
- * fake-spdz-ecdsa-party.cpp
+ * ecdsa/ot_ecdsa_party.hpp
  *
  */
+
+#pragma once
 
 #include "net/server.h"
 #include "net/crypto_player.h"

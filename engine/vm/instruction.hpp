@@ -1,5 +1,4 @@
-#ifndef PROCESSOR_INSTRUCTION_HPP_
-#define PROCESSOR_INSTRUCTION_HPP_
+#pragma once
 
 #include "vm/instruction.h"
 #include "vm/machine.h"
@@ -1672,5 +1671,3 @@ typename T::clear Instruction::sanitize(SubProcessor<T>& proc, int reg) const
     throw Processor_Error("Division by zero from register");
   return res;
 }
-
-#endif

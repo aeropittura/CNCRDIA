@@ -1,10 +1,9 @@
 /*
- * MaliciousShamirPO.h
+ * protocols/shamir/malicious_shamir_po.h
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSSHAMIRPO_H_
-#define PROTOCOLS_MALICIOUSSHAMIRPO_H_
+#pragma once
 
 template<class T>
 class MaliciousShamirPO
@@ -28,5 +27,3 @@ public:
     void receive();
     typename T::clear finalize(const T& secret);
 };
-
-#endif /* PROTOCOLS_MALICIOUSSHAMIRPO_H_ */

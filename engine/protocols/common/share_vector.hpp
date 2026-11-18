@@ -1,7 +1,9 @@
 /*
- * ShareVector.cpp
+ * protocols/common/share_vector.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/common/share_vector.h"
 #include "he/core/fft.h"

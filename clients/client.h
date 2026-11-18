@@ -1,10 +1,9 @@
 /*
- * Client.h
+ * clients/client.h
  *
  */
 
-#ifndef EXTERNALIO_CLIENT_H_
-#define EXTERNALIO_CLIENT_H_
+#pragma once
 
 #include "net/ssl_sockets.h"
 
@@ -95,5 +94,3 @@ public:
     template<class T, class U = T>
     vector<U> receive_outputs(int n);
 };
-
-#endif /* EXTERNALIO_CLIENT_H_ */

@@ -1,10 +1,9 @@
 /*
- * parse.h
+ * support/parse.h
  *
  */
 
-#ifndef TOOLS_PARSE_H_
-#define TOOLS_PARSE_H_
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -63,5 +62,3 @@ inline void get_string(string& res, istream& s)
   res.assign(buf, size);
   delete[] buf;
 }
-
-#endif /* TOOLS_PARSE_H_ */

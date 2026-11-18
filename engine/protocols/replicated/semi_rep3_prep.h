@@ -1,10 +1,9 @@
 /*
- * Rep2kPrep.h
+ * protocols/replicated/semi_rep3_prep.h
  *
  */
 
-#ifndef PROTOCOLS_SEMIREP3PREP_H_
-#define PROTOCOLS_SEMIREP3PREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -44,5 +43,3 @@ public:
         this->get_dabit_no_count(a, b);
     }
 };
-
-#endif /* PROTOCOLS_SEMIREP3PREP_H_ */

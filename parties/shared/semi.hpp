@@ -1,7 +1,9 @@
 /*
- * Semi.cpp
+ * parties/shared/semi.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/semi/semi_share.h"
 #include "numeric/gf2n.h"

@@ -1,5 +1,5 @@
 /*
- * PairwiseGenerator.cpp
+ * he/offline/pairwise_generator.cpp
  *
  */
 

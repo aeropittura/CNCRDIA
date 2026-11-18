@@ -1,10 +1,9 @@
 /*
- * InputTuple.h
+ * vm/input_tuple.h
  *
  */
 
-#ifndef PROCESSOR_INPUTTUPLE_H_
-#define PROCESSOR_INPUTTUPLE_H_
+#pragma once
 
 
 template <class T>
@@ -47,6 +46,3 @@ struct RefInputTuple
   RefInputTuple(T& share, typename T::open_type& value) : share(share), value(value) {}
   void operator=(InputTuple<T>& other) { share = other.share; value = other.value; }
 };
-
-
-#endif /* PROCESSOR_INPUTTUPLE_H_ */

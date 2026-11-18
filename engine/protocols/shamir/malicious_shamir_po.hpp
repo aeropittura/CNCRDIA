@@ -1,10 +1,9 @@
 /*
- * MaliciousShamirPO.cpp
+ * protocols/shamir/malicious_shamir_po.hpp
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUS_SHAMIR_PO_HPP_
-#define PROTOCOLS_MALICIOUS_SHAMIR_PO_HPP_
+#pragma once
 
 #include "protocols/shamir/malicious_shamir_po.h"
 
@@ -57,5 +56,3 @@ typename T::clear MaliciousShamirPO<T>::finalize(const T& secret)
 
     return MC.reconstruct(shares);
 }
-
-#endif

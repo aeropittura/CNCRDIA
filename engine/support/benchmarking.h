@@ -1,10 +1,9 @@
 /*
- * benchmarking.h
+ * support/benchmarking.h
  *
  */
 
-#ifndef TOOLS_BENCHMARKING_H_
-#define TOOLS_BENCHMARKING_H_
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -15,5 +14,3 @@ using namespace std;
 void insecure(string message, bool warning = true);
 
 void insecure_fake(bool warning = true);
-
-#endif /* TOOLS_BENCHMARKING_H_ */

@@ -1,10 +1,9 @@
 /*
- * Program.h
+ * boolean/program.h
  *
  */
 
-#ifndef GC_PROGRAM_H_
-#define GC_PROGRAM_H_
+#pragma once
 
 #include "boolean/instruction.h"
 #include "vm/program.h"
@@ -62,5 +61,3 @@ class Program
 
 
 } /* namespace GC */
-
-#endif /* GC_PROGRAM_H_ */

@@ -1,7 +1,9 @@
 /*
- * ChaiGearPrep.cpp
+ * protocols/spdz/chaigear_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdz/chaigear_prep.h"
 #include "protocols/spdz/cowgear_options.h"

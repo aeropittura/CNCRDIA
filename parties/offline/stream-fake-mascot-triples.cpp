@@ -1,5 +1,5 @@
 /*
- * stream-fake-mascot-triples.cpp
+ * parties/offline/stream-fake-mascot-triples.cpp
  *
  */
 

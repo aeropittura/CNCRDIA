@@ -1,5 +1,5 @@
 /*
- * sy-rep-ring-party.cpp
+ * parties/arith/sy-rep-ring-party.cpp
  *
  */
 

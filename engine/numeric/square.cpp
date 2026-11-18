@@ -1,5 +1,5 @@
 /*
- * Square.cpp
+ * numeric/square.cpp
  *
  */
 

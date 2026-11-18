@@ -1,10 +1,9 @@
 /*
- * Thread.h
+ * boolean/thread.h
  *
  */
 
-#ifndef GC_THREAD_H_
-#define GC_THREAD_H_
+#pragma once
 
 #include "net/player.h"
 #include "support/random.h"
@@ -75,5 +74,3 @@ Thread<T>& Thread<T>::s()
 }
 
 } /* namespace GC */
-
-#endif /* GC_THREAD_H_ */

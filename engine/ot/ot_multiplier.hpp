@@ -1,10 +1,9 @@
 /*
- * OTMultiplier.cpp
+ * ot/ot_multiplier.hpp
  *
  */
 
-#ifndef OT_OTMULTIPLIER_HPP_
-#define OT_OTMULTIPLIER_HPP_
+#pragma once
 
 #include "ot/config.h"
 
@@ -787,5 +786,3 @@ void OTMultiplier<T>::multiplyForMixed()
 {
     throw runtime_error("mixed generation not implemented in this case");
 }
-
-#endif

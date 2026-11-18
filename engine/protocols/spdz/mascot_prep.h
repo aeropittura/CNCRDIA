@@ -1,10 +1,9 @@
 /*
- * MascotPrep.h
+ * protocols/spdz/mascot_prep.h
  *
  */
 
-#ifndef PROTOCOLS_MASCOTPREP_H_
-#define PROTOCOLS_MASCOTPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "ot/mascot_params.h"
@@ -146,5 +145,3 @@ void MascotInputPrep<T>::teardown()
 {
 	T::TripleGenerator::reset_mac_key();
 }
-
-#endif /* PROTOCOLS_MASCOTPREP_H_ */

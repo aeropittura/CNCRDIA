@@ -1,10 +1,9 @@
 /*
- * NoiseBound.h
+ * he/core/noise_bounds.h
  *
  */
 
-#ifndef FHE_NOISEBOUNDS_H_
-#define FHE_NOISEBOUNDS_H_
+#pragma once
 
 #include "numeric/bigint.h"
 
@@ -63,5 +62,3 @@ public:
     bigint opt_p0() { return min_p0(opt_p1()); }
     double optimize(int& lg2p0, int& lg2p1);
 };
-
-#endif /* FHE_NOISEBOUNDS_H_ */

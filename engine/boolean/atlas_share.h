@@ -1,10 +1,9 @@
 /*
- * AtlasShare.h
+ * boolean/atlas_share.h
  *
  */
 
-#ifndef GC_ATLASSHARE_H_
-#define GC_ATLASSHARE_H_
+#pragma once
 
 #include "protocols/atlas/atlas_share.h"
 #include "protocols/shamir/shamir_mc.h"
@@ -61,5 +60,3 @@ public:
 };
 
 }
-
-#endif /* GC_ATLASSHARE_H_ */

@@ -1,10 +1,9 @@
 /*
- * gf2nlong.h
+ * numeric/gf2nlong.h
  *
  */
 
-#ifndef MATH_GF2NLONG_H_
-#define MATH_GF2NLONG_H_
+#pragma once
 
 #include <stdlib.h>
 #include <string.h>
@@ -264,5 +263,3 @@ inline bool int128::get_bit(int i) const
     else
         return (get_upper() >> (i - 64)) & 1;
 }
-
-#endif /* MATH_GF2NLONG_H_ */

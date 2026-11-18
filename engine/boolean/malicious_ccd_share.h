@@ -1,10 +1,9 @@
 /*
- * MalicousCcdShare.h
+ * boolean/malicious_ccd_share.h
  *
  */
 
-#ifndef GC_MALICIOUSCCDSHARE_H_
-#define GC_MALICIOUSCCDSHARE_H_
+#pragma once
 
 #include "boolean/ccd_share.h"
 #include "protocols/shamir/malicious_shamir_share.h"
@@ -92,5 +91,3 @@ template<class T>
 const int MaliciousCcdShare<T>::default_length;
 
 } /* namespace GC */
-
-#endif /* GC_MALICIOUSCCDSHARE_H_ */

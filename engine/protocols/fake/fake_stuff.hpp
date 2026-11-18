@@ -1,5 +1,4 @@
-#ifndef PROTOCOLS_FAKE_STUFF_HPP_
-#define PROTOCOLS_FAKE_STUFF_HPP_
+#pragma once
 
 #include "protocols/fake/fake_stuff.h"
 #include "vm/data_files.h"
@@ -618,5 +617,3 @@ void plain_edabits(vector<T>& as,
         bs[k] = square.rows[k];
     }
 }
-
-#endif

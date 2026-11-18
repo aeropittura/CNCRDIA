@@ -1,10 +1,9 @@
 /*
- * BitPrepFiles.h
+ * boolean/bit_prep_files.h
  *
  */
 
-#ifndef GC_BITPREPFILES_H_
-#define GC_BITPREPFILES_H_
+#pragma once
 
 #include "boolean/shiftable_triple_buffer.h"
 #include "vm/data_files.h"
@@ -34,5 +33,3 @@ public:
 };
 
 }
-
-#endif /* GC_BITPREPFILES_H_ */

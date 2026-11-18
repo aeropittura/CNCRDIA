@@ -1,10 +1,9 @@
 /*
- * MamaShare.h
+ * protocols/spdz/mama_share.h
  *
  */
 
-#ifndef PROTOCOLS_MAMASHARE_H_
-#define PROTOCOLS_MAMASHARE_H_
+#pragma once
 
 #include "protocols/common/share.h"
 #include "numeric/gfp.h"
@@ -114,5 +113,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_MAMASHARE_H_ */

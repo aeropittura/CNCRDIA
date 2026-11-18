@@ -1,10 +1,9 @@
 /*
- * CcdShare.h
+ * boolean/ccd_share.h
  *
  */
 
-#ifndef GC_CCDSHARE_H_
-#define GC_CCDSHARE_H_
+#pragma once
 
 #include "protocols/shamir/shamir_share.h"
 
@@ -82,5 +81,3 @@ template<class T>
 const int CcdShare<T>::default_length;
 
 }
-
-#endif /* GC_CCDSHARE_H_ */

@@ -1,10 +1,9 @@
 /*
- * Element.h
+ * ecdsa/p256_element.h
  *
  */
 
-#ifndef ECDSA_P256ELEMENT_H_
-#define ECDSA_P256ELEMENT_H_
+#pragma once
 
 #include <openssl/ec.h>
 #include <openssl/obj_mac.h>
@@ -70,5 +69,3 @@ public:
 };
 
 P256Element operator*(const P256Element::Scalar& x, const P256Element& y);
-
-#endif /* ECDSA_P256ELEMENT_H_ */

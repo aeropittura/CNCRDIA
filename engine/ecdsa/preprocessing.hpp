@@ -1,10 +1,9 @@
 /*
- * preprocessing.hpp
+ * ecdsa/preprocessing.hpp
  *
  */
 
-#ifndef ECDSA_PREPROCESSING_HPP_
-#define ECDSA_PREPROCESSING_HPP_
+#pragma once
 
 #include "ecdsa/p256_element.h"
 #include "ecdsa/ecdsa_options.h"
@@ -128,5 +127,3 @@ void check(vector<EcTuple<T>>& tuples, T<P256Element::Scalar> sk,
     }
     MC.Check(P);
 }
-
-#endif /* ECDSA_PREPROCESSING_HPP_ */

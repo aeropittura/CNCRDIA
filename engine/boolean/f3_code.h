@@ -1,10 +1,9 @@
 /*
- * F3Code.h
+ * boolean/f3_code.h
  *
  */
 
-#ifndef GC_F3CODE_H_
-#define GC_F3CODE_H_
+#pragma once
 
 #include "boolean/f3.h"
 
@@ -37,5 +36,3 @@ public:
 
     F3VectorBitWise apply(const F3VectorBitWise& x);
 };
-
-#endif /* GC_F3CODE_H_ */

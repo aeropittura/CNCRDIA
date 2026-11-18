@@ -1,10 +1,9 @@
 /*
- * sign.hpp
+ * ecdsa/sign.hpp
  *
  */
 
-#ifndef ECDSA_SIGN_HPP_
-#define ECDSA_SIGN_HPP_
+#pragma once
 
 //#include "CurveElement.h"
 #include "ecdsa/p256_element.h"
@@ -167,5 +166,3 @@ void sign_benchmark(vector<EcTuple<T>>& tuples, T<P256Element::Scalar> sk,
         diff.print();
     }
 }
-
-#endif /* ECDSA_SIGN_HPP_ */

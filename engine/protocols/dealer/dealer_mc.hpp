@@ -1,10 +1,9 @@
 /*
- * DealerMC.hpp
+ * protocols/dealer/dealer_mc.hpp
  *
  */
 
-#ifndef PROTOCOLS_DEALERMC_HPP_
-#define PROTOCOLS_DEALERMC_HPP_
+#pragma once
 
 #include "protocols/dealer/dealer_mc.h"
 
@@ -80,5 +79,3 @@ array<typename T::open_type*, 2> DealerMC<T>::finalize_several(size_t n)
     assert(sub_player);
     return internal.finalize_several(n);
 }
-
-#endif /* PROTOCOLS_DEALERMC_HPP_ */

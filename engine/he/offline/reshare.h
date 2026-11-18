@@ -1,5 +1,4 @@
-#ifndef _Reshare
-#define _Reshare
+#pragma once
 
 /* The procedure for the Reshare protocol 
  *   Input is a ciphertext cm and a flag NewCiphertext
@@ -23,6 +22,3 @@ void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
              const Ciphertext& cm,bool NewCiphertext,
              const Player& P,EncCommitBase<T,FD,S>& EC,
              const FHE_PK& pk,DistDecrypt<FD>& dd);
-
-#endif
-

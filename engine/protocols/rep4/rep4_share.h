@@ -1,10 +1,9 @@
 /*
- * Rep4Share.h
+ * protocols/rep4/rep4_share.h
  *
  */
 
-#ifndef PROTOCOLS_REP4SHARE_H_
-#define PROTOCOLS_REP4SHARE_H_
+#pragma once
 
 #include "protocols/replicated/rep3_share.h"
 
@@ -76,5 +75,3 @@ public:
     }
 
 };
-
-#endif /* PROTOCOLS_REP4SHARE_H_ */

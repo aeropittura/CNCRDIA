@@ -1,7 +1,9 @@
 /*
- * FakeShare.cpp
+ * protocols/fake/fake_share.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/fake/fake_share.h"
 #include "numeric/z2k.h"

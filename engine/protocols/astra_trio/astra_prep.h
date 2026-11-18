@@ -1,10 +1,9 @@
 /*
- * AstraPrep.h
+ * protocols/astra_trio/astra_prep.h
  *
  */
 
-#ifndef PROTOCOLS_ASTRAPREP_H_
-#define PROTOCOLS_ASTRAPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -50,5 +49,3 @@ public:
 
     void buffer_edabits_with_queues(bool strict, int n_bits);
 };
-
-#endif /* PROTOCOLS_ASTRAPREP_H_ */

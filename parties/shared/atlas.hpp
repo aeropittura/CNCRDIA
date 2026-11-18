@@ -1,10 +1,9 @@
 /*
- * Atlas.hpp
+ * parties/shared/atlas.hpp
  *
  */
 
-#ifndef MACHINES_ATLAS_HPP_
-#define MACHINES_ATLAS_HPP_
+#pragma once
 
 #include "protocols/atlas/atlas_share.h"
 #include "protocols/atlas/atlas_prep.h"
@@ -13,5 +12,3 @@
 #include "protocols/atlas/atlas.hpp"
 
 #include "parties/shared/shamir.hpp"
-
-#endif /* MACHINES_ATLAS_HPP_ */

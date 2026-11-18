@@ -1,10 +1,9 @@
 /*
- * FakePrep.h
+ * protocols/fake/fake_prep.h
  *
  */
 
-#ifndef PROTOCOLS_FAKEPREP_H_
-#define PROTOCOLS_FAKEPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -92,5 +91,3 @@ public:
         a = G.get_uchar() & 1;
     }
 };
-
-#endif /* PROTOCOLS_FAKEPREP_H_ */

@@ -1,5 +1,4 @@
-#ifndef _Data_Files
-#define _Data_Files
+#pragma once
 
 /* This class holds the Online data files all in one place
  * so the streams are easy to pass around and access
@@ -489,5 +488,3 @@ inline void Data_Files<sint, sgf2n>::purge()
   DataF2.purge();
   DataFb.purge();
 }
-
-#endif

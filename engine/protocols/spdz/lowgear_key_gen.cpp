@@ -1,5 +1,5 @@
 /*
- * LowGearKeyGen.cpp
+ * protocols/spdz/lowgear_key_gen.cpp
  *
  */
 

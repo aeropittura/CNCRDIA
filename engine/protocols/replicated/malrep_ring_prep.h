@@ -1,10 +1,9 @@
 /*
- * MalRepRingPrep.h
+ * protocols/replicated/malrep_ring_prep.h
  *
  */
 
-#ifndef PROTOCOLS_MALREPRINGPREP_H_
-#define PROTOCOLS_MALREPRINGPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "protocols/replicated/malicious_rep_prep.h"
@@ -110,5 +109,3 @@ public:
         RingOnlyBitsFromSquaresPrep<T>::buffer_bits();
     };
 };
-
-#endif /* PROTOCOLS_MALREPRINGPREP_H_ */

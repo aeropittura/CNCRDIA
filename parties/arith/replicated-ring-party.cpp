@@ -1,5 +1,5 @@
 /*
- * replicated-ring-party.cpp
+ * parties/arith/replicated-ring-party.cpp
  *
  */
 

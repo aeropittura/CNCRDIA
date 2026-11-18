@@ -1,10 +1,9 @@
 /*
- * FakeProtocol.h
+ * protocols/fake/fake_protocol.h
  *
  */
 
-#ifndef PROTOCOLS_FAKEPROTOCOL_H_
-#define PROTOCOLS_FAKEPROTOCOL_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 #include "protocols/common/secure_shuffle.h"
@@ -512,5 +511,3 @@ public:
             throw runtime_error("unknown CISC instruction: " + tag);
     }
 };
-
-#endif /* PROTOCOLS_FAKEPROTOCOL_H_ */

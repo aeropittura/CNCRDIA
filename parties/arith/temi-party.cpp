@@ -1,5 +1,5 @@
 /*
- * temi-party.cpp
+ * parties/arith/temi-party.cpp
  *
  */
 

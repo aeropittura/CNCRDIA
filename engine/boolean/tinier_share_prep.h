@@ -1,10 +1,9 @@
 /*
- * TinierSharePrep.h
+ * boolean/tinier_share_prep.h
  *
  */
 
-#ifndef GC_TINIERSHAREPREP_H_
-#define GC_TINIERSHAREPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "ot/n_party_triple_generator.h"
@@ -52,5 +51,3 @@ public:
 };
 
 }
-
-#endif /* GC_TINIERSHAREPREP_H_ */

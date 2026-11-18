@@ -1,5 +1,5 @@
 /*
- * galois-degree.cpp
+ * parties/tools/galois-degree.cpp
  *
  */
 

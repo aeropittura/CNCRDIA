@@ -1,5 +1,4 @@
-#ifndef _Zp_Data
-#define _Zp_Data
+#pragma once
 
 /* Class to define helper information for a Zp element
  *
@@ -268,5 +267,3 @@ inline void Zp_Data::Mont_Mult_max(mp_limb_t* z, const mp_limb_t* x,
   assert(t <= max_t);
   Mont_Mult(z, x, y);
 }
-
-#endif

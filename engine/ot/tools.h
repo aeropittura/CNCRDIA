@@ -1,5 +1,4 @@
-#ifndef _OTTOOLS
-#define _OTTOOLS
+#pragma once
 
 //#if defined(__SSE2__)
 /*
@@ -22,5 +21,3 @@ string __m128i_toString(const __m128i var) {
     return sstr.str();
 }
 //#endif
-
-#endif

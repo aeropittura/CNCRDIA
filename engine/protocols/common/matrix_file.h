@@ -1,10 +1,9 @@
 /*
- * MatrixFile.h
+ * protocols/common/matrix_file.h
  *
  */
 
-#ifndef PROTOCOLS_MATRIXFILE_H_
-#define PROTOCOLS_MATRIXFILE_H_
+#pragma once
 
 #include "vm/data_files.h"
 #include "protocols/common/share_matrix.h"
@@ -41,5 +40,3 @@ public:
         C.input(file);
     }
 };
-
-#endif /* PROTOCOLS_MATRIXFILE_H_ */

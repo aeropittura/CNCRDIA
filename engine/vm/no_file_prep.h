@@ -1,10 +1,9 @@
 /*
- * NoFilePrep.h
+ * vm/no_file_prep.h
  *
  */
 
-#ifndef PROCESSOR_NOFILEPREP_H_
-#define PROCESSOR_NOFILEPREP_H_
+#pragma once
 
 #include "vm/data_files.h"
 
@@ -18,5 +17,3 @@ public:
         throw runtime_error("preprocessing from file disabled");
     }
 };
-
-#endif /* PROCESSOR_NOFILEPREP_H_ */

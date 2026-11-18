@@ -1,5 +1,5 @@
 /*
- * he-example.cpp
+ * parties/examples/he-example.cpp
  *
  */
 

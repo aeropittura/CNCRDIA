@@ -1,5 +1,4 @@
-#ifndef _Memory
-#define _Memory
+#pragma once
 
 /* Class to hold global memory of our system */
 
@@ -155,6 +154,3 @@ class Memory
   friend ostream& operator<< <>(ostream& s,const Memory<T>& M);
   friend istream& operator>> <>(istream& s,Memory<T>& M);
 };
-
-#endif
-

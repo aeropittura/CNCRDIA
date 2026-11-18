@@ -1,10 +1,9 @@
 /*
- * BrainPrep.h
+ * protocols/brain/brain_prep.h
  *
  */
 
-#ifndef PROTOCOLS_BRAINPREP_H_
-#define PROTOCOLS_BRAINPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "protocols/brain/brain_share.h"
@@ -28,5 +27,3 @@ public:
     void buffer_triples();
     void buffer_inputs(int player);
 };
-
-#endif /* PROTOCOLS_BRAINPREP_H_ */

@@ -1,5 +1,5 @@
 /*
- * OT-Offline.cpp
+ * parties/offline/ot-offline.cpp
  *
  */
 

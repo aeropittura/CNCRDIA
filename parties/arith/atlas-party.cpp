@@ -1,5 +1,5 @@
 /*
- * atlas-party.cpp
+ * parties/arith/atlas-party.cpp
  *
  */
 

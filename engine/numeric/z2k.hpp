@@ -1,10 +1,9 @@
 /*
- * Z2k.cpp
+ * numeric/z2k.hpp
  *
  */
 
-#ifndef MATH_Z2K_HPP_
-#define MATH_Z2K_HPP_
+#pragma once
 
 #include "numeric/z2k.h"
 #include "numeric/integer.h"
@@ -214,5 +213,3 @@ istream& operator>>(istream& i, SignedZ2<K>& x)
     x = tmp;
     return i;
 }
-
-#endif

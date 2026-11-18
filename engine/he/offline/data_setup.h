@@ -1,10 +1,9 @@
 /*
- * DataSetup.h
+ * he/offline/data_setup.h
  *
  */
 
-#ifndef FHEOFFLINE_DATASETUP_H_
-#define FHEOFFLINE_DATASETUP_H_
+#pragma once
 
 #include "net/player.h"
 #include "he/core/fhe_keys.h"
@@ -96,5 +95,3 @@ public:
 
 template<> inline PartSetup<FFT_Data>& DataSetup::part<FFT_Data>() { return setup_p; }
 template<> inline PartSetup<P2Data>& DataSetup::part<P2Data>() { return setup_2; }
-
-#endif /* FHEOFFLINE_DATASETUP_H_ */

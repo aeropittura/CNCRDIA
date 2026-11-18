@@ -1,5 +1,4 @@
-#ifndef _Online_Thread
-#define _Online_Thread
+#pragma once
 
 #include "net/player.h"
 #include "numeric/gf2n.h"
@@ -35,5 +34,3 @@ class thread_info
   void Sub_Main_Func();
   void Main_Func_With_Purge();
 };
-
-#endif

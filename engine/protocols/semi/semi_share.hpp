@@ -1,10 +1,9 @@
 /*
- * SemiShare.hpp
+ * protocols/semi/semi_share.hpp
  *
  */
 
-#ifndef PROTOCOLS_SEMISHARE_HPP_
-#define PROTOCOLS_SEMISHARE_HPP_
+#pragma once
 
 #include "protocols/semi/semi_share.h"
 #include "protocols/semi/semi2k_share.h"
@@ -29,5 +28,3 @@ void SemiShare<T>::split(StackedVector<U>& dest, const ArgVector& regs,
     Semi2kShare<T::MAX_N_BITS>::split(dest, regs, n_bits, inputs.data(),
             n_inputs, protocol);
 }
-
-#endif /* PROTOCOLS_SEMISHARE_HPP_ */

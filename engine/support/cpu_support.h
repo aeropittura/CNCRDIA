@@ -1,10 +1,9 @@
 /*
- * cpu_support.h
+ * support/cpu_support.h
  *
  */
 
-#ifndef TOOLS_CPU_SUPPORT_H_
-#define TOOLS_CPU_SUPPORT_H_
+#pragma once
 
 #include <stdexcept>
 
@@ -75,5 +74,3 @@ inline bool cpu_has_aes()
     return true;
 #endif
 }
-
-#endif /* TOOLS_CPU_SUPPORT_H_ */

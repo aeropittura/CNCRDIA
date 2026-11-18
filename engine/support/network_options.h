@@ -1,10 +1,9 @@
 /*
- * NetworkOptions.h
+ * support/network_options.h
  *
  */
 
-#ifndef TOOLS_NETWORKOPTIONS_H_
-#define TOOLS_NETWORKOPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 #include "net/server.h"
@@ -32,5 +31,3 @@ public:
 
     Server* start_networking(Names& N, int my_num);
 };
-
-#endif /* TOOLS_NETWORKOPTIONS_H_ */

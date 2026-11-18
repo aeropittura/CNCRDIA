@@ -1,10 +1,9 @@
 /*
- * MaliciousRepPrep.h
+ * protocols/replicated/malicious_rep_prep.h
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSREPPREP_H_
-#define PROTOCOLS_MALICIOUSREPPREP_H_
+#pragma once
 
 #include "vm/data_files.h"
 #include "protocols/common/replicated_prep.h"
@@ -86,5 +85,3 @@ public:
     }
 
 };
-
-#endif /* PROTOCOLS_MALICIOUSREPPREP_H_ */

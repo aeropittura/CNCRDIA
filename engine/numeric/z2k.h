@@ -1,10 +1,9 @@
 /*
- * Z2k.h
+ * numeric/z2k.h
  *
  */
 
-#ifndef MATH_Z2K_H_
-#define MATH_Z2K_H_
+#pragma once
 
 #include <gmpxx.h>
 #include <string>
@@ -543,5 +542,3 @@ ostream& operator<<(ostream& o, const SignedZ2<K>& x)
     x.output(o, true, false);
     return o;
 }
-
-#endif /* MATH_Z2K_H_ */

@@ -1,5 +1,4 @@
-#ifndef _NTL_Subs
-#define _NTL_Subs
+#pragma once
 
 #include "he/core/ring.h"
 #include "he/core/fft_data.h"
@@ -81,5 +80,3 @@ void char_2_dimension(int& m, int& lg2);
 void load_or_generate(P2Data& P2D, const Ring& Rg);
 
 int phi_N(int N);
-
-#endif

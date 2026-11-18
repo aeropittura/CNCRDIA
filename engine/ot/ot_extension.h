@@ -1,5 +1,4 @@
-#ifndef _OTEXTENSION
-#define _OTEXTENSION
+#pragma once
 
 #include "ot/base_ot.h"
 
@@ -117,5 +116,3 @@ protected:
     vector< vector<PRNG> > G_sender;
     vector<PRNG> G_receiver;
 };
-
-#endif

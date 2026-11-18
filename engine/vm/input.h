@@ -1,10 +1,9 @@
 /*
- * Input.h
+ * vm/input.h
  *
  */
 
-#ifndef PROCESSOR_INPUT_H_
-#define PROCESSOR_INPUT_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -116,5 +115,3 @@ public:
     T finalize_mine();
     void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
 };
-
-#endif /* PROCESSOR_INPUT_H_ */

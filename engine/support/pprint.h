@@ -1,5 +1,4 @@
-#ifndef TOOLS_PPRINT_H_
-#define TOOLS_PPRINT_H_
+#pragma once
 
 #include <iostream>
 #include <iomanip>
@@ -14,5 +13,3 @@ inline void pprint_bytes(const char* label, unsigned char* bytes, int len,
         out << setfill('0') << setw(2) << hex << (int) bytes[j];
     out << dec << endl;
 }
-
-#endif

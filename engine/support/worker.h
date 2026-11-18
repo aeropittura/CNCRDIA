@@ -1,10 +1,9 @@
 /*
- * Worker.h
+ * support/worker.h
  *
  */
 
-#ifndef TOOLS_WORKER_H_
-#define TOOLS_WORKER_H_
+#pragma once
 
 #include "support/wait_queue.h"
 
@@ -80,5 +79,3 @@ public:
 		return res;
 	}
 };
-
-#endif /* TOOLS_WORKER_H_ */

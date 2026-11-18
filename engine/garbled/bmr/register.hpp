@@ -1,10 +1,9 @@
 /*
- * Register.hpp
+ * garbled/bmr/register.hpp
  *
  */
 
-#ifndef BMR_REGISTER_HPP_
-#define BMR_REGISTER_HPP_
+#pragma once
 
 #include "garbled/bmr/register.h"
 #include "garbled/bmr/party.h"
@@ -251,5 +250,3 @@ void EvalRegister::load(vector<GC::ReadAccess<T> >& accesses,
 	cout << endl;
 #endif
 }
-
-#endif /* BMR_REGISTER_HPP_ */

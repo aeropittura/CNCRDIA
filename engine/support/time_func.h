@@ -1,5 +1,4 @@
-#ifndef _timer
-#define _timer
+#pragma once
 
 #include <sys/wait.h>   /* Wait for Process Termination */
 #include <sys/time.h>
@@ -110,6 +109,3 @@ inline long long Timer::elapsed_since_last_start() const
   clock_gettime(clock_id, &endv);
   return timespec_diff(&startv, &endv);
 }
-
-#endif
-

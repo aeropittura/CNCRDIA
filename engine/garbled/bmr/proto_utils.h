@@ -1,10 +1,9 @@
 /*
- * utils.h
+ * garbled/bmr/proto_utils.h
  *
  */
 
-#ifndef PROTO_UTILS_H_
-#define PROTO_UTILS_H_
+#pragma once
 
 #include "garbled/bmr/msg_types.h"
 #include <time.h>
@@ -27,5 +26,3 @@ void phex (const void *addr, int len);
 
 
 inline void phex(const FlexBuffer& buffer) { phex(buffer.data(), buffer.size()); }
-
-#endif /* NETWORK_TEST_UTILS_H_ */

@@ -1,10 +1,9 @@
 /*
- * ShamirMC.cpp
+ * protocols/shamir/shamir_mc.hpp
  *
  */
 
-#ifndef PROTOCOLS_SHAMIRMC_HPP_
-#define PROTOCOLS_SHAMIRMC_HPP_
+#pragma once
 
 #include "protocols/shamir/shamir_mc.h"
 
@@ -206,5 +205,3 @@ void IndirectShamirMC<T>::exchange(const Player& P)
     while (os.left())
         this->values.push_back(os.get<T>());
 }
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * Shamir.h
+ * protocols/shamir/shamir.h
  *
  */
 
-#ifndef PROTOCOLS_SHAMIR_H_
-#define PROTOCOLS_SHAMIR_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -84,5 +83,3 @@ public:
     static void get_hyper(vector<vector<typename T::open_type>>& hyper, int t, int n);
     static string hyper_filename(int t, int n);
 };
-
-#endif /* PROTOCOLS_SHAMIR_H_ */

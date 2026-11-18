@@ -1,10 +1,9 @@
 /*
- * YaoPlayer.h
+ * garbled/yao/yao_player.h
  *
  */
 
-#ifndef YAO_YAOPLAYER_H_
-#define YAO_YAOPLAYER_H_
+#pragma once
 
 #include "net/player.h"
 #include "net/server.h"
@@ -18,5 +17,3 @@ public:
 	YaoPlayer(int argc, const char** argv);
 	~YaoPlayer();
 };
-
-#endif /* YAO_YAOPLAYER_H_ */

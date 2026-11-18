@@ -1,5 +1,5 @@
 /*
- * no-party.cpp
+ * parties/arith/no-party.cpp
  *
  */
 

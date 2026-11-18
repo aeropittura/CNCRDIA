@@ -1,10 +1,9 @@
 /*
- * Abfllnoww.h
+ * boolean/postsacri_bin.h
  *
  */
 
-#ifndef GC_POSTSACRIBIN_H_
-#define GC_POSTSACRIBIN_H_
+#pragma once
 
 #include "boolean/postsacri_secret.h"
 #include "protocols/replicated/replicated.h"
@@ -52,5 +51,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_POSTSACRIBIN_H_ */

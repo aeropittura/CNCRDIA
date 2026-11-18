@@ -1,7 +1,9 @@
 /*
- * RealGarbleWire.cpp
+ * garbled/bmr/real_garble_wire.hpp
  *
  */
+
+#pragma once
 
 #include "garbled/bmr/real_garble_wire.h"
 #include "garbled/bmr/real_program_party.h"

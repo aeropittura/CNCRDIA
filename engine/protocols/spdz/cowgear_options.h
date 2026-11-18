@@ -1,10 +1,9 @@
 /*
- * CowGearOptions.h
+ * protocols/spdz/cowgear_options.h
  *
  */
 
-#ifndef PROTOCOLS_COWGEAROPTIONS_H_
-#define PROTOCOLS_COWGEAROPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 
@@ -31,5 +30,3 @@ public:
         use_top_gear = use;
     }
 };
-
-#endif /* PROTOCOLS_COWGEAROPTIONS_H_ */

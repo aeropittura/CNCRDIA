@@ -1,10 +1,9 @@
 /*
- * ThreadQueue.h
+ * vm/thread_queue.h
  *
  */
 
-#ifndef PROCESSOR_THREADQUEUE_H_
-#define PROCESSOR_THREADQUEUE_H_
+#pragma once
 
 #include "vm/thread_job.h"
 #include "vm/thread_stats.h"
@@ -55,5 +54,3 @@ public:
     void start_online(Player& P, const TimerWithComm& prep_time);
     void stop_online(Player& P, const TimerWithComm& prep_time);
 };
-
-#endif /* PROCESSOR_THREADQUEUE_H_ */

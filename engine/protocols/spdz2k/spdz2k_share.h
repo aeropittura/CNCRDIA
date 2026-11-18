@@ -1,10 +1,9 @@
 /*
- * Spdz2kShare.h
+ * protocols/spdz2k/spdz2k_share.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZ2KSHARE_H_
-#define PROTOCOLS_SPDZ2KSHARE_H_
+#pragma once
 
 #ifndef SPDZ2K_DEFAULT_SECURITY
 #define SPDZ2K_DEFAULT_SECURITY 64
@@ -92,5 +91,3 @@ Spdz2kShare<K, S> operator*(const typename Spdz2kShare<K,S>::open_type& x, Spdz2
 {
     return typename Spdz2kShare<K,S>::tmp_type(x) * typename Spdz2kShare<K,S>::super(y);
 }
-
-#endif /* PROTOCOLS_SPDZ2KSHARE_H_ */

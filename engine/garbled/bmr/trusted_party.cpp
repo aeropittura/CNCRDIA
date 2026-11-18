@@ -1,5 +1,5 @@
 /*
- * TrustedParty.cpp
+ * garbled/bmr/trusted_party.cpp
  *
  */
 

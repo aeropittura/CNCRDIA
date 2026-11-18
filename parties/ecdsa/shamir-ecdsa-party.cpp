@@ -1,5 +1,5 @@
 /*
- * mal-shamir-ecdsa-party.cpp
+ * parties/ecdsa/shamir-ecdsa-party.cpp
  *
  */
 

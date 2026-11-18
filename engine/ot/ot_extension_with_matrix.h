@@ -1,10 +1,9 @@
 /*
- * OTExtensionWithMatrix.h
+ * ot/ot_extension_with_matrix.h
  *
  */
 
-#ifndef OT_OTEXTENSIONWITHMATRIX_H_
-#define OT_OTEXTENSIONWITHMATRIX_H_
+#pragma once
 
 #include "ot/ot_extension.h"
 #include "ot/bit_matrix.h"
@@ -163,5 +162,3 @@ protected:
     void check_iteration(__m128i delta, __m128i q, __m128i q2,
         __m128i t, __m128i t2, __m128i x);
 };
-
-#endif /* OT_OTEXTENSIONWITHMATRIX_H_ */

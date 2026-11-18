@@ -1,10 +1,9 @@
 /*
- * ThreadMaster.cpp
+ * boolean/thread_master.hpp
  *
  */
 
-#ifndef GC_THREADMASTER_HPP_
-#define GC_THREADMASTER_HPP_
+#pragma once
 
 #include "boolean/thread_master.h"
 #include "boolean/program.h"
@@ -143,5 +142,3 @@ void ThreadMaster<T>::run_with_error()
 }
 
 } /* namespace GC */
-
-#endif

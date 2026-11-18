@@ -1,5 +1,5 @@
 /*
- * binary-example.cpp
+ * parties/examples/binary-example.cpp
  *
  */
 

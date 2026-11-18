@@ -1,10 +1,9 @@
 /*
- * SemiPrep.h
+ * protocols/semi/semi_prep.h
  *
  */
 
-#ifndef PROTOCOLS_SEMIPREP_H_
-#define PROTOCOLS_SEMIPREP_H_
+#pragma once
 
 #include "protocols/spdz/mascot_prep.h"
 
@@ -29,5 +28,3 @@ public:
 
     static bool bits_from_dabits();
 };
-
-#endif /* PROTOCOLS_SEMIPREP_H_ */

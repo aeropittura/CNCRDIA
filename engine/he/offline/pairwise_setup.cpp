@@ -1,5 +1,5 @@
 /*
- * PairwiseSetup.cpp
+ * he/offline/pairwise_setup.cpp
  *
  */
 

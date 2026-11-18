@@ -1,10 +1,9 @@
 /*
- * TrioMC.h
+ * protocols/astra_trio/trio_mc.h
  *
  */
 
-#ifndef PROTOCOLS_TRIOMC_H_
-#define PROTOCOLS_TRIOMC_H_
+#pragma once
 
 #include "protocols/astra_trio/astra_mc.h"
 
@@ -26,5 +25,3 @@ public:
         return *this;
     }
 };
-
-#endif /* PROTOCOLS_TRIOMC_H_ */

@@ -1,5 +1,4 @@
-#ifndef _Ciphertext
-#define _Ciphertext
+#pragma once
 
 #include "he/core/fhe_keys.h"
 #include "he/core/random_coins.h"
@@ -134,5 +133,3 @@ class Ciphertext
 
   size_t report_size(ReportType type) const { return cc0.report_size(type) + cc1.report_size(type); }
 };
-
-#endif

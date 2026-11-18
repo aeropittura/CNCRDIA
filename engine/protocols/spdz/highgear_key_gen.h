@@ -1,10 +1,9 @@
 /*
- * HighGearKeyGen.h
+ * protocols/spdz/highgear_key_gen.h
  *
  */
 
-#ifndef PROTOCOLS_HIGHGEARKEYGEN_H_
-#define PROTOCOLS_HIGHGEARKEYGEN_H_
+#pragma once
 
 #include "protocols/spdz/lowgear_key_gen.h"
 
@@ -70,5 +69,3 @@ public:
     template<class FD>
     void run(PartSetup<FD>& setup, MachineBase& machine);
 };
-
-#endif /* PROTOCOLS_HIGHGEARKEYGEN_H_ */

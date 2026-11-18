@@ -1,5 +1,5 @@
 /*
- * chaigear-party.cpp
+ * parties/arith/chaigear-party.cpp
  *
  */
 

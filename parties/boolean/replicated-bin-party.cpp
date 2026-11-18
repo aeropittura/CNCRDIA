@@ -1,5 +1,5 @@
 /*
- * replicated-party.cpp
+ * parties/boolean/replicated-bin-party.cpp
  *
  */
 

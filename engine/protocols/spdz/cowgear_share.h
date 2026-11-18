@@ -1,10 +1,9 @@
 /*
- * CowGearShare.h
+ * protocols/spdz/cowgear_share.h
  *
  */
 
-#ifndef PROTOCOLS_COWGEARSHARE_H_
-#define PROTOCOLS_COWGEARSHARE_H_
+#pragma once
 
 #include "protocols/common/share.h"
 
@@ -44,5 +43,3 @@ public:
 
 template<class T>
 const true_type CowGearShare<T>::covert;
-
-#endif /* PROTOCOLS_COWGEARSHARE_H_ */

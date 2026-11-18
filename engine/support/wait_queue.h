@@ -1,10 +1,9 @@
 /*
- * WaitQueue.h
+ * support/wait_queue.h
  *
  */
 
-#ifndef TOOLS_WAITQUEUE_H_
-#define TOOLS_WAITQUEUE_H_
+#pragma once
 
 #include <pthread.h>
 #include <deque>
@@ -115,5 +114,3 @@ public:
         return res;
     }
 };
-
-#endif /* TOOLS_WAITQUEUE_H_ */

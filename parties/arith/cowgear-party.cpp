@@ -1,5 +1,5 @@
 /*
- * cowgear-party.cpp
+ * parties/arith/cowgear-party.cpp
  *
  */
 

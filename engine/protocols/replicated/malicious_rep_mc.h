@@ -1,10 +1,9 @@
 /*
- * MaliciousRepMC.h
+ * protocols/replicated/malicious_rep_mc.h
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSREPMC_H_
-#define PROTOCOLS_MALICIOUSREPMC_H_
+#pragma once
 
 #include "protocols/replicated/replicated_mc.h"
 
@@ -106,5 +105,3 @@ public:
 
     void Check(const Player& P);
 };
-
-#endif /* PROTOCOLS_MALICIOUSREPMC_H_ */

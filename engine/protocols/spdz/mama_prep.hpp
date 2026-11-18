@@ -1,7 +1,9 @@
 /*
- * MamPrep.cpp
+ * protocols/spdz/mama_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdz/mama_prep.h"
 

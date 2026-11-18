@@ -1,10 +1,9 @@
 /*
- * SemiMC.h
+ * protocols/semi/semi_mc.h
  *
  */
 
-#ifndef PROTOCOLS_SEMIMC_H_
-#define PROTOCOLS_SEMIMC_H_
+#pragma once
 
 #include "protocols/common/mac_check.h"
 #include "support/bundle.h"
@@ -64,5 +63,3 @@ public:
 
     void Check(const Player& P) { (void)P; }
 };
-
-#endif /* PROTOCOLS_SEMIMC_H_ */

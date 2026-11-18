@@ -1,5 +1,4 @@
-#ifndef _DistDecrypt
-#define _DistDecrypt
+#pragma once
 
 /*
  * This is the Distributed Decryption Protocol
@@ -37,6 +36,3 @@ public:
   size_t report_size(ReportType type)
   { return vv.report_size(type) + vv1.report_size(type) + mf.report_size(type) + f.report_size(type); }
 };
-
-#endif
-

@@ -1,10 +1,9 @@
 /*
- * Key.h
+ * garbled/bmr/key.h
  *
  */
 
-#ifndef COMMON_INC_KEY_H_
-#define COMMON_INC_KEY_H_
+#pragma once
 
 #include <iostream>
 #include <string.h>
@@ -95,5 +94,3 @@ inline Key Key::doubling(int i) const
         return _mm_loadu_si128((__m128i*)halfs);
     }
 }
-
-#endif /* COMMON_INC_KEY_H_ */

@@ -1,5 +1,5 @@
 /*
- * TemiSetup.cpp
+ * he/offline/temi_setup.cpp
  *
  */
 

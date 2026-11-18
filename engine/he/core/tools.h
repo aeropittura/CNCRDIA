@@ -1,10 +1,9 @@
 /*
- * tools.h
+ * he/core/tools.h
  *
  */
 
-#ifndef FHE_TOOLS_H_
-#define FHE_TOOLS_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -17,5 +16,3 @@ T sum(const vector<T>& summands)
         res += summands[i];
     return res;
 }
-
-#endif /* FHE_TOOLS_H_ */

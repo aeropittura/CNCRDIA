@@ -1,10 +1,9 @@
 /*
- * Trio.hpp
+ * protocols/astra_trio/trio.hpp
  *
  */
 
-#ifndef PROTOCOLS_TRIO_HPP_
-#define PROTOCOLS_TRIO_HPP_
+#pragma once
 
 #include "protocols/astra_trio/trio.h"
 #include "support/ranges.h"
@@ -528,5 +527,3 @@ void Trio<T>::unsplit1(StackedVector<T>& dest,
     assert(not os[1].left());
     assert(not prep.left());
 }
-
-#endif /* PROTOCOLS_TRIO_HPP_ */

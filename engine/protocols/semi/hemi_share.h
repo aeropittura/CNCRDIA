@@ -1,10 +1,9 @@
 /*
- * HemiShare.h
+ * protocols/semi/hemi_share.h
  *
  */
 
-#ifndef PROTOCOLS_HEMISHARE_H_
-#define PROTOCOLS_HEMISHARE_H_
+#pragma once
 
 #include "protocols/semi/semi_share.h"
 
@@ -52,5 +51,3 @@ public:
 
 template<class T>
 true_type HemiShare<T>::triple_matmul;
-
-#endif /* PROTOCOLS_HEMISHARE_H_ */

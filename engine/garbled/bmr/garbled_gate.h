@@ -1,10 +1,9 @@
 /*
- * GarbledGate.h
+ * garbled/bmr/garbled_gate.h
  *
  */
 
-#ifndef BMR_PRIME_CIRCUIT_BMR_INC_GARBLEDGATE_H_
-#define BMR_PRIME_CIRCUIT_BMR_INC_GARBLEDGATE_H_
+#pragma once
 
 #include "garbled/bmr/register.h"
 #include "garbled/bmr/common.h"
@@ -91,5 +90,3 @@ public:
     void compute_prfs_outputs(const Register** in_wires, int my_id, PRFOutputs& outputs, gate_id_t g);
     void print();
 };
-
-#endif /* BMR_PRIME_CIRCUIT_BMR_INC_GARBLEDGATE_H_ */

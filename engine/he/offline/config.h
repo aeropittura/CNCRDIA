@@ -1,10 +1,9 @@
 /*
- * config.h
+ * he/offline/config.h
  *
  */
 
-#ifndef FHEOFFLINE_CONFIG_H_
-#define FHEOFFLINE_CONFIG_H_
+#pragma once
 
 #ifndef LESS_MEM_MORE_ALLOC
 #define LESS_ALLOC_MORE_MEM
@@ -13,5 +12,3 @@
 #ifndef COMP_SEC
 #define COMP_SEC 128
 #endif
-
-#endif /* FHEOFFLINE_CONFIG_H_ */

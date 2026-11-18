@@ -1,10 +1,9 @@
 /*
- * int.h
+ * support/int.h
  *
  */
 
-#ifndef TOOLS_INT_H_
-#define TOOLS_INT_H_
+#pragma once
 
 
 typedef unsigned char octet;
@@ -67,5 +66,3 @@ inline int BYTES_TO_INT(octet *buff)
 inline int positive_modulo(int i, int n) {
     return (i % n + n) % n;
 }
-
-#endif /* TOOLS_INT_H_ */

@@ -1,10 +1,9 @@
 /*
- * Element.h
+ * ecdsa/curve_element.h
  *
  */
 
-#ifndef ECDSA_CURVEELEMENT_H_
-#define ECDSA_CURVEELEMENT_H_
+#pragma once
 
 #include <sodium.h>
 
@@ -58,5 +57,3 @@ public:
 };
 
 ostream& operator<<(ostream& s, const CurveElement& x);
-
-#endif /* ECDSA_CURVEELEMENT_H_ */

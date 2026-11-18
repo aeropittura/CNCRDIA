@@ -1,10 +1,9 @@
 /*
- * ReplicatedPO.h
+ * protocols/replicated/replicated_po.h
  *
  */
 
-#ifndef PROTOCOLS_REPLICATEDPO_H_
-#define PROTOCOLS_REPLICATEDPO_H_
+#pragma once
 
 #include "protocols/replicated/malicious_rep_po.h"
 
@@ -20,5 +19,3 @@ public:
     void send(int player);
     void receive();
 };
-
-#endif /* PROTOCOLS_REPLICATEDPO_H_ */

@@ -1,10 +1,9 @@
 /*
- * Multiplier.h
+ * he/offline/multiplier.h
  *
  */
 
-#ifndef FHEOFFLINE_MULTIPLIER_H_
-#define FHEOFFLINE_MULTIPLIER_H_
+#pragma once
 
 #include "he/offline/simple_enc_commit.h"
 #include "he/core/addable_vector.h"
@@ -58,5 +57,3 @@ public:
     const vector<Ciphertext>& get_multiplicands(
             const vector<vector<Ciphertext>>& others_ct, const FHE_PK&);
 };
-
-#endif /* FHEOFFLINE_MULTIPLIER_H_ */

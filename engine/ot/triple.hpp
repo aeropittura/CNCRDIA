@@ -1,10 +1,9 @@
 /*
- * Triple.hpp
+ * ot/triple.hpp
  *
  */
 
-#ifndef OT_TRIPLE_HPP_
-#define OT_TRIPLE_HPP_
+#pragma once
 
 template<class T> class NPartyTripleGenerator;
 
@@ -172,5 +171,3 @@ public:
         return this->c[0] - maskedA * this->b;
     }
 };
-
-#endif /* OT_TRIPLE_HPP_ */

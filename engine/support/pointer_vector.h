@@ -1,10 +1,9 @@
 /*
- * PointerVector.h
+ * support/pointer_vector.h
  *
  */
 
-#ifndef TOOLS_POINTERVECTOR_H_
-#define TOOLS_POINTERVECTOR_H_
+#pragma once
 
 #include "support/check_vector.h"
 
@@ -76,5 +75,3 @@ public:
         assert(it >= this->begin() and it + n <= this->end());
     }
 };
-
-#endif /* TOOLS_POINTERVECTOR_H_ */

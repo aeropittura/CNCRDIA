@@ -1,3 +1,5 @@
+#pragma once
+
 #include "garbled/bmr/and_job.h"
 #include "garbled/bmr/boolean_circuit.h"
 #include "garbled/bmr/common.h"

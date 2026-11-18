@@ -1,10 +1,9 @@
 /*
- * YaoEvalWire.h
+ * garbled/yao/yao_eval_wire.h
  *
  */
 
-#ifndef YAO_YAOEVALWIRE_H_
-#define YAO_YAOEVALWIRE_H_
+#pragma once
 
 #include "garbled/bmr/key.h"
 #include "garbled/bmr/gate.h"
@@ -89,5 +88,3 @@ public:
 	template<class T>
 	void finalize_input(T& inputter, int from, int n_bits);
 };
-
-#endif /* YAO_YAOEVALWIRE_H_ */

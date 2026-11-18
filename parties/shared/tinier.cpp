@@ -1,5 +1,5 @@
 /*
- * Tinier.cpp
+ * parties/shared/tinier.cpp
  *
  */
 

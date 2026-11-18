@@ -1,10 +1,9 @@
 /*
- * Astra.cpp
+ * protocols/astra_trio/astra.hpp
  *
  */
 
-#ifndef PROTOCOLS_ASTRA_HPP_
-#define PROTOCOLS_ASTRA_HPP_
+#pragma once
 
 #include "protocols/astra_trio/astra.h"
 #include "support/files.h"
@@ -1135,5 +1134,3 @@ void Astra<T>::unsplit1(StackedVector<T>& dest,
     assert(not recv_os.left());
     assert(not os_prep.left());
 }
-
-#endif

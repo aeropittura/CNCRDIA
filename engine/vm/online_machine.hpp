@@ -1,5 +1,4 @@
-#ifndef PROCESSOR_ONLINEMACHINE_HPP_
-#define PROCESSOR_ONLINEMACHINE_HPP_
+#pragma once
 
 #include "vm/online_machine.h"
 
@@ -215,5 +214,3 @@ int OnlineMachine::run_with_error()
 
     return 0;
 }
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * DishonestMajorityOfflineMachine.h
+ * vm/offline_machine.h
  *
  */
 
-#ifndef PROCESSOR_OFFLINEMACHINE_H_
-#define PROCESSOR_OFFLINEMACHINE_H_
+#pragma once
 
 #include "vm/online_machine.h"
 #include "vm/data_files.h"
@@ -35,5 +34,3 @@ public:
 
     const Names& get_N();
 };
-
-#endif /* PROCESSOR_OFFLINEMACHINE_H_ */

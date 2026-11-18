@@ -1,5 +1,5 @@
 /*
- * mama-party.cpp
+ * parties/arith/mama-party.cpp
  *
  */
 

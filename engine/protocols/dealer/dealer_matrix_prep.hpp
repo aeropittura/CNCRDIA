@@ -1,7 +1,9 @@
 /*
- * DealerMatrixPrep.hpp
+ * protocols/dealer/dealer_matrix_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/dealer/dealer_matrix_prep.h"
 

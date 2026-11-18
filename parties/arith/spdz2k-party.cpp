@@ -1,5 +1,5 @@
 /*
- * spdz2k-party.cpp
+ * parties/arith/spdz2k-party.cpp
  *
  */
 

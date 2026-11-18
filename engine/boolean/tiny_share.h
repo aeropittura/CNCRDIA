@@ -1,10 +1,9 @@
 /*
- * TinyShare.h
+ * boolean/tiny_share.h
  *
  */
 
-#ifndef GC_TINYSHARE_H_
-#define GC_TINYSHARE_H_
+#pragma once
 
 #include "boolean/share_secret.h"
 #include "boolean/share_party.h"
@@ -72,5 +71,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_TINYSHARE_H_ */

@@ -1,10 +1,9 @@
 /*
- * TemiShare.h
+ * protocols/semi/temi_share.h
  *
  */
 
-#ifndef PROTOCOLS_TEMISHARE_H_
-#define PROTOCOLS_TEMISHARE_H_
+#pragma once
 
 #include "protocols/semi/hemi_share.h"
 
@@ -46,5 +45,3 @@ public:
     }
 
 };
-
-#endif /* PROTOCOLS_TEMISHARE_H_ */

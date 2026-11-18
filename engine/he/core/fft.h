@@ -1,5 +1,4 @@
-#ifndef _FFT
-#define _FFT
+#pragma once
 
 /* FFT routine (mod p) for when N is a power of 2
      - We do not check that N is a power of 2 though
@@ -79,7 +78,3 @@ void FFT_non_power_of_two(vector<modp>& res, const vector<modp>& input,
    This works for any value of N
 */
 void NaiveFFT(vector<modp>& ans,vector<modp>& a,int N,const modp& theta,const Zp_Data& PrD);
-
-
-#endif
-

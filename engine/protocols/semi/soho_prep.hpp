@@ -1,7 +1,9 @@
 /*
- * SohoPrep.cpp
+ * protocols/semi/soho_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/semi/soho_prep.h"
 #include "he/offline/data_setup.h"

@@ -1,10 +1,9 @@
 /*
- * Secret.h
+ * boolean/fake_secret.h
  *
  */
 
-#ifndef GC_FAKESECRET_H_
-#define GC_FAKESECRET_H_
+#pragma once
 
 #include "boolean/clear.h"
 #include "boolean/memory.h"
@@ -177,5 +176,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_FAKESECRET_H_ */

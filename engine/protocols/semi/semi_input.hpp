@@ -1,10 +1,9 @@
 /*
- * SemiInput.cpp
+ * protocols/semi/semi_input.hpp
  *
  */
 
-#ifndef PROTOCOLS_SEMIINPUT_HPP_
-#define PROTOCOLS_SEMIINPUT_HPP_
+#pragma once
 
 #include "protocols/semi/semi_input.h"
 
@@ -82,5 +81,3 @@ void SemiInput<T>::finalize_other(int player, T& target, octetStream&,
 {
     target = this->recv_prngs.at(player).template get<T>();
 }
-
-#endif

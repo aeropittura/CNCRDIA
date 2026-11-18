@@ -1,10 +1,9 @@
 /*
- * ChaiGearPrep.h
+ * protocols/spdz/chaigear_prep.h
  *
  */
 
-#ifndef PROTOCOLS_CHAIGEARPREP_H_
-#define PROTOCOLS_CHAIGEARPREP_H_
+#pragma once
 
 #include "he/offline/simple_generator.h"
 
@@ -67,5 +66,3 @@ public:
     void buffer_bits();
     void buffer_inputs(int player);
 };
-
-#endif /* PROTOCOLS_CHAIGEARPREP_H_ */

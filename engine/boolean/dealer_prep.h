@@ -1,10 +1,9 @@
 /*
- * DealerPrep.h
+ * boolean/dealer_prep.h
  *
  */
 
-#ifndef GC_DEALERPREP_H_
-#define GC_DEALERPREP_H_
+#pragma once
 
 #include "protocols/dealer/dealer_prep.h"
 #include "protocols/common/protocol_set.h"
@@ -70,5 +69,3 @@ public:
 };
 
 }
-
-#endif /* GC_DEALERPREP_H_ */

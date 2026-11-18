@@ -1,10 +1,9 @@
 /*
- * NoShare.h
+ * boolean/no_share.h
  *
  */
 
-#ifndef GC_NOSHARE_H_
-#define GC_NOSHARE_H_
+#pragma once
 
 #include "vm/dummy_protocol.h"
 #include "vm/instruction.h"
@@ -224,5 +223,3 @@ inline ostream& operator<<(ostream& o, NoShare)
 }
 
 } /* namespace GC */
-
-#endif /* GC_NOSHARE_H_ */

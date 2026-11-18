@@ -1,10 +1,9 @@
 /*
- * EcdsaOptions.h
+ * ecdsa/ecdsa_options.h
  *
  */
 
-#ifndef ECDSA_ECDSAOPTIONS_H_
-#define ECDSA_ECDSAOPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 
@@ -73,5 +72,3 @@ public:
         opt.resetArgs();
     }
 };
-
-#endif /* ECDSA_ECDSAOPTIONS_H_ */

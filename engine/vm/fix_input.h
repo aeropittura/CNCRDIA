@@ -1,10 +1,9 @@
 /*
- * FixInput.h
+ * vm/fix_input.h
  *
  */
 
-#ifndef PROCESSOR_FIXINPUT_H_
-#define PROCESSOR_FIXINPUT_H_
+#pragma once
 
 #include <iostream>
 
@@ -35,5 +34,3 @@ typedef FixInput_<Integer> FixInput;
 #else
 typedef FixInput_<bigint> FixInput;
 #endif
-
-#endif /* PROCESSOR_FIXINPUT_H_ */

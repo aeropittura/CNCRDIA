@@ -1,10 +1,9 @@
 /*
- * TinierSecret.h
+ * boolean/tinier_secret.h
  *
  */
 
-#ifndef GC_TINIERSECRET_H_
-#define GC_TINIERSECRET_H_
+#pragma once
 
 #include "boolean/tiny_secret.h"
 #include "boolean/tinier_share.h"
@@ -102,5 +101,3 @@ TinierShare<T>::TinierShare(const TinierSecret<T>& other)
 }
 
 } /* namespace GC */
-
-#endif /* GC_TINIERSECRET_H_ */

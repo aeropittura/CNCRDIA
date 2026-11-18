@@ -1,5 +1,4 @@
-#ifndef _Plaintext
-#define _Plaintext
+#pragma once
 
 /* 
  * Defines plaintext either as a vector of field elements (gfp or gf2n_short)
@@ -209,5 +208,3 @@ template <class FD>
 using Plaintext_ = Plaintext<typename FD::T, FD, typename FD::S>;
 
 typedef Plaintext_<FFT_Data> Plaintext_mod_prime;
-
-#endif

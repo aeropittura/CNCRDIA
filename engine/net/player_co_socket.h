@@ -1,10 +1,9 @@
 /*
- * PlayerSocket.h
+ * net/player_co_socket.h
  *
  */
 
-#ifndef NETWORKING_PLAYERCOSOCKET_H_
-#define NETWORKING_PLAYERCOSOCKET_H_
+#pragma once
 
 #include "net/player.h"
 #include "support/pprint.h"
@@ -264,5 +263,3 @@ inline void Awaiter::await_suspend(Awaiter::handle_type h)
     else
         socket.receive_queue.push({buffer, h});
 }
-
-#endif /* NETWORKING_PLAYERCOSOCKET_H_ */

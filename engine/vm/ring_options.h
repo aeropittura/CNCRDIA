@@ -1,10 +1,9 @@
 /*
- * RingOptions.h
+ * vm/ring_options.h
  *
  */
 
-#ifndef PROCESSOR_RINGOPTIONS_H_
-#define PROCESSOR_RINGOPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 #include <string>
@@ -21,5 +20,3 @@ public:
 
     int ring_size_from_opts_or_schedule(string progname);
 };
-
-#endif /* PROCESSOR_RINGOPTIONS_H_ */

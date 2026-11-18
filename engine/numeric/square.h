@@ -1,10 +1,9 @@
 /*
- * gf2nSquare.h
+ * numeric/square.h
  *
  */
 
-#ifndef MATH_SQUARE_H_
-#define MATH_SQUARE_H_
+#pragma once
 
 #include "support/bit_vector.h"
 
@@ -44,5 +43,3 @@ public:
     void pack(octetStream& os) const;
     void unpack(octetStream& os);
 };
-
-#endif /* MATH_SQUARE_H_ */

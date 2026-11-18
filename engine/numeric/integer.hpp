@@ -1,7 +1,9 @@
 /*
- * Integer.cpp
+ * numeric/integer.hpp
  *
  */
+
+#pragma once
 
 #include "numeric/integer.h"
 

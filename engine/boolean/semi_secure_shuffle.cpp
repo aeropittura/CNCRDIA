@@ -1,5 +1,5 @@
 /*
- * SemiSecureShuffle.cpp
+ * boolean/semi_secure_shuffle.cpp
  *
  */
 

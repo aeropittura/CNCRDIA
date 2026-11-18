@@ -1,7 +1,9 @@
 /*
- * SPDZ2k.cpp
+ * parties/shared/spdz2k.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdz2k/spdz2k_share.h"
 #include "protocols/spdz2k/spdz2k_prep.h"

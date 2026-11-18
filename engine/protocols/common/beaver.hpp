@@ -1,10 +1,9 @@
 /*
- * Beaver.cpp
+ * protocols/common/beaver.hpp
  *
  */
 
-#ifndef PROTOCOLS_BEAVER_HPP_
-#define PROTOCOLS_BEAVER_HPP_
+#pragma once
 
 #include "protocols/common/beaver.h"
 
@@ -202,5 +201,3 @@ void Beaver<T>::check()
     assert(MC);
     MC->Check(P);
 }
-
-#endif

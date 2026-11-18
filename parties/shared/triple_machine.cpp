@@ -1,5 +1,5 @@
 /*
- * TripleMachine.cpp
+ * parties/shared/triple_machine.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * DealerInput.h
+ * protocols/dealer/dealer_input.h
  *
  */
 
-#ifndef PROTOCOLS_DEALERINPUT_H_
-#define PROTOCOLS_DEALERINPUT_H_
+#pragma once
 
 #include "net/all_but_last_player.h"
 #include "vm/input.h"
@@ -55,5 +54,3 @@ public:
     T finalize_random();
     void require(size_t n_inputs);
 };
-
-#endif /* PROTOCOLS_DEALERINPUT_H_ */

@@ -1,10 +1,9 @@
 /*
- * Subroutines.hpp
+ * support/subroutines.hpp
  *
  */
 
-#ifndef TOOLS_SUBROUTINES_HPP_
-#define TOOLS_SUBROUTINES_HPP_
+#pragma once
 
 #include "support/subroutines.h"
 #include "support/code_locations.h"
@@ -37,5 +36,3 @@ void Create_Random(T& ans,const Player& P)
       ans += e[i];
     }
 }
-
-#endif /* TOOLS_SUBROUTINES_HPP_ */

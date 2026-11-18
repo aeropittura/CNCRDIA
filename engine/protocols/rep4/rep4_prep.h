@@ -1,10 +1,9 @@
 /*
- * Rep4Prep.h
+ * protocols/rep4/rep4_prep.h
  *
  */
 
-#ifndef PROTOCOLS_REP4PREP_H_
-#define PROTOCOLS_REP4PREP_H_
+#pragma once
 
 #include "protocols/common/malicious_ring_prep.hpp"
 #include "protocols/replicated/malrep_ring_prep.h"
@@ -61,5 +60,3 @@ public:
         b = a & 1;
     }
 };
-
-#endif /* PROTOCOLS_REP4PREP_H_ */

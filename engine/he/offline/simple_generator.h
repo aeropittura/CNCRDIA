@@ -1,10 +1,9 @@
 /*
- * SimpleThread.h
+ * he/offline/simple_generator.h
  *
  */
 
-#ifndef FHEOFFLINE_SIMPLEGENERATOR_H_
-#define FHEOFFLINE_SIMPLEGENERATOR_H_
+#pragma once
 
 #include "net/player.h"
 #include "he/offline/simple_enc_commit.h"
@@ -73,5 +72,3 @@ public:
     void report_size(ReportType type, MemoryUsage& res);
     size_t report_sent() { return P.total_comm().sent; }
 };
-
-#endif /* FHEOFFLINE_SIMPLEGENERATOR_H_ */

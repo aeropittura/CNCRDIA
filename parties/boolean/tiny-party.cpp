@@ -1,5 +1,5 @@
 /*
- * tiny-party.cpp
+ * parties/boolean/tiny-party.cpp
  *
  */
 

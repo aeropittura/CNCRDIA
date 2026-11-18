@@ -1,10 +1,9 @@
 /*
- * MalRepRingOptions.h
+ * protocols/replicated/malrep_ring_options.h
  *
  */
 
-#ifndef PROTOCOLS_MALREPRINGOPTIONS_H_
-#define PROTOCOLS_MALREPRINGOPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 
@@ -18,5 +17,3 @@ public:
     MalRepRingOptions();
     MalRepRingOptions(ez::ezOptionParser& opt, int argc, const char** argv);
 };
-
-#endif /* PROTOCOLS_MALREPRINGOPTIONS_H_ */

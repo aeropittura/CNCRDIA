@@ -1,10 +1,9 @@
 /*
- * Opener.h
+ * protocols/common/opener.h
  *
  */
 
-#ifndef PROTOCOLS_OPENER_H_
-#define PROTOCOLS_OPENER_H_
+#pragma once
 
 #include <type_traits>
 
@@ -53,5 +52,3 @@ public:
         return inner.finalize_open();
     }
 };
-
-#endif /* PROTOCOLS_OPENER_H_ */

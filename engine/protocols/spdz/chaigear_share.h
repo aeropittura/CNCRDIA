@@ -1,10 +1,9 @@
 /*
- * ChaiGearShare.h
+ * protocols/spdz/chaigear_share.h
  *
  */
 
-#ifndef PROTOCOLS_CHAIGEARSHARE_H_
-#define PROTOCOLS_CHAIGEARSHARE_H_
+#pragma once
 
 #include "protocols/common/share.h"
 
@@ -44,5 +43,3 @@ public:
 
 template<class T>
 const true_type ChaiGearShare<T>::covert;
-
-#endif /* PROTOCOLS_CHAIGEARSHARE_H_ */

@@ -1,10 +1,9 @@
 /*
- * MascotPrep.cpp
+ * protocols/spdz/mascot_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_MASCOTPREP_HPP_
-#define PROTOCOLS_MASCOTPREP_HPP_
+#pragma once
 
 #include "protocols/spdz/mascot_prep.h"
 #include "vm/processor.h"
@@ -115,5 +114,3 @@ void MascotInputPrep<T>::buffer_inputs(int player)
     for (auto& input : triple_generator->inputs)
         this->inputs[player].push_back(input);
 }
-
-#endif

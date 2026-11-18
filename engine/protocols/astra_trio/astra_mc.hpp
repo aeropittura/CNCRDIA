@@ -1,7 +1,9 @@
 /*
- * AstraMC.cpp
+ * protocols/astra_trio/astra_mc.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/astra_trio/astra_mc.h"
 

@@ -1,5 +1,4 @@
-#ifndef _FHE_Keys
-#define _FHE_Keys
+#pragma once
 
 /* These are standardly generated FHE public and private key pairs */
 
@@ -241,5 +240,3 @@ void FHE_PK::encrypt(Ciphertext& c, const vector<S>& mess,
   mm.from(Iterator<S>(mess));
   quasi_encrypt(c, mm, rc);
 }
-
-#endif

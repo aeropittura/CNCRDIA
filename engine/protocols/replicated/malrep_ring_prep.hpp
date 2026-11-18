@@ -1,10 +1,9 @@
 /*
- * MalRepRingPrep.cpp
+ * protocols/replicated/malrep_ring_prep.hpp
  *
  */
 
-#ifndef PROTOCOlS_MALREPRINGPREP_HPP_
-#define PROTOCOlS_MALREPRINGPREP_HPP_
+#pragma once
 
 #include "protocols/replicated/malrep_ring_prep.h"
 #include "protocols/replicated/malicious_rep_prep.h"
@@ -267,5 +266,3 @@ void MalRepRingPrep<T>::buffer_inputs(int player)
 {
     this->buffer_inputs_as_usual(player, this->proc);
 }
-
-#endif

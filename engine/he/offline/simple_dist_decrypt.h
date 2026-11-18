@@ -1,10 +1,9 @@
 /*
- * SimpleDistDecrypt.h
+ * he/offline/simple_dist_decrypt.h
  *
  */
 
-#ifndef FHEOFFLINE_SIMPLEDISTDECRYPT_H_
-#define FHEOFFLINE_SIMPLEDISTDECRYPT_H_
+#pragma once
 
 #include "he/offline/dist_decrypt.h"
 #include "he/offline/data_setup.h"
@@ -22,5 +21,3 @@ public:
         EncCommitBase<typename FD::T, FD, typename FD::S>& EC);
     Plaintext_<FD> reshare(const Ciphertext& cm);
 };
-
-#endif /* FHEOFFLINE_SIMPLEDISTDECRYPT_H_ */

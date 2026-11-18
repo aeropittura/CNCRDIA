@@ -1,7 +1,9 @@
 /*
- * SpdzWiseShuffler.cpp
+ * protocols/spdzwise/spdzwise_rep3_shuffler.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdzwise/spdzwise_rep3_shuffler.h"
 

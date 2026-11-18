@@ -1,10 +1,9 @@
 /*
- * EdabitBuffer.h
+ * vm/edabit_buffer.h
  *
  */
 
-#ifndef PROCESSOR_EDABITBUFFER_H_
-#define PROCESSOR_EDABITBUFFER_H_
+#pragma once
 
 #include "support/buffer.h"
 
@@ -53,5 +52,3 @@ public:
         return eb;
     }
 };
-
-#endif /* PROCESSOR_EDABITBUFFER_H_ */

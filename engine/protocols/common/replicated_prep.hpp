@@ -1,10 +1,9 @@
 /*
- * ReplicatedPrep.cpp
+ * protocols/common/replicated_prep.hpp
  *
  */
 
-#ifndef PROTOCOlS_REPLICATEDPREP_HPP_
-#define PROTOCOlS_REPLICATEDPREP_HPP_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -1474,5 +1473,3 @@ void BufferPrep<T>::buffer_extra(Dtype type, int n_items)
         throw not_implemented();
     }
 }
-
-#endif

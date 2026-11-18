@@ -1,5 +1,5 @@
 /*
- * rep4-ecsda-party.cpp
+ * parties/ecdsa/rep4-ecdsa-party.cpp
  *
  */
 

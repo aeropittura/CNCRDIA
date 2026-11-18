@@ -1,10 +1,9 @@
 /*
- * SubDataFilesBase.h
+ * vm/prep_base.h
  *
  */
 
-#ifndef PROCESSOR_PREPBASE_H_
-#define PROCESSOR_PREPBASE_H_
+#pragma once
 
 #include <string>
 using namespace std;
@@ -43,5 +42,3 @@ public:
     void print_left_edabits(size_t n, size_t n_batch, bool strict,
             int n_bits, size_t used, bool malicious);
 };
-
-#endif /* PROCESSOR_PREPBASE_H_ */

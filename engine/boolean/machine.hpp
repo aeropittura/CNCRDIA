@@ -1,10 +1,9 @@
 /*
- * Machine.cpp
+ * boolean/machine.hpp
  *
  */
 
-#ifndef GC_MACHINE_HPP_
-#define GC_MACHINE_HPP_
+#pragma once
 
 #include "boolean/machine.h"
 
@@ -109,5 +108,3 @@ void Memories<T>::write_memory(int my_num)
 }
 
 } /* namespace GC */
-
-#endif

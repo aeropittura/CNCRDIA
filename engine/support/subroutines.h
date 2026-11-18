@@ -1,5 +1,4 @@
-#ifndef _Subroutines
-#define _Subroutines
+#pragma once
 
 /* Defines subroutines for use in both KeyGen and Offline phase
  * Mainly focused around commiting and decommitting to various
@@ -155,7 +154,3 @@ void Open(vector< vector<T> >& data,
         }
      }
 }
-
-
-#endif
-

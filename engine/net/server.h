@@ -1,9 +1,8 @@
 /*
- * Server.h
+ * net/server.h
  */
 
-#ifndef NETWORKING_SERVER_H_
-#define NETWORKING_SERVER_H_
+#pragma once
 
 #include "net/data.h"
 #include "net/player.h"
@@ -38,5 +37,3 @@ public:
 
     ServerSocket* get_socket();
 };
-
-#endif /* NETWORKING_SERVER_H_ */

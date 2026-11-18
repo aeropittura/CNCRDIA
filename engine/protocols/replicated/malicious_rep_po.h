@@ -1,10 +1,9 @@
 /*
- * MaliciousRepPO.h
+ * protocols/replicated/malicious_rep_po.h
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSREPPO_H_
-#define PROTOCOLS_MALICIOUSREPPO_H_
+#pragma once
 
 #include "net/player.h"
 
@@ -27,5 +26,3 @@ public:
     typename T::clear finalize(const T& secret);
     typename T::clear finalize();
 };
-
-#endif /* PROTOCOLS_MALICIOUSREPPO_H_ */

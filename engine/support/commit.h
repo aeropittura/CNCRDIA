@@ -1,5 +1,4 @@
-#ifndef _Commit
-#define _Commit
+#pragma once
 
 /* Define the hash based commitment scheme */
 
@@ -49,6 +48,3 @@ public:
     void check(int player, const octetStream& message);
     void check_relative(int diff, const octetStream& message);
 };
-
-#endif
-

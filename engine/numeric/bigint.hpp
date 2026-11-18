@@ -1,10 +1,9 @@
 /*
- * bigint.hpp
+ * numeric/bigint.hpp
  *
  */
 
-#ifndef MATH_BIGINT_HPP_
-#define MATH_BIGINT_HPP_
+#pragma once
 
 #include "numeric/bigint.h"
 #include "numeric/integer.h"
@@ -136,5 +135,3 @@ bigint sqrRootMod(const T& aa)
     }
     return ans;
 }
-
-#endif /* MATH_BIGINT_HPP_ */

@@ -1,10 +1,9 @@
 /*
- * PostSacriRepFieldShare.h
+ * protocols/replicated/postsacri_rep_field_share.h
  *
  */
 
-#ifndef PROTOCOLS_POSTSACRIREPFIELDSHARE_H_
-#define PROTOCOLS_POSTSACRIREPFIELDSHARE_H_
+#pragma once
 
 #include "protocols/replicated/malicious_rep3_share.h"
 
@@ -38,5 +37,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_POSTSACRIREPFIELDSHARE_H_ */

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "vm/binary_file_io.h"
 
 /* 

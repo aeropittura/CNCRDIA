@@ -1,10 +1,9 @@
 /*
- * Signal.h
+ * support/signal.h
  *
  */
 
-#ifndef TOOLS_SIGNAL_H_
-#define TOOLS_SIGNAL_H_
+#pragma once
 
 #include <pthread.h>
 
@@ -22,5 +21,3 @@ public:
     int wait(int seconds);
     void broadcast();
 };
-
-#endif /* TOOLS_SIGNAL_H_ */

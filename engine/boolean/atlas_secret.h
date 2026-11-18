@@ -1,10 +1,9 @@
 /*
- * AtlasSecret.h
+ * boolean/atlas_secret.h
  *
  */
 
-#ifndef GC_ATLASSECRET_H_
-#define GC_ATLASSECRET_H_
+#pragma once
 
 #include "boolean/tiny_secret.h"
 #include "boolean/atlas_share.h"
@@ -43,5 +42,3 @@ public:
 };
 
 }
-
-#endif /* GC_ATLASSECRET_H_ */

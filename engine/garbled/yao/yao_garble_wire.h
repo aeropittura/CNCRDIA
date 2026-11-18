@@ -1,10 +1,9 @@
 /*
- * YaoWire.h
+ * garbled/yao/yao_garble_wire.h
  *
  */
 
-#ifndef YAO_YAOGARBLEWIRE_H_
-#define YAO_YAOGARBLEWIRE_H_
+#pragma once
 
 #include "garbled/bmr/key.h"
 #include "garbled/bmr/register.h"
@@ -131,5 +130,3 @@ inline void YaoGarbleWire::set(Key key, bool mask)
     this->key_ = key;
     assert(key.get_signal() == mask);
 }
-
-#endif /* YAO_YAOGARBLEWIRE_H_ */

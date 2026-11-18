@@ -1,5 +1,4 @@
-#ifndef _gf2n
-#define _gf2n
+#pragma once
 
 #include <stdlib.h>
 #include <string.h>
@@ -283,5 +282,3 @@ gf2n_<U>::gf2n_(PRNG& G)
 {
   randomize(G);
 }
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * OTExtensionWithMatrix.cpp
+ * ot/ot_extension_with_matrix.cpp
  *
  */
 

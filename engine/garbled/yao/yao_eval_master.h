@@ -1,10 +1,9 @@
 /*
- * YaoEvalMaster.h
+ * garbled/yao/yao_eval_master.h
  *
  */
 
-#ifndef YAO_YAOEVALMASTER_H_
-#define YAO_YAOEVALMASTER_H_
+#pragma once
 
 #include "boolean/thread_master.h"
 #include "boolean/secret.h"
@@ -19,5 +18,3 @@ public:
 
     GC::Thread<GC::Secret<YaoEvalWire>>* new_thread(int i);
 };
-
-#endif /* YAO_YAOEVALMASTER_H_ */

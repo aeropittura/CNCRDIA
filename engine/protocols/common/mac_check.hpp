@@ -1,5 +1,4 @@
-#ifndef PROTOCOLS_MAC_CHECK_HPP_
-#define PROTOCOLS_MAC_CHECK_HPP_
+#pragma once
 
 #include "protocols/common/mac_check.h"
 #include "support/subroutines.h"
@@ -476,5 +475,3 @@ void Direct_MAC_Check<T>::prepare_open(const T& secret, int)
   this->values.push_back(secret.get_share());
   this->macs.push_back(secret.get_mac());
 }
-
-#endif

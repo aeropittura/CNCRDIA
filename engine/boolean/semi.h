@@ -1,10 +1,9 @@
 /*
- * Semi.h
+ * boolean/semi.h
  *
  */
 
-#ifndef GC_SEMI_H_
-#define GC_SEMI_H_
+#pragma once
 
 #include "protocols/common/beaver.h"
 #include "boolean/semi_secret.h"
@@ -30,5 +29,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_SEMI_H_ */

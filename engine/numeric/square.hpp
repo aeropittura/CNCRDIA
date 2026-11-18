@@ -1,7 +1,9 @@
 /*
- * gf2nSquare.cpp
+ * numeric/square.hpp
  *
  */
+
+#pragma once
 
 #include "numeric/square.h"
 #include "numeric/bit_vec.h"

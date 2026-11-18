@@ -1,10 +1,9 @@
 /*
- * Spdz2kPrep.cpp
+ * protocols/spdz2k/spdz2k_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_SPDZ2KPREP_HPP_
-#define PROTOCOLS_SPDZ2KPREP_HPP_
+#pragma once
 
 #include "protocols/spdz2k/spdz2k_prep.h"
 #include "boolean/bit_adder.h"
@@ -268,5 +267,3 @@ void MaliciousRingPrep<T>::buffer_edabits(bool strict, int n_bits,
     cerr << "Total edaBit generation took " << timer.elapsed() << " seconds" << endl;
 #endif
 }
-
-#endif

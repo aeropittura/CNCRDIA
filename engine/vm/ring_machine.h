@@ -1,10 +1,9 @@
 /*
- * ReplicatedMachine.h
+ * vm/ring_machine.h
  *
  */
 
-#ifndef PROCESSOR_RINGMACHINE_H_
-#define PROCESSOR_RINGMACHINE_H_
+#pragma once
 
 #include <string>
 using namespace std;
@@ -53,5 +52,3 @@ public:
         RingMachine<T, U, W>(argc, argv, opt, online_opts);
     }
 };
-
-#endif /* PROCESSOR_RINGMACHINE_H_ */

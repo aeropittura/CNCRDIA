@@ -1,10 +1,9 @@
 /*
- * ArgTuples.h
+ * boolean/arg_tuples.h
  *
  */
 
-#ifndef GC_ARGTUPLES_H_
-#define GC_ARGTUPLES_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -153,5 +152,3 @@ public:
     {
     }
 };
-
-#endif /* GC_ARGTUPLES_H_ */

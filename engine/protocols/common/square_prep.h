@@ -1,10 +1,9 @@
 /*
- * SquarePrep.h
+ * protocols/common/square_prep.h
  *
  */
 
-#ifndef PROTOCOLS_SQUAREPREP_H_
-#define PROTOCOLS_SQUAREPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -36,5 +35,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_SQUAREPREP_H_ */

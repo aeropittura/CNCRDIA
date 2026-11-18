@@ -1,10 +1,9 @@
 /*
- * YaoGarbleMaster.h
+ * garbled/yao/yao_garble_master.h
  *
  */
 
-#ifndef YAO_YAOGARBLEMASTER_H_
-#define YAO_YAOGARBLEMASTER_H_
+#pragma once
 
 #include "boolean/thread_master.h"
 #include "boolean/secret.h"
@@ -30,5 +29,3 @@ public:
         return delta;
     }
 };
-
-#endif /* YAO_YAOGARBLEMASTER_H_ */

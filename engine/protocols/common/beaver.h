@@ -1,10 +1,9 @@
 /*
- * Beaver.h
+ * protocols/common/beaver.h
  *
  */
 
-#ifndef PROTOCOLS_BEAVER_H_
-#define PROTOCOLS_BEAVER_H_
+#pragma once
 
 #include <vector>
 #include <array>
@@ -74,5 +73,3 @@ public:
 
     int get_buffer_size() { return triples.size(); }
 };
-
-#endif /* PROTOCOLS_BEAVER_H_ */

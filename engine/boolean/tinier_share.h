@@ -1,10 +1,9 @@
 /*
- * TinierShare.h
+ * boolean/tinier_share.h
  *
  */
 
-#ifndef GC_TINIERSHARE_H_
-#define GC_TINIERSHARE_H_
+#pragma once
 
 #include "vm/dummy_protocol.h"
 #include "protocols/common/share.h"
@@ -149,5 +148,3 @@ template<class T>
 const int TinierShare<T>::default_length;
 
 } /* namespace GC */
-
-#endif /* GC_TINIERSHARE_H_ */

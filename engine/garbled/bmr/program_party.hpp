@@ -1,10 +1,9 @@
 /*
- * ProgramParty.hpp
+ * garbled/bmr/program_party.hpp
  *
  */
 
-#ifndef BMR_PROGRAMPARTY_HPP_
-#define BMR_PROGRAMPARTY_HPP_
+#pragma once
 
 #include "garbled/bmr/party.h"
 
@@ -104,5 +103,3 @@ void ProgramPartySpec<T>::get_spdz_wire(SpdzOp op, DualWire<T>& spdz_wire)
 	cout << "mask share for " << get_id() << ": " << spdz_wire.mask << endl;
 #endif
 }
-
-#endif /* BMR_PROGRAMPARTY_HPP_ */

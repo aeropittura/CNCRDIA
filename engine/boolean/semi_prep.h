@@ -1,10 +1,9 @@
 /*
- * SemiPrep.h
+ * boolean/semi_prep.h
  *
  */
 
-#ifndef GC_SEMIPREP_H_
-#define GC_SEMIPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "ot/mascot_params.h"
@@ -67,5 +66,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_SEMIPREP_H_ */

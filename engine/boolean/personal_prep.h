@@ -1,10 +1,9 @@
 /*
- * PersonalPrep.h
+ * boolean/personal_prep.h
  *
  */
 
-#ifndef GC_PERSONALPREP_H_
-#define GC_PERSONALPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "boolean/share_thread.h"
@@ -31,5 +30,3 @@ public:
 };
 
 }
-
-#endif /* GC_PERSONALPREP_H_ */

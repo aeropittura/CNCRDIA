@@ -1,10 +1,9 @@
 /*
- * ShareMatrix.h
+ * protocols/common/share_matrix.h
  *
  */
 
-#ifndef PROTOCOLS_SHAREMATRIX_H_
-#define PROTOCOLS_SHAREMATRIX_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -403,5 +402,3 @@ public:
         }
     }
 };
-
-#endif /* PROTOCOLS_SHAREMATRIX_H_ */

@@ -1,10 +1,9 @@
 /*
- * Exchanger.h
+ * net/exchanger.h
  *
  */
 
-#ifndef NETWORKING_EXCHANGER_H_
-#define NETWORKING_EXCHANGER_H_
+#pragma once
 
 #include "support/octet_stream.h"
 #include "support/time_func.h"
@@ -157,5 +156,3 @@ public:
                 or (sent < len and send_socket);
     }
 };
-
-#endif /* NETWORKING_EXCHANGER_H_ */

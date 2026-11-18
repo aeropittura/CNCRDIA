@@ -1,5 +1,5 @@
 /*
- * semi2k-party.cpp
+ * parties/arith/semi2k-party.cpp
  *
  */
 

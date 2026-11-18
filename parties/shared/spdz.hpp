@@ -1,10 +1,9 @@
 /*
- * SPDZ.hpp
+ * parties/shared/spdz.hpp
  *
  */
 
-#ifndef MACHINES_SPDZ_HPP_
-#define MACHINES_SPDZ_HPP_
+#pragma once
 
 #include "protocols/common/mac_check.h"
 #include "protocols/spdz/spdz.h"
@@ -37,5 +36,3 @@
 #include "ot/n_party_triple_generator.hpp"
 
 #include "numeric/gfp.hpp"
-
-#endif /* MACHINES_SPDZ_HPP_ */

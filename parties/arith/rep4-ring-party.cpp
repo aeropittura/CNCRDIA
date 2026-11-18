@@ -1,5 +1,5 @@
 /*
- * rep4-party.cpp
+ * parties/arith/rep4-ring-party.cpp
  *
  */
 

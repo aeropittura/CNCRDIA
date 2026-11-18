@@ -1,10 +1,9 @@
 /*
- * Machine.h
+ * vm/machine.h
  *
  */
 
-#ifndef MACHINE_H_
-#define MACHINE_H_
+#pragma once
 
 #include "vm/base_machine.h"
 #include "vm/memory.h"
@@ -132,5 +131,3 @@ class Machine : public BaseMachine
 
   void gap_warning(int k);
 };
-
-#endif /* MACHINE_H_ */

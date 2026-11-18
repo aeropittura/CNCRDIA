@@ -1,10 +1,9 @@
 /*
- * MemoryUsage.h
+ * support/memory_usage.h
  *
  */
 
-#ifndef TOOLS_MEMORYUSAGE_H_
-#define TOOLS_MEMORYUSAGE_H_
+#pragma once
 
 #include <map>
 using namespace std;
@@ -42,5 +41,3 @@ public:
             cout << it.first << " required: " << 1e-9 * it.second << " (GB)" << endl;
     }
 };
-
-#endif /* TOOLS_MEMORYUSAGE_H_ */

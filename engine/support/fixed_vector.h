@@ -1,10 +1,9 @@
 /*
- * FixedVector.h
+ * support/fixed_vector.h
  *
  */
 
-#ifndef TOOLS_FIXEDVECTOR_H_
-#define TOOLS_FIXEDVECTOR_H_
+#pragma once
 
 #include <array>
 #include <vector>
@@ -137,5 +136,3 @@ public:
             x.unpack(os);
     }
 };
-
-#endif /* TOOLS_FIXEDVECTOR_H_ */

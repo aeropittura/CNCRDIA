@@ -1,5 +1,4 @@
-#ifndef TOOLS_OCT_H_
-#define TOOLS_OCT_H_
+#pragma once
 
 typedef unsigned char octet;
 
@@ -15,5 +14,3 @@ inline bool OCTETS_EQUAL(const octet* left, const octet* right, int size) {
             return false;
     return true;
 }
-
-#endif

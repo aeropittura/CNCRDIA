@@ -1,10 +1,9 @@
 /*
- * DummyMatrixPrep.h
+ * protocols/common/dummy_matrix_prep.h
  *
  */
 
-#ifndef PROTOCOLS_DUMMYMATRIXPREP_H_
-#define PROTOCOLS_DUMMYMATRIXPREP_H_
+#pragma once
 
 #include "vm/data_files.h"
 #include "protocols/common/share_matrix.h"
@@ -23,5 +22,3 @@ public:
         throw no_matrix_prep();
     }
 };
-
-#endif /* PROTOCOLS_DUMMYMATRIXPREP_H_ */

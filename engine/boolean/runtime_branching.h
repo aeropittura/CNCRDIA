@@ -1,10 +1,9 @@
 /*
- * RuntimeBranching.h
+ * boolean/runtime_branching.h
  *
  */
 
-#ifndef GC_RUNTIMEBRANCHING_H_
-#define GC_RUNTIMEBRANCHING_H_
+#pragma once
 
 namespace GC
 {
@@ -42,5 +41,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_RUNTIMEBRANCHING_H_ */

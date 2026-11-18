@@ -1,5 +1,4 @@
-#ifndef _FHE_Params
-#define _FHE_Params
+#pragma once
 
 /* Class to hold the FHE Parameters 
  *
@@ -88,5 +87,3 @@ class FHE_Params
 
   bigint get_plaintext_modulus() const;
 };
-
-#endif

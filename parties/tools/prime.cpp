@@ -1,5 +1,5 @@
 /*
- * prime.cpp
+ * parties/tools/prime.cpp
  *
  */
 

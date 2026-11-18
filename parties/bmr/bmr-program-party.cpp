@@ -1,5 +1,5 @@
 /*
- * bmr-program-party.cpp
+ * parties/bmr/bmr-program-party.cpp
  *
  */
 

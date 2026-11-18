@@ -1,10 +1,9 @@
 /*
- * DealerMatrixPrep.h
+ * protocols/dealer/dealer_matrix_prep.h
  *
  */
 
-#ifndef PROTOCOLS_DEALERMATRIXPREP_H_
-#define PROTOCOLS_DEALERMATRIXPREP_H_
+#pragma once
 
 #include "protocols/common/share_matrix.h"
 
@@ -33,5 +32,3 @@ public:
 
     void buffer_triples();
 };
-
-#endif /* PROTOCOLS_DEALERMATRIXPREP_H_ */

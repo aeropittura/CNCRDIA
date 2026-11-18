@@ -1,10 +1,9 @@
 /*
- * LiboteState.h
+ * boolean/libote_state.h
  *
  */
 
-#ifndef GC_LIBOTESTATE_H_
-#define GC_LIBOTESTATE_H_
+#pragma once
 
 #include "net/player_co_socket.h"
 
@@ -70,5 +69,3 @@ public:
 };
 
 }
-
-#endif /* GC_LIBOTESTATE_H_ */

@@ -1,10 +1,9 @@
 /*
- * MalRepRingShare.h
+ * protocols/replicated/malrep_ring_share.h
  *
  */
 
-#ifndef PROTOCOLS_MALREPRINGSHARE_H_
-#define PROTOCOLS_MALREPRINGSHARE_H_
+#pragma once
 
 #include "numeric/z2k.h"
 #include "protocols/replicated/malicious_rep3_share.h"
@@ -45,5 +44,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_MALREPRINGSHARE_H_ */

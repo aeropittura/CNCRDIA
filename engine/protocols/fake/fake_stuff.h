@@ -1,6 +1,5 @@
 
-#ifndef _fake_stuff
-#define _fake_stuff
+#pragma once
 
 #include <fstream>
 using namespace std;
@@ -138,5 +137,3 @@ public:
       Sa[j].output(outf[j],false);
   }
 };
-
-#endif

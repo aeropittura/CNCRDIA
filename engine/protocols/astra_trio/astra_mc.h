@@ -1,10 +1,9 @@
 /*
- * AstraMC.h
+ * protocols/astra_trio/astra_mc.h
  *
  */
 
-#ifndef PROTOCOLS_ASTRAMC_H_
-#define PROTOCOLS_ASTRAMC_H_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 
@@ -25,5 +24,3 @@ public:
         return *this;
     }
 };
-
-#endif /* PROTOCOLS_ASTRAMC_H_ */

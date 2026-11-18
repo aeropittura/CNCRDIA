@@ -1,10 +1,9 @@
 /*
- * MaliciousShamirShare.h
+ * protocols/shamir/malicious_shamir_share.h
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSSHAMIRSHARE_H_
-#define PROTOCOLS_MALICIOUSSHAMIRSHARE_H_
+#pragma once
 
 #include "protocols/shamir/shamir_share.h"
 #include "protocols/common/beaver.h"
@@ -67,5 +66,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_MALICIOUSSHAMIRSHARE_H_ */

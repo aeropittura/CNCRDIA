@@ -1,5 +1,5 @@
 /*
- * ThreadStats.cpp
+ * vm/thread_stats.cpp
  *
  */
 

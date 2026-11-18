@@ -1,10 +1,9 @@
 /*
- * SemiSecret.h
+ * boolean/semi_secret.h
  *
  */
 
-#ifndef GC_SEMISECRET_H_
-#define GC_SEMISECRET_H_
+#pragma once
 
 #include "protocols/semi/semi_mc.h"
 #include "protocols/semi/semi_share.h"
@@ -161,5 +160,3 @@ template<class T, class V>
 false_type SemiSecretBase<T, V>::is_clear;
 
 } /* namespace GC */
-
-#endif /* GC_SEMISECRET_H_ */

@@ -1,5 +1,4 @@
-#ifndef _DiscreteGauss
-#define _DiscreteGauss
+#pragma once
 
 /* Class to sample from a Discrete Gauss distribution of 
    standard deviation R
@@ -82,5 +81,3 @@ public:
   Generator<T>* clone() const { return new HalfGenerator<T>(*this); }
   void get(T& x) const { x = sample_half(this->G); }
 };
-
-#endif

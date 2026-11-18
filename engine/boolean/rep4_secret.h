@@ -1,10 +1,9 @@
 /*
- * Rep4Secret.h
+ * boolean/rep4_secret.h
  *
  */
 
-#ifndef GC_REP4SECRET_H_
-#define GC_REP4SECRET_H_
+#pragma once
 
 #include "boolean/share_secret.h"
 #include "protocols/rep4/rep4_mc.h"
@@ -51,5 +50,3 @@ public:
 };
 
 }
-
-#endif /* GC_REP4SECRET_H_ */

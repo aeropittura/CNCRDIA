@@ -1,5 +1,4 @@
-#ifndef NETWORKING_DATA_H_
-#define NETWORKING_DATA_H_
+#pragma once
 
 #include <string.h>
 
@@ -54,5 +53,3 @@ inline size_t decode_length(octet *buff, size_t n_bytes)
     short_memcpy((void*)&tmp, buff, n_bytes);
     return le64toh(tmp);
 }
-
-#endif

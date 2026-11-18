@@ -1,5 +1,5 @@
 /*
- * SPDZ2k.cpp
+ * parties/shared/spdz2k.cpp
  *
  */
 

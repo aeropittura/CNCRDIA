@@ -1,10 +1,9 @@
 /*
- * Sender.h
+ * net/sender.h
  *
  */
 
-#ifndef NETWORKING_SENDER_H_
-#define NETWORKING_SENDER_H_
+#pragma once
 
 #include <pthread.h>
 
@@ -46,5 +45,3 @@ public:
     void request(const octetStream& os);
     void wait(const octetStream& os);
 };
-
-#endif /* NETWORKING_SENDER_H_ */

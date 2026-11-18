@@ -1,10 +1,9 @@
 /*
- * Trio.h
+ * protocols/astra_trio/trio.h
  *
  */
 
-#ifndef PROTOCOLS_TRIO_H_
-#define PROTOCOLS_TRIO_H_
+#pragma once
 
 #include "protocols/astra_trio/astra.h"
 #include "protocols/astra_trio/trio_share.h"
@@ -83,5 +82,3 @@ public:
     T get_random();
     void randoms_inst(StackedVector<T>&, const Instruction&);
 };
-
-#endif /* PROTOCOLS_TRIO_H_ */

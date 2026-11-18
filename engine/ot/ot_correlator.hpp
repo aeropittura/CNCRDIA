@@ -1,10 +1,9 @@
 /*
- * OTCorrelator.hpp
+ * ot/ot_correlator.hpp
  *
  */
 
-#ifndef OT_OTCORRELATOR_HPP_
-#define OT_OTCORRELATOR_HPP_
+#pragma once
 
 #include "ot/ot_extension_with_matrix.h"
 
@@ -235,5 +234,3 @@ void OTCorrelator<U>::common_seed(PRNG& G)
     auto hash = os.hash();
     G = PRNG(hash);
 }
-
-#endif /* OT_OTCORRELATOR_HPP_ */

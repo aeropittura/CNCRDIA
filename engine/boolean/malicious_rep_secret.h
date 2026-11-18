@@ -1,10 +1,9 @@
 /*
- * MaliciousRepSecret.h
+ * boolean/malicious_rep_secret.h
  *
  */
 
-#ifndef GC_MALICIOUSREPSECRET_H_
-#define GC_MALICIOUSREPSECRET_H_
+#pragma once
 
 #include "boolean/share_secret.h"
 #include "boolean/machine.h"
@@ -107,5 +106,3 @@ public:
 };
 
 }
-
-#endif /* GC_MALICIOUSREPSECRET_H_ */

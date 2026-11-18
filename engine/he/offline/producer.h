@@ -1,10 +1,9 @@
 /*
- * Producer.h
+ * he/offline/producer.h
  *
  */
 
-#ifndef FHEOFFLINE_PRODUCER_H_
-#define FHEOFFLINE_PRODUCER_H_
+#pragma once
 
 #include "net/player.h"
 #include "he/core/plaintext.h"
@@ -262,5 +261,3 @@ public:
   void clear_file(int my_num, int thread_num = 0, bool initial = 0);
 
 };
-
-#endif /* FHEOFFLINE_PRODUCER_H_ */

@@ -1,5 +1,5 @@
 /*
- * RingOptions.cpp
+ * vm/ring_options.cpp
  *
  */
 

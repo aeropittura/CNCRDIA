@@ -1,5 +1,4 @@
-#ifndef _sockets_h
-#define _sockets_h
+#pragma once
 
 #include "net/data.h"
 
@@ -103,5 +102,3 @@ inline ssize_t receive_all_or_nothing(int socket, octet *msg, ssize_t len)
   else
     return 0;
 }
-
-#endif

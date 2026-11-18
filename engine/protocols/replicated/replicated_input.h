@@ -1,10 +1,9 @@
 /*
- * ReplicatedInput.h
+ * protocols/replicated/replicated_input.h
  *
  */
 
-#ifndef PROTOCOLS_REPLICATEDINPUT_H_
-#define PROTOCOLS_REPLICATEDINPUT_H_
+#pragma once
 
 #include <span>
 
@@ -117,5 +116,3 @@ public:
         return protocol.randomness_time();
     }
 };
-
-#endif /* PROTOCOLS_REPLICATEDINPUT_H_ */

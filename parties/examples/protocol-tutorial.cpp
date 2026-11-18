@@ -1,5 +1,5 @@
 /*
- * protocol-tutorial.cpp
+ * parties/examples/protocol-tutorial.cpp
  *
  * This file demonstrates the use of the low-level capabilities
  * to build a protocol, namely Rep3 multiplication and opening.

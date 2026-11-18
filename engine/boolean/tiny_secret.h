@@ -1,10 +1,9 @@
 /*
- * TinySecret.h
+ * boolean/tiny_secret.h
  *
  */
 
-#ifndef GC_TINYSECRET_H_
-#define GC_TINYSECRET_H_
+#pragma once
 
 #include "boolean/secret.h"
 #include "boolean/tiny_share.h"
@@ -293,5 +292,3 @@ inline VectorSecret<T> operator*(const BitVec& clear, const VectorSecret<T>& sha
 }
 
 } /* namespace GC */
-
-#endif /* GC_TINYSECRET_H_ */

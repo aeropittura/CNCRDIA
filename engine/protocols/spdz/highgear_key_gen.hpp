@@ -1,7 +1,9 @@
 /*
- * HighGearKeyGen.cpp
+ * protocols/spdz/highgear_key_gen.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdz/highgear_key_gen.h"
 #include "he/core/rq_element.h"

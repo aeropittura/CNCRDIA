@@ -1,10 +1,9 @@
 /*
- * Machine.h
+ * boolean/machine.h
  *
  */
 
-#ifndef GC_MACHINE_H_
-#define GC_MACHINE_H_
+#pragma once
 
 #include "boolean/clear.h"
 #include "boolean/memory.h"
@@ -67,5 +66,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_MACHINE_H_ */

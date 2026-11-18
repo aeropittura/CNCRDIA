@@ -1,10 +1,9 @@
 /*
- * Semi2k.h
+ * protocols/semi/semi.h
  *
  */
 
-#ifndef PROTOCOLS_SEMI_H_
-#define PROTOCOLS_SEMI_H_
+#pragma once
 
 #include "protocols/common/beaver.h"
 #include "vm/trunc_pr_tuple.h"
@@ -181,5 +180,3 @@ public:
             this->multiply(products, multiplicands, 0, products.size(), proc);
     }
 };
-
-#endif /* PROTOCOLS_SEMI_H_ */

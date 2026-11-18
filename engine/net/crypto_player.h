@@ -1,10 +1,9 @@
 /*
- * CryptoPlayer.h
+ * net/crypto_player.h
  *
  */
 
-#ifndef NETWORKING_CRYPTOPLAYER_H_
-#define NETWORKING_CRYPTOPLAYER_H_
+#pragma once
 
 #include "net/ssl_sockets.h"
 #include "net/player.h"
@@ -68,5 +67,3 @@ public:
 
     Player* fresh_fork(string suffix);
 };
-
-#endif /* NETWORKING_CRYPTOPLAYER_H_ */

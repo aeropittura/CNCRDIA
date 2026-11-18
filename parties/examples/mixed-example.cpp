@@ -1,5 +1,5 @@
 /*
- * mixed-example.cpp
+ * parties/examples/mixed-example.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * prf.h
+ * garbled/bmr/prf.h
  *
  */
 
-#ifndef PROTOCOL_INC_PRF_H_
-#define PROTOCOL_INC_PRF_H_
+#pragma once
 
 #include "garbled/bmr/key.h"
 
@@ -30,5 +29,3 @@ inline void PRF_chunk(const Key& key, char* input, char* output, int number)
 		break;
 	}
 }
-
-#endif /* PROTOCOL_INC_PRF_H_ */

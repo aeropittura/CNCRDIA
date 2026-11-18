@@ -1,10 +1,9 @@
 /*
- * YaoWire.hpp
+ * garbled/yao/yao_wire.hpp
  *
  */
 
-#ifndef YAO_YAOWIRE_HPP_
-#define YAO_YAOWIRE_HPP_
+#pragma once
 
 #include "garbled/yao/yao_wire.h"
 
@@ -65,5 +64,3 @@ void YaoWire::andm(GC::Processor<T>& processor,
 				dest.get_reg(j).public_input(0);
 	}
 }
-
-#endif /* YAO_YAOWIRE_HPP_ */

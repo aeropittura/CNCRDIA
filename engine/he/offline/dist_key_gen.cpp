@@ -1,5 +1,5 @@
 /*
- * DistKeyGen.cpp
+ * he/offline/dist_key_gen.cpp
  *
  */
 

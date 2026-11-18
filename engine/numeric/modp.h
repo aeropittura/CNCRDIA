@@ -1,5 +1,4 @@
-#ifndef _Modp
-#define _Modp
+#pragma once
 
 /* 
  * Currently we only support an GMP based implementation.
@@ -194,6 +193,3 @@ void to_bigint(bigint& ans,const modp_<L>& x,const Zp_Data& ZpD,bool reduce=true
 {
   x.to_bigint(ans, ZpD, reduce);
 }
-
-#endif
-

@@ -1,5 +1,5 @@
 /*
- * minimal.hpp
+ * parties/shared/minimal.hpp
  *
  */
 
@@ -9,8 +9,7 @@
 
 // please report if otherwise
 
-#ifndef MACHINES_MINIMAL_HPP_
-#define MACHINES_MINIMAL_HPP_
+#pragma once
 
 #include "parties/shared/h_files.h"
 
@@ -22,5 +21,3 @@
 #include "protocols/common/mac_check.hpp"
 #include "protocols/replicated/malicious_rep_mc.hpp"
 #include "protocols/shamir/shamir_mc.hpp"
-
-#endif /* MACHINES_MINIMAL_HPP_ */

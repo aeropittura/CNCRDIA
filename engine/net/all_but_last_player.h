@@ -1,10 +1,9 @@
 /*
- * AllButZeroPlayer.h
+ * net/all_but_last_player.h
  *
  */
 
-#ifndef NETWORKING_ALLBUTLASTPLAYER_H_
-#define NETWORKING_ALLBUTLASTPLAYER_H_
+#pragma once
 
 #include "net/player.h"
 
@@ -74,5 +73,3 @@ public:
         os.resize(num_players());
     }
 };
-
-#endif

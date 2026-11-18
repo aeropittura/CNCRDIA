@@ -1,5 +1,4 @@
-#ifndef _gfp
-#define _gfp
+#pragma once
 
 #include <iostream>
 using namespace std;
@@ -392,5 +391,3 @@ void to_signed_bigint(bigint& ans, const T& x)
     if (ans >= T::get_ZpD().pr_half)
         ans -= T::pr();
 }
-
-#endif

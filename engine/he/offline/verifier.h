@@ -1,5 +1,4 @@
-#ifndef _Verifier
-#define _Verifier
+#pragma once
 
 #include "he/offline/proof.h"
 
@@ -32,5 +31,3 @@ public:
 
   size_t report_size(ReportType type) { return z.report_size(type) + t.report_size(type); }
 };
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * SimpleMachine.h
+ * he/offline/simple_machine.h
  *
  */
 
-#ifndef FHEOFFLINE_SIMPLEMACHINE_H_
-#define FHEOFFLINE_SIMPLEMACHINE_H_
+#pragma once
 
 #include "he/core/fhe_keys.h"
 #include "he/offline/data_setup.h"
@@ -98,5 +97,3 @@ class SimpleMachine : public MultiplicativeMachine
 public:
     SimpleMachine(int argc, const char** argv);
 };
-
-#endif /* FHEOFFLINE_SIMPLEMACHINE_H_ */

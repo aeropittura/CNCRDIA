@@ -1,5 +1,4 @@
-#ifndef PROCESSOR_PROCESSOR_HPP_
-#define PROCESSOR_PROCESSOR_HPP_
+#pragma once
 
 #include "vm/processor.h"
 #include "vm/program.h"
@@ -1268,5 +1267,3 @@ void Processor<sint, sgf2n>::jump(int n)
   if (OnlineOptions::singleton.has_option("output_jumps"))
     cerr << "jumping " << n << " to " << PC << endl;
 }
-
-#endif

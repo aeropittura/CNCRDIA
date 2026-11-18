@@ -1,5 +1,5 @@
 /*
- * BitMatrix.cpp
+ * numeric/square128.cpp
  *
  */
 

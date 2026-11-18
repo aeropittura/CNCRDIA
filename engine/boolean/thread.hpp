@@ -1,10 +1,9 @@
 /*
- * Thread.cpp
+ * boolean/thread.hpp
  *
  */
 
-#ifndef GC_THREAD_HPP_
-#define GC_THREAD_HPP_
+#pragma once
 
 #include "boolean/thread.h"
 #include "boolean/program.h"
@@ -122,5 +121,3 @@ inline int InputArgListBase<T>::n_interactive_inputs_from_me(int my_num)
         cout << "Please enter " << res << " numbers:" << endl;
     return res;
 }
-
-#endif

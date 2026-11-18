@@ -1,7 +1,9 @@
 /*
- * AstraPrep.cpp
+ * protocols/astra_trio/astra_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/astra_trio/astra_prep.h"
 #include "protocols/replicated/rep3_share.h"

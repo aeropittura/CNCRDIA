@@ -1,10 +1,9 @@
 /*
- * TrioInput.h
+ * protocols/astra_trio/trio_input.h
  *
  */
 
-#ifndef PROTOCOLS_TRIOINPUT_H_
-#define PROTOCOLS_TRIOINPUT_H_
+#pragma once
 
 #include "protocols/astra_trio/astra_input.h"
 
@@ -30,5 +29,3 @@ public:
 
     T finalize_offset(int offset) final;
 };
-
-#endif /* PROTOCOLS_TRIOINPUT_H_ */

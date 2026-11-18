@@ -1,10 +1,9 @@
 /*
- * Semi2kShare.h
+ * protocols/semi/semi2k_share.h
  *
  */
 
-#ifndef PROTOCOLS_SEMI2KSHARE_H_
-#define PROTOCOLS_SEMI2KSHARE_H_
+#pragma once
 
 #include "protocols/semi/semi_share.h"
 #include "protocols/semi/semi.h"
@@ -89,5 +88,3 @@ public:
         }
     }
 };
-
-#endif /* PROTOCOLS_SEMI2KSHARE_H_ */

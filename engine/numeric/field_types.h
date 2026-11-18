@@ -1,10 +1,9 @@
 /*
- * types.h
+ * numeric/field_types.h
  *
  */
 
-#ifndef MATH_FIELD_TYPES_H_
-#define MATH_FIELD_TYPES_H_
+#pragma once
 
 
 enum DataFieldType { DATA_INT, DATA_GF2N, DATA_GF2, N_DATA_FIELD_TYPE };
@@ -21,5 +20,3 @@ enum Dtype
     DATA_OPEN,
     N_DTYPE,
 };
-
-#endif /* MATH_FIELD_TYPES_H_ */

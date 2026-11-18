@@ -1,7 +1,9 @@
 /*
- * TinyPrep.cpp
+ * boolean/tiny_prep.hpp
  *
  */
+
+#pragma once
 
 #include "boolean/tinier_share_prep.h"
 

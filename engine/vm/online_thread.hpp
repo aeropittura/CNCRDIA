@@ -1,5 +1,4 @@
-#ifndef PROCESSOR_ONLINETHREAD_HPP_
-#define PROCESSOR_ONLINETHREAD_HPP_
+#pragma once
 
 #include "vm/program.h"
 #include "vm/online_thread.h"
@@ -501,5 +500,3 @@ void thread_info<sint, sgf2n>::purge_preprocessing(const Names& N, int thread_nu
       cerr << "Reason: " << e.what() << endl;
   }
 }
-
-#endif

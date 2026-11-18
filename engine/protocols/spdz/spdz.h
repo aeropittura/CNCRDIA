@@ -1,10 +1,9 @@
 /*
- * Multiplication.h
+ * protocols/spdz/spdz.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZ_H_
-#define PROTOCOLS_SPDZ_H_
+#pragma once
 
 #include "protocols/semi/hemi.h"
 #include "protocols/semi/semi_share.h"
@@ -32,5 +31,3 @@ public:
         return this->P.num_players();
     }
 };
-
-#endif /* PROTOCOLS_SPDZ_H_ */

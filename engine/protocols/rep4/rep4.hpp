@@ -1,7 +1,9 @@
 /*
- * Rep4.cpp
+ * protocols/rep4/rep4.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/rep4/rep4.h"
 #include "boolean/square64.h"

@@ -1,10 +1,9 @@
 /*
- * Bit.h
+ * numeric/bit.h
  *
  */
 
-#ifndef MATH_BIT_H_
-#define MATH_BIT_H_
+#pragma once
 
 #include "numeric/bit_vec.h"
 
@@ -89,5 +88,3 @@ inline Bit operator*(bool a, const Bit& b)
 {
     return b * a;
 }
-
-#endif /* MATH_BIT_H_ */

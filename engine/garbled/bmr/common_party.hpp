@@ -1,10 +1,9 @@
 /*
- * CommonParty.hpp
+ * garbled/bmr/common_party.hpp
  *
  */
 
-#ifndef BMR_COMMONPARTY_HPP_
-#define BMR_COMMONPARTY_HPP_
+#pragma once
 
 #include "garbled/bmr/common_party.h"
 
@@ -74,5 +73,3 @@ GC::BreakType CommonParty::second_phase(GC::Program& program,
 	else
 		return next;
 }
-
-#endif /* BMR_COMMONPARTY_HPP_ */

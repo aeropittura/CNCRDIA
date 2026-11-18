@@ -1,10 +1,9 @@
 /*
- * HemiMatrixPrep.hpp
+ * protocols/semi/hemi_matrix_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_HEMIMATRIXPREP_HPP_
-#define PROTOCOLS_HEMIMATRIXPREP_HPP_
+#pragma once
 
 #include "protocols/semi/hemi_matrix_prep.h"
 #include "protocols/common/mac_check.h"
@@ -245,5 +244,3 @@ void HemiMatrixPrep<T>::buffer_triples()
     fflush(stderr);
 #endif
 }
-
-#endif

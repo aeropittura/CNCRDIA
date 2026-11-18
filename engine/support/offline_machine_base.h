@@ -1,10 +1,9 @@
 /*
- * OfflineMachineBase.h
+ * support/offline_machine_base.h
  *
  */
 
-#ifndef TOOLS_OFFLINEMACHINEBASE_H_
-#define TOOLS_OFFLINEMACHINEBASE_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 #include "net/server.h"
@@ -35,5 +34,3 @@ public:
     void parse_options(int argc, const char** argv);
     void start_networking_with_server(string hostname = "localhost", int portnum = 5000);
 };
-
-#endif /* TOOLS_OFFLINEMACHINEBASE_H_ */

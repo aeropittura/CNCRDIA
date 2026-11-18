@@ -1,10 +1,9 @@
 /*
- * ShuffleSacrifice.hpp
+ * protocols/common/shuffle_sacrifice.hpp
  *
  */
 
-#ifndef PROTOCOLS_SHUFFLESACRIFICE_HPP_
-#define PROTOCOLS_SHUFFLESACRIFICE_HPP_
+#pragma once
 
 #include "protocols/common/shuffle_sacrifice.h"
 #include "protocols/common/buffer_scope.h"
@@ -551,5 +550,3 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
     MCB.Check(P);
     delete &MCB;
 }
-
-#endif /* PROTOCOLS_SHUFFLESACRIFICE_HPP_ */

@@ -1,5 +1,5 @@
 /*
- * KeyGen.cpp
+ * protocols/spdz/highgear_key_gen.cpp
  *
  */
 

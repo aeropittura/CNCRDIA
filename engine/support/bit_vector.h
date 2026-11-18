@@ -1,5 +1,4 @@
-#ifndef _BITVECTOR
-#define _BITVECTOR
+#pragma once
 
 /* Vector of bits */
 
@@ -473,5 +472,3 @@ inline BitVector BitVectorView::operator^(const BitVectorView& other) const
     res.add(*this, other);
     return res;
 }
-
-#endif

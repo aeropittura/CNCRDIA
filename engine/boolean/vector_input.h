@@ -1,10 +1,9 @@
 /*
- * VectorInput.h
+ * boolean/vector_input.h
  *
  */
 
-#ifndef GC_VECTORINPUT_H_
-#define GC_VECTORINPUT_H_
+#pragma once
 
 #include "protocols/replicated/replicated_input.h"
 
@@ -84,5 +83,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_VECTORINPUT_H_ */

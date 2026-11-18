@@ -1,10 +1,9 @@
 /*
- * DealerPrep.h
+ * protocols/dealer/dealer_prep.h
  *
  */
 
-#ifndef PROTOCOLS_DEALERPREP_H_
-#define PROTOCOLS_DEALERPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 #include "protocols/dealer/dealer_matrix_prep.h"
@@ -54,5 +53,3 @@ public:
     void buffer_edabits(int n_bits, ThreadQueues*);
     void buffer_sedabits(int n_bits, ThreadQueues*);
 };
-
-#endif /* PROTOCOLS_DEALERPREP_H_ */

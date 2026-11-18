@@ -1,10 +1,9 @@
 /*
- * Buffer.h
+ * support/buffer.h
  *
  */
 
-#ifndef TOOLS_BUFFER_H_
-#define TOOLS_BUFFER_H_
+#pragma once
 
 #include <fstream>
 #include <iostream>
@@ -310,5 +309,3 @@ inline void Buffer<T,U>::input(U& a)
     a = buffer[next];
     next++;
 }
-
-#endif /* TOOLS_BUFFER_H_ */

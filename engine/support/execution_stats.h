@@ -1,10 +1,9 @@
 /*
- * ExecutionsStats.h
+ * support/execution_stats.h
  *
  */
 
-#ifndef TOOLS_EXECUTIONSTATS_H_
-#define TOOLS_EXECUTIONSTATS_H_
+#pragma once
 
 #include <map>
 using namespace std;
@@ -18,5 +17,3 @@ public:
 
     void print() const;
 };
-
-#endif /* TOOLS_EXECUTIONSTATS_H_ */

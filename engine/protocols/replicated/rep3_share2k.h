@@ -1,10 +1,9 @@
 /*
- * Rep3Share2k.h
+ * protocols/replicated/rep3_share2k.h
  *
  */
 
-#ifndef PROTOCOLS_REP3SHARE2K_H_
-#define PROTOCOLS_REP3SHARE2K_H_
+#pragma once
 
 #include "protocols/replicated/rep3_share.h"
 #include "protocols/replicated/replicated_input.h"
@@ -220,5 +219,3 @@ public:
         }
     }
 };
-
-#endif /* PROTOCOLS_REP3SHARE2K_H_ */

@@ -1,10 +1,9 @@
 /*
- * SemiSecureShuffle.h
+ * boolean/semi_secure_shuffle.h
  *
  */
 
-#ifndef GC_SEMISECURESHUFFLE_H_
-#define GC_SEMISECURESHUFFLE_H_
+#pragma once
 
 #include "boolean/processor.h"
 #include "boolean/semi_secret.h"
@@ -401,5 +400,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_SEMISECURESHUFFLE_H_ */

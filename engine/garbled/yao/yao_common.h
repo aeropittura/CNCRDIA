@@ -1,10 +1,9 @@
 /*
- * YaoCommon.h
+ * garbled/yao/yao_common.h
  *
  */
 
-#ifndef YAO_YAOCOMMON_H_
-#define YAO_YAOCOMMON_H_
+#pragma once
 
 #include <stdexcept>
 #include <math.h>
@@ -75,5 +74,3 @@ public:
             jobs[i]->worker.done();
     }
 };
-
-#endif /* YAO_YAOCOMMON_H_ */

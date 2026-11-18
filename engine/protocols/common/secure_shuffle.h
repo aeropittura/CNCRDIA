@@ -1,10 +1,9 @@
 /*
- * SecureShuffle.h
+ * protocols/common/secure_shuffle.h
  *
  */
 
-#ifndef PROTOCOLS_SECURESHUFFLE_H_
-#define PROTOCOLS_SECURESHUFFLE_H_
+#pragma once
 
 #include <vector>
 #include <deque>
@@ -148,5 +147,3 @@ public:
      */
     void inverse_permutation(StackedVector<T>& stack, size_t n, size_t output_base, size_t input_base);
 };
-
-#endif /* PROTOCOLS_SECURESHUFFLE_H_ */

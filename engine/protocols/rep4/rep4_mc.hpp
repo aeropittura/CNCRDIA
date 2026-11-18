@@ -1,10 +1,9 @@
 /*
- * Rep4MC.hpp
+ * protocols/rep4/rep4_mc.hpp
  *
  */
 
-#ifndef PROTOCOLS_REP4MC_HPP_
-#define PROTOCOLS_REP4MC_HPP_
+#pragma once
 
 #include "protocols/rep4/rep4_mc.h"
 
@@ -57,5 +56,3 @@ void Rep4MC<T>::Check(const Player& P)
     if (os != left)
         throw mac_fail();
 }
-
-#endif /* PROTOCOLS_REP4MC_HPP_ */

@@ -1,10 +1,9 @@
 /*
- * F3.h
+ * boolean/f3.h
  *
  */
 
-#ifndef MATH_F3_H_
-#define MATH_F3_H_
+#pragma once
 
 #include "numeric/value_interface.h"
 #include "support/bit_vector.h"
@@ -631,5 +630,3 @@ array<F3, 5> F3Vector::randomness_lookup(unsigned char r)
     assert(r < 243);
     return randomness_table[r];
 }
-
-#endif /* MATH_F3_H_ */

@@ -1,10 +1,9 @@
 /*
- * PersonalPrep.cpp
+ * boolean/personal_prep.hpp
  *
  */
 
-#ifndef GC_PERSONALPREP_HPP_
-#define GC_PERSONALPREP_HPP_
+#pragma once
 
 #include "boolean/personal_prep.h"
 
@@ -110,5 +109,3 @@ void PersonalPrep<T>::buffer_personal_triples(vector<array<T, 3>>& triples,
 }
 
 }
-
-#endif

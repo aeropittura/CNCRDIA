@@ -1,5 +1,5 @@
 /*
- * semi-bmr-party.cpp
+ * parties/bmr/semi-bmr-party.cpp
  *
  */
 

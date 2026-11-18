@@ -1,10 +1,9 @@
 /*
- * TripleMachine.h
+ * ot/triple_machine.h
  *
  */
 
-#ifndef OT_TRIPLEMACHINE_H_
-#define OT_TRIPLEMACHINE_H_
+#pragma once
 
 #include "numeric/gf2n.h"
 #include "numeric/gfp.h"
@@ -43,5 +42,3 @@ public:
 
     void run();
 };
-
-#endif /* OT_TRIPLEMACHINE_H_ */

@@ -1,10 +1,9 @@
 /*
- * FlexBuffer.h
+ * support/flex_buffer.h
  *
  */
 
-#ifndef TOOLS_FLEXBUFFER_H_
-#define TOOLS_FLEXBUFFER_H_
+#pragma once
 
 #include "support/avx_memcpy.h"
 #include "support/time_func.h"
@@ -236,5 +235,3 @@ inline void ReceivedMsg::check_buffer(size_t size)
 		throw overflow_error("not enough data in buffer");
 #endif
 }
-
-#endif /* TOOLS_FLEXBUFFER_H_ */

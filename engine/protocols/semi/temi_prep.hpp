@@ -4,8 +4,7 @@
  *
  */
 
-#ifndef PROTOCOLS_TEMIPREP_HPP_
-#define PROTOCOLS_TEMIPREP_HPP_
+#pragma once
 
 #include "protocols/semi/temi_prep.h"
 #include "he/offline/simple_machine.h"
@@ -135,5 +134,3 @@ void TemiMultiplier<T>::add(Plaintext_<FD>& res, const Ciphertext& C,
     auto zero = TemiPrep<T>::get_pk().template encrypt<FD>(TemiPrep<T>::get_FTD());
     res += dd.reshare(ts.run(C + zero, P));
 }
-
-#endif /* PROTOCOLS_TEMIPREP_HPP_ */

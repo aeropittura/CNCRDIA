@@ -1,10 +1,9 @@
 /*
- * SpdzWiseShuffler.h
+ * protocols/spdzwise/spdzwise_rep3_shuffler.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISEREP3SHUFFLER_H_
-#define PROTOCOLS_SPDZWISEREP3SHUFFLER_H_
+#pragma once
 
 #include "protocols/replicated/rep3_shuffler.h"
 #include "protocols/common/protocol_set.h"
@@ -29,5 +28,3 @@ public:
 
     void apply_multiple(StackedVector<T>& a, vector<ShuffleTuple<shuffle_type>>& shuffles);
 };
-
-#endif /* PROTOCOLS_SPDZWISEREP3SHUFFLER_H_ */

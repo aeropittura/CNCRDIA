@@ -1,5 +1,4 @@
-#ifndef _SHA1
-#define _SHA1
+#pragma once
 
 #include <sodium.h>
 #include <vector>
@@ -63,5 +62,3 @@ public:
 };
 
 void hash_update(Hash *ctx, const void *dataIn, unsigned long len);
-
-#endif

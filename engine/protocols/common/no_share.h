@@ -1,10 +1,9 @@
 /*
- * NoShare.h
+ * protocols/common/no_share.h
  *
  */
 
-#ifndef PROTOCOLS_NOSHARE_H_
-#define PROTOCOLS_NOSHARE_H_
+#pragma once
 
 #include "protocols/common/share_interface.h"
 #include "numeric/bigint.h"
@@ -200,5 +199,3 @@ inline ostream& operator<<(ostream& o, NoShare<T>)
     throw runtime_error("no output");
     return o;
 }
-
-#endif /* PROTOCOLS_NOSHARE_H_ */

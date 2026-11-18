@@ -1,10 +1,9 @@
 /*
- * msg_types.h
+ * garbled/bmr/msg_types.h
  *
  */
 
-#ifndef PROTOCOL_INC_MSG_TYPES_H_
-#define PROTOCOL_INC_MSG_TYPES_H_
+#pragma once
 
 
 #define MESSAGE_TYPES \
@@ -31,5 +30,3 @@ MESSAGE_TYPES
 #undef X
 
 extern const char* message_type_names[];
-
-#endif /* PROTOCOL_INC_MSG_TYPES_H_ */

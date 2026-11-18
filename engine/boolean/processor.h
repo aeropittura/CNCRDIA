@@ -1,10 +1,9 @@
 /*
- * Processor.h
+ * boolean/processor.h
  *
  */
 
-#ifndef GC_PROCESSOR_H_
-#define GC_PROCESSOR_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -170,5 +169,3 @@ inline int GC::Processor<T>::check_args(const ArgVector& args, int n)
 }
 
 } /* namespace GC */
-
-#endif /* GC_PROCESSOR_H_ */

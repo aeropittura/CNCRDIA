@@ -1,5 +1,5 @@
 /*
- * ReplicatedMachine.cpp
+ * vm/honest_majority_machine.cpp
  *
  */
 

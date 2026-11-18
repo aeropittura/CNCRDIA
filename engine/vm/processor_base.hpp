@@ -1,10 +1,9 @@
 /*
- * ProcessorBase.cpp
+ * vm/processor_base.hpp
  *
  */
 
-#ifndef PROCESSOR_PROCESSORBASE_HPP_
-#define PROCESSOR_PROCESSORBASE_HPP_
+#pragma once
 
 #include "vm/processor_base.h"
 #include "vm/int_input.h"
@@ -50,5 +49,3 @@ T ProcessorBase::get_input(istream& input_file, const string& input_filename,
     input_counter++;
     return res;
 }
-
-#endif

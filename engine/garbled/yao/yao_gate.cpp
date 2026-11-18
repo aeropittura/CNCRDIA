@@ -1,5 +1,5 @@
 /*
- * YaoGate.cpp
+ * garbled/yao/yao_gate.cpp
  *
  */
 

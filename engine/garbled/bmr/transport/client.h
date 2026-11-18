@@ -1,10 +1,9 @@
 /*
- * Client.h
+ * garbled/bmr/transport/client.h
  *
  */
 
-#ifndef NETWORK_INC_CLIENT_H_
-#define NETWORK_INC_CLIENT_H_
+#pragma once
 
 #include "garbled/bmr/transport/common.h"
 //#include <queue>
@@ -64,5 +63,3 @@ private:
 };
 
 }
-
-#endif /* NETWORK_INC_CLIENT_H_ */

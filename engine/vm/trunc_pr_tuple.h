@@ -1,10 +1,9 @@
 /*
- * TruncPrTuple.h
+ * vm/trunc_pr_tuple.h
  *
  */
 
-#ifndef PROCESSOR_TRUNCPRTUPLE_H_
-#define PROCESSOR_TRUNCPRTUPLE_H_
+#pragma once
 
 #include <vector>
 #include <assert.h>
@@ -213,5 +212,3 @@ public:
         return res;
     }
 };
-
-#endif /* PROCESSOR_TRUNCPRTUPLE_H_ */

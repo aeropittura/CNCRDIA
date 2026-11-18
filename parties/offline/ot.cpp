@@ -1,5 +1,5 @@
 /*
- * OText_main.cpp
+ * parties/offline/ot.cpp
  *
  */
 

@@ -1,10 +1,9 @@
 /*
- * Replicated.h
+ * protocols/replicated/replicated.h
  *
  */
 
-#ifndef PROTOCOLS_REPLICATED_H_
-#define PROTOCOLS_REPLICATED_H_
+#pragma once
 
 #include <assert.h>
 #include <vector>
@@ -275,5 +274,3 @@ public:
 
     virtual double randomness_time();
 };
-
-#endif /* PROTOCOLS_REPLICATED_H_ */

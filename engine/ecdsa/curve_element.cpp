@@ -1,5 +1,5 @@
 /*
- * Element.cpp
+ * ecdsa/curve_element.cpp
  *
  */
 

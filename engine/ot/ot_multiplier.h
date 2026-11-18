@@ -1,10 +1,9 @@
 /*
- * OTMultiplier.h
+ * ot/ot_multiplier.h
  *
  */
 
-#ifndef OT_OTMULTIPLIER_H_
-#define OT_OTMULTIPLIER_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -207,5 +206,3 @@ public:
     {
     }
 };
-
-#endif /* OT_OTMULTIPLIER_H_ */

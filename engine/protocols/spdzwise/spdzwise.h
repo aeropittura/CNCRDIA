@@ -1,10 +1,9 @@
 /*
- * SpdzWise.h
+ * protocols/spdzwise/spdzwise.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISE_H_
-#define PROTOCOLS_SPDZWISE_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 #include "protocols/spdzwise/spdzwise_rep3_shuffler.h"
@@ -66,5 +65,3 @@ public:
 
     void randoms_inst(StackedVector<T>& S, const Instruction& instruction);
 };
-
-#endif /* PROTOCOLS_SPDZWISE_H_ */

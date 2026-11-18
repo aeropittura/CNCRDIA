@@ -1,10 +1,9 @@
 /*
- * MaliciousRepMC.cpp
+ * protocols/replicated/malicious_rep_mc.hpp
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSREPMC_HPP_
-#define PROTOCOLS_MALICIOUSREPMC_HPP_
+#pragma once
 
 #include "protocols/replicated/malicious_rep_mc.h"
 #include "boolean/machine.h"
@@ -205,5 +204,3 @@ void CommMaliciousRepMC<T>::Check(const Player& P)
 {
     (void)P;
 }
-
-#endif

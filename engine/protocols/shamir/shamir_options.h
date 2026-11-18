@@ -1,10 +1,9 @@
 /*
- * ShamirMachine.h
+ * protocols/shamir/shamir_options.h
  *
  */
 
-#ifndef PROTOCOLS_SHAMIROPTIONS_H_
-#define PROTOCOLS_SHAMIROPTIONS_H_
+#pragma once
 
 #include "support/ez_option_parser.h"
 
@@ -33,5 +32,3 @@ class ShamirMachineSpec
 public:
     ShamirMachineSpec(int argc, const char** argv);
 };
-
-#endif /* PROTOCOLS_SHAMIROPTIONS_H_ */

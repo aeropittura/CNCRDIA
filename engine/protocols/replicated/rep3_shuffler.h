@@ -1,10 +1,9 @@
 /*
- * Rep3Shuffler.h
+ * protocols/replicated/rep3_shuffler.h
  *
  */
 
-#ifndef PROTOCOLS_REP3SHUFFLER_H_
-#define PROTOCOLS_REP3SHUFFLER_H_
+#pragma once
 
 #include "protocols/common/secure_shuffle.h"
 
@@ -34,5 +33,3 @@ public:
     void shuffle_job(StackedVector<T>& a, const vector<ShuffleTuple<shuffle_type>>& shuffles,
             long begin, long end, Player& P, ThreadQueues* queues);
 };
-
-#endif /* PROTOCOLS_REP3SHUFFLER_H_ */

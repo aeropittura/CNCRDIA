@@ -1,7 +1,9 @@
 /*
- * ReplicatedParty.cpp
+ * boolean/share_party.hpp
  *
  */
+
+#pragma once
 
 #include "boolean/share_party.h"
 

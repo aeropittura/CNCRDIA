@@ -1,10 +1,9 @@
 /*
- * Rep4MC.h
+ * protocols/rep4/rep4_mc.h
  *
  */
 
-#ifndef PROTOCOLS_REP4MC_H_
-#define PROTOCOLS_REP4MC_H_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 
@@ -26,5 +25,3 @@ public:
         return *this;
     }
 };
-
-#endif /* PROTOCOLS_REP4MC_H_ */

@@ -1,5 +1,5 @@
 /*
- * malicious-shamir-party.cpp
+ * parties/arith/malicious-shamir-party.cpp
  *
  */
 

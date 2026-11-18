@@ -1,10 +1,9 @@
 /*
- * LimitedPrep.h
+ * protocols/common/limited_prep.h
  *
  */
 
-#ifndef PROTOCOLS_LIMITEDPREP_H_
-#define PROTOCOLS_LIMITEDPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -24,5 +23,3 @@ public:
 
     void set_protocol(typename T::Protocol& protocol);
 };
-
-#endif /* PROTOCOLS_LIMITEDPREP_H_ */

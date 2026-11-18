@@ -1,10 +1,9 @@
 /*
- * CutAndChooseMachine.h
+ * he/offline/cut_and_choose_machine.h
  *
  */
 
-#ifndef FHEOFFLINE_CUTANDCHOOSEMACHINE_H_
-#define FHEOFFLINE_CUTANDCHOOSEMACHINE_H_
+#pragma once
 
 #include "he/offline/simple_machine.h"
 
@@ -20,5 +19,3 @@ public:
 
     int get_covert() const { return sec; }
 };
-
-#endif /* FHEOFFLINE_CUTANDCHOOSEMACHINE_H_ */

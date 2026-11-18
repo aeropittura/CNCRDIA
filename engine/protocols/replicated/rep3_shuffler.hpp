@@ -1,10 +1,9 @@
 /*
- * Rep3Shuffler.cpp
+ * protocols/replicated/rep3_shuffler.hpp
  *
  */
 
-#ifndef PROTOCOLS_REP3SHUFFLER_HPP_
-#define PROTOCOLS_REP3SHUFFLER_HPP_
+#pragma once
 
 #include "protocols/replicated/rep3_shuffler.h"
 
@@ -182,5 +181,3 @@ void Rep3Shuffler<T>::shuffle_job(StackedVector<T>& a,
     if (queues)
         queues->sync();
 }
-
-#endif

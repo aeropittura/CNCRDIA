@@ -1,7 +1,9 @@
 /*
- * LowGearKeyGen.cpp
+ * protocols/spdz/lowgear_key_gen.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdz/lowgear_key_gen.h"
 #include "he/core/rq_element.h"

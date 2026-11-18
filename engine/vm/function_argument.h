@@ -1,10 +1,9 @@
 /*
- * FunctionArgument.h
+ * vm/function_argument.h
  *
  */
 
-#ifndef PROCESSOR_FUNCTIONARGUMENT_H_
-#define PROCESSOR_FUNCTIONARGUMENT_H_
+#pragma once
 
 #include "protocols/common/share_interface.h"
 
@@ -137,5 +136,3 @@ public:
 
     void check_type(const string& type_string);
 };
-
-#endif /* PROCESSOR_FUNCTIONARGUMENT_H_ */

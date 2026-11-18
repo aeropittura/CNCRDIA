@@ -1,10 +1,9 @@
 /*
- * mac_key.hpp
+ * protocols/common/mac_key.hpp
  *
  */
 
-#ifndef PROTOCOLS_MAC_KEY_HPP_
-#define PROTOCOLS_MAC_KEY_HPP_
+#pragma once
 
 #include "net/player.h"
 #include "numeric/setup.h"
@@ -29,5 +28,3 @@ void check_field_size()
         throw field_too_small(T::length(),
                 OnlineOptions::singleton.security_parameter);
 }
-
-#endif /* PROTOCOLS_MAC_KEY_HPP_ */

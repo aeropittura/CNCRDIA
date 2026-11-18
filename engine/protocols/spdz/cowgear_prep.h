@@ -1,10 +1,9 @@
 /*
- * CowGearPrep.h
+ * protocols/spdz/cowgear_prep.h
  *
  */
 
-#ifndef PROTOCOLS_COWGEARPREP_H_
-#define PROTOCOLS_COWGEARPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -72,5 +71,3 @@ public:
     void buffer_bits();
     void buffer_inputs(int player);
 };
-
-#endif /* PROTOCOLS_COWGEARPREP_H_ */

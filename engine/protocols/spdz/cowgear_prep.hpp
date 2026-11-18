@@ -1,7 +1,9 @@
 /*
- * CowGearPrep.cpp
+ * protocols/spdz/cowgear_prep.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/spdz/cowgear_prep.h"
 #include "he/offline/pairwise_machine.h"

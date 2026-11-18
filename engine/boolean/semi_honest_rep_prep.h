@@ -1,10 +1,9 @@
 /*
- * ReplicatedPrep.h
+ * boolean/semi_honest_rep_prep.h
  *
  */
 
-#ifndef GC_SEMIHONESTREPPREP_H_
-#define GC_SEMIHONESTREPPREP_H_
+#pragma once
 
 #include "boolean/rep_prep.h"
 #include "boolean/share_secret.h"
@@ -24,5 +23,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_SEMIHONESTREPPREP_H_ */

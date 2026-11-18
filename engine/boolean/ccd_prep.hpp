@@ -1,10 +1,9 @@
 /*
- * CcdPrep.hpp
+ * boolean/ccd_prep.hpp
  *
  */
 
-#ifndef GC_CCDPREP_HPP_
-#define GC_CCDPREP_HPP_
+#pragma once
 
 #include "boolean/ccd_prep.h"
 
@@ -38,5 +37,3 @@ void CcdPrep<T>::set_protocol(typename T::Protocol& protocol)
 }
 
 }
-
-#endif /* GC_CCDPREP_HPP_ */

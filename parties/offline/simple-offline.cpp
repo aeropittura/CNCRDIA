@@ -1,5 +1,5 @@
 /*
- * simple-offline.cpp
+ * parties/offline/simple-offline.cpp
  *
  */
 

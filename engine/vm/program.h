@@ -1,5 +1,4 @@
-#ifndef _Program
-#define _Program
+#pragma once
 
 #include "vm/instruction.h"
 #include "vm/data_files.h"
@@ -76,6 +75,3 @@ class Program
   template<class T>
   void mulm_check() const;
 };
-
-#endif
-

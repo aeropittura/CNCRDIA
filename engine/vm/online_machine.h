@@ -1,10 +1,9 @@
 /*
- * DishonestMajorityMachine.h
+ * vm/online_machine.h
  *
  */
 
-#ifndef PROCESSOR_ONLINEMACHINE_H_
-#define PROCESSOR_ONLINEMACHINE_H_
+#pragma once
 
 #include "vm/online_options.h"
 #include "numeric/gf2n.h"
@@ -55,5 +54,3 @@ public:
     DishonestMajorityMachine(int argc, const char** argv,
             ez::ezOptionParser& opt, OnlineOptions& online_opts, int nplayers);
 };
-
-#endif /* PROCESSOR_ONLINEMACHINE_H_ */

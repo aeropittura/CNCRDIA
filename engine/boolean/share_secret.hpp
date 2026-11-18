@@ -1,10 +1,9 @@
 /*
- * ReplicatedSecret.cpp
+ * boolean/share_secret.hpp
  *
  */
 
-#ifndef GC_SHARESECRET_HPP
-#define GC_SHARESECRET_HPP
+#pragma once
 
 #include "boolean/share_secret.h"
 
@@ -376,5 +375,3 @@ U& GC::ShareSecret<U>::operator=(const U& other)
 }
 
 }
-
-#endif

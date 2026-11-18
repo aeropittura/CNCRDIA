@@ -1,10 +1,9 @@
 /*
- * OnlineOptions.hpp
+ * vm/online_options.hpp
  *
  */
 
-#ifndef PROCESSOR_ONLINEOPTIONS_HPP_
-#define PROCESSOR_ONLINEOPTIONS_HPP_
+#pragma once
 
 #include "vm/online_options.h"
 
@@ -117,5 +116,3 @@ OnlineOptions::OnlineOptions(T) : OnlineOptions()
     if (not T::dishonest_majority)
         batch_size = 10000;
 }
-
-#endif /* PROCESSOR_ONLINEOPTIONS_HPP_ */

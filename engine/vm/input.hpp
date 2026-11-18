@@ -1,10 +1,9 @@
 /*
- * Input.cpp
+ * vm/input.hpp
  *
  */
 
-#ifndef PROCESSOR_INPUT_HPP_
-#define PROCESSOR_INPUT_HPP_
+#pragma once
 
 #include "vm/input.h"
 #include "vm/processor.h"
@@ -371,5 +370,3 @@ void InputBase<T>::input_mixed(SubProcessor<T>& Proc, const ArgVector& args,
         i += n_arg_tuple;
     }
 }
-
-#endif

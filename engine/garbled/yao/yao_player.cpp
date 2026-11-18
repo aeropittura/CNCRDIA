@@ -1,5 +1,5 @@
 /*
- * YaoPlayer.cpp
+ * garbled/yao/yao_player.cpp
  *
  */
 

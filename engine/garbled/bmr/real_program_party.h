@@ -1,10 +1,9 @@
 /*
- * RealProgramParty.h
+ * garbled/bmr/real_program_party.h
  *
  */
 
-#ifndef BMR_REALPROGRAMPARTY_H_
-#define BMR_REALPROGRAMPARTY_H_
+#pragma once
 
 #include "garbled/bmr/party.h"
 #include "garbled/bmr/real_garble_wire.h"
@@ -75,5 +74,3 @@ inline RealProgramParty<T>& RealProgramParty<T>::s()
 	else
 		throw runtime_error("no singleton");
 }
-
-#endif /* BMR_REALPROGRAMPARTY_H_ */

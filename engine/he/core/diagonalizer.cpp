@@ -1,5 +1,5 @@
 /*
- * Diagonalizer.cpp
+ * he/core/diagonalizer.cpp
  *
  */
 

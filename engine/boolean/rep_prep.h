@@ -1,10 +1,9 @@
 /*
- * MaliciousRepPrep.h
+ * boolean/rep_prep.h
  *
  */
 
-#ifndef GC_REPPREP_H_
-#define GC_REPPREP_H_
+#pragma once
 
 #include "boolean/malicious_rep_secret.h"
 #include "boolean/shiftable_triple_buffer.h"
@@ -47,5 +46,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_REPPREP_H_ */

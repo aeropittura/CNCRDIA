@@ -1,3 +1,5 @@
+#pragma once
+
 #include "vm/memory.h"
 #include "vm/instruction.h"
 

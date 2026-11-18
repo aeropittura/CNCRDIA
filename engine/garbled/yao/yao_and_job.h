@@ -1,10 +1,9 @@
 /*
- * YaoAndJob.h
+ * garbled/yao/yao_and_job.h
  *
  */
 
-#ifndef YAO_YAOANDJOB_H_
-#define YAO_YAOANDJOB_H_
+#pragma once
 
 #include "garbled/yao/yao_garble_wire.h"
 #include "support/worker.h"
@@ -84,5 +83,3 @@ public:
 		return 0;
 	}
 };
-
-#endif /* YAO_YAOANDJOB_H_ */

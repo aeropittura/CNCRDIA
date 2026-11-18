@@ -1,5 +1,5 @@
 /*
- * SimpleDistDecrypt.cpp
+ * he/offline/simple_dist_decrypt.cpp
  *
  */
 

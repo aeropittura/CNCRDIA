@@ -1,5 +1,4 @@
-#ifndef OT_NPARTYTRIPLGENERATOR_HPP_
-#define OT_NPARTYTRIPLGENERATOR_HPP_
+#pragma once
 
 #include "ot/n_party_triple_generator.h"
 
@@ -1050,5 +1049,3 @@ void OTTripleGenerator<T>::run_multipliers(MultJob job)
     signal_multipliers(job);
     wait_for_multipliers();
 }
-
-#endif

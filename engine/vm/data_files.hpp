@@ -1,5 +1,4 @@
-#ifndef PROCESSOR_DATA_FILES_HPP_
-#define PROCESSOR_DATA_FILES_HPP_
+#pragma once
 
 #include "vm/data_files.h"
 #include "vm/processor.h"
@@ -441,5 +440,3 @@ TimerWithComm Preprocessing<T>::total_time()
   }
   return res;
 }
-
-#endif

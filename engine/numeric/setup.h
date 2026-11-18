@@ -1,10 +1,9 @@
 /*
- * Setup.h
+ * numeric/setup.h
  *
  */
 
-#ifndef MATH_SETUP_H_
-#define MATH_SETUP_H_
+#pragma once
 
 #include "numeric/bigint.h"
 #include "support/mkpath.h"
@@ -67,5 +66,3 @@ void generate_prime_setup(string dir, int nparties, int lgp)
     generate_online_setup<typename T::clear>(
             get_prep_sub_dir<T>(dir, nparties, lgp), p, lgp);
 }
-
-#endif /* MATH_SETUP_H_ */

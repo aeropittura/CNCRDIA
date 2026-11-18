@@ -1,10 +1,9 @@
 /*
- * Spdz2kPrep.h
+ * protocols/spdz2k/spdz2k_prep.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZ2KPREP_H_
-#define PROTOCOLS_SPDZ2KPREP_H_
+#pragma once
 
 #include "protocols/spdz/mascot_prep.h"
 #include "protocols/common/ring_only_prep.h"
@@ -43,5 +42,3 @@ public:
     void get_dabit(T& a, GC::TinySecret<T::s>& b);
 #endif
 };
-
-#endif /* PROTOCOLS_SPDZ2KPREP_H_ */

@@ -1,10 +1,9 @@
 /*
- * BaseMachine.h
+ * vm/base_machine.h
  *
  */
 
-#ifndef PROCESSOR_BASEMACHINE_H_
-#define PROCESSOR_BASEMACHINE_H_
+#pragma once
 
 #include "support/time_func.h"
 #include "support/timer_with_comm.h"
@@ -262,5 +261,3 @@ int BaseMachine::edabit_batch_size(int n_bits, int buffer_size)
     assert(res > 0);
     return res;
 }
-
-#endif /* PROCESSOR_BASEMACHINE_H_ */

@@ -1,5 +1,4 @@
-#ifndef _MAC_Check
-#define _MAC_Check
+#pragma once
 
 /* Class for storing MAC Check data and doing the Check */
 
@@ -506,5 +505,3 @@ void TreeSum<T>::ReceiveValues(vector<T>& values, const Player& P, int sender)
   unpack<false>(values, os);
   AddToValues(values);
 }
-
-#endif

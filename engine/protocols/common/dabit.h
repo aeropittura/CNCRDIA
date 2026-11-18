@@ -1,10 +1,9 @@
 /*
- * dabit.h
+ * protocols/common/dabit.h
  *
  */
 
-#ifndef PROTOCOLS_DABIT_H_
-#define PROTOCOLS_DABIT_H_
+#pragma once
 
 #include <array>
 using namespace std;
@@ -65,5 +64,3 @@ public:
         this->second.unpack(os);
     }
 };
-
-#endif /* PROTOCOLS_DABIT_H_ */

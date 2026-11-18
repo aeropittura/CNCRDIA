@@ -1,10 +1,9 @@
 /*
- * ReplicatedMC.cpp
+ * protocols/replicated/replicated_mc.hpp
  *
  */
 
-#ifndef PROTOCOLS_REPLICATEDMC_HPP_
-#define PROTOCOLS_REPLICATEDMC_HPP_
+#pragma once
 
 #include "protocols/replicated/replicated_mc.h"
 
@@ -82,5 +81,3 @@ array<typename T::open_type*, 2> ReplicatedMC<T>::finalize_several(size_t n)
         finalize(this->values, this->secrets);
     return MAC_Check_Base<T>::finalize_several(n);
 }
-
-#endif

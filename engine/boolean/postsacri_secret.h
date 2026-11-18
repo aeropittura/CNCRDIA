@@ -1,10 +1,9 @@
 /*
- * AbfllnowShare.h
+ * boolean/postsacri_secret.h
  *
  */
 
-#ifndef GC_POSTSACRISECRET_H_
-#define GC_POSTSACRISECRET_H_
+#pragma once
 
 #include "boolean/malicious_rep_secret.h"
 
@@ -33,5 +32,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * instructions.h
+ * vm/instructions.h
  *
  */
 
-#ifndef PROCESSOR_INSTRUCTIONS_H_
-#define PROCESSOR_INSTRUCTIONS_H_
+#pragma once
 
 #include "vm/instruction.h"
 
@@ -401,5 +400,3 @@
 
 #define ALL_INSTRUCTIONS ARITHMETIC_INSTRUCTIONS REGINT_INSTRUCTIONS \
     CLEAR_GF2N_INSTRUCTIONS REMAINING_INSTRUCTIONS
-
-#endif /* PROCESSOR_INSTRUCTIONS_H_ */

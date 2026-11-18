@@ -1,5 +1,5 @@
 /*
- * NoiseBound.cpp
+ * he/core/noise_bounds.cpp
  *
  */
 

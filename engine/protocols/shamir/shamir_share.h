@@ -1,10 +1,9 @@
 /*
- * ShamirShare.h
+ * protocols/shamir/shamir_share.h
  *
  */
 
-#ifndef PROTOCOLS_SHAMIRSHARE_H_
-#define PROTOCOLS_SHAMIRSHARE_H_
+#pragma once
 
 #include "protocols/shamir/shamir.h"
 #include "protocols/shamir/shamir_input.h"
@@ -142,5 +141,3 @@ true_type ShamirShare<T>::variable_players;
 
 template<class T>
 false_type ShamirShare<T>::is_clear;
-
-#endif /* PROTOCOLS_SHAMIRSHARE_H_ */

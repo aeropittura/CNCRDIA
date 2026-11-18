@@ -1,10 +1,9 @@
 /*
- * Processor.cpp
+ * boolean/processor.hpp
  *
  */
 
-#ifndef GC_PROCESSOR_HPP_
-#define GC_PROCESSOR_HPP_
+#pragma once
 
 #include "boolean/processor.h"
 
@@ -792,5 +791,3 @@ void Processor<T>::convcint(const StackedVector<Integer>& Ci,
 }
 
 } /* namespace GC */
-
-#endif

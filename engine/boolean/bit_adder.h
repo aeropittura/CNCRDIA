@@ -1,10 +1,9 @@
 /*
- * BitAdder.h
+ * boolean/bit_adder.h
  *
  */
 
-#ifndef GC_BITADDER_H_
-#define GC_BITADDER_H_
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -27,5 +26,3 @@ public:
             size_t begin, size_t end, SubProcessor<T>& proc, int length,
             int input_begin);
 };
-
-#endif /* GC_BITADDER_H_ */

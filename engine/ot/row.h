@@ -1,5 +1,4 @@
-#ifndef OT_ROW_H_
-#define OT_ROW_H_
+#pragma once
 
 #include "numeric/z2k.h"
 #include "numeric/gf2nlong.h"
@@ -126,5 +125,3 @@ public:
 
     void pack(octetStream& o) const;
 };
-
-#endif /* OT_ROW_H_ */

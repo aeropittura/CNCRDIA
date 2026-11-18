@@ -1,10 +1,9 @@
 /*
- * LimitedPrep.cpp
+ * protocols/common/limited_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_LIMITEDPREP_HPP
-#define PROTOCOLS_LIMITEDPREP_HPP
+#pragma once
 
 #include "protocols/common/limited_prep.h"
 
@@ -28,5 +27,3 @@ void LimitedPrep<T>::set_protocol(typename T::Protocol& protocol)
 {
     usage.set_num_players(protocol.P.num_players());
 }
-
-#endif

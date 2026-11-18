@@ -1,5 +1,4 @@
-#ifndef _Exceptions
-#define _Exceptions
+#pragma once
 
 #include <exception>
 #include <string>
@@ -331,5 +330,3 @@ class field_too_small : public runtime_error
 public:
     field_too_small(int length, int security);
 };
-
-#endif

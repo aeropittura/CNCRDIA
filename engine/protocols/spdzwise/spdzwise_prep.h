@@ -1,10 +1,9 @@
 /*
- * SpdzWisePrep.h
+ * protocols/spdzwise/spdzwise_prep.h
  *
  */
 
-#ifndef PROTOCOLS_SPDZWISEPREP_H_
-#define PROTOCOLS_SPDZWISEPREP_H_
+#pragma once
 
 #include "protocols/common/replicated_prep.h"
 
@@ -41,5 +40,3 @@ public:
     {
     }
 };
-
-#endif /* PROTOCOLS_SPDZWISEPREP_H_ */

@@ -1,7 +1,9 @@
 /*
- * AddableVector.cpp
+ * he/core/addable_vector.hpp
  *
  */
+
+#pragma once
 
 #include "he/core/addable_vector.h"
 #include "he/core/rq_element.h"

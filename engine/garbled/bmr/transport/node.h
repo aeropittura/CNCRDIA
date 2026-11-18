@@ -1,10 +1,9 @@
 /*
- * Node.h
+ * garbled/bmr/transport/node.h
  *
  */
 
-#ifndef NETWORK_NODE_H_
-#define NETWORK_NODE_H_
+#pragma once
 
 #include <string>
 #include <map>
@@ -79,5 +78,3 @@ private:
 	bool* _clients_connected;
 	NodeUpdatable* _updatable;
 };
-
-#endif /* NETWORK_NODE_H_ */

@@ -1,10 +1,9 @@
 /*
- * Hemi.h
+ * protocols/semi/hemi.h
  *
  */
 
-#ifndef PROTOCOLS_HEMI_H_
-#define PROTOCOLS_HEMI_H_
+#pragma once
 
 #include "protocols/semi/semi.h"
 #include "protocols/semi/hemi_matrix_prep.h"
@@ -46,5 +45,3 @@ public:
 
     TimerWithComm prep_time();
 };
-
-#endif /* PROTOCOLS_HEMI_H_ */

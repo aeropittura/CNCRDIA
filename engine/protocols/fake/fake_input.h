@@ -1,10 +1,9 @@
 /*
- * FakeProtocol.h
+ * protocols/fake/fake_input.h
  *
  */
 
-#ifndef PROTOCOLS_FAKEINPUT_H_
-#define PROTOCOLS_FAKEINPUT_H_
+#pragma once
 
 #include "protocols/replicated/replicated.h"
 #include "vm/input.h"
@@ -51,5 +50,3 @@ public:
         throw runtime_error("input from other parties not implemented");
     }
 };
-
-#endif /* PROTOCOLS_FAKEPROTOCOL_H_ */

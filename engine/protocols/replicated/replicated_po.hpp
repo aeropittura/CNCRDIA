@@ -1,7 +1,9 @@
 /*
- * ReplicatedPO.cpp
+ * protocols/replicated/replicated_po.hpp
  *
  */
+
+#pragma once
 
 #include "protocols/replicated/replicated_po.h"
 

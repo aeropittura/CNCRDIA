@@ -1,10 +1,9 @@
 /*
- * ShamirMC.h
+ * protocols/shamir/shamir_mc.h
  *
  */
 
-#ifndef PROTOCOLS_SHAMIRMC_H_
-#define PROTOCOLS_SHAMIRMC_H_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 #include "protocols/shamir/shamir_share.h"
@@ -82,5 +81,3 @@ public:
 
     int get_threshold() const { return threshold; }
 };
-
-#endif /* PROTOCOLS_SHAMIRMC_H_ */

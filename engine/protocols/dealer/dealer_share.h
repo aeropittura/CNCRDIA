@@ -1,10 +1,9 @@
 /*
- * DealerShare.h
+ * protocols/dealer/dealer_share.h
  *
  */
 
-#ifndef PROTOCOLS_DEALERSHARE_H_
-#define PROTOCOLS_DEALERSHARE_H_
+#pragma once
 
 #include "numeric/z2k.h"
 #include "protocols/semi/semi_share.h"
@@ -83,5 +82,3 @@ using DealerRingShare = DealerShare<SignedZ2<K>>;
 
 template<class T>
 false_type DealerShare<T>::dishonest_majority;
-
-#endif /* PROTOCOLS_DEALERSHARE_H_ */

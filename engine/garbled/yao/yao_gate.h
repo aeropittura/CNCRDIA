@@ -1,10 +1,9 @@
 /*
- * YaoGate.h
+ * garbled/yao/yao_gate.h
  *
  */
 
-#ifndef YAO_YAOGATE_H_
-#define YAO_YAOGATE_H_
+#pragma once
 
 #include "garbled/yao/config.h"
 #include "garbled/bmr/key.h"
@@ -143,5 +142,3 @@ inline void YaoFullGate::eval(YaoEvalWire& out, const Key* hash,
 #endif
 	out.set(key);
 }
-
-#endif /* YAO_YAOGATE_H_ */

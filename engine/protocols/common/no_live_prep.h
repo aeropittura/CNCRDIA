@@ -1,10 +1,9 @@
 /*
- * NoLivePrep.h
+ * protocols/common/no_live_prep.h
  *
  */
 
-#ifndef PROCESSOR_NOLIVEPREP_H_
-#define PROCESSOR_NOLIVEPREP_H_
+#pragma once
 
 #include "support/exceptions.h"
 #include "protocols/common/replicated_prep.h"
@@ -54,5 +53,3 @@ public:
         throw runtime_error("no bits");
     }
 };
-
-#endif /* PROCESSOR_NOLIVEPREP_H_ */

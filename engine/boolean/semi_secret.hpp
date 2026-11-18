@@ -1,10 +1,9 @@
 /*
- * SemiSecret.cpp
+ * boolean/semi_secret.hpp
  *
  */
 
-#ifndef GC_SEMISECRET_HPP_
-#define GC_SEMISECRET_HPP_
+#pragma once
 
 #include "boolean/share_party.h"
 #include "boolean/share_secret.hpp"
@@ -170,5 +169,3 @@ void SemiSecretBase<T, V>::reveal(size_t n_bits, Clear& x)
 }
 
 } /* namespace GC */
-
-#endif

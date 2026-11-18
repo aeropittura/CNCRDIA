@@ -1,5 +1,4 @@
-#ifndef _BASE_OT
-#define _BASE_OT
+#pragma once
 
 /* The OT thread uses the Miracl library, which is not thread safe.
  * Thus all Miracl based code is contained in this one thread so as
@@ -125,5 +124,3 @@ public:
        BaseOT(nOT, player, role) {}
    void exec_base(bool new_receiver_inputs=true);
 };
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * LowGearKeyGen.h
+ * protocols/spdz/lowgear_key_gen.h
  *
  */
 
-#ifndef PROTOCOLS_LOWGEARKEYGEN_H_
-#define PROTOCOLS_LOWGEARKEYGEN_H_
+#pragma once
 
 #include "protocols/common/share_vector.h"
 #include "he/offline/pairwise_machine.h"
@@ -81,5 +80,3 @@ public:
     template<class FD>
     void run(PairwiseSetup<FD>& setup);
 };
-
-#endif /* PROTOCOLS_LOWGEARKEYGEN_H_ */

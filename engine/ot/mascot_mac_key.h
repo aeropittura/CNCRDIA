@@ -1,10 +1,9 @@
 /*
- * MascotMacKey.h
+ * ot/mascot_mac_key.h
  *
  */
 
-#ifndef OT_MASCOTMACKEY_H_
-#define OT_MASCOTMACKEY_H_
+#pragma once
 
 template<class share_type>
 string get_ot_secrets_filename(const Player& P);
@@ -45,5 +44,3 @@ public:
         return res;
     }
 };
-
-#endif /* OT_MASCOTMACKEY_H_ */

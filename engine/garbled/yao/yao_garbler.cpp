@@ -1,5 +1,5 @@
 /*
- * YaoGarbler.cpp
+ * garbled/yao/yao_garbler.cpp
  *
  */
 

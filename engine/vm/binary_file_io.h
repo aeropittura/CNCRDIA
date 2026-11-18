@@ -1,5 +1,4 @@
-#ifndef _FILE_IO_HEADER
-#define _FILE_IO_HEADER
+#pragma once
 
 #include "support/exceptions.h"
 
@@ -50,5 +49,3 @@ class Binary_File_IO
   void read(StackedVector<T>& dest, StackedVector<Integer>& Ci,
        const Player& P, const BaseInstruction& inst);
 };
-
-#endif

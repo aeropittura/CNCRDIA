@@ -1,7 +1,9 @@
 /*
- * YaoCommon.cpp
+ * garbled/yao/yao_common.hpp
  *
  */
+
+#pragma once
 
 #include "garbled/yao/yao_common.h"
 

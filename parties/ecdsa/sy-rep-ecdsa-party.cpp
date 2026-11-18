@@ -1,5 +1,5 @@
 /*
- * sy-ecdsa-party.cpp
+ * parties/ecdsa/sy-rep-ecdsa-party.cpp
  *
  */
 

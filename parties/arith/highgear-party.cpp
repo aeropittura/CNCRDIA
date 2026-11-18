@@ -1,5 +1,5 @@
 /*
- * highgear-party.cpp
+ * parties/arith/highgear-party.cpp
  *
  */
 

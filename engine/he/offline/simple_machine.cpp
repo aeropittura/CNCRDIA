@@ -1,5 +1,5 @@
 /*
- * SimpleMachine.cpp
+ * he/offline/simple_machine.cpp
  *
  */
 

@@ -1,5 +1,5 @@
 /*
- * shamir-bmr-party.cpp
+ * parties/bmr/shamir-bmr-party.cpp
  *
  */
 

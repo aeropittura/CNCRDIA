@@ -1,5 +1,5 @@
 /*
- * square64.cpp
+ * boolean/square64.cpp
  *
  */
 

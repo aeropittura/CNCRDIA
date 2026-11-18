@@ -1,10 +1,9 @@
 /*
- * common.h
+ * garbled/bmr/transport/common.h
  *
  */
 
-#ifndef NETWORK_INC_COMMON_H_
-#define NETWORK_INC_COMMON_H_
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -22,5 +21,3 @@ typedef struct {
 	std::string ip;
 	int port;
 } endpoint_t;
-
-#endif /* NETWORK_INC_COMMON_H_ */

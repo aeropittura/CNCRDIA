@@ -1,5 +1,4 @@
-#ifndef OT_NPARTYTRIPLEGENERATOR_H_
-#define OT_NPARTYTRIPLEGENERATOR_H_
+#pragma once
 
 #include "net/player.h"
 #include "ot/base_ot.h"
@@ -221,5 +220,3 @@ public:
 
     void generateTriples();
 };
-
-#endif

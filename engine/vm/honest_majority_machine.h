@@ -1,10 +1,9 @@
 /*
- * DishonestMajorityMachine.h
+ * vm/honest_majority_machine.h
  *
  */
 
-#ifndef PROCESSOR_HONESTMAJORITYMACHINE_H_
-#define PROCESSOR_HONESTMAJORITYMACHINE_H_
+#pragma once
 
 #include "vm/online_machine.h"
 
@@ -21,5 +20,3 @@ public:
     {
     }
 };
-
-#endif /* PROCESSOR_HONESTMAJORITYMACHINE_H_ */

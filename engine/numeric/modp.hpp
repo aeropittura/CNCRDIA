@@ -1,5 +1,4 @@
-#ifndef MATH_MODP_HPP_
-#define MATH_MODP_HPP_
+#pragma once
 
 #include "numeric/zp_data.h"
 #include "numeric/modp.h"
@@ -362,5 +361,3 @@ void modp_<L>::input(istream& s,const Zp_Data& ZpD,bool human)
   else
     { s.read((char*) x,ZpD.t*sizeof(mp_limb_t)); }
 }
-
-#endif

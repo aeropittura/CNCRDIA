@@ -1,5 +1,5 @@
 /*
- * semi-bin-party.cpp
+ * parties/boolean/semi-bin-party.cpp
  *
  */
 

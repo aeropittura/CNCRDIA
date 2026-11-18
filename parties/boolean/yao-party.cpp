@@ -1,5 +1,5 @@
 /*
- * yao-player.cpp
+ * parties/boolean/yao-party.cpp
  *
  */
 

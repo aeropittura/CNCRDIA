@@ -1,10 +1,9 @@
 /*
- * ShiftableTripleBuffer.h
+ * boolean/shiftable_triple_buffer.h
  *
  */
 
-#ifndef GC_SHIFTABLETRIPLEBUFFER_H_
-#define GC_SHIFTABLETRIPLEBUFFER_H_
+#pragma once
 
 #include "numeric/fixed_vec.h"
 
@@ -58,5 +57,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_SHIFTABLETRIPLEBUFFER_H_ */

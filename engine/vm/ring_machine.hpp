@@ -1,10 +1,9 @@
 /*
- * ReplicatedRingMachine.hpp
+ * vm/ring_machine.hpp
  *
  */
 
-#ifndef PROCESSOR_RINGMACHINE_HPP_
-#define PROCESSOR_RINGMACHINE_HPP_
+#pragma once
 
 #include "vm/ring_machine.h"
 #include "vm/honest_majority_machine.h"
@@ -113,5 +112,3 @@ HonestMajorityRingMachineWithSecurity<U, V>::HonestMajorityRingMachineWithSecuri
 #undef X
     ring_domain_error(R, 128);
 }
-
-#endif /* PROCESSOR_RINGMACHINE_HPP_ */

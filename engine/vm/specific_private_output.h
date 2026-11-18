@@ -1,10 +1,9 @@
 /*
- * SpecificPrivateOutput.h
+ * vm/specific_private_output.h
  *
  */
 
-#ifndef PROCESSOR_SPECIFICPRIVATEOUTPUT_H_
-#define PROCESSOR_SPECIFICPRIVATEOUTPUT_H_
+#pragma once
 
 template<class T>
 class SpecificPrivateOutput
@@ -61,5 +60,3 @@ public:
             return {};
     }
 };
-
-#endif /* PROCESSOR_SPECIFICPRIVATEOUTPUT_H_ */

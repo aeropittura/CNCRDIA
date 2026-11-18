@@ -1,10 +1,9 @@
 /*
- * AndJob.h
+ * garbled/bmr/and_job.h
  *
  */
 
-#ifndef BMR_ANDJOB_H_
-#define BMR_ANDJOB_H_
+#pragma once
 
 #include "boolean/secret.h"
 #include "garbled/bmr/register.h"
@@ -39,5 +38,3 @@ public:
 
 	int run();
 };
-
-#endif /* BMR_ANDJOB_H_ */

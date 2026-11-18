@@ -1,10 +1,9 @@
 /*
- * MaliciousShamirMC.h
+ * protocols/shamir/malicious_shamir_mc.h
  *
  */
 
-#ifndef PROTOCOLS_MALICIOUSSHAMIRMC_H_
-#define PROTOCOLS_MALICIOUSSHAMIRMC_H_
+#pragma once
 
 #include "protocols/shamir/shamir_mc.h"
 
@@ -42,5 +41,3 @@ public:
 
     typename T::open_type reconstruct(const vector<open_type>& shares);
 };
-
-#endif /* PROTOCOLS_MALICIOUSSHAMIRMC_H_ */

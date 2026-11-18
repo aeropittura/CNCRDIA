@@ -1,10 +1,9 @@
 /*
- * Rep4Share.h
+ * protocols/rep4/rep4_share2k.h
  *
  */
 
-#ifndef PROTOCOLS_REP4SHARE2K_H_
-#define PROTOCOLS_REP4SHARE2K_H_
+#pragma once
 
 #include "protocols/rep4/rep4_share.h"
 #include "vm/dummy_protocol.h"
@@ -96,5 +95,3 @@ public:
         }
     }
 };
-
-#endif /* PROTOCOLS_REP4SHARE2K_H_ */

@@ -1,10 +1,9 @@
 /*
- * memcpy.h
+ * support/avx_memcpy.h
  *
  */
 
-#ifndef TOOLS_AVX_MEMCPY_H_
-#define TOOLS_AVX_MEMCPY_H_
+#pragma once
 
 #include <string.h>
 #include <cstdint>
@@ -78,5 +77,3 @@ inline void avx_memzero(void* dest, size_t length)
 		memset((void*)d, 0, length);
 	}
 }
-
-#endif /* TOOLS_AVX_MEMCPY_H_ */

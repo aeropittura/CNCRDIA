@@ -1,10 +1,9 @@
 /*
- * Dealer.h
+ * protocols/dealer/dealer.h
  *
  */
 
-#ifndef PROTOCOLS_DEALER_H_
-#define PROTOCOLS_DEALER_H_
+#pragma once
 
 #include "protocols/common/beaver.h"
 
@@ -32,5 +31,3 @@ public:
         return vector<int>(1, this->P.num_players() - 1);
     }
 };
-
-#endif /* PROTOCOLS_DEALER_H_ */

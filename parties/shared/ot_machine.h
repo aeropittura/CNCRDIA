@@ -1,10 +1,9 @@
 /*
- * OTMachine.h
+ * parties/shared/ot_machine.h
  *
  */
 
-#ifndef OT_OTMACHINE_H_
-#define OT_OTMACHINE_H_
+#pragma once
 
 #include "ot/ot_extension.h"
 #include "support/ez_option_parser.h"
@@ -27,5 +26,3 @@ public:
     ~OTMachine();
     void run();
 };
-
-#endif /* OT_OTMACHINE_H_ */

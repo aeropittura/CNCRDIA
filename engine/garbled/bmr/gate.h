@@ -1,6 +1,5 @@
 
-#ifndef __GATE_H__
-#define __GATE_H__
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -38,5 +37,3 @@ public:
 	}
 
 };
-
-#endif

@@ -1,10 +1,9 @@
 /*
- * Rep4Prep.h
+ * boolean/rep4_prep.h
  *
  */
 
-#ifndef GC_REP4PREP_H_
-#define GC_REP4PREP_H_
+#pragma once
 
 #include "boolean/rep4_secret.h"
 #include "boolean/personal_prep.h"
@@ -24,5 +23,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_REP4PREP_H_ */

@@ -1,5 +1,4 @@
-#ifndef _P2Data
-#define _P2Data
+#pragma once
 
 /* This class defines all the data needed for representing
  * plaintexts modulo 2
@@ -51,6 +50,3 @@ class P2Data
 
   friend void init(P2Data& P2D,const Ring& Rg);
 };
-
-#endif
-

@@ -1,10 +1,9 @@
 /*
- * EvalSecret.cpp
+ * boolean/secret.hpp
  *
  */
 
-#ifndef GC_SECRET_HPP_
-#define GC_SECRET_HPP_
+#pragma once
 
 #include "boolean/secret.h"
 #include "boolean/secret_inline.h"
@@ -320,5 +319,3 @@ Secret<T> Secret<T>::mask(size_t n_bits) const
 }
 
 } /* namespace GC */
-
-#endif

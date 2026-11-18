@@ -1,10 +1,9 @@
 /*
- * Rep4Prep.hpp
+ * protocols/rep4/rep4_prep.hpp
  *
  */
 
-#ifndef PROTOCOLS_REP4PREP_HPP_
-#define PROTOCOLS_REP4PREP_HPP_
+#pragma once
 
 #include "protocols/rep4/rep4_prep.h"
 
@@ -106,5 +105,3 @@ void Rep4RingPrep<T>::buffer_bits()
         this->bits.push_back(
                 a[i].res + b[i].res - two * protocol.finalize_mul());
 }
-
-#endif /* PROTOCOLS_REP4PREP_HPP_ */

@@ -1,10 +1,9 @@
 /*
- * MaliciousCcdSecret.h
+ * boolean/malicious_ccd_secret.h
  *
  */
 
-#ifndef GC_MALICIOUSCCDSECRET_H_
-#define GC_MALICIOUSCCDSECRET_H_
+#pragma once
 
 #include "boolean/ccd_secret.h"
 #include "boolean/malicious_ccd_share.h"
@@ -65,5 +64,3 @@ public:
 };
 
 } /* namespace GC */
-
-#endif /* GC_MALICIOUSCCDSECRET_H_ */

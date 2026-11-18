@@ -1,10 +1,9 @@
 /*
- * Rectangle.h
+ * ot/rectangle.h
  *
  */
 
-#ifndef OT_RECTANGLE_H_
-#define OT_RECTANGLE_H_
+#pragma once
 
 #include "support/random.h"
 #include "support/bit_vector.h"
@@ -79,5 +78,3 @@ ostream& operator<<(ostream& o, const Rectangle<U, V>&)
 	throw not_implemented();
 	return o;
 }
-
-#endif /* OT_RECTANGLE_H_ */

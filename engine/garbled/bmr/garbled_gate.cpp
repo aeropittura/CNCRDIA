@@ -1,5 +1,5 @@
 /*
- * GarbledGate.cpp
+ * garbled/bmr/garbled_gate.cpp
  *
  */
 

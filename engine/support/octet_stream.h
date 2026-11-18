@@ -1,5 +1,4 @@
-#ifndef _octetStream
-#define _octetStream
+#pragma once
 
 
 /* This class creates a stream of data and adds stuff onto it.
@@ -637,6 +636,3 @@ void octetStream::unserialize(T* x, size_t n)
             x[i].unpack(*this);
         }
 }
-
-#endif
-

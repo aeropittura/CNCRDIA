@@ -1,10 +1,9 @@
 /*
- * DiskVector.h
+ * support/disk_vector.h
  *
  */
 
-#ifndef TOOLS_DISKVECTOR_H_
-#define TOOLS_DISKVECTOR_H_
+#pragma once
 
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/filesystem.hpp>
@@ -80,5 +79,3 @@ public:
         return data_[index];
     }
 };
-
-#endif /* TOOLS_DISKVECTOR_H_ */

@@ -1,10 +1,9 @@
 /*
- * ReplicatedMC.h
+ * protocols/replicated/replicated_mc.h
  *
  */
 
-#ifndef PROTOCOLS_REPLICATEDMC_H_
-#define PROTOCOLS_REPLICATEDMC_H_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 
@@ -44,5 +43,3 @@ public:
         return *this;
     }
 };
-
-#endif /* PROTOCOLS_REPLICATEDMC_H_ */

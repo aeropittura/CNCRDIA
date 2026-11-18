@@ -1,10 +1,9 @@
 /*
- * DealerMC.h
+ * protocols/dealer/dealer_mc.h
  *
  */
 
-#ifndef PROTOCOLS_DEALERMC_H_
-#define PROTOCOLS_DEALERMC_H_
+#pragma once
 
 #include "protocols/common/mac_check_base.h"
 #include "net/all_but_last_player.h"
@@ -39,5 +38,3 @@ class DirectDealerMC : public DealerMC<T>
 public:
     DirectDealerMC(typename T::mac_key_type = {});
 };
-
-#endif /* PROTOCOLS_DEALERMC_H_ */

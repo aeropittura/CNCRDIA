@@ -1,10 +1,9 @@
 /*
- * TimerWithComm.h
+ * support/timer_with_comm.h
  *
  */
 
-#ifndef TOOLS_TIMERWITHCOMM_H_
-#define TOOLS_TIMERWITHCOMM_H_
+#pragma once
 
 #include "support/time_func.h"
 #include "net/player.h"
@@ -37,5 +36,3 @@ public:
 
     friend ostream& operator<<(ostream& os, const TimerWithComm& stats);
 };
-
-#endif /* TOOLS_TIMERWITHCOMM_H_ */

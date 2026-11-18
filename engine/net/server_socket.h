@@ -1,10 +1,9 @@
 /*
- * ServerSocket.h
+ * net/server_socket.h
  *
  */
 
-#ifndef NETWORKING_SERVERSOCKET_H_
-#define NETWORKING_SERVERSOCKET_H_
+#pragma once
 
 #include <map>
 #include <set>
@@ -74,5 +73,3 @@ public:
 
     void remove_client(const string& client_id);
 };
-
-#endif /* NETWORKING_SERVERSOCKET_H_ */
