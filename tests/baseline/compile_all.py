@@ -104,12 +104,28 @@ def run(args):
 UNSTABLE = ('Compilation timeout reached', 'URLError', 'HTTPError')
 
 
+def legacy_modules():
+    """Old compiler module names and their new ones (mpcl/legacy.py)."""
+    path = os.path.join(REPO, 'mpcl', 'legacy.py')
+    if not os.path.exists(path):
+        return {}
+    namespace = {}
+    with open(path) as handle:
+        exec(handle.read(), namespace)
+    return namespace['MODULES']
+
+
 def normalize(results):
     """Error messages are compared without the module path of the
     exception class, which changes when modules move.  Unstable outcomes
     are reported as timeouts."""
+    renames = sorted(legacy_modules().items(), key=lambda x: -len(x[0]))
     for outcome in results.values():
         if 'message' in outcome:
+            for old, new in renames:
+                outcome['message'] = re.sub(
+                    r'(?<![\w.])' + re.escape(old) + r'(?=\.|\b)', new,
+                    outcome['message'])
             outcome['message'] = re.sub(r'^([A-Za-z_][\w]*\.)+(?=\w+:)', '',
                                         outcome['message'])
             if any(marker in outcome['message'] for marker in UNSTABLE):

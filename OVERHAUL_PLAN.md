@@ -54,7 +54,11 @@ covered.
 5. `tests/check.sh`: one command that rebuilds, recompiles, diffs hashes and
    reruns the suite. This is the gate for every later commit.
 
-## Phase 1: new layout
+## Phase 1: new layout (done)
+
+Implemented as planned, with these deviations: `Scripts/` became `launch/`
+(kept as a symlink), dev scripts live in `devtools/`, and `doc/` became
+`docs/`. See ARCHITECTURE.md for the result.
 
 ```
 engine/                 C++ runtime (was the top-level dirs)
@@ -110,7 +114,10 @@ Done by a script that runs `git mv` (keeps history), rewrites every quoted
 `.gitmodules`, CI, the Dockerfile and docs. One commit per top-level move,
 each through the gate.
 
-## Phase 2: renaming
+## Phase 2: renaming (in progress)
+
+Done: C++ file names (snake_case), `#pragma once` in all headers, file
+banners naming the new path, Python module names (`mpcl.*`).
 
 - **Python (`mpcl`)**: LibCST codemods for internal helpers, locals, private
   attributes and module names; public DSL names are kept (or aliased). Gate:
