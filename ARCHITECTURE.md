@@ -84,9 +84,39 @@ listed in `mpcl/legacy.py`.
 * Local build settings still go into `CONFIG.mine`. The defaults moved from
   `CONFIG` to `build/config.mk`.
 
+## Launchers
+
+Every protocol launcher in `launch/` (`mascot.sh`, `ring.sh`, ...) is a
+symbolic link to `launch/party.sh`, which looks up the link name in
+`launch/protocols.tsv`: the executable, the number of parties, the list it
+belongs to and extra options. Adding a protocol means adding a row and a
+link. `list-ring-protocols.sh`, `list-field-protocols.sh` and
+`list-he-protocols.sh` read the same table.
+
+## Naming
+
+C++ types are `PascalCase` with acronyms written as words (`OctetStream`,
+`MacCheck`, `Gfp`); functions and variables are `snake_case`; constants,
+enumerators, macros and namespaces keep their spelling. Abbreviations are
+spelled out (`MC` became `Opener`, `proc` became `processor`). The old
+and new spellings are in `devtools/rename/cxx-names.tsv` and, for renamed
+compiler locals, `devtools/rename/py-locals.tsv`. Each family in
+`engine/protocols/` has a README naming its main classes.
+
+## Building and tools
+
+* `make clean-objects` removes our objects and executables but keeps the
+  third-party builds; `make clean` removes both.
+* `make compdb` writes `compile_commands.json` (for clangd and the rename
+  tools in `devtools/rename/`).
+* `make check` runs the regression gate below (`STEP=build`, `compile` or
+  `run` for one part).
+* TLS works with OpenSSL 3 and 4. Certificates made by
+  `launch/setup-ssl.sh` carry the party name as subjectAltName.
+
 ## Checking that nothing changed
 
-`tests/check.sh` builds every executable, recompiles all example programs
+`tests/check.sh` (or `make check`) builds every executable, recompiles all example programs
 and compares the output byte for byte with the recorded baseline, and runs
 the tutorial on every protocol. See the top of `tests/check.sh` and
 `OVERHAUL_PLAN.md`.

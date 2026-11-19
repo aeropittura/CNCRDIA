@@ -114,35 +114,44 @@ Done by a script that runs `git mv` (keeps history), rewrites every quoted
 `.gitmodules`, CI, the Dockerfile and docs. One commit per top-level move,
 each through the gate.
 
-## Phase 2: renaming (in progress)
+## Phase 2: renaming (done)
 
-Done: C++ file names (snake_case), `#pragma once` in all headers, file
-banners naming the new path, Python module names (`mpcl.*`).
+- C++ file names in snake_case, `#pragma once`, file banners naming the
+  new path; Python module names (`mpcl.*`).
+- C++ identifiers: `devtools/rename/cxx_collect.py` scans every
+  translation unit with libclang, `cxx_plan.py` derives new names (foreign
+  API names, macros, `##`-pasted prefixes and invariant spellings frozen;
+  collisions rejected) and `cxx_apply.py` rewrites code tokens, code-like
+  names in comments and code spans in the docs. Table:
+  `devtools/rename/cxx-names.tsv`.
+- Python locals: `devtools/rename/py_locals.py` (LibCST, scope-aware) spells
+  out abbreviated function locals; parameters, module-level names, nested
+  defs and functions using `locals()`/`exec` are left alone. Table:
+  `devtools/rename/py-locals.tsv`.
+- Shell launchers: one `launch/party.sh` driven by `launch/protocols.tsv`;
+  every old script name is a link to it.
 
-- **Python (`mpcl`)**: LibCST codemods for internal helpers, locals, private
-  attributes and module names; public DSL names are kept (or aliased). Gate:
-  byte-identical compiler output.
-- **C++ file names**: consistent `snake_case` with a mapping table, applied by
-  the Phase 1 script machinery (no case-only collisions).
-- **C++ identifiers**: generate `compile_commands.json`, then use clang tooling
-  (clangd/clang-rename) for members, locals, parameters and internal helper
-  types, so renames resolve through templates rather than regex. String
-  literals in invariants stay frozen.
-- **Shell launchers**: consolidated onto one shared runner with per-protocol
-  config instead of 70 near-identical scripts (names kept).
+## Phase 3: improvements
 
-## Phase 3: real improvements
+Done:
 
-- Split very large modules (`types.py`, `library.py`, `instructions.py`,
-  `ml.py`) into cohesive submodules.
-- Python: type hints, docstrings, remove dead code and Python 2 leftovers.
-- C++: `-Wall -Wextra` clean-up, `const`/RAII/`override`, remove dead code,
-  replace macro tricks with templates where safe, document each protocol
-  family with a short README.
-- Build: Makefile fragments, a `make check` target, optional CMake later.
-- Tests: protocol coverage for families CI does not exercise.
-- Security-critical code (MAC checks, ZK proofs, OT checks, key handling) gets
-  renames and comments only, no logic rewrites.
+- `-Wall -Wextra -Werror` builds (already the default flags).
+- OpenSSL 4 support for TLS; certificates with subjectAltName.
+- Deterministic schedule files (sorted options).
+- A README per protocol family in `engine/protocols/`.
+- Build: `make check`, `make compdb`, `make clean-objects`.
+
+Not done (each needs a full run of the gate below to be safe):
+
+- Splitting `types.py`, `library.py`, `instructions.py` and `ml.py` into
+  submodules. `driver.py` exposes module-level names to programs, so a split
+  has to re-export every name and keep the `Compiler.*` aliases.
+- Type hints, docstrings, dead code and Python 2 leftovers.
+- `const`/RAII/`override` clean-ups and macro-to-template rewrites.
+- Protocol coverage for families CI does not exercise.
+
+Security-critical code (MAC checks, ZK proofs, OT checks, key handling)
+gets renames and comments only, no logic rewrites.
 
 ## Verification gate (every commit)
 

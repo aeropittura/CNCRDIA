@@ -39,7 +39,20 @@ upstream authors.
   `devtools/restructure/moved-files.txt` maps every old path to its new one.
 - The Python package `Compiler` is renamed `mpcl`. `Compiler` remains as a
   compatibility alias.
-- The build is split into `build/*.mk`.
+- The build is split into `build/*.mk`, with `clean-objects`, `compdb` and
+  `check` targets.
+- C++ identifiers are renamed to one naming scheme (PascalCase types,
+  snake_case functions and variables, abbreviations spelled out), and
+  abbreviated local variables in the compiler are spelled out. The old and
+  new names are listed in `devtools/rename/cxx-names.tsv` and
+  `devtools/rename/py-locals.tsv`.
+- The protocol launch scripts are replaced by one script driven by
+  `launch/protocols.tsv`; the script names are unchanged.
+- TLS peer checking is ported to an OpenSSL interface that also exists in
+  OpenSSL 4, and the certificate scripts add a subjectAltName.
+- The compiler writes schedule options in sorted order, so that its output
+  no longer depends on set iteration order.
+- Each protocol family in `engine/protocols/` has a short README.
 - Behaviour is checked against a baseline recorded from the unmodified
   upstream revision (`tests/`).
 

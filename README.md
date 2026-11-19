@@ -865,7 +865,7 @@ The following table shows all programs for honest-majority computation:
 | `malicious-shamir-party.x` | Shamir | Mod prime | Y | 3 or more | `mal-shamir.sh` |
 | `sy-shamir-party.x` | SPDZ-wise Shamir | Mod prime | Y | 3 or more | `sy-shamir.sh` |
 | `ccd-party.x` | CCD/Shamir | Binary | N | 3 or more | `ccd.sh` |
-| `malicious-cdd-party.x` | CCD/Shamir | Binary | Y | 3 or more | `mal-ccd.sh` |
+| `malicious-ccd-party.x` | CCD/Shamir | Binary | Y | 3 or more | `mal-ccd.sh` |
 
 We use the "generate random triple optimistically/sacrifice/Beaver"
 methodology described by [Lindell and
