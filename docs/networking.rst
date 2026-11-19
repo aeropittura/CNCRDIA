@@ -41,7 +41,7 @@ change this by either using ``--encrypted/-e`` or
 ``--unencrypted/-u``.
 
 If using encryption, the certificates (``Player-Data/*.pem``) must be
-the same on all hosts, and you have to run ``c_rehash Player-Data`` on
+the same on all hosts, and you have to run ``openssl rehash Player-Data`` (or ``c_rehash``) on
 all of them. ``launch/setup-ssl.sh`` can be used to generate the
 necessary certificates. The common name has to be ``P<player number>``
 for computing parties and ``C<client number>`` for clients.

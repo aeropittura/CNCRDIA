@@ -22,7 +22,7 @@ void ssl_error(string side, string other, string me, exception& e)
             << " have the necessary certificate (" << SSL_DIR << me
             << ".pem in the default configuration on their side and "
             << SSL_DIR << other << ".pem on ours),"
-            << " and run `c_rehash <directory>` on its location." << endl
+            << " and run `openssl rehash <directory>` (or `c_rehash`) on its location." << endl
             << "The certificates should be the same on every host. "
             << "Also make sure that it's still valid. Certificates generated "
             << "with `launch/setup-ssl.sh` expire after a month." << endl;

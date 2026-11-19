@@ -44,6 +44,26 @@ class ssl_socket : public boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
 {
     typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> parent;
 
+    /**
+     * Make certificate verification require that the peer's certificate is
+     * issued to ``name``.
+     *
+     * The check runs inside OpenSSL's verification. Certificates from
+     * ``setup-ssl.sh`` before it added a subject alternative name carry the
+     * party name only as the common name; OpenSSL 4 ignores the common name
+     * unless told otherwise, so it is requested explicitly there.
+     */
+    void expect_peer(const string& name)
+    {
+        X509_VERIFY_PARAM* param = SSL_get0_param(native_handle());
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_MAJOR >= 4
+        X509_VERIFY_PARAM_set_hostflags(param,
+                X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT);
+#endif
+        if (X509_VERIFY_PARAM_set1_host(param, name.c_str(), name.size()) != 1)
+            throw runtime_error("cannot set expected TLS peer " + name);
+    }
+
 public:
     ssl_socket(ssl_service& io_service,
             boost::asio::ssl::context& ctx, int plaintext_socket, string other,
@@ -56,7 +76,7 @@ public:
 #endif
         lowest_layer().assign(boost::asio::ip::tcp::v4(), plaintext_socket);
         set_verify_mode(boost::asio::ssl::verify_peer);
-        set_verify_callback(boost::asio::ssl::host_name_verification(other));
+        expect_peer(other);
         if (client)
             try
             {

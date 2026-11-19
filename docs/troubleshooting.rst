@@ -215,7 +215,7 @@ together.  The easiest way of setting this up is to run
 ``Player-Data/*.{pem,key}`` to all other hosts. This is *not* secure
 but it suffices for experiments. A secure setup would generate every
 key pair locally and then distributed only the public keys.  Finally,
-run ``c_rehash Player-Data`` on all hosts. The certificates generated
+run ``openssl rehash Player-Data`` (or ``c_rehash``) on all hosts. The certificates generated
 by ``launch/setup-ssl.sh`` expire after a month, so you need to
 regenerate them. The same holds for ``launch/setup-client.sh`` if you
 use the client facility.

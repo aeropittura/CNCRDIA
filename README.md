@@ -920,8 +920,8 @@ The programs expect the keys and certificates to be in
 `SSL_DIR/P<i>.key` and `SSL_DIR/P<i>.pem`, respectively, and
 the certificates to have the common name `P<i>` for player
 `<i>`. Furthermore, the relevant root certificates have to be in
-`SSL_DIR` such that OpenSSL can find them (run `c_rehash
-<ssl_dir>`). The script above takes care of all this by generating
+`SSL_DIR` such that OpenSSL can find them (run `openssl rehash
+<ssl_dir>`, or `c_rehash <ssl_dir>` with older OpenSSL). The script above takes care of all this by generating
 self-signed certificates. Therefore, if you are running the programs
 on different hosts you will need to copy the certificate files.
 Note that `<ssl_dir>` must match `SSL_DIR` set in `CONFIG.mine` (default in `build/config.mk`).
