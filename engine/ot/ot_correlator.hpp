@@ -12,87 +12,87 @@
 #include "ot/bit_matrix.hpp"
 
 template <class U>
-void OTCorrelator<U>::resize(int nOTs)
+void OtCorrelator<U>::resize(int n_ots)
 {
-    t1.resize_vertical(nOTs);
-    u.resize_vertical(nOTs);
-    senderOutputMatrices.resize(2);
+    t1.resize_vertical(n_ots);
+    u.resize_vertical(n_ots);
+    sender_output_matrices.resize(2);
     for (int i = 0; i < 2; i++)
-        senderOutputMatrices[i].resize_vertical(nOTs);
-    receiverOutputMatrix.resize_vertical(nOTs);
+        sender_output_matrices[i].resize_vertical(n_ots);
+    receiver_output_matrix.resize_vertical(n_ots);
 }
 
 template <class U>
-void OTCorrelator<U>::expand(int start, int slice)
+void OtCorrelator<U>::expand(int start, int slice)
 {
     (void)start, (void)slice;
-    Slice<U> receiverOutputSlice(receiverOutputMatrix, start, slice);
-    Slice<U> senderOutputSlices[2] = {
-            Slice<U>(senderOutputMatrices[0], start, slice),
-            Slice<U>(senderOutputMatrices[1], start, slice)
+    Slice<U> receiver_output_slice(receiver_output_matrix, start, slice);
+    Slice<U> sender_output_slices[2] = {
+            Slice<U>(sender_output_matrices[0], start, slice),
+            Slice<U>(sender_output_matrices[1], start, slice)
     };
-    Slice<U> t1Slice(t1, start, slice);
+    Slice<U> t1_slice(t1, start, slice);
 
     // expand with PRG
     if (ot_role & RECEIVER)
     {
-        for (int i = 0; i < nbaseOTs; i++)
+        for (int i = 0; i < nbase_ots; i++)
         {
-            receiverOutputSlice.randomize(i, G_sender[i][0]);
-            t1Slice.randomize(i, G_sender[i][1]);
+            receiver_output_slice.randomize(i, g_sender[i][0]);
+            t1_slice.randomize(i, g_sender[i][1]);
         }
     }
 
     if (ot_role & SENDER)
     {
-        for (int i = 0; i < nbaseOTs; i++)
+        for (int i = 0; i < nbase_ots; i++)
             // randomize base receiver output
-            senderOutputSlices[0].randomize(i, G_receiver[i]);
+            sender_output_slices[0].randomize(i, g_receiver[i]);
     }
 }
 
 template <class U>
-void OTCorrelator<U>::setup_for_correlation(BitVector& baseReceiverInput,
-        vector<U>& baseSenderOutputs,
-        U& baseReceiverOutput)
+void OtCorrelator<U>::setup_for_correlation(BitVector& base_receiver_input,
+        vector<U>& base_sender_outputs,
+        U& base_receiver_output)
 {
-    this->baseReceiverInput = baseReceiverInput;
-    receiverOutputMatrix = baseSenderOutputs[0];
-    t1 = baseSenderOutputs[1];
+    this->base_receiver_input = base_receiver_input;
+    receiver_output_matrix = base_sender_outputs[0];
+    t1 = base_sender_outputs[1];
     u.squares.resize(t1.squares.size());
-    senderOutputMatrices.resize(2);
-    senderOutputMatrices[0] = baseReceiverOutput;
+    sender_output_matrices.resize(2);
+    sender_output_matrices[0] = base_receiver_output;
 }
 
 template <class U>
-void OTCorrelator<U>::correlate(int start, int slice,
-        BitVector& newReceiverInput, bool useConstantBase, int repeat)
+void OtCorrelator<U>::correlate(int start, int slice,
+        BitVector& new_receiver_input, bool use_constant_base, int repeat)
 {
     CODE_LOCATION
-    vector<octetStream> os(2);
+    vector<OctetStream> os(2);
 
-    Slice<U> receiverOutputSlice(receiverOutputMatrix, start, slice);
-    Slice<U> senderOutputSlices[] = {
-            Slice<U>(senderOutputMatrices[0], start, slice),
+    Slice<U> receiver_output_slice(receiver_output_matrix, start, slice);
+    Slice<U> sender_output_slices[] = {
+            Slice<U>(sender_output_matrices[0], start, slice),
     };
-    Slice<U> t1Slice(t1, start, slice);
-    Slice<U> uSlice(u, start, slice);
+    Slice<U> t1_slice(t1, start, slice);
+    Slice<U> u_slice(u, start, slice);
 
     if (OnlineOptions::singleton.has_option("verbose_correlate"))
         fprintf(stderr, "correlate %d matrices of size %d*%d, %zu bits\n", slice,
                 int(U::PartType::n_rows()), int(U::PartType::n_columns()),
-                newReceiverInput.size());
+                new_receiver_input.size());
 
     // create correlation
     if (ot_role & RECEIVER)
     {
-        t1Slice.rsub(receiverOutputSlice);
-        t1Slice.sub(newReceiverInput, repeat);
-        t1Slice.pack(os[0]);
+        t1_slice.rsub(receiver_output_slice);
+        t1_slice.sub(new_receiver_input, repeat);
+        t1_slice.pack(os[0]);
 
-//        t1 = receiverOutputMatrix;
-//        t1 ^= newReceiverInput;
-//        receiverOutputMatrix.print_side_by_side(t1);
+//        t1 = receiver_output_matrix;
+//        t1 ^= new_receiver_input;
+//        receiver_output_matrix.print_side_by_side(t1);
     }
 #ifdef OTEXT_TIMER
     timeval commst1, commst2;
@@ -105,8 +105,8 @@ void OTCorrelator<U>::correlate(int start, int slice,
     if (ot_role & SENDER)
     {
         // u = t0 + t1 + x
-        uSlice.unpack(os[1]);
-        senderOutputSlices[0].conditional_add(baseReceiverInput, u, !useConstantBase);
+        u_slice.unpack(os[1]);
+        sender_output_slices[0].conditional_add(base_receiver_input, u, !use_constant_base);
     }
 #ifdef OTEXT_TIMER
     gettimeofday(&commst2, NULL);
@@ -117,20 +117,20 @@ void OTCorrelator<U>::correlate(int start, int slice,
 }
 
 template<class U>
-void OTCorrelator<U>::expand_correlate_unchecked(const BitVector& delta, int n_bits)
+void OtCorrelator<U>::expand_correlate_unchecked(const BitVector& delta, int n_bits)
 {
     if (n_bits < 0)
         n_bits = delta.size();
     resize(n_bits);
-    int slice = receiverOutputMatrix.squares.size();
+    int slice = receiver_output_matrix.squares.size();
     expand(0, slice);
     BitVector tmp = delta;
-    tmp.resize_zero(receiverOutputMatrix.vertical_size());
+    tmp.resize_zero(receiver_output_matrix.vertical_size());
     correlate(0, slice, tmp, true);
 }
 
 template <class V>
-void OTExtensionWithMatrix::hash_outputs(int nOTs, vector<V>& senderOutput,
+void OtExtensionWithMatrix::hash_outputs(int n_ots, vector<V>& senderOutput,
         V& receiverOutput, bool correlated)
 {
     //cout << "Hashing... " << flush;
@@ -141,15 +141,15 @@ void OTExtensionWithMatrix::hash_outputs(int nOTs, vector<V>& senderOutput,
 #endif
 
     int n_rows = V::PartType::n_rows_allocated();
-    int n = (nOTs + n_rows - 1) / n_rows * V::PartType::n_rows();
+    int n = (n_ots + n_rows - 1) / n_rows * V::PartType::n_rows();
     for (int i = 0; i < 2; i++)
         senderOutput[i].resize_vertical(n);
     receiverOutput.resize_vertical(n);
 
-    if (nOTs % 8 != 0)
+    if (n_ots % 8 != 0)
         throw runtime_error("number of OTs must be divisible by 8");
 
-    for (int i = 0; i < nOTs; i += 8)
+    for (int i = 0; i < n_ots; i += 8)
     {
         int i_outer_input = i / 128;
         int i_inner_input = i % 128;
@@ -157,26 +157,26 @@ void OTExtensionWithMatrix::hash_outputs(int nOTs, vector<V>& senderOutput,
         int i_inner_output = i % n_rows;
         if (ot_role & SENDER)
         {
-            int128 tmp[2][8];
+            Int128 tmp[2][8];
             for (int j = 0; j < 8; j++)
             {
-                tmp[0][j] = senderOutputMatrices[0].squares[i_outer_input].rows[i_inner_input + j];
+                tmp[0][j] = sender_output_matrices[0].squares[i_outer_input].rows[i_inner_input + j];
                 if (correlated)
-                    tmp[1][j] = tmp[0][j] ^ baseReceiverInput.get_int128(0);
+                    tmp[1][j] = tmp[0][j] ^ base_receiver_input.get_int128(0);
                 else
                     tmp[1][j] =
-                            senderOutputMatrices[1].squares[i_outer_input].rows[i_inner_input + j];
+                            sender_output_matrices[1].squares[i_outer_input].rows[i_inner_input + j];
             }
             for (int j = 0; j < 2; j++)
-                mmo.hashEightBlocks(
+                mmo.hash_eight_blocks(
                         &senderOutput[j].squares[i_outer_output].rows[i_inner_output],
                         &tmp[j]);
         }
         if (ot_role & RECEIVER)
         {
-            mmo.hashEightBlocks(
+            mmo.hash_eight_blocks(
                     &receiverOutput.squares[i_outer_output].rows[i_inner_output],
-                    &receiverOutputMatrix.squares[i_outer_input].rows[i_inner_input]);
+                    &receiver_output_matrix.squares[i_outer_input].rows[i_inner_input]);
         }
     }
     //cout << "done.\n";
@@ -190,46 +190,46 @@ void OTExtensionWithMatrix::hash_outputs(int nOTs, vector<V>& senderOutput,
 
 template <class U>
 template <class T>
-void OTCorrelator<U>::reduce_squares(unsigned int nTriples, vector<T>& output, int start)
+void OtCorrelator<U>::reduce_squares(unsigned int nTriples, vector<T>& output, int start)
 {
-    if (receiverOutputMatrix.squares.size() < nTriples + start)
-        throw invalid_length("reduce_squares");
+    if (receiver_output_matrix.squares.size() < nTriples + start)
+        throw InvalidLength("reduce_squares");
     output.resize(nTriples);
     for (unsigned int j = 0; j < nTriples; j++)
     {
 #ifdef DEBUG_MASCOT
         T a, b;
-        receiverOutputMatrix.squares[j + start].to(a);
-        senderOutputMatrices[0].squares[j + start].to(b);
+        receiver_output_matrix.squares[j + start].to(a);
+        sender_output_matrices[0].squares[j + start].to(b);
 #endif
 
-        receiverOutputMatrix.squares[j + start].sub(
-                senderOutputMatrices[0].squares[j + start]).to(output[j]);
+        receiver_output_matrix.squares[j + start].sub(
+                sender_output_matrices[0].squares[j + start]).to(output[j]);
 
 #ifdef DEBUG_MASCOT
         cout << output[j] << " ?= " << a <<  " - " << b << endl;
-        cout << "first row " << receiverOutputMatrix.squares[j + start].rows[0] << endl;
+        cout << "first row " << receiver_output_matrix.squares[j + start].rows[0] << endl;
         assert(output[j] == a - b);
 #endif
     }
 }
 
 template <class U>
-void OTCorrelator<U>::common_seed(PRNG& G)
+void OtCorrelator<U>::common_seed(PRNG& G)
 {
-    Slice<U> t1Slice(t1, 0, t1.squares.size());
-    Slice<U> uSlice(u, 0, u.squares.size());
+    Slice<U> t1_slice(t1, 0, t1.squares.size());
+    Slice<U> u_slice(u, 0, u.squares.size());
 
-    octetStream os;
+    OctetStream os;
     if (player->my_num())
     {
-        t1Slice.pack(os);
-        uSlice.pack(os);
+        t1_slice.pack(os);
+        u_slice.pack(os);
     }
     else
     {
-        uSlice.pack(os);
-        t1Slice.pack(os);
+        u_slice.pack(os);
+        t1_slice.pack(os);
     }
     auto hash = os.hash();
     G = PRNG(hash);

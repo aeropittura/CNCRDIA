@@ -12,7 +12,7 @@
 #include "protocols/replicated/rep3_share2k.h"
 
 template<class T> class Astra;
-template<class T> class AstraMC;
+template<class T> class AstraOpener;
 template<class T> class AstraPrepProtocol;
 template<class T> class AstraInput;
 template<class T> class AstraPrepInput;
@@ -27,21 +27,21 @@ template<class T> class AstraSecret;
 template<class T>
 class AstraShare : public ShareInterface, public FixedVec<T, 2>
 {
-    typedef FixedVec<T, 2> super;
+    typedef FixedVec<T, 2> Super;
     typedef AstraShare This;
 
 public:
-    typedef This share_type;
+    typedef This ShareType;
 
     // type for clear values in relevant domain
     typedef T clear;
-    typedef clear open_type;
+    typedef clear OpenType;
 
-    typedef GC::AstraSecret<AstraShare<BitVec>> bit_type;
+    typedef GC::AstraSecret<AstraShare<BitVec>> BitType;
 
     // opening facility
-    typedef AstraMC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef AstraOpener<This> MacCheck;
+    typedef MacCheck DirectOpener;
 
     // multiplication protocol
     typedef Astra<This> Protocol;
@@ -56,11 +56,11 @@ public:
     typedef ::PrivateOutput<This> PrivateOutput;
 
     template<class U>
-    using mc_template = AstraMC<U>;
+    using OpenerTemplate = AstraOpener<U>;
     template<class U>
-    using protocol_template = Astra<U>;
+    using ProtocolTemplate = Astra<U>;
     template<class U>
-    using input_template = AstraInput<U>;
+    using InputTemplate = AstraInput<U>;
 
     // indicate whether protocol allows dishonest majority and variable players
     static const bool dishonest_majority = true;
@@ -88,14 +88,14 @@ public:
     }
 
     // serialize computation domain for client communication
-    static void specification(octetStream& os)
+    static void specification(OctetStream& os)
     {
         T::specification(os);
     }
 
     // constant secret sharing
     static This constant(const clear& value, int my_num = -1,
-            const mac_key_type& = {})
+            const MacKeyType& = {})
     {
         This res;
         res.m(my_num + 1) = value;
@@ -107,7 +107,7 @@ public:
     }
     template<class U>
     AstraShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 
@@ -156,11 +156,11 @@ public:
     T local_mul_P2(const This& other) const;
 
     template<class U, int MY_NUM>
-    static void pre_reduced_mul(U& a, U& b, U& c, Astra<U>& protocol,
+    static void pre_reduced_mult(U& a, U& b, U& c, Astra<U>& protocol,
             const T& aa, const T& bb);
 
     template<class U, int MY_NUM>
-    static pair<U, clear> post_reduced_mul(typename U::Protocol & protocol);
+    static pair<U, clear> post_reduced_mult(typename U::Protocol & protocol);
 
     template<class U, int MY_NUM>
     static void pre_input0(const clear&, typename U::Protocol&)
@@ -170,19 +170,19 @@ public:
     template<class U, int MY_NUM>
     static This post_input0(typename U::Protocol& protocol);
 
-    void pack(octetStream& os, T) const
+    void pack(OctetStream& os, T) const
     {
-        super::pack(os);
+        Super::pack(os);
     }
-    void pack(octetStream& os, bool full = true) const
+    void pack(OctetStream& os, bool full = true) const
     {
         assert(full);
-        super::pack(os);
+        Super::pack(os);
     }
-    void unpack(octetStream& os, bool full = true)
+    void unpack(OctetStream& os, bool full = true)
     {
         assert(full);
-        super::unpack(os);
+        Super::unpack(os);
     }
 
     static int split_index(int arithmetic_index, int my_num)
@@ -238,7 +238,7 @@ public:
         assert(regs.size() / n_bits == 2);
         int unit = U::default_length;
         assert(n_bits <= unit);
-        octetStream os;
+        OctetStream os;
         protocol.read(os);
         int my_num = protocol.P.my_num();
         int n_blocks = DIV_CEIL(n_inputs, unit);
@@ -254,16 +254,16 @@ public:
             for (auto& it : iterators[0])
                 os.get_no_check(*it++);
             int m = min(unit, n_inputs - start);
-            square64 square;
+            Square64 square;
             for (int j = 0; j < m; j++)
                 square.rows[j] = Integer(source[j + start].for_split(0)).get();
             square.transpose(m, n_bits);
             for (int j = 0; j < n_bits; j++)
             {
-                auto& dest_reg = *iterators[1][j]++;
-                dest_reg.m(my_num) = square.rows[j];
-                dest_reg.neg_lambda(my_num) = {};
-                dest_reg = U::from_rep3(dest_reg);
+                auto& destination_reg = *iterators[1][j]++;
+                destination_reg.m(my_num) = square.rows[j];
+                destination_reg.neg_lambda(my_num) = {};
+                destination_reg = U::from_rep3(destination_reg);
             }
 
         }
@@ -274,8 +274,8 @@ public:
     {
         for (int i = 0; i < inst.get_size(); i++)
         {
-            auto& dest = proc.get_S_ref(inst.get_r(0) + i);
-            auto& source = proc.get_S_ref(inst.get_r(1) + i);
+            auto& dest = proc.get_s_ref(inst.get_r(0) + i);
+            auto& source = proc.get_s_ref(inst.get_r(1) + i);
             dest = source >> inst.get_n();
         }
     }
@@ -285,16 +285,16 @@ template<class T>
 class AstraPrepShare : public AstraShare<T>
 {
     typedef AstraPrepShare This;
-    typedef AstraShare<T> super;
+    typedef AstraShare<T> Super;
 
 public:
     typedef T clear;
 
-    typedef GC::AstraSecret<AstraPrepShare<BitVec>> bit_type;
+    typedef GC::AstraSecret<AstraPrepShare<BitVec>> BitType;
 
     // opening facility
-    typedef ReplicatedMC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef ReplicatedOpener<This> MacCheck;
+    typedef MacCheck DirectOpener;
 
     // multiplication protocol
     typedef AstraPrepProtocol<This> Protocol;
@@ -309,11 +309,11 @@ public:
     typedef ::PrivateOutput<This> PrivateOutput;
 
     template<class U>
-    using mc_template = ReplicatedMC<U>;
+    using OpenerTemplate = ReplicatedOpener<U>;
     template<class U>
-    using protocol_template = AstraPrepProtocol<U>;
+    using ProtocolTemplate = AstraPrepProtocol<U>;
     template<class U>
-    using input_template = AstraPrepInput<U>;
+    using InputTemplate = AstraPrepInput<U>;
 
     static bool real_shares(const Player&)
     {
@@ -321,8 +321,8 @@ public:
     }
 
     // constant secret sharing
-    static This constant(const typename super::clear&, int = -1,
-            const typename super::mac_key_type& = {})
+    static This constant(const typename Super::clear&, int = -1,
+            const typename Super::MacKeyType& = {})
     {
         return {};
     }
@@ -332,32 +332,32 @@ public:
     }
     template<class U>
     AstraPrepShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 
     T& m(int my_num)
     {
         assert(my_num > 0);
-        return super::m(my_num);
+        return Super::m(my_num);
     }
 
     const T& m(int my_num) const
     {
         assert(my_num > 0);
-        return super::m(my_num);
+        return Super::m(my_num);
     }
 
     T& neg_lambda(int my_num)
     {
 //        assert(my_num > 0);
-        return super::neg_lambda(my_num);
+        return Super::neg_lambda(my_num);
     }
 
     const T& neg_lambda(int my_num) const
     {
         assert(my_num > 0);
-        return super::neg_lambda(my_num);
+        return Super::neg_lambda(my_num);
     }
 
     T lambda(int my_num)
@@ -376,13 +376,13 @@ public:
     T local_mul_P2(const AstraPrepShare& other) const;
 
     template<class U, int MY_NUM>
-    static void pre_reduced_mul(U& a, U& b, U& c, AstraPrepProtocol<U>& protocol,
+    static void pre_reduced_mult(U& a, U& b, U& c, AstraPrepProtocol<U>& protocol,
             const T& aa, const T& bb);
 
     template<class U, int MY_NUM>
-    static pair<U, typename super::clear> post_reduced_mul(typename U::Protocol&)
+    static pair<U, typename Super::clear> post_reduced_mult(typename U::Protocol&)
     {
-        return pair<U, typename super::clear>();
+        return pair<U, typename Super::clear>();
     }
 
     template<class U, int MY_NUM>
@@ -395,7 +395,7 @@ public:
     {
         unsigned res;
         if (my_num > 0)
-            res = super::split_index(arithmetic_index, my_num - 1);
+            res = Super::split_index(arithmetic_index, my_num - 1);
         else
             res = (arithmetic_index + 1) % 3;
         assert(res < 3);
@@ -419,7 +419,7 @@ public:
 
         int unit = U::default_length;
         vector<typename StackedVector<U>::iterator> iterators;
-        octetStream os;
+        OctetStream os;
         int n_blocks = DIV_CEIL(n_inputs, unit);
         os.reserve<U>(n_bits * n_blocks);
         for (int j = 0; j < n_bits; j++)

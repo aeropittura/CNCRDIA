@@ -21,14 +21,14 @@ Rep4<T>::Rep4(Player& P) :
         {
             vector<bool> parties(4, true);
             parties[i] = false;
-            rep_prngs.at(P.get_offset(i) - 1).SeedGlobally(P, parties);
+            rep_prngs.at(P.get_offset(i) - 1).seed_globally(P, parties);
         }
 
     malicious = not OnlineOptions::singleton.semi_honest;
 }
 
 template<class T>
-Rep4<T>::Rep4(Player& P, prngs_type& prngs) :
+Rep4<T>::Rep4(Player& P, PrngsType& prngs) :
         my_num(P.my_num()), P(P)
 {
     for (int i = 0; i < 3; i++)
@@ -73,7 +73,7 @@ Rep4<T> Rep4<T>::branch()
 }
 
 template<class T>
-void Rep4<T>::init_mul()
+void Rep4<T>::initialize_mult()
 {
     for (auto& x : add_shares)
         x.clear();
@@ -100,14 +100,14 @@ void Rep4<T>::reset_joint_input(int n_inputs)
 
 template<class T>
 void Rep4<T>::prepare_joint_input(int sender, int backup, int receiver,
-        int outsider, vector<open_type>& inputs)
+        int outsider, vector<OpenType>& inputs)
 {
     prepare_joint_input(sender, backup, receiver, outsider, inputs, results);
 }
 
 template<class T>
 void Rep4<T>::prepare_joint_input(int sender, int backup, int receiver,
-        int outsider, vector<open_type>& inputs, vector<ResTuple>& results)
+        int outsider, vector<OpenType>& inputs, vector<ResultTuple>& results)
 {
     channels[sender][receiver] = true;
     channels[backup][receiver] = true;
@@ -153,7 +153,7 @@ void Rep4<T>::prepare_joint_input(int sender, int backup, int receiver,
                 inputs[i].pack(send_os[get_player(-1)], bit_lengths[i]);
             break;
         default:
-            throw not_implemented();
+            throw NotImplemented();
         }
     }
 
@@ -170,14 +170,14 @@ void Rep4<T>::finalize_joint_input(int sender, int backup, int receiver,
 
 template<class T>
 void Rep4<T>::finalize_joint_input(int sender, int backup, int receiver,
-        int, vector<ResTuple>& results)
+        int, vector<ResultTuple>& results)
 {
     if (P.my_num() == receiver)
     {
         assert(results.size() == bit_lengths.size());
         T res;
         size_t n_results = results.size();
-        octetStream* os;
+        OctetStream* os;
         int index;
         switch (P.get_offset(backup))
         {
@@ -191,7 +191,7 @@ void Rep4<T>::finalize_joint_input(int sender, int backup, int receiver,
             break;
         }
 
-        auto start = os->get_data_ptr();
+        auto start = os->get_data_pointer();
         for (size_t i = 0; i < n_results; i++)
         {
             auto& x = results[i];
@@ -203,7 +203,7 @@ void Rep4<T>::finalize_joint_input(int sender, int backup, int receiver,
 
         if (malicious)
             receive_hashes[sender][backup].update(start,
-                    os->get_data_ptr() - start);
+                    os->get_data_pointer() - start);
     }
 }
 
@@ -223,9 +223,9 @@ void Rep4<T>::prepare_mul(const T& x, const T& y, int n_bits)
 }
 
 template<class T>
-array<typename T::open_type, 5> Rep4<T>::get_addshares(const T& x, const T& y)
+array<typename T::OpenType, 5> Rep4<T>::get_addshares(const T& x, const T& y)
 {
-    array<open_type, 5> res;
+    array<OpenType, 5> res;
     for (int i = 0; i < 2; i++)
         res[get_player(i - 1)] =
                 (x[i] + x[i + 1]) * y[i] + x[i] * y[i + 1];
@@ -234,9 +234,9 @@ array<typename T::open_type, 5> Rep4<T>::get_addshares(const T& x, const T& y)
 }
 
 template<class T>
-void Rep4<T>::init_dotprod()
+void Rep4<T>::initialize_dotprod()
 {
-    init_mul();
+    initialize_mult();
     dotprod_shares = {};
 }
 
@@ -284,7 +284,7 @@ void Rep4<T>::exchange()
 template<class T>
 T Rep4<T>::finalize_mul(int n_bits)
 {
-    this->add_mul(n_bits);
+    this->add_mult(n_bits);
     if (n_bits == -1)
         return results.next().res;
     else
@@ -315,16 +315,16 @@ template<class T>
 void Rep4<T>::must_check()
 {
     CODE_LOCATION
-    octetStreams to_send(P);
+    OctetStreams to_send(P);
     append_hashes(to_send);
 
-    octetStreams to_receive;
+    OctetStreams to_receive;
     P.send_receive_all(to_send, to_receive);
     check_hashes(to_receive);
 }
 
 template<class T>
-void Rep4<T>::append_hashes(octetStreams& to_send)
+void Rep4<T>::append_hashes(OctetStreams& to_send)
 {
     for (int i = 1; i < 4; i++)
         for (int j = 0; j < 4; j++)
@@ -341,7 +341,7 @@ void Rep4<T>::append_hashes(octetStreams& to_send)
 }
 
 template<class T>
-void Rep4<T>::check_hashes(octetStreams& to_receive)
+void Rep4<T>::check_hashes(OctetStreams& to_receive)
 {
     for (int i = 1; i < 4; i++)
         for (int j = 0; j < 4; j++)
@@ -388,9 +388,9 @@ void Rep4<T>::trunc_pr(const ArgVector& regs, int size,
     CODE_LOCATION
     assert(regs.size() % 4 == 0);
     this->trunc_pr_counter += size * regs.size() / 4;
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
 
-    vector<TruncPrTupleWithGap<open_type>> infos;
+    vector<TruncPrTupleWithGap<OpenType>> infos;
     for (size_t i = 0; i < regs.size(); i += 4)
         infos.push_back({regs, i});
 
@@ -409,15 +409,15 @@ void Rep4<T>::trunc_pr(const ArgVector& regs, int size,
     {
         for (int j = 0; j < size; j++)
         {
-            auto c = proc.get_S_ref(info.source_base + j) + rs.next();
+            auto c = proc.get_s_ref(info.source_base + j) + rs.next();
             if (info.small_gap())
                 c += T::constant(info.add_before(), my_num);
             cs.push_back(c);
         }
     }
 
-    octetStream c_os;
-    vector<open_type> eval_inputs;
+    OctetStream c_os;
+    vector<OpenType> eval_inputs;
     if (P.my_num() < 2)
     {
         if (P.my_num() == 0)
@@ -437,19 +437,19 @@ void Rep4<T>::trunc_pr(const ArgVector& regs, int size,
 
         if (malicious)
         {
-            octetStream hash;
+            OctetStream hash;
             P.receive_player(3 - P.my_num(), hash);
             if (hash != c_os.hash())
                 throw runtime_error("hash mismatch in joint message passing");
         }
 
-        PointerVector<open_type> open_cs;
+        PointerVector<OpenType> open_cs;
         if (P.my_num() == 2)
             for (auto& c : cs)
-                open_cs.push_back(c_os.get<open_type>() + c[1] + c[2]);
+                open_cs.push_back(c_os.get<OpenType>() + c[1] + c[2]);
         else
             for (auto& c : cs)
-                open_cs.push_back(c_os.get<open_type>() + c[1] + c[0]);
+                open_cs.push_back(c_os.get<OpenType>() + c[1] + c[0]);
         for (auto& info : infos)
             for (int j = 0; j < size; j++)
             {
@@ -464,7 +464,7 @@ void Rep4<T>::trunc_pr(const ArgVector& regs, int size,
             }
     }
 
-    PointerVector<open_type> inputs;
+    PointerVector<OpenType> inputs;
     bool generate = proc.P.my_num() < 2;
     if (generate)
     {
@@ -480,11 +480,11 @@ void Rep4<T>::trunc_pr(const ArgVector& regs, int size,
             }
     }
 
-    init_mul();
+    initialize_mult();
     size_t n_inputs = max(inputs.size(), eval_inputs.size());
     reset_joint_input(n_inputs);
-    PointerVector<ResTuple> gen_results(n_inputs);
-    PointerVector<ResTuple> eval_results(n_inputs);
+    PointerVector<ResultTuple> gen_results(n_inputs);
+    PointerVector<ResultTuple> eval_results(n_inputs);
     prepare_joint_input(0, 1, 3, 2, inputs, gen_results);
     prepare_joint_input(2, 3, 1, 0, eval_inputs, eval_results);
     append_hashes(send_os);
@@ -493,7 +493,7 @@ void Rep4<T>::trunc_pr(const ArgVector& regs, int size,
     finalize_joint_input(2, 3, 1, 0, eval_results);
     check_hashes(receive_os);
 
-    init_mul();
+    initialize_mult();
     for (auto& info : infos)
         for (int j = 0; j < size; j++)
         {
@@ -513,13 +513,13 @@ void Rep4<T>::trunc_pr(const ArgVector& regs, int size,
         for (int j = 0; j < size; j++)
         {
             if (info.big_gap())
-                proc.get_S_ref(info.dest_base + j) = eval_results.next().res
+                proc.get_s_ref(info.destination_base + j) = eval_results.next().res
                         - gen_results.next().res;
             else
             {
                 auto b = gen_results.next().res + eval_results.next().res
                         - 2 * finalize_mul();
-                proc.get_S_ref(info.dest_base + j) = eval_results.next().res
+                proc.get_s_ref(info.destination_base + j) = eval_results.next().res
                         - gen_results.next().res + (b << (info.k - info.m))
                         - T::constant(info.subtract_after(), P.my_num());
             }
@@ -555,14 +555,14 @@ void Rep4<T>::split(StackedVector<T>& dest, const ArgVector& regs, int n_bits,
     }
 
     vector<BitVec> to_share;
-    init_mul();
+    initialize_mult();
 
     for (int k = 0; k < DIV_CEIL(n_inputs, unit); k++)
     {
         int start = k * unit;
         int m = min(unit, n_inputs - start);
 
-        square64 square;
+        Square64 square;
 
         for (int j = 0; j < m; j++)
         {
@@ -580,7 +580,7 @@ void Rep4<T>::split(StackedVector<T>& dest, const ArgVector& regs, int n_bits,
         }
     }
 
-    array<PointerVector<ResTuple>, 2> results;
+    array<PointerVector<ResultTuple>, 2> results;
     for (auto& x : results)
         x.resize(to_share.size());
     prepare_joint_input(0, 1, 3, 2, to_share, results[0]);

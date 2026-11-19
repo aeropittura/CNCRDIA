@@ -249,9 +249,9 @@ void ThreadQueues::wrap_up(ThreadJob job, vector<int>& available)
     }
 }
 
-TimerWithComm ThreadQueues::sum(const string& phase)
+TimerWithCommunication ThreadQueues::sum(const string& phase)
 {
-    TimerWithComm res;
+    TimerWithCommunication res;
     for (auto& x : *this)
         res += x->timers[phase];
     return res;
@@ -282,19 +282,19 @@ void ThreadQueues::print_breakdown()
     }
 }
 
-ThreadStats ThreadQueues::total_stats()
+ThreadStatistics ThreadQueues::total_statistics()
 {
-    ThreadStats res;
+    ThreadStatistics res;
     for (auto& queue : *this)
-      res += queue->get_stats();
+      res += queue->get_statistics();
     return res;
 }
 
-NamedCommStats ThreadQueues::max_comm()
+NamedCommunicationStatistics ThreadQueues::max_communication()
 {
-    NamedCommStats max;
+    NamedCommunicationStatistics max;
     if (size() > 2)
         for (auto& queue : *this)
-            max.imax(queue->get_comm_stats());
+            max.imax(queue->get_communication_statistics());
     return max;
 }

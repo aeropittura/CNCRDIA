@@ -10,20 +10,20 @@
 template<class T>
 class TrioInput : public AstraInput<T>
 {
-    typedef AstraInput<T> super;
+    typedef AstraInput<T> Super;
 
 public:
-    TrioInput(SubProcessor<T>& proc, MAC_Check_Base<T>& MC) :
-            super(proc, MC)
+    TrioInput(SubProcessor<T>& proc, MacCheckBase<T>& MC) :
+            Super(proc, MC)
     {
     }
     TrioInput(SubProcessor<T>* proc, Player& P) :
-            super(proc, P)
+            Super(proc, P)
     {
     }
-    TrioInput(MAC_Check_Base<T>& MC, Preprocessing<T>& prep, Player& P,
+    TrioInput(MacCheckBase<T>& MC, Preprocessing<T>& prep, Player& P,
             Trio<T>* protocol) :
-            super(MC, prep, P, protocol)
+            Super(MC, prep, P, protocol)
     {
     }
 

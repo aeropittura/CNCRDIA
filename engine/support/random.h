@@ -47,21 +47,21 @@ class PRNG
    static const int N_CACHE = 10;
    static const int RAND_SIZE = N_CACHE * CALL_SIZE;
 
-   octet seed[SEED_SIZE]; 
-   octet state[RAND_SIZE] __attribute__((aligned (16)));
-   octet random[RAND_SIZE] __attribute__((aligned (16)));
+   Octet seed[SEED_SIZE]; 
+   Octet state[RAND_SIZE] __attribute__((aligned (16)));
+   Octet random[RAND_SIZE] __attribute__((aligned (16)));
 
    #ifdef USE_AES
 #if defined(__AES__) || !defined(__x86_64__)
-     bool useC;
+     bool use_c;
 #else
-     const static bool useC = true;
+     const static bool use_c = true;
 #endif
 
      // Two types of key schedule for the different implementations 
      // of AES
-     uint  KeyScheduleC[44];
-     octet KeySchedule[176]  __attribute__((aligned (16)));
+     uint  key_schedule_c[44];
+     Octet KeySchedule[176]  __attribute__((aligned (16)));
    #endif
 
    int cnt;    // How many bytes of the current random value have been used
@@ -81,7 +81,7 @@ class PRNG
    /// Construction without initialization. Usage without initialization will fail.
    PRNG();
    /// Initialize with ``SEED_SIZE`` bytes from buffer.
-   PRNG(octetStream& seed);
+   PRNG(OctetStream& seed);
    /// Initialize with ``SEED_SIZE`` bytes from buffer.
    PRNG(const string& seed);
 
@@ -89,10 +89,10 @@ class PRNG
    void print_state() const;
 
    /// Initialize from local randomness.
-   void ReSeed();
+   void re_seed();
 
    // Agree securely on seed
-   void SeedGlobally(const PlayerBase& P,
+   void seed_globally(const PlayerBase& P,
            const vector<bool>& parties = { });
 
    /**
@@ -100,7 +100,7 @@ class PRNG
     * @param P communication instances
     * @param secure seeding prevents tampering at higher cost
     */
-   void SeedGlobally(const Player& P, bool secure = true);
+   void seed_globally(const Player& P, bool secure = true);
 
    /// Initialize with ``SEED_SIZE`` bytes from pointer.
    void SetSeed(const unsigned char*);
@@ -108,8 +108,8 @@ class PRNG
    void SetSeed(PRNG& G);
    /// Initialize with seed from any serializable
    template<class T>
-   void SetSeedFrom(const T& seed);
-   void InitSeed();
+   void set_seed_from(const T& seed);
+   void initialize_seed();
    
    template<bool SMALL = false>
    void next();
@@ -131,7 +131,7 @@ class PRNG
     * @n_bits number of bits
     * @positive positive result (random sign otherwise)
     */
-   void get(bigint& res, int n_bits, bool positive = true);
+   void get(Bigint& res, int n_bits, bool positive = true);
 
    /**
     * Random integer in ``[0, B-1]``
@@ -140,16 +140,16 @@ class PRNG
     * @param positive positive result (random sign otherwise)
     */
    template<class T>
-   void randomBnd(T& res, const bigint& B, bool positive=true);
+   void random_bnd(T& res, const Bigint& B, bool positive=true);
    template<int N_BYTES>
-   void randomBnd(mp_limb_t* res, const mp_limb_t* B, mp_limb_t mask = -1);
-   void randomBnd(mp_limb_t* res, const mp_limb_t* B, size_t n_bytes, mp_limb_t mask = -1);
+   void random_bnd(mp_limb_t* res, const mp_limb_t* B, mp_limb_t mask = -1);
+   void random_bnd(mp_limb_t* res, const mp_limb_t* B, size_t n_bytes, mp_limb_t mask = -1);
 
    /// Random 64-bit integer
    word get_word()
      {
        word a;
-       get_octets<sizeof(a)>((octet*)&a);
+       get_octets<sizeof(a)>((Octet*)&a);
        return le64toh(a);
      }
 
@@ -161,26 +161,26 @@ class PRNG
     * @param ans result
     * @param len byte length
     */
-   void get_octetStream(octetStream& ans,int len);
+   void get_octet_stream(OctetStream& ans,int len);
 
    /**
     * Fill array with random data
     * @param ans result
     * @param len byte length
     */
-   void get_octets(octet* ans, int len);
+   void get_octets(Octet* ans, int len);
 
    // non-inlined version
-   void get_octets_call(octet* ans, int len);
+   void get_octets_call(Octet* ans, int len);
 
    /**
     * Fill array with random data (compile-time length)
     * @param ans result
     */
    template <int L>
-   void get_octets(octet* ans);
+   void get_octets(Octet* ans);
 
-   const octet* get_seed() const
+   const Octet* get_seed() const
      { return seed; }
 
    /// Random instance of any supported class
@@ -193,22 +193,22 @@ class PRNG
 };
 
 /// Randomly seeded pseudo-random number generator
-class SeededPRNG : public PRNG
+class SeededPrng : public PRNG
 {
 public:
-  SeededPRNG()
+  SeededPrng()
   {
-    ReSeed();
+    re_seed();
   }
 };
 
 /// Coordinated pseudo-random number with secure seeding
-class GlobalPRNG : public PRNG
+class GlobalPrng : public PRNG
 {
 public:
-  GlobalPRNG(const PlayerBase& P)
+  GlobalPrng(const PlayerBase& P)
   {
-    SeedGlobally(P);
+    seed_globally(P);
   }
 };
 
@@ -223,9 +223,9 @@ public:
 };
 
 template<class T>
-void PRNG::SetSeedFrom(const T& seed)
+void PRNG::set_seed_from(const T& seed)
 {
-  octetStream os;
+  OctetStream os;
   seed.pack(os);
   assert(os.get_length() >= SEED_SIZE);
   SetSeed(os.get_data());
@@ -272,7 +272,7 @@ inline __m128i PRNG::get_doubleword()
     return ans;
 }
 
-inline void PRNG::get_octets(octet* ans,int len)
+inline void PRNG::get_octets(Octet* ans,int len)
 {
   int pos=0;
   while (len)
@@ -288,7 +288,7 @@ inline void PRNG::get_octets(octet* ans,int len)
 }
 
 template<int L>
-inline void PRNG::get_octets(octet* ans)
+inline void PRNG::get_octets(Octet* ans)
 {
    if (L <= RAND_SIZE - cnt)
    {
@@ -300,19 +300,19 @@ inline void PRNG::get_octets(octet* ans)
 }
 
 template<int N_BYTES>
-inline void PRNG::randomBnd(mp_limb_t* res, const mp_limb_t* B, mp_limb_t mask)
+inline void PRNG::random_bnd(mp_limb_t* res, const mp_limb_t* B, mp_limb_t mask)
 {
   size_t n_limbs = (N_BYTES + sizeof(mp_limb_t) - 1) / sizeof(mp_limb_t);
   do
     {
-      get_octets<N_BYTES>((octet*) res);
+      get_octets<N_BYTES>((Octet*) res);
       res[n_limbs - 1] &= mask;
     }
   while (mpn_cmp(res, B, n_limbs) >= 0);
 }
 
 template<>
-inline octet PRNG::get()
+inline Octet PRNG::get()
 {
   return get_uchar();
 }
@@ -329,16 +329,16 @@ inline unsigned int PRNG::get_uint_lemire(unsigned int upper)
   auto s = upper;
   uint64_t x = get_uint();
   uint64_t m = x * s;
-  uint64_t twoL = uint64_t(1) << 32;
-  uint64_t l = m % twoL;
+  uint64_t two_l = uint64_t(1) << 32;
+  uint64_t l = m % two_l;
   if (l < s)
     {
-      uint64_t t = (twoL - s) % s;
+      uint64_t t = (two_l - s) % s;
       while (l < t)
         {
           x = get_uint();
           m = x * s;
-          l = m % twoL;
+          l = m % two_l;
         }
     }
   return m >> 32;

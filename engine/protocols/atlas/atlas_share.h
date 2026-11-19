@@ -19,19 +19,19 @@ template<class T>
 class AtlasShare : public ShamirShare<T>
 {
     typedef AtlasShare This;
-    typedef ShamirShare<T> super;
+    typedef ShamirShare<T> Super;
 
 public:
     typedef Atlas<This> Protocol;
     typedef ShamirInput<This> Input;
-    typedef IndirectShamirMC<This> MAC_Check;
-    typedef ShamirMC<This> Direct_MC;
+    typedef IndirectShamirOpener<This> MacCheck;
+    typedef ShamirOpener<This> DirectOpener;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef AtlasPrep<This> LivePrep;
     typedef LivePrep TriplePrep;
 
 #ifndef NO_MIXED_CIRCUITS
-    typedef GC::AtlasSecret bit_type;
+    typedef GC::AtlasSecret BitType;
 #endif
 
     const static int bit_generation_threshold = 2;
@@ -47,7 +47,7 @@ public:
 
     template<class U>
     AtlasShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 };

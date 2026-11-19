@@ -10,24 +10,24 @@
 
 
 template <class FD, class U>
-Prover<FD,U>::Prover(Proof& proof, const FD& FieldD) :
+Prover<FD,U>::Prover(Proof& proof, const FD& field_d) :
   volatile_memory(0)
 {
-  s.resize(proof.V, proof.pk->get_params());
-  y.resize(proof.V, FieldD);
+  s.resize(proof.V, proof.pk->get_parameters());
+  y.resize(proof.V, field_d);
 #ifdef LESS_ALLOC_MORE_MEM
   t = s[0];
   z = y[0];
   // extra limb to prevent reallocation
-  t.allocate_slots(bigint(1) << (proof.B_rand_length + 64));
-  z.allocate_slots(bigint(1) << (proof.B_plain_length + 64));
-  s.allocate_slots(bigint(1) << proof.B_rand_length);
-  y.allocate_slots(bigint(1) << proof.B_plain_length);
+  t.allocate_slots(Bigint(1) << (proof.b_random_length + 64));
+  z.allocate_slots(Bigint(1) << (proof.b_plain_length + 64));
+  s.allocate_slots(Bigint(1) << proof.b_random_length);
+  y.allocate_slots(Bigint(1) << proof.b_plain_length);
 #endif
 }
 
 template <class FD, class U>
-void Prover<FD,U>::Stage_1(const Proof& P, octetStream& ciphertexts,
+void Prover<FD,U>::stage_1(const Proof& P, OctetStream& ciphertexts,
     const AddableVector<Ciphertext>& c,
     const FHE_PK& pk)
 {
@@ -43,20 +43,20 @@ void Prover<FD,U>::Stage_1(const Proof& P, octetStream& ciphertexts,
 //  ZZ pr=(*AE.A).prime();
 //  ZZ bd=B_plain/(pr+1);
   PRNG G;
-  G.ReSeed();
-  Random_Coins rc(pk.get_params());
-  Ciphertext ciphertext(pk.get_params());
+  G.re_seed();
+  RandomCoins rc(pk.get_parameters());
+  Ciphertext ciphertext(pk.get_parameters());
   ciphertexts.store(V);
   for (int i=0; i<V; i++)
     {
 //      AE.randomize(Diag,binary);
 //      rd=RandPoly(phim,bd<<1);
 //      y[i]=AE.plaintext()+pr*rd;
-      y[i].randomize(G, P.B_plain_length, P.get_diagonal());
+      y[i].randomize(G, P.b_plain_length, P.get_diagonal());
       if (P.get_diagonal())
         assert(y[i].is_diagonal());
       s[i].resize(3, P.phim);
-      s[i].generateUniform(G, P.B_rand_length);
+      s[i].generate_uniform(G, P.b_random_length);
       rc.assign(s[i][0], s[i][1], s[i][2]);
       pk.encrypt(ciphertext,y[i],rc);
       ciphertext.pack(ciphertexts);
@@ -65,20 +65,20 @@ void Prover<FD,U>::Stage_1(const Proof& P, octetStream& ciphertexts,
 
 
 template <class FD, class U>
-bool Prover<FD,U>::Stage_2(Proof& P, octetStream& cleartexts,
+bool Prover<FD,U>::stage_2(Proof& P, OctetStream& cleartexts,
                         const vector<U>& x,
                         const Proof::Randomness& r,
                         const FHE_PK& pk)
 {
   size_t allocate = P.V * P.phim
-      * (5 + numBytes(P.plain_check) + 3 * (5 + numBytes(P.rand_check)));
+      * (5 + numBytes(P.plain_check) + 3 * (5 + numBytes(P.random_check)));
   cleartexts.resize_precise(allocate);
   cleartexts.reset_write_head();
 
   unsigned int i;
 #ifndef LESS_ALLOC_MORE_MEM
-  AddableVector<fixint<gfp::N_LIMBS>> z;
-  AddableMatrix<fixint<gfp::N_LIMBS>> t;
+  AddableVector<Fixint<Gfp::N_LIMBS>> z;
+  AddableMatrix<Fixint<Gfp::N_LIMBS>> t;
 #endif
   cleartexts.reset_write_head();
   cleartexts.store(P.V);
@@ -89,7 +89,7 @@ bool Prover<FD,U>::Stage_2(Proof& P, octetStream& cleartexts,
     { z=y[i];
       t=s[i];
       P.apply_challenge(i, z, x, pk);
-      Check_Decoding(z, P.get_diagonal(), x[0].get_field());
+      check_decoding(z, P.get_diagonal(), x[0].get_field());
       P.apply_challenge(i, t, r, pk);
       if (not P.check_bounds(z, t, i))
           return false;
@@ -101,7 +101,7 @@ bool Prover<FD,U>::Stage_2(Proof& P, octetStream& cleartexts,
 #endif
 #ifdef PRINT_MIN_DIST
   cout << "Minimal distance (log) " << log2(P.dist) << ", compare to " <<
-      log2(P.plain_check.get_d() / pow(2, P.B_plain_length))  << endl;
+      log2(P.plain_check.get_d() / pow(2, P.b_plain_length))  << endl;
 #endif
   return true;
 }
@@ -111,7 +111,7 @@ bool Prover<FD,U>::Stage_2(Proof& P, octetStream& cleartexts,
 /* This is the non-interactive version using the ROM 
 */
 template <class FD, class U>
-size_t Prover<FD,U>::NIZKPoK(Proof& P, octetStream& ciphertexts, octetStream& cleartexts,
+size_t Prover<FD,U>::nizk_pok(Proof& P, OctetStream& ciphertexts, OctetStream& cleartexts,
                         const FHE_PK& pk,
                         const AddableVector<Ciphertext>& c,
                         const vector<U>& x,
@@ -132,10 +132,10 @@ size_t Prover<FD,U>::NIZKPoK(Proof& P, octetStream& ciphertexts, octetStream& cl
   (void) cnt;
   while (!ok)
     { cnt++;
-      Stage_1(P,ciphertexts,c,pk);
+      stage_1(P,ciphertexts,c,pk);
       P.set_challenge(ciphertexts, prover, pk);
       // Check check whether we are OK, or whether we should abort
-      ok = Stage_2(P,cleartexts,x,r,pk);
+      ok = stage_2(P,cleartexts,x,r,pk);
     }
 #ifdef VERBOSE
   if (cnt > 1)
@@ -173,8 +173,8 @@ void Prover<FD, U>::report_size(ReportType type, MemoryUsage& res)
 }
 
 
-template class Prover<FFT_Data, Plaintext_<FFT_Data> >;
-//template class Prover<FFT_Data, AddableVector<bigint> >;
+template class Prover<FftData, Plaintext_<FftData> >;
+//template class Prover<FftData, AddableVector<bigint> >;
 
 template class Prover<P2Data, Plaintext_<P2Data> >;
 //template class Prover<P2Data, AddableVector<bigint> >;

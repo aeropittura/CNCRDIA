@@ -15,7 +15,7 @@ class Ring
 {
   int mm,phim;
   vector<int> pi;
-  vector<int> pi_inv;
+  vector<int> pi_inverse;
   vector<int> poly;
   
   public:
@@ -30,16 +30,16 @@ class Ring
   int m()     const { return mm;   }
 
   int p(int i)      const { return pi.at(i);     }
-  int p_inv(int i)  const { return pi_inv.at(i); }
+  int p_inverse(int i)  const { return pi_inverse.at(i); }
   const vector<int>& Phi() const { assert(poly.size()); return poly; }
 
-  friend void init(Ring& Rg, int m, bool generate_poly);
+  friend void init(Ring& rg, int m, bool generate_polynomial);
 
-  void pack(octetStream& o) const;
-  void unpack(octetStream& o);
+  void pack(OctetStream& o) const;
+  void unpack(OctetStream& o);
 
   bool operator!=(const Ring& other) const;
   bool operator==(const Ring& other) const { return not (*this != other); }
 };
 
-void init(Ring& Rg, int m, bool generate_poly = false);
+void init(Ring& rg, int m, bool generate_polynomial = false);

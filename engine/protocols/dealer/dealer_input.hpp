@@ -8,13 +8,13 @@
 #include "protocols/dealer/dealer_input.h"
 
 template<class T>
-DealerInput<T>::DealerInput(SubProcessor<T>& proc, typename T::MAC_Check&) :
+DealerInput<T>::DealerInput(SubProcessor<T>& proc, typename T::MacCheck&) :
         DealerInput(&proc, proc.P)
 {
 }
 
 template<class T>
-DealerInput<T>::DealerInput(typename T::MAC_Check&, Preprocessing<T>&,
+DealerInput<T>::DealerInput(typename T::MacCheck&, Preprocessing<T>&,
         Player& P, typename T::Protocol*) :
         DealerInput(P)
 {
@@ -73,7 +73,7 @@ void DealerInput<T>::reset(int player)
 {
     if (is_dealer(player))
     {
-        octetStreams to_send, to_receive;
+        OctetStreams to_send, to_receive;
         vector<bool> senders(P.num_players());
         senders.back() = true;
 
@@ -111,7 +111,7 @@ void DealerInput<T>::reset(int player)
 }
 
 template<class T>
-void DealerInput<T>::add_mine(const typename T::open_type& input,
+void DealerInput<T>::add_mine(const typename T::OpenType& input,
         int)
 {
     if (is_dealer())
@@ -132,22 +132,22 @@ void DealerInput<T>::add_other(int player, int)
 }
 
 template<class T>
-void DealerInput<T>::add_from_dealer(const typename T::open_type& input)
+void DealerInput<T>::add_from_dealer(const typename T::OpenType& input)
 {
     add_from_dealer(span(&input, &input + 1));
 }
 
 template<class T>
-void DealerInput<T>::add_from_dealer(const vector<typename T::open_type>& inputs)
+void DealerInput<T>::add_from_dealer(const vector<typename T::OpenType>& inputs)
 {
     add_from_dealer(span(inputs));
 }
 
 template<class T>
-void DealerInput<T>::add_from_dealer(span<const typename T::open_type> inputs)
+void DealerInput<T>::add_from_dealer(span<const typename T::OpenType> inputs)
 {
     int n = P.num_players() - 1;
-    os.reserve_min(inputs.size() * T::open_type::size());
+    os.reserve_min(inputs.size() * T::OpenType::size());
 
     for (auto& input : inputs)
     {
@@ -159,8 +159,8 @@ void DealerInput<T>::add_from_dealer(span<const typename T::open_type> inputs)
                 rest -= r;
             }
 
-        os.append_no_resize((octet*) rest.get_ptr(),
-                T::open_type::size());
+        os.append_no_resize((Octet*) rest.get_ptr(),
+                T::OpenType::size());
     }
 
     from_dealer = true;
@@ -182,12 +182,12 @@ void DealerInput<T>::add_n_from_dealer(size_t n_inputs, bool random)
 }
 
 template<class T>
-typename T::open_type DealerInput<T>::random_for_dealer()
+typename T::OpenType DealerInput<T>::random_for_dealer()
 {
     T res;
     for (auto& prng : dealer_random_prngs)
     {
-        auto share = prng.template get<typename T::open_type>();
+        auto share = prng.template get<typename T::OpenType>();
         res += share;
     }
     return res;

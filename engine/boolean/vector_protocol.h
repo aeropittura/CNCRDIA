@@ -20,9 +20,9 @@ public:
 
     VectorProtocol(Player& P);
 
-    void init(Preprocessing<T>& prep, typename T::MAC_Check& MC);
+    void init(Preprocessing<T>& prep, typename T::MacCheck& MC);
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1);
     void exchange();
     void finalize_mult(T& res, int n = -1);

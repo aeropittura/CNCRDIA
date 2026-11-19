@@ -36,7 +36,7 @@ public:
 			processor(0), args(0), start(0), end(0), n_gates(0), gate(0),
 			counter(0), repeat(0), party(party), type(YAO_NO_JOB)
 	{
-		prng.ReSeed();
+		prng.re_seed();
 	}
 
 	~YaoAndJob()

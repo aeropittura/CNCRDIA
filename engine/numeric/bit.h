@@ -7,11 +7,11 @@
 
 #include "numeric/bit_vec.h"
 
-template<class T> class gf2n_;
+template<class T> class Gf2n_;
 
-class Bit : public BitVec_<bool>
+class Bit : public BitVector_<bool>
 {
-    typedef BitVec_<bool> super;
+    typedef BitVector_<bool> Super;
 
 public:
     static int size_in_bits()
@@ -28,12 +28,12 @@ public:
     {
     }
     Bit(int other) :
-            super(other)
+            Super(other)
     {
         assert(other == 0 or other == 1);
     }
-    Bit(const super::super& other) :
-            super(other)
+    Bit(const Super::Super& other) :
+            Super(other)
     {
     }
     Bit(char*)
@@ -42,11 +42,11 @@ public:
     }
 
     template<class T>
-    Bit(const gf2n_<T>& other);
+    Bit(const Gf2n_<T>& other);
 
     Bit operator*(const Bit& other) const
     {
-        return super::operator*(other);
+        return Super::operator*(other);
     }
 
     template<class T>
@@ -60,13 +60,13 @@ public:
         *this = G.get_bit();
     }
 
-    void pack(octetStream& os, int = -1) const
+    void pack(OctetStream& os, int = -1) const
     {
-        super::pack(os, 1);
+        Super::pack(os, 1);
     }
-    void unpack(octetStream& os, int = -1)
+    void unpack(OctetStream& os, int = -1)
     {
-        super::unpack(os, 1);
+        Super::unpack(os, 1);
     }
 
     void operator>>=(int)

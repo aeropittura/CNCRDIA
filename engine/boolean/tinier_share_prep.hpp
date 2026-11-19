@@ -43,17 +43,17 @@ void TinierSharePrep<T>::set_protocol(typename T::Protocol& protocol)
         return;
     }
 
-    params.generateMACs = true;
+    params.generate_macs = true;
     params.amplify = false;
     params.check = false;
-    auto& thread = ShareThread<typename T::whole_type>::s();
+    auto& thread = ShareThread<typename T::WholeType>::s();
     triple_generator = new typename T::TripleGenerator(
             BaseMachine::fresh_ot_setup(protocol.P), protocol.P.N, -1,
             OnlineOptions::singleton.batch_size, 1,
             params, &protocol.P);
     triple_generator->multi_threaded = false;
     this->inputs.resize(thread.P->num_players());
-    init_real(protocol.P);
+    initialize_real(protocol.P);
 }
 
 template<class T>
@@ -82,7 +82,7 @@ void TinierSharePrep<T>::buffer_inputs(int player)
 template<class T>
 void GC::TinierSharePrep<T>::buffer_bits()
 {
-    auto& thread = ShareThread<secret_type>::s();
+    auto& thread = ShareThread<SecretType>::s();
     this->bits.push_back(
             BufferPrep<T>::get_random_from_inputs(thread.P->num_players()));
 }

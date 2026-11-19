@@ -22,7 +22,7 @@ void SemiShare<T>::split(StackedVector<U>& dest, const ArgVector& regs,
     vector<Semi2kShare<T::MAX_N_BITS>> inputs;
     for (int i = 0; i < n_inputs; i++)
     {
-        inputs.push_back(bigint::tmp.from_signed(T(source[i])));
+        inputs.push_back(Bigint::tmp.from_signed(T(source[i])));
     }
 
     Semi2kShare<T::MAX_N_BITS>::split(dest, regs, n_bits, inputs.data(),

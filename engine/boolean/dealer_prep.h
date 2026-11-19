@@ -46,7 +46,7 @@ public:
 
     void buffer_bits()
     {
-        SeededPRNG G;
+        SeededPrng G;
         if (not DealerInput<DealerSecret>(*P).is_dealer())
             for (int i = 0; i < OnlineOptions::singleton.batch_size; i++)
                 this->bits.push_back(G.get_bit());

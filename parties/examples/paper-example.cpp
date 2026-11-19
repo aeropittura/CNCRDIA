@@ -34,9 +34,9 @@ int main(int argc, char** argv)
         protocol = argv[3];
 
     if (protocol == "MASCOT")
-        run<Share<gfp_<0, n_limbs>>>(argv, prime_length);
+        run<Share<Gfp_<0, n_limbs>>>(argv, prime_length);
     else if (protocol == "CowGear")
-        run<CowGearShare<gfp_<0, n_limbs>>>(argv, prime_length);
+        run<CowGearShare<Gfp_<0, n_limbs>>>(argv, prime_length);
     else if (protocol == "SPDZ2k")
         run<Spdz2kShare<64, 64>>(argv, 0);
     else if (protocol == "Semi2k")
@@ -52,9 +52,9 @@ int main(int argc, char** argv)
         ShamirOptions::s().nparties = nparties;
 
         if (protocol == "Shamir")
-            run<ShamirShare<gfp_<0, n_limbs>>>(argv, prime_length);
+            run<ShamirShare<Gfp_<0, n_limbs>>>(argv, prime_length);
         else
-            run<MaliciousShamirShare<gfp_<0, n_limbs>>>(argv, prime_length);
+            run<MaliciousShamirShare<Gfp_<0, n_limbs>>>(argv, prime_length);
     }
     else
     {
@@ -97,7 +97,7 @@ void run(char** argv, int prime_length)
         b[i] = input.finalize(1);
     }
 
-    protocol.init_dotprod();
+    protocol.initialize_dotprod();
     for (int i = 0; i < n; i++)
         protocol.prepare_dotprod(a[i], b[i]);
     protocol.next_dotprod();
@@ -107,7 +107,7 @@ void run(char** argv, int prime_length)
     // protocol check before revealing results
     set.check();
 
-    output.init_open(P);
+    output.initialize_open(P);
     output.prepare_open(c);
     output.exchange(P);
     result = output.finalize_open();

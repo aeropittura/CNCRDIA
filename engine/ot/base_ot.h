@@ -23,11 +23,11 @@ enum OT_ROLE
 OT_ROLE INV_ROLE(OT_ROLE role);
 
 const char* role_to_str(OT_ROLE role);
-void send_if_ot_sender(TwoPartyPlayer* P, vector<octetStream>& os, OT_ROLE role);
-void send_if_ot_receiver(TwoPartyPlayer* P, vector<octetStream>& os, OT_ROLE role);
+void send_if_ot_sender(TwoPartyPlayer* P, vector<OctetStream>& os, OT_ROLE role);
+void send_if_ot_receiver(TwoPartyPlayer* P, vector<OctetStream>& os, OT_ROLE role);
 
 /** Generating and holding a number of base OTs.
- * @param nOT number of OTs
+ * @param n_ot number of OTs
  * @param ot_length obsolete (always 128 bits for seeding PRGs)
  * @param player two-party networking
  * @param role which role(s) to play
@@ -48,16 +48,16 @@ public:
 	vector<BitVector> receiver_outputs;
 	TwoPartyPlayer* P;
 	/// Number of OTs
-	int nOT;
+	int n_ot;
 	/// Which role(s) on this side
 	OT_ROLE ot_role;
 
-	BaseOT(int nOT, TwoPartyPlayer* player, OT_ROLE role=BOTH)
-		: P(player), nOT(nOT), ot_role(role)
+	BaseOT(int n_ot, TwoPartyPlayer* player, OT_ROLE role=BOTH)
+		: P(player), n_ot(n_ot), ot_role(role)
 	{
-		receiver_inputs.resize(nOT);
-		sender_inputs.resize(nOT);
-		receiver_outputs.resize(nOT);
+		receiver_inputs.resize(n_ot);
+		sender_inputs.resize(n_ot);
+		receiver_outputs.resize(n_ot);
 	}
 
 	BaseOT(TwoPartyPlayer* player, OT_ROLE role) :
@@ -70,13 +70,13 @@ public:
 	/// Set choice bits
 	void set_receiver_inputs(const BitVector& new_inputs)
 	{
-		if ((int)new_inputs.size() != nOT)
-			throw invalid_length("BaseOT");
+		if ((int)new_inputs.size() != n_ot)
+			throw InvalidLength("BaseOT");
 		receiver_inputs = new_inputs;
 	}
 
 	/// Set choice bits
-	void set_receiver_inputs(int128 inputs)
+	void set_receiver_inputs(Int128 inputs)
 	{
 		BitVector new_inputs(128);
 		for (int i = 0; i < 128; i++)
@@ -101,9 +101,9 @@ public:
 
 protected:
 	/// Sender-side PRGs
-	vector< array<PRNG, 2> > G_sender;
+	vector< array<PRNG, 2> > g_sender;
 	/// Receiver-side PRGs
-	vector<PRNG> G_receiver;
+	vector<PRNG> g_receiver;
 
 	bool is_sender() { return (bool) (ot_role & SENDER); }
 	bool is_receiver() { return (bool) (ot_role & RECEIVER); }
@@ -117,10 +117,10 @@ protected:
 	void exec_base(bool new_receiver_inputs=true);
 };
 
-class FakeOT : public BaseOT
+class FakeOt : public BaseOT
 {
 public:
-   FakeOT(int nOT, TwoPartyPlayer* player, OT_ROLE role=BOTH) :
-       BaseOT(nOT, player, role) {}
+   FakeOt(int n_ot, TwoPartyPlayer* player, OT_ROLE role=BOTH) :
+       BaseOT(n_ot, player, role) {}
    void exec_base(bool new_receiver_inputs=true);
 };

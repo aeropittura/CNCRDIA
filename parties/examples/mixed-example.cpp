@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     else if (protocol == "Rep4")
         run<Rep4Share2<64>>(argv);
     else if (protocol == "Atlas")
-        run<AtlasShare<gfp_<0, 2>>>(argv);
+        run<AtlasShare<Gfp_<0, 2>>>(argv);
     else
     {
         cerr << "Unknown protocol: " << protocol << endl;
@@ -67,7 +67,7 @@ void run(char** argv)
 
     int n = 10;
     int n_bits = 16;
-    vector<typename T::bit_type> a(n), b(n);
+    vector<typename T::BitType> a(n), b(n);
 
     // inputs in binary domain
     bit_input.reset_all(P);
@@ -81,13 +81,13 @@ void run(char** argv)
     }
 
     // compute AND in binary domain
-    bit_protocol.init_mul();
+    bit_protocol.initialize_mult();
     for (int i = 0; i < n; i++)
         bit_protocol.prepare_mul(a[i], b[i], n_bits);
     bit_protocol.exchange();
     bit_protocol.check();
-    bit_output.init_open(P, n * n_bits);
-    PointerVector<pair<T, typename T::bit_type>> dabits;
+    bit_output.initialize_open(P, n * n_bits);
+    PointerVector<pair<T, typename T::BitType>> dabits;
     for (int i = 0; i < n; i++)
     {
         auto c = bit_protocol.finalize_mul(n_bits);
@@ -96,15 +96,15 @@ void run(char** argv)
         for (int j = 0; j < n_bits; j++)
         {
             dabits.push_back({});
-            auto& dabit = dabits.back();
-            prep.get_dabit(dabit.first, dabit.second);
+            auto& Dabit = dabits.back();
+            prep.get_dabit(Dabit.first, Dabit.second);
             bit_output.prepare_open(
-                    typename T::bit_type::part_type(
-                            dabit.second.get_bit(0) + c.get_bit(j)));
+                    typename T::BitType::part_type(
+                            Dabit.second.get_bit(0) + c.get_bit(j)));
         }
     }
     bit_output.exchange(P);
-    output.init_open(P, n);
+    output.initialize_open(P, n);
     for (int i = 0; i < n; i++)
     {
         T res;

@@ -29,12 +29,12 @@ class Multiplier
     // temporary
     Ciphertext C, mask;
     Plaintext_<FD> product_share;
-    Random_Coins rc;
+    RandomCoins rc;
 
     size_t volatile_capacity;
     MemoryUsage memory_usage;
 
-    octetStream o;
+    OctetStream o;
 
 public:
     Multiplier(int offset, PairwiseGenerator<FD>& generator);
@@ -44,10 +44,10 @@ public:
     void multiply_and_add(Plaintext_<FD>& res, const Ciphertext& C,
             const Plaintext_<FD>& b);
     void multiply_and_add(Plaintext_<FD>& res, const Ciphertext& C,
-            const Rq_Element& b, OT_ROLE role = BOTH);
+            const RqElement& b, OT_ROLE role = BOTH);
     void add(Plaintext_<FD>& res, const Ciphertext& C, OT_ROLE role = BOTH,
             int n_summands = 1);
-    void multiply_alpha_and_add(Plaintext_<FD>& res, const Rq_Element& b,
+    void multiply_alpha_and_add(Plaintext_<FD>& res, const RqElement& b,
             OT_ROLE role = BOTH);
     int get_offset() { return P.get_offset(); }
     size_t report_size(ReportType type);

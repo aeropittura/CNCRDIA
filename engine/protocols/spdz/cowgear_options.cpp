@@ -26,7 +26,7 @@ CowGearOptions::CowGearOptions(bool covert)
     use_top_gear = false;
 }
 
-CowGearOptions::CowGearOptions(ez::ezOptionParser& opt, int argc,
+CowGearOptions::CowGearOptions(ez::EzOptionParser& opt, int argc,
         const char** argv, bool covert) : CowGearOptions(covert)
 {
     if (covert)
@@ -82,5 +82,5 @@ CowGearOptions::CowGearOptions(ez::ezOptionParser& opt, int argc,
     if (opt.isSet("-T"))
         cerr << "WARNING: Option -T/--top-gear is obsolete "
             "because it is the default now. Use -J to deactivate it." << endl;
-    opt.resetArgs();
+    opt.reset_args();
 }

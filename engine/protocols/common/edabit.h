@@ -8,37 +8,37 @@
 #include "support/fixed_vector.h"
 
 template<class T>
-using edabit = pair<T, FixedVector<typename T::bit_type::part_type::small_type, T::clear::MAX_EDABITS + 5>>;
+using Edabit = pair<T, FixedVector<typename T::BitType::part_type::SmallType, T::clear::MAX_EDABITS + 5>>;
 
 template<class T>
-class edabitvec
+class Edabitvec
 {
-    typedef FixedVector<typename T::bit_type::part_type, T::clear::MAX_EDABITS + 5> b_type;
-    typedef FixedVector<T, T::bit_type::part_type::default_length> a_type;
+    typedef FixedVector<typename T::BitType::part_type, T::clear::MAX_EDABITS + 5> BType;
+    typedef FixedVector<T, T::BitType::part_type::default_length> AType;
 
 public:
-    static const int MAX_SIZE = a_type::MAX_SIZE;
+    static const int MAX_SIZE = AType::MAX_SIZE;
 
-    a_type a;
-    b_type b;
+    AType a;
+    BType b;
 
-    edabitvec()
+    Edabitvec()
     {
     }
 
-    edabitvec(const edabit<T>& other) :
-            edabitvec(other.first, other.second)
+    Edabitvec(const Edabit<T>& other) :
+            Edabitvec(other.first, other.second)
     {
     }
 
-    edabitvec(const T& aa, const typename edabit<T>::second_type& bb)
+    Edabitvec(const T& aa, const typename Edabit<T>::second_type& bb)
     {
         a.push_back(aa);
         for (auto& x : bb)
             b.push_back(x);
     }
 
-    edabitvec(const vector<typename T::bit_type::part_type>& other)
+    Edabitvec(const vector<typename T::BitType::part_type>& other)
     {
         b = other;
     }
@@ -68,16 +68,16 @@ public:
         return a[i];
     }
 
-    typename T::bit_type get_b(int i)
+    typename T::BitType get_b(int i)
     {
         return b[i];
     }
 
-    edabit<T> next()
+    Edabit<T> next()
     {
-        edabit<T> res;
+        Edabit<T> res;
         res.first = a.pop();
-        if (T::bit_type::part_type::default_length > 1)
+        if (T::BitType::part_type::default_length > 1)
             for (auto& x : b)
                 res.second.push_back(x.get_bit(a.size()));
         else
@@ -86,11 +86,11 @@ public:
         return res;
     }
 
-    void push_back(const edabit<T>& x)
+    void push_back(const Edabit<T>& x)
     {
         for (size_t i = 0; i < x.second.size(); i++)
         {
-            b[i] ^= (typename T::bit_type::part_type(x.second[i])
+            b[i] ^= (typename T::BitType::part_type(x.second[i])
                     ^ b[i].get_bit(a.size())) << a.size();
         }
         a.push_back(x.first);
@@ -106,12 +106,12 @@ public:
             x.assign(buffer + i * T::size());
             a.push_back(x);
         }
-        size_t bsize = T::bit_type::part_type::size();
+        size_t bsize = T::BitType::part_type::size();
         char* bbuffer = new char[length * bsize];
         s.read(bbuffer, length * bsize);
         for (int i = 0; i < length; i++)
         {
-            typename T::bit_type::part_type x;
+            typename T::BitType::part_type x;
             x.assign(bbuffer + i * bsize);
             b.push_back(x);
         }
@@ -128,13 +128,13 @@ public:
             b[i].output(s, false);
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         a.pack(os);
         b.pack(os);
     }
 
-    void unpack(octetStream os)
+    void unpack(OctetStream os)
     {
         a.unpack(os);
         b.unpack(os);

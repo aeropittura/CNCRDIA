@@ -16,13 +16,13 @@ template<class T> class SpdzWiseInput;
 template<class T>
 class SpdzWise : public ProtocolBase<T>
 {
-    typedef typename T::part_type check_type;
+    typedef typename T::part_type CheckType;
 
     friend class SpdzWiseInput<T>;
 
     typename T::part_type::Honest::Protocol internal, internal2;
 
-    typename T::mac_key_type mac_key;
+    typename T::MacKeyType mac_key;
 
     vector<T> results;
 
@@ -30,7 +30,7 @@ class SpdzWise : public ProtocolBase<T>
 
     void buffer_random();
 
-    virtual void zero_check(check_type t);
+    virtual void zero_check(CheckType t);
 
 public:
     typedef typename conditional<T::variable_players, SecureShuffle<T>,
@@ -45,14 +45,14 @@ public:
 
     typename T::Protocol branch();
 
-    void init(Preprocessing<T>&, typename T::MAC_Check& MC);
+    void init(Preprocessing<T>&, typename T::MacCheck& MC);
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1);
     void exchange();
     T finalize_mul(int n = -1);
 
-    void init_dotprod();
+    void initialize_dotprod();
     void prepare_dotprod(const T& x, const T& y);
     void next_dotprod();
     T finalize_dotprod(int length);

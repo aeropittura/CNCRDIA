@@ -12,74 +12,74 @@ namespace GC
 {
 
 template<class T>
-class TinyMC : public MAC_Check_Base<T>
+class TinyOpener : public MacCheckBase<T>
 {
-    typename T::part_type::MAC_Check* part_MC;
+    typename T::part_type::MacCheck* part_opener;
     PointerVector<int> sizes;
 
 public:
     static void setup(Player& P)
     {
-        T::part_type::MAC_Check::setup(P);
+        T::part_type::MacCheck::setup(P);
     }
 
     static void teardown()
     {
-        T::part_type::MAC_Check::teardown();
+        T::part_type::MacCheck::teardown();
     }
 
-    TinyMC(typename T::mac_key_type mac_key)
+    TinyOpener(typename T::MacKeyType mac_key)
     {
         this->alphai = mac_key;
 
         if (OnlineOptions::singleton.direct)
-            part_MC = new typename T::part_type::Direct_MC(mac_key);
+            part_opener = new typename T::part_type::DirectOpener(mac_key);
         else
-            part_MC = new typename T::part_type::MAC_Check(mac_key);
+            part_opener = new typename T::part_type::MacCheck(mac_key);
 
     }
 
-    ~TinyMC()
+    ~TinyOpener()
     {
-        delete part_MC;
+        delete part_opener;
     }
 
-    typename T::part_type::MAC_Check& get_part_MC()
+    typename T::part_type::MacCheck& get_part_opener()
     {
-        return *part_MC;
+        return *part_opener;
     }
 
-    void init_open(const Player& P, int n = 0)
+    void initialize_open(const Player& P, int n = 0)
     {
-        part_MC->init_open(P);
+        part_opener->initialize_open(P);
         sizes.clear();
         sizes.reserve(n);
     }
 
     void prepare_open(const T& secret, int = -1)
     {
-        for (auto& part : secret.get_regs())
-            part_MC->prepare_open(part);
-        sizes.push_back(secret.get_regs().size());
+        for (auto& part : secret.get_registers())
+            part_opener->prepare_open(part);
+        sizes.push_back(secret.get_registers().size());
     }
 
     void exchange(const Player& P)
     {
-        part_MC->exchange(P);
+        part_opener->exchange(P);
     }
 
-    typename T::open_type finalize_raw()
+    typename T::OpenType finalize_raw()
     {
         int n = sizes.next();
-        typename T::open_type opened = 0;
+        typename T::OpenType opened = 0;
         for (int i = 0; i < n; i++)
-            opened += typename T::open_type(part_MC->finalize_raw().get_bit(0)) << i;
+            opened += typename T::OpenType(part_opener->finalize_raw().get_bit(0)) << i;
         return opened;
     }
 
     void Check(const Player& P)
     {
-        part_MC->Check(P);
+        part_opener->Check(P);
     }
 };
 

@@ -30,15 +30,15 @@ void ProcessorBase::setup_redirection(int my_num, int thread_num,
 		OnlineOptions& opts, SwitchableOutput& out, bool real)
 {
     // only output on party 0 if not interactive
-    bool always_stdout = opts.cmd_private_output_file == ".";
+    bool always_stdout = opts.command_private_output_file == ".";
     bool output = my_num == 0 or opts.interactive or always_stdout;
     output &= real or always_stdout;
     out.activate(output);
 
-    if (not (opts.cmd_private_output_file.empty() or always_stdout))
+    if (not (opts.command_private_output_file.empty() or always_stdout))
     {
         const string stdout_filename = get_parameterized_filename(my_num,
-                thread_num, opts.cmd_private_output_file);
+                thread_num, opts.command_private_output_file);
         stdout_redirect_file.open(stdout_filename.c_str(), ios_base::out);
         out.redirect_to_file(stdout_redirect_file);
     }

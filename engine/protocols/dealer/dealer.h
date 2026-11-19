@@ -10,7 +10,7 @@
 template<class T>
 class Dealer : public Beaver<T>
 {
-    SeededPRNG G;
+    SeededPrng G;
 
 public:
     Dealer(Player& P) :

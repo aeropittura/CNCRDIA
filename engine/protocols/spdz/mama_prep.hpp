@@ -19,7 +19,7 @@ MamaPrep<T>::MamaPrep(SubProcessor<T>* proc, DataPositions& usage) :
         MaliciousRingPrep<T>(proc, usage)
 {
     this->params.amplify = true;
-    this->params.generateMACs = true;
+    this->params.generate_macs = true;
     this->params.check = false;
 }
 
@@ -44,7 +44,7 @@ void MamaPrep<T>::buffer_triples()
     auto& triple_generator = this->triple_generator;
     assert(triple_generator != 0);
     assert(this->proc != 0);
-    this->params.generateBits = false;
+    this->params.generate_bits = false;
     vector<array<T, 3>> triples;
     TripleShuffleSacrifice<T> sacrifice;
     size_t required = OnlineOptions::singleton.batch_size;
@@ -59,19 +59,19 @@ void MamaPrep<T>::buffer_triples()
     {
         triple_generator->generateTriples();
         triple_generator->unlock();
-        for (auto& x : triple_generator->uncheckedTriples)
+        for (auto& x : triple_generator->unchecked_triples)
         {
             triples.push_back({});
             for (int k = 0; k < 3; k++)
-                triples.back()[k] = x.byIndex(k, 0);
+                triples.back()[k] = x.by_index(k, 0);
         }
 #ifdef VERBOSE
-        cerr << "Got " << triple_generator->uncheckedTriples.size()
+        cerr << "Got " << triple_generator->unchecked_triples.size()
                 << " triples" << endl;
 #endif
     }
 
-    typename T::MAC_Check MC(this->proc->MC.get_alphai());
+    typename T::MacCheck MC(this->proc->MC.get_alphai());
 
     if (use_shuffling)
         sacrifice.triple_sacrifice(triples, triples, this->proc->P,
@@ -91,7 +91,7 @@ void MamaPrep<T>::buffer_triples()
                 triples.pop_back();
             }
         }
-        auto t = GlobalPRNG(P).get<typename T::clear>();
+        auto t = GlobalPrng(P).get<typename T::clear>();
         vector<T> masked;
         PointerVector<typename T::clear> opened;
         for (auto& x : check_triples)
@@ -115,7 +115,7 @@ void MamaPrep<T>::buffer_triples()
                                         proc->MC.get_alphai()));
             }
         }
-        MC.CheckFor(0, checks, P);
+        MC.check_for(0, checks, P);
     }
 
     this->triples = triples;

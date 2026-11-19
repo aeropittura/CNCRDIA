@@ -26,7 +26,7 @@
 #include "support/callgrind.h"
 
 inline
-void BaseInstruction::parse(istream& s, int inst_pos)
+void BaseInstruction::parse(istream& s, int inst_position)
 {
   n=0; start.resize(0);
   r[0]=0; r[1]=0; r[2]=0; r[3]=0;
@@ -37,16 +37,16 @@ void BaseInstruction::parse(istream& s, int inst_pos)
   opcode = 0x3FF & code;
   
   if (s.fail())
-    throw bytecode_error("cannot read opcode");
+    throw BytecodeError("cannot read opcode");
 
   if (size==0)
     size=1;
 
-  parse_operands(s, inst_pos, pos);
+  parse_operands(s, inst_position, pos);
 }
 
 inline
-void BaseInstruction::parse_operands(istream& s, int pos, int file_pos)
+void BaseInstruction::parse_operands(istream& s, int pos, int file_position)
 {
   int num_var_args = 0;
   switch (opcode)
@@ -436,11 +436,11 @@ void BaseInstruction::parse_operands(istream& s, int pos, int file_pos)
         break;
       case GREQBL:
         n = get_int(s);
-        if (n > 0 && gf2n::degree() < int(n))
+        if (n > 0 && Gf2n::degree() < int(n))
           {
             stringstream ss;
             ss << "Tape requires prime of bit length " << n << endl;
-            throw Processor_Error(ss.str());
+            throw ProcessorError(ss.str());
           }
         break;
       case ACTIVE:
@@ -529,8 +529,8 @@ void BaseInstruction::parse_operands(istream& s, int pos, int file_pos)
       default:
         ostringstream os;
         os << "Invalid instruction " << showbase << hex << opcode << " at " << dec
-            << pos << "/" << hex << file_pos << dec;
-        throw Invalid_Instruction(os.str());
+            << pos << "/" << hex << file_position << dec;
+        throw InvalidInstruction(os.str());
   }
 }
 
@@ -541,18 +541,18 @@ bool Instruction::get_offline_data_usage(DataPositions& usage)
   {
     case USE:
       if (r[0] >= N_DATA_FIELD_TYPE)
-        throw invalid_program();
+        throw InvalidProgram();
       if (r[1] >= N_DTYPE)
-        throw invalid_program();
+        throw InvalidProgram();
       usage.files[r[0]][r[1]] = n;
       return long(n) >= 0;
     case USE_INP:
       if (r[0] >= N_DATA_FIELD_TYPE)
-        throw invalid_program();
+        throw InvalidProgram();
       if (usage.inputs.size() != 1)
         {
           if ((unsigned) r[1] >= usage.inputs.size())
-            throw Processor_Error("Player number too high");
+            throw ProcessorError("Player number too high");
           usage.inputs[r[1]][r[0]] = n;
         }
       return long(n) >= 0;
@@ -566,7 +566,7 @@ bool Instruction::get_offline_data_usage(DataPositions& usage)
       usage.extended[DATA_INT][r] = n;
       return long(n) >= 0;
     case GUSE_PREP:
-      usage.extended[gf2n::field_type()][r] = n;
+      usage.extended[Gf2n::field_type()][r] = n;
       return long(n) >= 0;
     default:
       return true;
@@ -985,8 +985,8 @@ bool BaseInstruction::is_direct_memory_access() const
 }
 
 
-template<class sint, class sgf2n>
-inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
+template<class Sint, class Sgf2n>
+inline void Instruction::execute(Processor<Sint, Sgf2n>& Proc) const
 {
   auto& Procp = Proc.Procp;
   auto& Proc2 = Proc.Proc2;
@@ -999,14 +999,14 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
       values.reserve(size);
       for (int i = 0; i < size; i++)
       {
-          auto source = Proc.read_Cp(r[1] + i);
+          auto source = Proc.read_cp(r[1] + i);
           Integer tmp;
           if (n == 0)
               tmp = Integer::convert_unsigned(source);
           else if (n <= 64)
               tmp = Integer(source, n);
           else
-            throw Processor_Error(to_string(n) + "-bit conversion impossible; "
+            throw ProcessorError(to_string(n) + "-bit conversion impossible; "
                 "integer registers only have 64 bits");
           values.push_back(tmp);
       }
@@ -1019,7 +1019,7 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
                       values.at(0).get());
       }
       for (int i = 0; i < size; i++)
-          Proc.write_Ci(r[0] + i, values[i].get());
+          Proc.write_ci(r[0] + i, values[i].get());
       return;
   }
 
@@ -1029,19 +1029,19 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
   { switch (opcode)
     {
       case LDMC:
-        Proc.write_Cp(r[0],Proc.machine.Mp.read_C(n));
+        Proc.write_cp(r[0],Proc.machine.Mp.read_c(n));
         n++;
         break;
       case STMC:
-        Proc.machine.Mp.write_C(n,Proc.read_Cp(r[0]));
+        Proc.machine.Mp.write_c(n,Proc.read_cp(r[0]));
         n++;
         break;
       case MOVC:
-        Proc.write_Cp(r[0],Proc.read_Cp(r[1]));
+        Proc.write_cp(r[0],Proc.read_cp(r[1]));
         break;
       case CONCATS:
         {
-          auto& S = Proc.Procp.get_S();
+          auto& S = Proc.Procp.get_s();
           auto dest = S.begin() + r[0];
           for (auto j = start.begin(); j < start.end(); j += 2)
             {
@@ -1055,7 +1055,7 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         }
       case ZIPS:
         {
-          auto& S = Proc.Procp.get_S();
+          auto& S = Proc.Procp.get_s();
           auto dest = S.begin() + r[0];
           for (int i = 0; i < get_size(); i++)
             {
@@ -1065,105 +1065,105 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
           return;
         }
       case DIVC:
-        Proc.write_Cp(r[0], Proc.read_Cp(r[1]) / sanitize(Proc.Procp, r[2]));
+        Proc.write_cp(r[0], Proc.read_cp(r[1]) / sanitize(Proc.Procp, r[2]));
         break;
       case GDIVC:
-        Proc.write_C2(r[0], Proc.read_C2(r[1]) / sanitize(Proc.Proc2, r[2]));
+        Proc.write_c2(r[0], Proc.read_c2(r[1]) / sanitize(Proc.Proc2, r[2]));
         break;
       case FLOORDIVC:
-        Proc.temp.aa.from_signed(Proc.read_Cp(r[1]));
+        Proc.temp.aa.from_signed(Proc.read_cp(r[1]));
         Proc.temp.aa2.from_signed(sanitize(Proc.Procp, r[2]));
-        Proc.write_Cp(r[0], bigint(Proc.temp.aa / Proc.temp.aa2));
+        Proc.write_cp(r[0], Bigint(Proc.temp.aa / Proc.temp.aa2));
         break;
       case MODC:
-        to_bigint(Proc.temp.aa, Proc.read_Cp(r[1]));
+        to_bigint(Proc.temp.aa, Proc.read_cp(r[1]));
         to_bigint(Proc.temp.aa2, sanitize(Proc.Procp, r[2]));
         mpz_fdiv_r(Proc.temp.aa.get_mpz_t(), Proc.temp.aa.get_mpz_t(), Proc.temp.aa2.get_mpz_t());
         Proc.temp.ansp.convert_destroy(Proc.temp.aa);
-        Proc.write_Cp(r[0],Proc.temp.ansp);
+        Proc.write_cp(r[0],Proc.temp.ansp);
         break;
       case LEGENDREC:
-        to_bigint(Proc.temp.aa, Proc.read_Cp(r[1]));
-        Proc.temp.aa = mpz_legendre(Proc.temp.aa.get_mpz_t(), sint::clear::pr().get_mpz_t());
+        to_bigint(Proc.temp.aa, Proc.read_cp(r[1]));
+        Proc.temp.aa = mpz_legendre(Proc.temp.aa.get_mpz_t(), Sint::clear::pr().get_mpz_t());
         to_gfp(Proc.temp.ansp, Proc.temp.aa);
-        Proc.write_Cp(r[0], Proc.temp.ansp);
+        Proc.write_cp(r[0], Proc.temp.ansp);
         break;
       case DIGESTC:
       {
-        octetStream o;
-        to_bigint(Proc.temp.aa, Proc.read_Cp(r[1]));
+        OctetStream o;
+        to_bigint(Proc.temp.aa, Proc.read_cp(r[1]));
 
         to_gfp(Proc.temp.ansp, Proc.temp.aa);
         Proc.temp.ansp.pack(o);
         // keep first n bytes
         to_gfp(Proc.temp.ansp, o.check_sum(n));
-        Proc.write_Cp(r[0], Proc.temp.ansp);
+        Proc.write_cp(r[0], Proc.temp.ansp);
       }
         break;
       case DIVCI:
         if (n == 0)
-          throw Processor_Error("Division by immediate zero");
-        Proc.write_Cp(r[0], Proc.read_Cp(r[1]) / n);
+          throw ProcessorError("Division by immediate zero");
+        Proc.write_cp(r[0], Proc.read_cp(r[1]) / n);
         break;
       case GDIVCI:
         if (n == 0)
-          throw Processor_Error("Division by immediate zero");
-        Proc.write_C2(r[0], Proc.read_C2(r[1]) / n);
+          throw ProcessorError("Division by immediate zero");
+        Proc.write_c2(r[0], Proc.read_c2(r[1]) / n);
         break;
       case INV2M:
-        Proc.write_Cp(r[0], Proc.get_inverse2(n));
+        Proc.write_cp(r[0], Proc.get_inverse2(n));
         break;
       case MODCI:
         if (n == 0)
-          throw Processor_Error("Modulo by immediate zero");
-        to_bigint(Proc.temp.aa, Proc.read_Cp(r[1]));
+          throw ProcessorError("Modulo by immediate zero");
+        to_bigint(Proc.temp.aa, Proc.read_cp(r[1]));
         to_gfp(Proc.temp.ansp, Proc.temp.aa2 = mpz_fdiv_ui(Proc.temp.aa.get_mpz_t(), n));
-        Proc.write_Cp(r[0],Proc.temp.ansp);
+        Proc.write_cp(r[0],Proc.temp.ansp);
         break;
       case SQUARE:
-        Procp.DataF.get_two(DATA_SQUARE, Proc.get_Sp_ref(r[0]),Proc.get_Sp_ref(r[1]));
+        Procp.DataF.get_two(DATA_SQUARE, Proc.get_sp_ref(r[0]),Proc.get_sp_ref(r[1]));
         break;
       case GSQUARE:
-        Proc2.DataF.get_two(DATA_SQUARE, Proc.get_S2_ref(r[0]),Proc.get_S2_ref(r[1]));
+        Proc2.DataF.get_two(DATA_SQUARE, Proc.get_s2_ref(r[0]),Proc.get_s2_ref(r[1]));
         break;
       case INV:
-        Procp.DataF.get_two(DATA_INVERSE, Proc.get_Sp_ref(r[0]),Proc.get_Sp_ref(r[1]));
+        Procp.DataF.get_two(DATA_INVERSE, Proc.get_sp_ref(r[0]),Proc.get_sp_ref(r[1]));
         break;
       case GINV:
-        Proc2.DataF.get_two(DATA_INVERSE, Proc.get_S2_ref(r[0]),Proc.get_S2_ref(r[1]));
+        Proc2.DataF.get_two(DATA_INVERSE, Proc.get_s2_ref(r[0]),Proc.get_s2_ref(r[1]));
         break;
       case RANDOMS:
-        Procp.protocol.randoms_inst(Procp.get_S(), *this);
+        Procp.protocol.randoms_inst(Procp.get_s(), *this);
         return;
       case INPUTMASKREG:
-        Procp.DataF.get_input(Proc.get_Sp_ref(r[0]), Proc.temp.rrp, Proc.read_Ci(r[2]));
-        Proc.write_Cp(r[1], Proc.temp.rrp);
+        Procp.DataF.get_input(Proc.get_sp_ref(r[0]), Proc.temp.rrp, Proc.read_ci(r[2]));
+        Proc.write_cp(r[1], Proc.temp.rrp);
         break;
       case INPUTMASK:
-        Procp.DataF.get_input(Proc.get_Sp_ref(r[0]), Proc.temp.rrp, n);
-        Proc.write_Cp(r[1], Proc.temp.rrp);
+        Procp.DataF.get_input(Proc.get_sp_ref(r[0]), Proc.temp.rrp, n);
+        Proc.write_cp(r[1], Proc.temp.rrp);
         break;
       case GINPUTMASK:
-        Proc2.DataF.get_input(Proc.get_S2_ref(r[0]), Proc.temp.ans2, n);
-        Proc.write_C2(r[1], Proc.temp.ans2);
+        Proc2.DataF.get_input(Proc.get_s2_ref(r[0]), Proc.temp.ans2, n);
+        Proc.write_c2(r[1], Proc.temp.ans2);
         break;
       case INPUT:
-        sint::Input::template input<IntInput<typename sint::clear>>(Proc.Procp, start, size);
+        Sint::Input::template input<IntInput<typename Sint::clear>>(Proc.Procp, start, size);
         return;
       case GINPUT:
-        sgf2n::Input::template input<IntInput<typename sgf2n::clear>>(Proc.Proc2, start, size);
+        Sgf2n::Input::template input<IntInput<typename Sgf2n::clear>>(Proc.Proc2, start, size);
         return;
       case INPUTFIX:
-        sint::Input::template input<FixInput>(Proc.Procp, start, size);
+        Sint::Input::template input<FixInput>(Proc.Procp, start, size);
         return;
       case INPUTFLOAT:
-        sint::Input::template input<FloatInput>(Proc.Procp, start, size);
+        Sint::Input::template input<FloatInput>(Proc.Procp, start, size);
         return;
       case INPUTMIXED:
-        sint::Input::input_mixed(Proc.Procp, start, size, false);
+        Sint::Input::input_mixed(Proc.Procp, start, size, false);
         return;
       case INPUTMIXEDREG:
-        sint::Input::input_mixed(Proc.Procp, start, size, true);
+        Sint::Input::input_mixed(Proc.Procp, start, size, true);
         return;
       case RAWINPUT:
         Proc.Procp.input.raw_input(Proc.Procp, start, size);
@@ -1183,19 +1183,19 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         return;
       // Note: Fp version has different semantics for NOTC than GNOTC
       case NOTC:
-        to_bigint(Proc.temp.aa, Proc.read_Cp(r[1]));
+        to_bigint(Proc.temp.aa, Proc.read_cp(r[1]));
         mpz_com(Proc.temp.aa.get_mpz_t(), Proc.temp.aa.get_mpz_t());
         Proc.temp.aa2 = 1;
         Proc.temp.aa2 <<= n;
         Proc.temp.aa += Proc.temp.aa2;
         Proc.temp.ansp.convert_destroy(Proc.temp.aa);
-        Proc.write_Cp(r[0],Proc.temp.ansp);
+        Proc.write_cp(r[0],Proc.temp.ansp);
         break;
       case SHRSI:
-        sint::shrsi(Procp, *this);
+        Sint::shrsi(Procp, *this);
         return;
       case GSHRSI:
-        sgf2n::shrsi(Proc2, *this);
+        Sgf2n::shrsi(Proc2, *this);
         return;
       case OPEN:
         Proc.Procp.POpen(*this);
@@ -1225,10 +1225,10 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         Proc.Proc2.dotprods(start, size);
         return;
       case MATMULS:
-        Proc.Procp.matmuls(Proc.Procp.get_S(), *this);
+        Proc.Procp.matmuls(Proc.Procp.get_s(), *this);
         return;
       case GMATMULS:
-        Proc.Proc2.matmuls(Proc.Proc2.get_S(), *this);
+        Proc.Proc2.matmuls(Proc.Proc2.get_s(), *this);
         return;
       case MATMULSM:
         Proc.Procp.protocol.matmulsm(Proc.Procp, Proc.machine.Mp.MS, *this);
@@ -1241,7 +1241,7 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         return;
       case TRUNC_PR:
         Proc.Procp.protocol.trunc_pr(start, size, Proc.Procp,
-            sint::clear::characteristic_two);
+            Sint::clear::characteristic_two);
         return;
       case SECSHUFFLE:
         Proc.Procp.secure_shuffle(*this);
@@ -1250,14 +1250,14 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         Proc.Proc2.secure_shuffle(*this);
         return;
       case GENSECSHUFFLE:
-        Proc.write_Ci(r[0], Proc.Procp.generate_secure_shuffle(*this,
+        Proc.write_ci(r[0], Proc.Procp.generate_secure_shuffle(*this,
             Proc.machine.shuffle_store));
         return;
       case APPLYSHUFFLE:
         Proc.Procp.apply_shuffle(*this, Proc.machine.shuffle_store);
         return;
       case DELSHUFFLE:
-        Proc.machine.shuffle_store.del(Proc.read_Ci(r[0]));
+        Proc.machine.shuffle_store.del(Proc.read_ci(r[0]));
         return;
       case INVPERM:
         Proc.Procp.inverse_permutation(*this);
@@ -1276,44 +1276,44 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         Proc.jump(n);
         break;
       case JMPI:
-        Proc.jump(Proc.read_Ci(r[0]));
+        Proc.jump(Proc.read_ci(r[0]));
         break;
       case JMPNZ:
-        if (Proc.read_Ci(r[0]) != 0)
+        if (Proc.read_ci(r[0]) != 0)
           Proc.jump(n);
         break;
       case JMPEQZ:
-        if (Proc.read_Ci(r[0]) == 0)
+        if (Proc.read_ci(r[0]) == 0)
           Proc.jump(n);
         break;
       case PRINTREG:
            {
-             Proc.out << "Reg[" << r[0] << "] = " << Proc.read_Cp(r[0])
+             Proc.out << "Reg[" << r[0] << "] = " << Proc.read_cp(r[0])
               << " # " << string((char*)&n, 4) << endl;
            }
         break;
       case PRINTREGPLAIN:
-        print(Proc.out, &Proc.read_Cp(r[0]));
+        print(Proc.out, &Proc.read_cp(r[0]));
         return;
       case PRINTREGPLAINS:
-        Proc.out << Proc.read_Sp(r[0]);
+        Proc.out << Proc.read_sp(r[0]);
         return;
       case GPRINTREGPLAINS:
-        Proc.out << Proc.read_S2(r[0]);
+        Proc.out << Proc.read_s2(r[0]);
         return;
       case CONDPRINTPLAIN:
-        if (not Proc.read_Cp(r[0]).is_zero())
+        if (not Proc.read_cp(r[0]).is_zero())
           {
-            print(Proc.out, &Proc.read_Cp(r[1]), &Proc.read_Cp(r[2]));
+            print(Proc.out, &Proc.read_cp(r[1]), &Proc.read_cp(r[2]));
           }
         return;
       case PRINTFLOATPLAIN:
-        print(Proc.out, &Proc.read_Cp(start[0]), &Proc.read_Cp(start[1]),
-            &Proc.read_Cp(start[2]), &Proc.read_Cp(start[3]),
-            &Proc.read_Cp(start[4]));
+        print(Proc.out, &Proc.read_cp(start[0]), &Proc.read_cp(start[1]),
+            &Proc.read_cp(start[2]), &Proc.read_cp(start[3]),
+            &Proc.read_cp(start[4]));
         return;
       case CONDPRINTSTR:
-          if (not Proc.read_Cp(r[0]).is_zero())
+          if (not Proc.read_cp(r[0]).is_zero())
             {
               string str = {(char*)&n, 4};
               size_t n = str.find('\0');
@@ -1336,11 +1336,11 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         Proc.machine.time();
 	break;
       case START:
-        Proc.machine.set_thread_stats({Proc.P.total_comm(), Proc.stats});
+        Proc.machine.set_thread_statistics({Proc.P.total_communication(), Proc.statistics});
         Proc.machine.start(n);
         break;
       case STOP:
-        Proc.machine.set_thread_stats({Proc.P.total_comm(), Proc.stats});
+        Proc.machine.set_thread_statistics({Proc.P.total_communication(), Proc.statistics});
         Proc.machine.stop(n);
         break;
       case RUN_TAPE:
@@ -1350,11 +1350,11 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         Proc.machine.join_tape(r[0]);
         break;
       case CALL_TAPE:
-        Proc.call_tape(r[0], Proc.read_Ci(r[1]), start);
+        Proc.call_tape(r[0], Proc.read_ci(r[1]), start);
         break;
       case CRASH:
-        if (Proc.read_Ci(r[0]))
-          throw crash_requested();
+        if (Proc.read_ci(r[0]))
+          throw CrashRequested();
         break;
       case STARTGRIND:
         CALLGRIND_START_INSTRUMENTATION;
@@ -1363,20 +1363,20 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         CALLGRIND_STOP_INSTRUMENTATION;
         break;
       case NPLAYERS:
-        Proc.write_Ci(r[0], Proc.P.num_players());
+        Proc.write_ci(r[0], Proc.P.num_players());
         break;
       case THRESHOLD:
-        Proc.write_Ci(r[0], sint::threshold(Proc.P.num_players()));
+        Proc.write_ci(r[0], Sint::threshold(Proc.P.num_players()));
         break;
       case PLAYERID:
-        Proc.write_Ci(r[0], Proc.P.my_num());
+        Proc.write_ci(r[0], Proc.P.my_num());
         break;
       case CMDLINEARG:
         {
-          size_t idx = Proc.read_Ci(r[1]);
+          size_t idx = Proc.read_ci(r[1]);
           auto& args = OnlineOptions::singleton.args;
           if (idx < args.size())
-              Proc.write_Ci(r[0], args[idx]);
+              Proc.write_ci(r[0], args[idx]);
           else
             {
               cerr << idx << "-th command-line argument not given" << endl;
@@ -1389,99 +1389,99 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
       // ***
       case LISTEN:
         // listen for connections at port number n
-        Proc.external_clients.start_listening(Proc.read_Ci(r[0]));
+        Proc.external_clients.start_listening(Proc.read_ci(r[0]));
         break;
       case ACCEPTCLIENTCONNECTION:
       {
         TimeScope _(Proc.client_timer);
         // get client connection at port number n + my_num())
         int client_handle = Proc.external_clients.get_client_connection(
-            Proc.read_Ci(r[1]));
+            Proc.read_ci(r[1]));
         {
-          octetStream os;
-          os.store(int(sint::open_type::type_char()));
-          sint::specification(os);
-          sint::clear::specification(os);
+          OctetStream os;
+          os.store(int(Sint::OpenType::type_char()));
+          Sint::specification(os);
+          Sint::clear::specification(os);
           os.Send(Proc.external_clients.get_socket(client_handle));
         }
-        Proc.write_Ci(r[0], client_handle);
+        Proc.write_ci(r[0], client_handle);
         break;
       }
       case INITCLIENTCONNECTION:
-        Proc.write_Ci(r[0],
-            Proc.external_clients.init_client_connection(str,
-                Proc.read_Ci(r[1]), Proc.read_Ci(r[2])));
+        Proc.write_ci(r[0],
+            Proc.external_clients.initialize_client_connection(str,
+                Proc.read_ci(r[1]), Proc.read_ci(r[2])));
         break;
       case CLOSECLIENTCONNECTION:
-        Proc.external_clients.close_connection(Proc.read_Ci(r[0]));
+        Proc.external_clients.close_connection(Proc.read_ci(r[0]));
         break;
       case READSOCKETINT:
-        Proc.read_socket_ints(Proc.read_Ci(r[0]), start, n);
+        Proc.read_socket_ints(Proc.read_ci(r[0]), start, n);
         break;
       case READSOCKETC:
-        Proc.read_socket_vector(Proc.read_Ci(r[0]), start, n);
+        Proc.read_socket_vector(Proc.read_ci(r[0]), start, n);
         break;
       case READSOCKETS:
         // read shares and MAC shares
-        Proc.read_socket_private(Proc.read_Ci(r[0]), start, n, true);
+        Proc.read_socket_private(Proc.read_ci(r[0]), start, n, true);
         break;
       case WRITESOCKETINT:
-        Proc.write_socket(INT, false, Proc.read_Ci(r[0]), r[1], start, n);
+        Proc.write_socket(INT, false, Proc.read_ci(r[0]), r[1], start, n);
         break;
       case WRITESOCKETC:
-        Proc.write_socket(CINT, false, Proc.read_Ci(r[0]), r[1], start, n);
+        Proc.write_socket(CINT, false, Proc.read_ci(r[0]), r[1], start, n);
         break;
       case WRITESOCKETS:
         // Send shares + MACs
-        Proc.write_socket(SINT, true, Proc.read_Ci(r[0]), r[1], start, n);
+        Proc.write_socket(SINT, true, Proc.read_ci(r[0]), r[1], start, n);
         break;
       case WRITESOCKETSHARE:
         // Send only shares, no MACs
         // N.B. doesn't make sense to have a corresponding read instruction for this
-        Proc.write_socket(SINT, false, Proc.read_Ci(r[0]), r[1], start, n);
+        Proc.write_socket(SINT, false, Proc.read_ci(r[0]), r[1], start, n);
         break;
       case WRITEFILESHARE:
         // Write shares to file system
-        Procp.binary_file_io.write(Procp.get_S(), Proc.get_Ci(), Proc.P, *this);
+        Procp.binary_file_io.write(Procp.get_s(), Proc.get_ci(), Proc.P, *this);
         return;
       case READFILESHARE:
         // Read shares from file system
-        Procp.binary_file_io.read(Procp.get_S(), Proc.get_Ci(), Proc.P, *this);
+        Procp.binary_file_io.read(Procp.get_s(), Proc.get_ci(), Proc.P, *this);
         return;
       case GWRITEFILESHARE:
         // Write shares to file system
-        Proc2.binary_file_io.write(Proc2.get_S(), Proc.get_Ci(), Proc.P, *this);
+        Proc2.binary_file_io.write(Proc2.get_s(), Proc.get_ci(), Proc.P, *this);
         return;
       case GREADFILESHARE:
         // Read shares from file system
-        Proc2.binary_file_io.read(Proc2.get_S(), Proc.get_Ci(), Proc.P, *this);
+        Proc2.binary_file_io.read(Proc2.get_s(), Proc.get_ci(), Proc.P, *this);
         return;
       case WRITEFILECLEAR:
-        Procp.binary_file_io_clear.write(Procp.get_C(), Proc.get_Ci(), Proc.P,
+        Procp.binary_file_io_clear.write(Procp.get_c(), Proc.get_ci(), Proc.P,
             *this);
         return;
       case READFILECLEAR:
-        Procp.binary_file_io_clear.read(Procp.get_C(), Proc.get_Ci(), Proc.P,
+        Procp.binary_file_io_clear.read(Procp.get_c(), Proc.get_ci(), Proc.P,
             *this);
         return;
       case PUBINPUT:
-        Proc.get_Cp_ref(r[0]) = Proc.template
-            get_input<IntInput<typename sint::clear>>(
+        Proc.get_cp_ref(r[0]) = Proc.template
+            get_input<IntInput<typename Sint::clear>>(
             Proc.public_input, Proc.public_input_filename, 0).items[0];
         break;
       case RAWOUTPUT:
-        Proc.read_Cp(r[0]).output(Proc.get_public_output(), false);
+        Proc.read_cp(r[0]).output(Proc.get_public_output(), false);
         break;
       case INTOUTPUT:
         if (n == -1 or n == Proc.P.my_num())
-          Integer(Proc.read_Ci(r[0])).output(Proc.get_binary_output(), false);
+          Integer(Proc.read_ci(r[0])).output(Proc.get_binary_output(), false);
         break;
       case FLOATOUTPUT:
         if (n == -1 or n == Proc.P.my_num())
           {
-            double tmp = bigint::get_float(Proc.read_Cp(start[0] + i),
-              Proc.read_Cp(start[1] + i), Proc.read_Cp(start[2] + i),
-              Proc.read_Cp(start[3] + i)).get_d();
+            double tmp = Bigint::get_float(Proc.read_cp(start[0] + i),
+              Proc.read_cp(start[1] + i), Proc.read_cp(start[2] + i),
+              Proc.read_cp(start[3] + i)).get_d();
             Proc.get_binary_output().write((char*) &tmp, sizeof(double));
             Proc.get_binary_output().flush();
           }
@@ -1490,21 +1490,21 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
         Proc.fixinput(*this);
         return;
       case PREP:
-        Procp.DataF.get(Proc.Procp.get_S(), r, start, size);
+        Procp.DataF.get(Proc.Procp.get_s(), r, start, size);
         return;
       case GPREP:
-        Proc2.DataF.get(Proc.Proc2.get_S(), r, start, size);
+        Proc2.DataF.get(Proc.Proc2.get_s(), r, start, size);
         return;
       case CISC:
-        Procp.protocol.cisc(Procp, Proc.get_Ci(), Proc.machine.Mp.MS, *this);
+        Procp.protocol.cisc(Procp, Proc.get_ci(), Proc.machine.Mp.MS, *this);
         return;
       default:
-        throw invalid_opcode(opcode);
+        throw InvalidOpcode(opcode);
         break;
 #define X(NAME, CODE) case NAME:
         COMBI_INSTRUCTIONS
 #undef X
-#define X(NAME, CODE) case NAME: throw no_dynamic_memory();
+#define X(NAME, CODE) case NAME: throw NoDynamicMemory();
         DYNAMIC_INSTRUCTIONS
 #undef X
 #define X(NAME, PRE, CODE) case NAME:
@@ -1525,8 +1525,8 @@ inline void Instruction::execute(Processor<sint, sgf2n>& Proc) const
   }
 }
 
-template<class sint, class sgf2n>
-void Program::execute(Processor<sint, sgf2n>& Proc) const
+template<class Sint, class Sgf2n>
+void Program::execute(Processor<Sint, Sgf2n>& Proc) const
 {
   if (OnlineOptions::singleton.has_option("throw_exceptions"))
     execute_with_errors(Proc);
@@ -1538,16 +1538,16 @@ void Program::execute(Processor<sint, sgf2n>& Proc) const
       }
       catch (exception& e)
       {
-          auto inst =  p[Proc.last_PC].get_name();
+          auto inst =  p[Proc.last_pc].get_name();
           fprintf(stderr, "Fatal error at %s:%d (%s): %s\n", name.c_str(),
-                  Proc.last_PC, inst.c_str(), e.what());
+                  Proc.last_pc, inst.c_str(), e.what());
           exit(1);
       }
     }
 }
 
-template<class sint, class sgf2n>
-void Program::execute_with_errors(Processor<sint, sgf2n>& Proc) const
+template<class Sint, class Sgf2n>
+void Program::execute_with_errors(Processor<Sint, Sgf2n>& Proc) const
 {
   unsigned int size = p.size();
   Proc.PC=0;
@@ -1556,15 +1556,15 @@ void Program::execute_with_errors(Processor<sint, sgf2n>& Proc) const
   auto& Proc2 = Proc.Proc2;
 
   // binary instructions
-  typedef typename sint::bit_type T;
-  auto& processor = Proc.Procb;
-  auto& Ci = Proc.get_Ci();
+  typedef typename Sint::BitType T;
+  auto& processor = Proc.procb;
+  auto& Ci = Proc.get_ci();
 
-  bool time_stats = OnlineOptions::singleton.has_option("time_stats");
-  (void) time_stats;
+  bool time_statistics = OnlineOptions::singleton.has_option("time_stats");
+  (void) time_statistics;
 
 #ifdef TIME_INSTRUCTIONS
-  time_stats = not OnlineOptions::singleton.has_option("count_stats");
+  time_statistics = not OnlineOptions::singleton.has_option("count_stats");
 #endif
 
   if (OnlineOptions::singleton.has_option("output_tape"))
@@ -1573,7 +1573,7 @@ void Program::execute_with_errors(Processor<sint, sgf2n>& Proc) const
 
   while (Proc.PC<size)
     {
-      Proc.last_PC = Proc.PC;
+      Proc.last_pc = Proc.PC;
       auto& instruction = p[Proc.PC];
       auto& r = instruction.r;
       auto& n = instruction.n;
@@ -1584,10 +1584,10 @@ void Program::execute_with_errors(Processor<sint, sgf2n>& Proc) const
 #ifdef COUNT_INSTRUCTIONS
       Timer timer;
       int PC = Proc.PC;
-      if (time_stats)
+      if (time_statistics)
           timer.start();
       else
-          Proc.stats[p[PC].get_opcode()]++;
+          Proc.statistics[p[PC].get_opcode()]++;
 #endif
 
 #ifdef OUTPUT_INSTRUCTIONS
@@ -1605,11 +1605,11 @@ void Program::execute_with_errors(Processor<sint, sgf2n>& Proc) const
 #undef X
 #define X(NAME, PRE, CODE) case NAME:
         CLEAR_GF2N_INSTRUCTIONS
-        instruction.execute_clear_gf2n(Proc2.get_C(), Proc.machine.M2.MC, Proc); break;
+        instruction.execute_clear_gf2n(Proc2.get_c(), Proc.machine.M2.MC, Proc); break;
 #undef X
 #define X(NAME, PRE, CODE) case NAME:
         REGINT_INSTRUCTIONS
-        instruction.execute_regint(Proc, Proc.machine.Mi.MC); break;
+        instruction.execute_regint(Proc, Proc.machine.mi.MC); break;
 #undef X
 #define X(NAME, CODE) case NAME: CODE; break;
         COMBI_INSTRUCTIONS
@@ -1619,8 +1619,8 @@ void Program::execute_with_errors(Processor<sint, sgf2n>& Proc) const
         }
 
 #if defined(COUNT_INSTRUCTIONS)
-      if (time_stats)
-          Proc.stats[p[PC].get_opcode()] += timer.elapsed() * 1e9;
+      if (time_statistics)
+          Proc.statistics[p[PC].get_opcode()] += timer.elapsed() * 1e9;
 #endif
     }
 }
@@ -1646,12 +1646,12 @@ void Instruction::print(SwitchableOutput& out, T* v, T* p, T* s, T* z, T* nan) c
       if (p == 0 or (*p == 0 and s == 0))
         out.signed_output(v[i]);
       else if (s == 0)
-        out << bigint::get_float(v[i], p[i], {}, {});
+        out << Bigint::get_float(v[i], p[i], {}, {});
       else
         {
           assert(z != 0);
           assert(nan != 0);
-          bigint::output_float(out, bigint::get_float(v[i], p[i], s[i], z[i]),
+          Bigint::output_float(out, Bigint::get_float(v[i], p[i], s[i], z[i]),
               nan[i]);
         }
       if (i < size - 1)
@@ -1666,8 +1666,8 @@ typename T::clear Instruction::sanitize(SubProcessor<T>& proc, int reg) const
 {
   if (not T::real_shares(proc.P))
     return 1;
-  auto& res = proc.get_C_ref(reg);
+  auto& res = proc.get_c_ref(reg);
   if (res.is_zero())
-    throw Processor_Error("Division by zero from register");
+    throw ProcessorError("Division by zero from register");
   return res;
 }

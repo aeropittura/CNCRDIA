@@ -3,7 +3,7 @@
 #include "vm/instruction.h"
 #include "vm/data_files.h"
 
-template<class sint, class sgf2n> class Machine;
+template<class Sint, class Sgf2n> class Machine;
 
 /* A program is a vector of instructions */
 
@@ -56,7 +56,7 @@ class Program
   unsigned num_reg(RegType reg_type) const
     { return max_reg[reg_type]; }
 
-  size_t direct_mem(RegType reg_type) const
+  size_t direct_memory(RegType reg_type) const
     { return max_mem[reg_type]; }
 
   const string& get_hash() const
@@ -66,11 +66,11 @@ class Program
 
   // Execute this program, updateing the processor and memory
   // and streams pointing to the triples etc
-  template<class sint, class sgf2n>
-  void execute(Processor<sint, sgf2n>& Proc) const;
+  template<class Sint, class Sgf2n>
+  void execute(Processor<Sint, Sgf2n>& Proc) const;
 
-  template<class sint, class sgf2n>
-  void execute_with_errors(Processor<sint, sgf2n>& Proc) const;
+  template<class Sint, class Sgf2n>
+  void execute_with_errors(Processor<Sint, Sgf2n>& Proc) const;
 
   template<class T>
   void mulm_check() const;

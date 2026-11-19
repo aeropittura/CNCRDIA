@@ -30,7 +30,7 @@ template<int>
 void MaliciousDabitOnlyPrep<T>::buffer_dabits(ThreadQueues* queues, false_type, false_type)
 {
     assert(this->proc != 0);
-    vector<dabit<T>> check_dabits;
+    vector<Dabit<T>> check_dabits;
     this->buffer_dabits_without_check(check_dabits,
             dabit_sacrifice.minimum_n_inputs(this->buffer_size), queues);
     dabit_sacrifice.sacrifice_and_check_bits(this->dabits, check_dabits,
@@ -46,7 +46,7 @@ void MaliciousDabitOnlyPrep<T>::buffer_dabits(ThreadQueues* queues, false_type, 
     else
     {
         assert(this->proc != 0);
-        vector<dabit<T>> check_dabits;
+        vector<Dabit<T>> check_dabits;
         DabitShuffleSacrifice<T> shuffle_sacrifice;
         this->buffer_dabits_without_check(check_dabits,
                 shuffle_sacrifice.minimum_n_inputs(), queues);

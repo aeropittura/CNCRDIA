@@ -11,7 +11,7 @@ using namespace std;
 
 template<class T>
 void check_share(vector<T>& Sa, typename T::clear& value,
-    typename T::mac_type& mac, int N, const typename T::mac_key_type& key);
+    typename T::MacType& mac, int N, const typename T::MacKeyType& key);
 
 template<class T> class Share;
 
@@ -34,7 +34,7 @@ template <class U>
 void read_mac_key(const string& directory, const Names& N, U& key);
 
 template <class T>
-typename T::mac_key_type read_generate_write_mac_key(Player& P,
+typename T::MacKeyType read_generate_write_mac_key(Player& P,
         string directory = "");
 
 void check_files(ofstream* outf, int N);
@@ -43,10 +43,10 @@ template<class T>
 class KeySetup
 {
 public:
-    typename T::mac_share_type::open_type key;
-    vector<typename T::mac_share_type> key_shares;
+    typename T::MacShareType::OpenType key;
+    vector<typename T::MacShareType> key_shares;
 
-    typename T::mac_share_type get(size_t i) const
+    typename T::MacShareType get(size_t i) const
     {
         if (key_shares.empty())
             return {};
@@ -61,8 +61,8 @@ public:
   virtual ~FilesBase() {}
   virtual void output_shares(word a) = 0;
 
-  void make_AES(int n, bool zero, PRNG& G);
-  void make_DES(int n, bool zero, PRNG& G);
+  void make_aes(int n, bool zero, PRNG& G);
+  void make_des(int n, bool zero, PRNG& G);
 };
 
 template <class T>
@@ -85,7 +85,7 @@ public:
   Files(int N, const KeySetup<T>& key, const string& prep_data_prefix,
       Dtype type, PRNG& G, int thread_num = -1) :
       Files(N, key,
-          get_prep_sub_dir<T>(prep_data_prefix, N, true)
+          get_prep_sub_directory<T>(prep_data_prefix, N, true)
               + DataPositions::dtype_names[type] + "-" + T::type_short(),
           G, thread_num)
   {
@@ -120,15 +120,15 @@ public:
 
   void output_shares(word a)
   {
-    output_shares(typename T::open_type(a));
+    output_shares(typename T::OpenType(a));
   }
   template<class U = T>
-  void output_shares(const typename U::open_type& a)
+  void output_shares(const typename U::OpenType& a)
   {
     output_shares<T>(a, key.key);
   }
   template<class U, class V>
-  void output_shares(const typename U::open_type& a,
+  void output_shares(const typename U::OpenType& a,
       const V& key)
   {
     vector<U> Sa(N);

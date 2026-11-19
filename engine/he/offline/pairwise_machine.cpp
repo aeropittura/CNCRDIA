@@ -27,29 +27,29 @@ void RealPairwiseMachine::init()
 {
     if (use_gf2n)
     {
-        field_size = gf2n_short::DEFAULT_LENGTH;
-        gf2n_short::init_field(field_size);
+        field_size = Gf2nShort::DEFAULT_LENGTH;
+        Gf2nShort::initialize_field(field_size);
         setup_keys<P2Data>();
     }
     else
     {
-        setup_keys<FFT_Data>();
-        bigint p = setup_p.FieldD.get_prime();
-        gfp::init_field(p);
+        setup_keys<FftData>();
+        Bigint p = setup_p.field_d.get_prime();
+        Gfp::initialize_field(p);
         ofstream outf;
         if (output)
-            gfp::write_setup(get_prep_dir<FFT_Data>(P));
+            Gfp::write_setup(get_prep_directory<FftData>(P));
     }
 
     for (int i = 0; i < nthreads; i++)
         if (use_gf2n)
             generators.push_back(new PairwiseGenerator<P2Data>(i, *this));
         else
-            generators.push_back(new PairwiseGenerator<FFT_Data>(i, *this));
+            generators.push_back(new PairwiseGenerator<FftData>(i, *this));
 }
 
 template <>
-PairwiseSetup<FFT_Data>& PairwiseMachine::setup()
+PairwiseSetup<FftData>& PairwiseMachine::setup()
 {
     return setup_p;
 }
@@ -67,22 +67,22 @@ void RealPairwiseMachine::setup_keys()
     PairwiseSetup<FD>& s = setup<FD>();
     s.init(P, sec, field_size, extra_slack);
     if (output)
-        write_mac_key(get_prep_dir<FD>(P), P.my_num(), P.num_players(), s.alphai);
+        write_mac_key(get_prep_directory<FD>(P), P.my_num(), P.num_players(), s.alphai);
     for (auto& x : other_pks)
-        x = FHE_PK(s.params, s.FieldD.get_prime());
+        x = FHE_PK(s.params, s.field_d.get_prime());
     sk = FHE_SK(pk);
     PRNG G;
-    G.ReSeed();
+    G.re_seed();
     insecure("local key generation");
-    KeyGen(pk, sk, G);
-    vector<octetStream> os(N.num_players());
+    key_gen(pk, sk, G);
+    vector<OctetStream> os(N.num_players());
     pk.pack(os[N.my_num()]);
-    P.Broadcast_Receive(os);
+    P.broadcast_receive(os);
     for (int i = 0; i < N.num_players(); i++)
         if (i != N.my_num())
             other_pks[i].unpack(os[i]);
     set_mac_key(s.alphai);
-    Share<typename FD::T>::MAC_Check::setup(P);
+    Share<typename FD::T>::MacCheck::setup(P);
 }
 
 template <class T>
@@ -97,12 +97,12 @@ void RealPairwiseMachine::set_mac_key(T alphai)
         s.alpha.set_element(i, alphai);
     insecure("MAC key generation");
     Ciphertext enc_alpha = pk.encrypt(s.alpha);
-    vector<octetStream> os;
+    vector<OctetStream> os;
     os.clear();
     os.resize(N.num_players());
     enc_alphas.resize(N.num_players(), pk);
     enc_alpha.pack(os[N.my_num()]);
-    P.Broadcast_Receive(os);
+    P.broadcast_receive(os);
     for (int i = 0; i < N.num_players(); i++)
         if (i != N.my_num())
             enc_alphas[i].unpack(os[i]);
@@ -112,14 +112,14 @@ void RealPairwiseMachine::set_mac_key(T alphai)
                 << endl;
 }
 
-void PairwiseMachine::pack(octetStream& os) const
+void PairwiseMachine::pack(OctetStream& os) const
 {
     os.store(other_pks);
     os.store(enc_alphas);
     sk.pack(os);
 }
 
-void PairwiseMachine::unpack(octetStream& os)
+void PairwiseMachine::unpack(OctetStream& os)
 {
     os.get_no_resize(other_pks);
     os.get(enc_alphas, {pk});
@@ -128,7 +128,7 @@ void PairwiseMachine::unpack(octetStream& os)
 
 void PairwiseMachine::check(Player& P) const
 {
-    Bundle<octetStream> bundle(P);
+    Bundle<OctetStream> bundle(P);
 
     try
     {
@@ -147,5 +147,5 @@ int PairwiseMachine::comp_sec()
     return NonInteractiveProof::comp_sec(sec);
 }
 
-template void RealPairwiseMachine::setup_keys<FFT_Data>();
+template void RealPairwiseMachine::setup_keys<FftData>();
 template void RealPairwiseMachine::setup_keys<P2Data>();

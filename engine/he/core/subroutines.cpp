@@ -4,22 +4,22 @@
 
 #include "numeric/modp.hpp"
 
-void Subs(modp& ans,const vector<int>& poly,const modp& x,const Zp_Data& ZpD)
+void Subs(modp& ans,const vector<int>& poly,const modp& x,const ZpData& zp_d)
 {
   modp one,co;
-  assignOne(one,ZpD);
-  assignZero(ans,ZpD);
+  assignOne(one,zp_d);
+  assignZero(ans,zp_d);
   for (int i=poly.size()-1; i>=0; i--)
-    { Mul(ans,ans,x,ZpD);
+    { Mul(ans,ans,x,zp_d);
       if (poly[i] > 0)
         {
           for (int j = 0; j < poly[i]; j++)
-            Add(ans, ans, one, ZpD);
+            Add(ans, ans, one, zp_d);
         }
       if (poly[i] < 0)
         {
           for (int j = 0; j < -poly[i]; j++)
-            Sub(ans, ans, one, ZpD);
+            Sub(ans, ans, one, zp_d);
         }
     }
 }
@@ -30,20 +30,20 @@ void Subs(modp& ans,const vector<int>& poly,const modp& x,const Zp_Data& ZpD)
  *   This is deterministic so all players have the same root of unity
  *   poly is Phi_m(X)
  */
-modp Find_Primitive_Root_m(int m,const vector<int>& poly,const Zp_Data& ZpD)
+modp find_primitive_root_m(int m,const vector<int>& poly,const ZpData& zp_d)
 {
   modp ans,e,one,base;
-  assignOne(one,ZpD);
-  assignOne(base,ZpD);
-  bigint   exp;
-  exp=(ZpD.pr-1)/m;
+  assignOne(one,zp_d);
+  assignOne(base,zp_d);
+  Bigint   exp;
+  exp=(zp_d.pr-1)/m;
   bool flag=true;
   while (flag)
-    { Add(base,base,one,ZpD);   // Keep incrementing base until we hit the answer
-      Power(ans,base,exp,ZpD);
+    { Add(base,base,one,zp_d);   // Keep incrementing base until we hit the answer
+      Power(ans,base,exp,zp_d);
       // e=Phi(ans)
-      Subs(e,poly,ans,ZpD);
-      if (isZero(e,ZpD)) { flag=false; }
+      Subs(e,poly,ans,zp_d);
+      if (isZero(e,zp_d)) { flag=false; }
     }
   return ans;
 }
@@ -54,7 +54,7 @@ modp Find_Primitive_Root_m(int m,const vector<int>& poly,const Zp_Data& ZpD)
  *   This is deterministic so all players have the same root of unity
  *   poly is Phi_m(X)
  */
-modp Find_Primitive_Root_2m(int m,const vector<int>& poly,const Zp_Data& ZpD)
+modp find_primitive_root_2m(int m,const vector<int>& poly,const ZpData& zp_d)
 {
   // Thin out poly, where poly is Phi_m(X) by 2
   vector<int> poly2;
@@ -63,7 +63,7 @@ modp Find_Primitive_Root_2m(int m,const vector<int>& poly,const Zp_Data& ZpD)
     { poly2[2*i]=poly[i];
       poly2[2*i+1]=0;
     }
-  modp ans=Find_Primitive_Root_m(2*m,poly2,ZpD);
+  modp ans=find_primitive_root_m(2*m,poly2,zp_d);
   return ans;
 }
 
@@ -74,24 +74,24 @@ modp Find_Primitive_Root_2m(int m,const vector<int>& poly,const Zp_Data& ZpD)
  * This assumes m is a power of two and so the cyclotomic polynomial
  * is  F=X^{m/2}+1
  */
-modp Find_Primitive_Root_2power(int m,const Zp_Data& ZpD)
+modp find_primitive_root_2power(int m,const ZpData& zp_d)
 {
   assert((m & (m - 1)) == 0);
   assert(m > 1);
   modp ans,e,one,base;
-  assignOne(one,ZpD);
-  assignOne(base,ZpD);
-  bigint   exp;
-  exp=(ZpD.pr-1)/m;
-  assert(exp * m == ZpD.pr - 1);
+  assignOne(one,zp_d);
+  assignOne(base,zp_d);
+  Bigint   exp;
+  exp=(zp_d.pr-1)/m;
+  assert(exp * m == zp_d.pr - 1);
   bool flag=true;
   while (flag)
-    { Add(base,base,one,ZpD);   // Keep incrementing base until we hit the answer
-      Power(ans,base,exp,ZpD);
+    { Add(base,base,one,zp_d);   // Keep incrementing base until we hit the answer
+      Power(ans,base,exp,zp_d);
       // e=ans^{m/2}+1
-      Power(e,ans,m/2,ZpD);
-      Add(e,e,one,ZpD);
-      if (isZero(e,ZpD)) { flag=false; }
+      Power(e,ans,m/2,zp_d);
+      Add(e,e,one,zp_d);
+      if (isZero(e,zp_d)) { flag=false; }
     }
   return ans;
 }

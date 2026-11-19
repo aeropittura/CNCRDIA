@@ -80,7 +80,7 @@ public:
 inline Timer& Timer::start()
 {
   if (running)
-    throw Processor_Error("Timer already running.");
+    throw ProcessorError("Timer already running.");
   // clock() is not suitable in threaded programs so time using something else
   clock_gettime(clock_id, &startv);
   running = true;
@@ -90,7 +90,7 @@ inline Timer& Timer::start()
 inline void Timer::stop()
 {
   if (!running)
-    throw Processor_Error("Time not running.");
+    throw ProcessorError("Time not running.");
   elapsed_time += elapsed_since_last_start();
 
   running = false;

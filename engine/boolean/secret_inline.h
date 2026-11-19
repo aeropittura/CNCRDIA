@@ -50,13 +50,13 @@ inline Secret<T> GC::Secret<T>::operator+(const Secret<T>& x) const
     res.xor_(min_n, *this, x);
     if (min_n < n)
     {
-        const vector<T>* more_regs;
+        const vector<T>* more_registers;
         if (registers.size() < x.registers.size())
-            more_regs = &x.registers;
+            more_registers = &x.registers;
         else
-            more_regs = &registers;
-        res.registers.insert(res.registers.end(), more_regs->begin() + min_n,
-                more_regs->begin() + min((size_t)n, more_regs->size()));
+            more_registers = &registers;
+        res.registers.insert(res.registers.end(), more_registers->begin() + min_n,
+                more_registers->begin() + min((size_t)n, more_registers->size()));
     }
     return res;
 }
@@ -64,7 +64,7 @@ inline Secret<T> GC::Secret<T>::operator+(const Secret<T>& x) const
 template <class T>
 void Secret<T>::invert(int n, const Secret<T>& x)
 {
-    resize_regs(n);
+    resize_registers(n);
     T one;
     one.public_input(1);
     for (int i = 0; i < n; i++)
@@ -77,13 +77,13 @@ template <class T>
 MAYBE_INLINE void Secret<T>::and_(int n, const Secret<T>& x, const Secret<T>& y, bool repeat)
 {
     assert(n <= default_length);
-    resize_regs(n);
+    resize_registers(n);
     for (int i = 0; i < n; i++)
         AND<T>(registers[i], x.get_reg(i), y.get_reg(repeat ? 0 : i));
 }
 
 template <class T>
-inline void Secret<T>::resize_regs(size_t n)
+inline void Secret<T>::resize_registers(size_t n)
 {
     if (registers.size() != n)
         registers.resize(n);

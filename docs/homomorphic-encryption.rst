@@ -12,10 +12,10 @@ See ``parties/examples/he-example.cpp`` for some example code.
 Reference
 ~~~~~~~~~
 
-.. doxygenclass:: FHE_Params
+.. doxygenclass:: FheParameters
    :members:
 
-.. doxygenclass:: FHE_KeyPair
+.. doxygenclass:: FheKeyPair
    :members:
 
 .. doxygenclass:: FHE_SK

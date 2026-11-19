@@ -6,83 +6,83 @@
 #include "protocols/semi/hemi_options.h"
 #include "vm/online_options.h"
 
-FHE_Params::FHE_Params(int n_mults, int drown_sec) :
-    FFTData(n_mults + 1), Chi(0.7), sec_p(drown_sec), matrix_dim(1)
+FheParameters::FheParameters(int n_mults, int drown_sec) :
+    fft_data(n_mults + 1), Chi(0.7), sec_p(drown_sec), matrix_dimension(1)
 {
 }
 
-void FHE_Params::set(const Ring& R,
-                     const vector<bigint>& primes)
+void FheParameters::set(const Ring& R,
+                     const vector<Bigint>& primes)
 {
-  if (primes.size() != FFTData.size())
+  if (primes.size() != fft_data.size())
     throw runtime_error("wrong number of primes");
 
-  for (size_t i = 0; i < FFTData.size(); i++)
-    FFTData[i].init(R,primes[i]);
+  for (size_t i = 0; i < fft_data.size(); i++)
+    fft_data[i].init(R,primes[i]);
 
   set_sec(sec_p);
 }
 
-void FHE_Params::set_sec(int sec)
+void FheParameters::set_sec(int sec)
 {
   assert(sec >= 0);
   sec_p=sec;
-  Bval=1;  Bval=Bval<<sec_p;
-  Bval=FFTData[0].get_prime()/(2*(1+Bval));
+  bval=1;  bval=bval<<sec_p;
+  bval=fft_data[0].get_prime()/(2*(1+bval));
 }
 
-void FHE_Params::set_min_sec(int sec)
+void FheParameters::set_min_sec(int sec)
 {
   set_sec(max(sec, sec_p));
 }
 
-void FHE_Params::set_matrix_dim(int matrix_dim)
+void FheParameters::set_matrix_dimension(int matrix_dimension)
 {
-  assert(matrix_dim > 0);
-  if (FFTData[0].get_prime() != 0)
+  assert(matrix_dimension > 0);
+  if (fft_data[0].get_prime() != 0)
     throw runtime_error("cannot change matrix dimension after parameter generation");
-  this->matrix_dim = matrix_dim;
+  this->matrix_dimension = matrix_dimension;
 }
 
-void FHE_Params::set_matrix_dim_from_options()
+void FheParameters::set_matrix_dimension_from_options()
 {
-  set_matrix_dim(
+  set_matrix_dimension(
       HemiOptions::singleton.plain_matmul ?
           1 : OnlineOptions::singleton.batch_size);
 }
 
-bigint FHE_Params::Q() const
+Bigint FheParameters::Q() const
 {
-  bigint res = FFTData[0].get_prime();
-  for (size_t i = 1; i < FFTData.size(); i++)
-    res *= FFTData[i].get_prime();
+  Bigint res = fft_data[0].get_prime();
+  for (size_t i = 1; i < fft_data.size(); i++)
+    res *= fft_data[i].get_prime();
   return res;
 }
 
-void FHE_Params::pack(octetStream& o) const
+void FheParameters::pack(OctetStream& o) const
 {
-  o.store(FFTData);
+  o.store(fft_data);
   Chi.pack(o);
-  Bval.pack(o);
+  bval.pack(o);
   o.store(sec_p);
-  o.store(matrix_dim);
+  o.store(matrix_dimension);
   fd.pack(o);
 }
 
-void FHE_Params::unpack(octetStream& o)
+void FheParameters::unpack(OctetStream& o)
 {
-  o.get(FFTData);
+  o.get(fft_data);
   Chi.unpack(o);
-  Bval.unpack(o);
+  bval.unpack(o);
   o.get(sec_p);
-  o.get(matrix_dim);
+  o.get(matrix_dimension);
   fd.unpack(o);
 }
 
-bool FHE_Params::operator!=(const FHE_Params& other) const
+bool FheParameters::operator!=(const FheParameters& other) const
 {
-  if (FFTData != other.FFTData or Chi != other.Chi or sec_p != other.sec_p
-      or Bval != other.Bval)
+  if (fft_data != other.fft_data or Chi != other.Chi or sec_p != other.sec_p
+      or bval != other.bval)
     {
       return true;
     }
@@ -90,7 +90,7 @@ bool FHE_Params::operator!=(const FHE_Params& other) const
     return false;
 }
 
-void FHE_Params::basic_generation_mod_prime(int plaintext_length)
+void FheParameters::basic_generation_mod_prime(int plaintext_length)
 {
   if (n_mults() == 0)
     generate_semi_setup(plaintext_length, 0, *this, fd, false);
@@ -102,18 +102,18 @@ void FHE_Params::basic_generation_mod_prime(int plaintext_length)
 }
 
 template<>
-const FFT_Data& FHE_Params::get_plaintext_field_data() const
+const FftData& FheParameters::get_plaintext_field_data() const
 {
   return fd;
 }
 
 template<>
-const P2Data& FHE_Params::get_plaintext_field_data() const
+const P2Data& FheParameters::get_plaintext_field_data() const
 {
-  throw not_implemented();
+  throw NotImplemented();
 }
 
-bigint FHE_Params::get_plaintext_modulus() const
+Bigint FheParameters::get_plaintext_modulus() const
 {
   return fd.get_prime();
 }

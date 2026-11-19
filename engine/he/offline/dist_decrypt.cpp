@@ -8,66 +8,66 @@ DistDecrypt<FD>::DistDecrypt(const Player& P, const FHE_SK& share,
     const FHE_PK& pk, const FD& FTD) :
     P(P), share(share), pk(pk), mf(FTD), f(FTD)
 {
-  vv.resize(pk.get_params().phi_m());
-  vv1.resize(pk.get_params().phi_m());
+  vv.resize(pk.get_parameters().phi_m());
+  vv1.resize(pk.get_parameters().phi_m());
   // extra limb for operations
-  bigint limit = pk.get_params().p0() << 64;
+  Bigint limit = pk.get_parameters().p0() << 64;
   vv.allocate_slots(limit);
   vv1.allocate_slots(limit);
   mf.allocate_slots(pk.p() << 64);
 }
 
-class ModuloTreeSum : public TreeSum<bigint>
+class ModuloTreeSum : public TreeSum<Bigint>
 {
-  typedef TreeSum<bigint> super;
+  typedef TreeSum<Bigint> Super;
 
-  bigint modulo;
+  Bigint modulo;
 
-  void post_add_process(vector<bigint>& values)
+  void post_add_process(vector<Bigint>& values)
   {
     for (auto& v : values)
       v %= modulo;
   }
 
 public:
-  ModuloTreeSum(bigint modulo) :
+  ModuloTreeSum(Bigint modulo) :
       modulo(modulo)
   {
   }
 
-  void run(vector<bigint>& values, const Player& P)
+  void run(vector<Bigint>& values, const Player& P)
   {
     lengths.resize(values.size(), numBytes(modulo));
-    super::run(values, P);
+    Super::run(values, P);
   }
 };
 
 template<class FD>
-Plaintext_<FD>& DistDecrypt<FD>::run(const Ciphertext& ctx, bool NewCiphertext)
+Plaintext_<FD>& DistDecrypt<FD>::run(const Ciphertext& ctx, bool new_ciphertext)
 {
   CODE_LOCATION
-  const FHE_Params& params=ctx.get_params();
+  const FheParameters& params=ctx.get_parameters();
 
   share.dist_decrypt_1(vv, ctx,P.my_num(),P.num_players());
 
-  if (not NewCiphertext)
+  if (not new_ciphertext)
     intermediate_step();
 
   if ((int)vv.size() != params.phi_m())
     throw length_error("wrong length of ring element");
 
-  size_t length = numBytes(pk.get_params().p0());
+  size_t length = numBytes(pk.get_parameters().p0());
 
   if (OnlineOptions::singleton.direct)
     {
-      // Now pack into an octetStream for broadcasting
-      vector<octetStream> os(P.num_players());
+      // Now pack into an OctetStream for broadcasting
+      vector<OctetStream> os(P.num_players());
 
       for (int i=0; i<params.phi_m(); i++)
         { (os[P.my_num()]).store(vv[i], length); }
 
       // Broadcast and Receive the values
-      P.Broadcast_Receive(os);
+      P.broadcast_receive(os);
 
       // Reconstruct the value mod p0 from all shares
       vv1.resize(params.phi_m());
@@ -89,13 +89,13 @@ Plaintext_<FD>& DistDecrypt<FD>::run(const Ciphertext& ctx, bool NewCiphertext)
     }
 
   // Now get the final message
-  bigint mod=params.p0();
-  mf.set_poly_mod(vv,mod);
+  Bigint mod=params.p0();
+  mf.set_polynomial_mod(vv,mod);
   return mf;
 }
 
 
-template class DistDecrypt<FFT_Data>;
+template class DistDecrypt<FftData>;
 template class DistDecrypt<P2Data>;
 
 

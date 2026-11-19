@@ -44,7 +44,7 @@ OT_ROLE INV_ROLE(OT_ROLE role)
         return BOTH;
 }
 
-void send_if_ot_sender(TwoPartyPlayer* P, vector<octetStream>& os, OT_ROLE role)
+void send_if_ot_sender(TwoPartyPlayer* P, vector<OctetStream>& os, OT_ROLE role)
 {
     if (role == SENDER)
     {
@@ -61,7 +61,7 @@ void send_if_ot_sender(TwoPartyPlayer* P, vector<octetStream>& os, OT_ROLE role)
     }
 }
 
-void send_if_ot_receiver(TwoPartyPlayer* P, vector<octetStream>& os, OT_ROLE role)
+void send_if_ot_receiver(TwoPartyPlayer* P, vector<OctetStream>& os, OT_ROLE role)
 {
     if (role == RECEIVER)
     {
@@ -85,10 +85,10 @@ void sender_genS(ref10_SENDER* s, unsigned char* S_pack)
     ref10_sender_genS(s, S_pack);
 }
 
-void sender_keygen(ref10_SENDER* s, unsigned char* Rs_pack,
+void sender_keygen(ref10_SENDER* s, unsigned char* rs_pack,
         unsigned char (*keys)[4][HASHBYTES])
 {
-    ref10_sender_keygen(s, Rs_pack, keys);
+    ref10_sender_keygen(s, rs_pack, keys);
 }
 
 void receiver_maketable(ref10_RECEIVER* r)
@@ -101,10 +101,10 @@ void receiver_procS(ref10_RECEIVER* r)
     ref10_receiver_procS(r);
 }
 
-void receiver_rsgen(ref10_RECEIVER* r, unsigned char* Rs_pack,
+void receiver_rsgen(ref10_RECEIVER* r, unsigned char* rs_pack,
         unsigned char* cs)
 {
-    ref10_receiver_rsgen(r, Rs_pack, cs);
+    ref10_receiver_rsgen(r, rs_pack, cs);
 }
 
 void receiver_keygen(ref10_RECEIVER* r, unsigned char (*keys)[HASHBYTES])
@@ -114,7 +114,7 @@ void receiver_keygen(ref10_RECEIVER* r, unsigned char (*keys)[HASHBYTES])
 
 void BaseOT::allocate()
 {
-    for (int i = 0; i < nOT; i++)
+    for (int i = 0; i < n_ot; i++)
     {
         sender_inputs[i][0] = BitVector(8 * AES_BLK_SIZE);
         sender_inputs[i][1] = BitVector(8 * AES_BLK_SIZE);
@@ -161,13 +161,13 @@ void BaseOT::exec_base(bool new_receiver_inputs)
     int i, j, k;
     size_t len;
     PRNG G;
-    G.ReSeed();
-    vector<octetStream> os(2);
+    G.re_seed();
+    vector<OctetStream> os(2);
     T sender;
     U receiver;
 
     unsigned char S_pack[ PACKBYTES ];
-    unsigned char Rs_pack[ 2 ][ 4 * PACKBYTES ];
+    unsigned char rs_pack[ 2 ][ 4 * PACKBYTES ];
     unsigned char sender_keys[ 2 ][ 4 ][ HASHBYTES ];
     unsigned char receiver_keys[ 4 ][ HASHBYTES ];
     unsigned char cs[ 4 ];
@@ -185,7 +185,7 @@ void BaseOT::exec_base(bool new_receiver_inputs)
     {
         // Receive A
         len = sizeof(receiver.S_pack);
-        os[1].get_bytes((octet*) receiver.S_pack, len);
+        os[1].get_bytes((Octet*) receiver.S_pack, len);
         if (len != HASHBYTES)
         {
             cerr << "Received invalid length in base OT\n";
@@ -200,11 +200,11 @@ void BaseOT::exec_base(bool new_receiver_inputs)
     os[0].reset_write_head();
     allocate();
 
-    for (i = 0; i < nOT; i += 4)
+    for (i = 0; i < n_ot; i += 4)
     {
         if (ot_role & RECEIVER)
         {
-            for (j = 0; j < 4 and (i + j) < nOT; j++)
+            for (j = 0; j < 4 and (i + j) < n_ot; j++)
             {
                 // Process choice bits
                 if (new_receiver_inputs)
@@ -212,14 +212,14 @@ void BaseOT::exec_base(bool new_receiver_inputs)
                 cs[j] = receiver_inputs[i + j].get();
             }
             // Compute B
-            receiver_rsgen(&receiver, Rs_pack[0], cs);
+            receiver_rsgen(&receiver, rs_pack[0], cs);
             // Send B
-            os[0].store_bytes(Rs_pack[0], sizeof(Rs_pack[0]));
+            os[0].store_bytes(rs_pack[0], sizeof(rs_pack[0]));
             // Compute k_R
             receiver_keygen(&receiver, receiver_keys);
 
             // Copy keys to receiver_outputs
-            for (j = 0; j < 4 and (i + j) < nOT; j++)
+            for (j = 0; j < 4 and (i + j) < n_ot; j++)
             {
                 for (k = 0; k < AES_BLK_SIZE; k++)
                 {
@@ -243,23 +243,23 @@ void BaseOT::exec_base(bool new_receiver_inputs)
 
     send_if_ot_receiver(P, os, ot_role);
         
-    for (i = 0; i < nOT; i += 4)
+    for (i = 0; i < n_ot; i += 4)
     {
         if (ot_role & SENDER)
         {
             // Receive B
-            len = sizeof(Rs_pack[1]);
-            os[1].get_bytes((octet*) Rs_pack[1], len);
-            if (len != sizeof(Rs_pack[1]))
+            len = sizeof(rs_pack[1]);
+            os[1].get_bytes((Octet*) rs_pack[1], len);
+            if (len != sizeof(rs_pack[1]))
             {
                 cerr << "Received invalid length in base OT\n";
                 exit(1);
             }
             // Compute k_0 and k_1
-            sender_keygen(&sender, Rs_pack[1], sender_keys);
+            sender_keygen(&sender, rs_pack[1], sender_keys);
 
             // Copy 128 bits of keys to sender_inputs
-            for (j = 0; j < 4 and (i + j) < nOT; j++)
+            for (j = 0; j < 4 and (i + j) < n_ot; j++)
             {
                 for (k = 0; k < AES_BLK_SIZE; k++)
                 {
@@ -286,7 +286,7 @@ void BaseOT::exec_base(bool new_receiver_inputs)
     }
 
     if (ot_role & SENDER)
-        for (int i = 0; i < nOT; i++)
+        for (int i = 0; i < n_ot; i++)
         {
             if(sender_inputs.at(i).at(0) == sender_inputs.at(i).at(1))
             {
@@ -303,7 +303,7 @@ void BaseOT::exec_base(bool new_receiver_inputs)
         }
 
     // Hash with counter to avoid collisions
-    for (int i = 0; i < nOT; i++)
+    for (int i = 0; i < n_ot; i++)
     {
         if (ot_role & RECEIVER)
             hash_with_id(receiver_outputs.at(i), i);
@@ -313,14 +313,14 @@ void BaseOT::exec_base(bool new_receiver_inputs)
     }
 
     if (ot_role & SENDER)
-        for (int i = 0; i < nOT; i++)
+        for (int i = 0; i < n_ot; i++)
             assert(sender_inputs.at(i).at(0) != sender_inputs.at(i).at(1));
 
     // Set PRG seeds
     set_seeds();
 
     if (ot_role & SENDER)
-        for (int i = 0; i < nOT; i++)
+        for (int i = 0; i < n_ot; i++)
             assert(sender_inputs.at(i).at(0) != sender_inputs.at(i).at(1));
 }
 
@@ -335,14 +335,14 @@ void BaseOT::hash_with_id(BitVector& bits, long id)
 
 void BaseOT::set_seeds()
 {
-    assert(size_t(nOT) == sender_inputs.size());
+    assert(size_t(n_ot) == sender_inputs.size());
 
-    G_sender.clear();
-    G_receiver.clear();
+    g_sender.clear();
+    g_receiver.clear();
 
     PRNG G[2];
 
-    for (int i = 0; i < nOT; i++)
+    for (int i = 0; i < n_ot; i++)
     {
         // Set PRG seeds
         if (ot_role & SENDER)
@@ -352,12 +352,12 @@ void BaseOT::set_seeds()
                 G[j].SetSeed(sender_inputs[i][j].get_ptr());
             }
 
-            G_sender.push_back({G[0], G[1]});
+            g_sender.push_back({G[0], G[1]});
         }
         if (ot_role & RECEIVER)
         {
             G[0].SetSeed(receiver_outputs[i].get_ptr());
-            G_receiver.push_back(G[0]);
+            g_receiver.push_back(G[0]);
         }
     }
     extend_length();
@@ -365,16 +365,16 @@ void BaseOT::set_seeds()
 
 void BaseOT::extend_length()
 {
-    for (int i = 0; i < nOT; i++)
+    for (int i = 0; i < n_ot; i++)
     {
         if (ot_role & SENDER)
         {
-            sender_inputs.at(i)[0].randomize(G_sender[i][0]);
-            sender_inputs.at(i)[1].randomize(G_sender[i][1]);
+            sender_inputs.at(i)[0].randomize(g_sender[i][0]);
+            sender_inputs.at(i)[1].randomize(g_sender[i][1]);
         }
         if (ot_role & RECEIVER)
         {
-            receiver_outputs.at(i).randomize(G_receiver[i]);
+            receiver_outputs.at(i).randomize(g_receiver[i]);
         }
     }
 }
@@ -382,11 +382,11 @@ void BaseOT::extend_length()
 
 void BaseOT::check()
 {
-    vector<octetStream> os(2);
-    BitVector tmp_vector(8 * AES_BLK_SIZE);
+    vector<OctetStream> os(2);
+    BitVector temp_vector(8 * AES_BLK_SIZE);
 
 
-    for (int i = 0; i < nOT; i++)
+    for (int i = 0; i < n_ot; i++)
     {
         if (ot_role == SENDER)
         {
@@ -408,13 +408,13 @@ void BaseOT::check()
         }
         if (ot_role & RECEIVER)
         {
-            tmp_vector.unpack(os[1]);
+            temp_vector.unpack(os[1]);
         
             if (receiver_inputs[i] == 1)
             {
-                tmp_vector.unpack(os[1]);
+                temp_vector.unpack(os[1]);
             }
-            if (!tmp_vector.equals(receiver_outputs[i]))
+            if (!temp_vector.equals(receiver_outputs[i]))
             {
                 cerr << "Incorrect OT\n";
                 exit(1);
@@ -426,25 +426,25 @@ void BaseOT::check()
 }
 
 
-void FakeOT::exec_base(bool new_receiver_inputs)
+void FakeOt::exec_base(bool new_receiver_inputs)
 {
     insecure("base OTs");
     PRNG G;
-    G.ReSeed();
-    vector<octetStream> os(2);
+    G.re_seed();
+    vector<OctetStream> os(2);
     vector<BitVector> bv(2, 128);
 
     allocate();
 
     if ((ot_role & RECEIVER) && new_receiver_inputs)
     {
-        for (int i = 0; i < nOT; i++)
+        for (int i = 0; i < n_ot; i++)
             // Generate my receiver inputs
             receiver_inputs[i] = G.get_uchar()&1;
     }
 
     if (ot_role & SENDER)
-        for (int i = 0; i < nOT; i++)
+        for (int i = 0; i < n_ot; i++)
             for (int j = 0; j < 2; j++)
             {
                 sender_inputs[i][j].randomize(G);
@@ -454,7 +454,7 @@ void FakeOT::exec_base(bool new_receiver_inputs)
     send_if_ot_sender(P, os, ot_role);
 
     if (ot_role & RECEIVER)
-        for (int i = 0; i < nOT; i++)
+        for (int i = 0; i < n_ot; i++)
         {
             for (int j = 0; j < 2; j++)
                 bv[j].unpack(os[1]);

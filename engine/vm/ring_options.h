@@ -11,12 +11,12 @@ using namespace std;
 
 class RingOptions
 {
-    bool R_is_set;
+    bool r_is_set;
 
 public:
     int R;
 
-    RingOptions(ez::ezOptionParser& opt, int argc, const char** argv);
+    RingOptions(ez::EzOptionParser& opt, int argc, const char** argv);
 
-    int ring_size_from_opts_or_schedule(string progname);
+    int ring_size_from_options_or_schedule(string progname);
 };

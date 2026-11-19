@@ -10,47 +10,47 @@ typedef unsigned int  uint;
 
 /************* C Version *************/
 // Key Schedule
-void aes_schedule( int nb, int nr, const octet* k, uint* RK );
+void aes_schedule( int nb, int nr, const Octet* k, uint* RK );
 
-inline void aes_schedule( uint* RK, octet* K )
+inline void aes_schedule( uint* RK, Octet* K )
 { aes_schedule(4,10,K,RK); }
-inline void aes_128_schedule( uint* RK, const octet* K )
+inline void aes_128_schedule( uint* RK, const Octet* K )
 { aes_schedule(4,10,K,RK); }
-inline void aes_192_schedule( uint* RK, octet* K )
+inline void aes_192_schedule( uint* RK, Octet* K )
 { aes_schedule(6,12,K,RK); }
-inline void aes_256_schedule( uint* RK, octet* K )
+inline void aes_256_schedule( uint* RK, Octet* K )
 { aes_schedule(8,14,K,RK); }
 
 // Encryption Function 
-void aes_128_encrypt( octet* C, octet* M, uint* RK );
-void aes_192_encrypt( octet* C, octet* M, uint* RK );
-void aes_256_encrypt( octet* C, octet* M, uint* RK );
+void aes_128_encrypt( Octet* C, Octet* M, uint* RK );
+void aes_192_encrypt( Octet* C, Octet* M, uint* RK );
+void aes_256_encrypt( Octet* C, Octet* M, uint* RK );
 
-inline void aes_encrypt( octet* C, octet* M, uint* RK )
+inline void aes_encrypt( Octet* C, Octet* M, uint* RK )
 { aes_128_encrypt(C,M,RK ); }
 
 
 /*********** M-Code Version ***********/
 // Check can support this
-inline int Check_CPU_support_AES() { return cpu_has_aes(); }
+inline int check_cpu_support_aes() { return cpu_has_aes(); }
 // Key Schedule 
-void aes_128_schedule( octet* key, const octet* userkey );
-void aes_192_schedule( octet* key, const octet* userkey );
-void aes_256_schedule( octet* key, const octet* userkey );
+void aes_128_schedule( Octet* key, const Octet* userkey );
+void aes_192_schedule( Octet* key, const Octet* userkey );
+void aes_256_schedule( Octet* key, const Octet* userkey );
 
-inline void aes_schedule( octet* key, const octet* userkey )
+inline void aes_schedule( Octet* key, const Octet* userkey )
 { aes_128_schedule(key,userkey); }
 
 
 // Encryption Function 
-void aes_128_encrypt( octet* C, const octet* M,const octet* RK );
-void aes_192_encrypt( octet* C, const octet* M,const octet* RK );
-void aes_256_encrypt( octet* C, const octet* M,const octet* RK );
+void aes_128_encrypt( Octet* C, const Octet* M,const Octet* RK );
+void aes_192_encrypt( Octet* C, const Octet* M,const Octet* RK );
+void aes_256_encrypt( Octet* C, const Octet* M,const Octet* RK );
 
 #ifndef __clang__
 __attribute__((optimize("unroll-loops")))
 #endif
-inline __m128i aes_128_encrypt(__m128i in, const octet* key)
+inline __m128i aes_128_encrypt(__m128i in, const Octet* key)
 {
 #if defined(__AES__) || !defined(__x86_64__)
     if (cpu_has_aes())
@@ -67,7 +67,7 @@ inline __m128i aes_128_encrypt(__m128i in, const octet* key)
 #endif
     {
         __m128i tmp;
-        aes_128_encrypt((octet*) &tmp, (octet*) &in, (uint*) key);
+        aes_128_encrypt((Octet*) &tmp, (Octet*) &in, (uint*) key);
         return tmp;
     }
 }
@@ -76,14 +76,14 @@ template <int N>
 inline void software_ecb_aes_128_encrypt(__m128i* out, const __m128i* in, uint* key)
 {
     for (int i = 0; i < N; i++)
-        aes_128_encrypt((octet*)&out[i], (octet*)&in[i], key);
+        aes_128_encrypt((Octet*)&out[i], (Octet*)&in[i], key);
 }
 
 template <int N>
 #ifndef __clang__
 __attribute__((optimize("unroll-loops")))
 #endif
-inline void ecb_aes_128_encrypt(__m128i* out, const __m128i* in, const octet* key)
+inline void ecb_aes_128_encrypt(__m128i* out, const __m128i* in, const Octet* key)
 {
 #if defined(__AES__) || !defined(__x86_64__)
     if (cpu_has_aes())
@@ -104,7 +104,7 @@ inline void ecb_aes_128_encrypt(__m128i* out, const __m128i* in, const octet* ke
 }
 
 template <int N>
-inline void ecb_aes_128_encrypt(__m128i* out, const __m128i* in, const octet* key, const int* indices)
+inline void ecb_aes_128_encrypt(__m128i* out, const __m128i* in, const Octet* key, const int* indices)
 {
     __m128i tmp[N];
     for (int i = 0; i < N; i++)
@@ -114,8 +114,8 @@ inline void ecb_aes_128_encrypt(__m128i* out, const __m128i* in, const octet* ke
         out[indices[i]] = tmp[i];
 }
 
-inline void aes_encrypt( octet* C, const octet* M,const octet* RK )
+inline void aes_encrypt( Octet* C, const Octet* M,const Octet* RK )
 { aes_128_encrypt(C,M,RK); }
 
-inline __m128i aes_encrypt( __m128i M,const octet* RK )
+inline __m128i aes_encrypt( __m128i M,const Octet* RK )
 { return aes_128_encrypt(M,RK); }

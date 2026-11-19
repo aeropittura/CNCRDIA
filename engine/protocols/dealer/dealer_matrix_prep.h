@@ -10,7 +10,7 @@
 template<class T>
 class DealerMatrixPrep : public BufferPrep<ShareMatrix<T>>
 {
-    typedef BufferPrep<ShareMatrix<T>> super;
+    typedef BufferPrep<ShareMatrix<T>> Super;
     typedef typename T::LivePrep LivePrep;
 
     int n_rows, n_inner, n_cols;

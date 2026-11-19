@@ -51,7 +51,7 @@ F3VectorBitWise F3Code::apply(const F3VectorBitWise& x)
 {
     assert(x.size() == permutations.at(0).size());
     GC::RowMatrix<F3VectorBitWise> code_input(x.size(), 1);
-    code_input.set_col(0, x);
+    code_input.set_column(0, x);
     auto code_output = apply(code_input.transpose());
     F3VectorBitWise res = code_output.transpose().col(0);
     assert(res.size());

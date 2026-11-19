@@ -17,41 +17,41 @@
  */
 
 
-// Special version for octetStreams
-void Commit(vector< vector<octetStream> >& Comm_data,
-            vector<octetStream>& Open_data,
-            const vector< vector<octetStream> >& data,const Player& P,int num_runs)
+// Special version for OctetStreams
+void Commit(vector< vector<OctetStream> >& communication_data,
+            vector<OctetStream>& open_data,
+            const vector< vector<OctetStream> >& data,const Player& P,int num_runs)
 {
   CODE_LOCATION
   int my_number=P.my_num();
   for (int i=0; i<num_runs; i++)
-     { Comm_data[i].resize(P.num_players());
-       Commit(Comm_data[i][my_number],Open_data[i],data[i][my_number],my_number);
-       P.Broadcast_Receive(Comm_data[i]);
+     { communication_data[i].resize(P.num_players());
+       Commit(communication_data[i][my_number],open_data[i],data[i][my_number],my_number);
+       P.broadcast_receive(communication_data[i]);
      }
 }
 
 
 
 
-// Special version for octetStreams
-void Open(vector< vector<octetStream> >& data,
-          const vector< vector<octetStream> >& Comm_data,
-          const vector<octetStream>& My_Open_data,
+// Special version for OctetStreams
+void Open(vector< vector<OctetStream> >& data,
+          const vector< vector<OctetStream> >& communication_data,
+          const vector<OctetStream>& my_open_data,
           const Player& P,int num_runs,int dont)
 {
   CODE_LOCATION
   int my_number=P.my_num();
   int num_players=P.num_players();
-  vector<octetStream> Open_data(num_players);
+  vector<OctetStream> open_data(num_players);
   for (int i=0; i<num_runs; i++)
      { if (i!=dont)
-        { Open_data[my_number]=My_Open_data[i];
-          P.Broadcast_Receive(Open_data);
+        { open_data[my_number]=my_open_data[i];
+          P.broadcast_receive(open_data);
           for (int j=0; j<num_players; j++) 
             { if (j!=my_number)
-	        { if (!Open(data[i][j],Comm_data[i][j],Open_data[j],j))
-	             { throw invalid_commitment(); }
+	        { if (!Open(data[i][j],communication_data[i][j],open_data[j],j))
+	             { throw InvalidCommitment(); }
 	        }
 	    }
         }
@@ -59,24 +59,24 @@ void Open(vector< vector<octetStream> >& data,
 }
 
 
-void Open(vector< vector<octetStream> >& data,
-          const vector< vector<octetStream> >& Comm_data,
-          const vector<octetStream>& My_Open_data,
+void Open(vector< vector<OctetStream> >& data,
+          const vector< vector<OctetStream> >& communication_data,
+          const vector<OctetStream>& my_open_data,
           const vector<int> open,
           const Player& P,int num_runs)
 {
   CODE_LOCATION
   int my_number=P.my_num();
   int num_players=P.num_players();
-  vector<octetStream> Open_data(num_players);
+  vector<OctetStream> open_data(num_players);
   for (int i=0; i<num_runs; i++)
      { if (open[i]==1)
-        { Open_data[my_number]=My_Open_data[i];
-          P.Broadcast_Receive(Open_data);
+        { open_data[my_number]=my_open_data[i];
+          P.broadcast_receive(open_data);
           for (int j=0; j<num_players; j++) 
             { if (j!=my_number)
-	         { if (!Open(data[i][j],Comm_data[i][j],Open_data[j],j))
-	             { throw invalid_commitment(); }
+	         { if (!Open(data[i][j],communication_data[i][j],open_data[j],j))
+	             { throw InvalidCommitment(); }
 	        }
 	    }
         }
@@ -87,39 +87,39 @@ void Open(vector< vector<octetStream> >& data,
 
 
 
-void Commit_To_Challenge(vector<unsigned int>& e,
-                         vector<octetStream>& Comm_e,vector<octetStream>& Open_e,
+void commit_to_challenge(vector<unsigned int>& e,
+                         vector<OctetStream>& communication_e,vector<OctetStream>& open_e,
                          const Player& P,int num_runs)
 {
   CODE_LOCATION
   PRNG G;
-  G.ReSeed();
+  G.re_seed();
 
   e.resize(P.num_players());
-  Comm_e.resize(P.num_players());
-  Open_e.resize(P.num_players());
+  communication_e.resize(P.num_players());
+  open_e.resize(P.num_players());
   
   e[P.my_num()]=G.get_uint(num_runs);
-  octetStream ee; ee.store(e[P.my_num()]);
-  Commit(Comm_e[P.my_num()],Open_e[P.my_num()],ee,P.my_num());
-  P.Broadcast_Receive(Comm_e);
+  OctetStream ee; ee.store(e[P.my_num()]);
+  Commit(communication_e[P.my_num()],open_e[P.my_num()],ee,P.my_num());
+  P.broadcast_receive(communication_e);
 }
 
 
-int Open_Challenge(vector<unsigned int>& e,vector<octetStream>& Open_e,
-                   const vector<octetStream>& Comm_e,
+int open_challenge(vector<unsigned int>& e,vector<OctetStream>& open_e,
+                   const vector<OctetStream>& communication_e,
                    const Player& P,int num_runs)
 {
   CODE_LOCATION
   // Now open the challenge commitments and determine which run was for real
-  P.Broadcast_Receive(Open_e);
+  P.broadcast_receive(open_e);
   
   int challenge=0;
-  octetStream ee;
+  OctetStream ee;
   for (int i = 0; i < P.num_players(); i++)
     { if (i != P.my_num())
-        { if (!Open(ee,Comm_e[i],Open_e[i],i))
-	     { throw invalid_commitment(); }
+        { if (!Open(ee,communication_e[i],open_e[i],i))
+	     { throw InvalidCommitment(); }
           ee.get(e[i]);
           }
       challenge+=e[i];
@@ -130,7 +130,7 @@ int Open_Challenge(vector<unsigned int>& e,vector<octetStream>& Open_e,
 }
 
 
-void Create_Random_Seed(octet* seed, const PlayerBase& P, int len,
+void create_random_seed(Octet* seed, const PlayerBase& P, int len,
     const vector<bool>& parties)
 {
   CODE_LOCATION
@@ -140,75 +140,75 @@ void Create_Random_Seed(octet* seed, const PlayerBase& P, int len,
     my_parties.resize(P.num_players(), true);
 
   PRNG G;
-  G.ReSeed();
-  vector<octetStream> e(P.num_players());
-  vector<octetStream> Comm_e(P.num_players());
-  vector<octetStream> Open_e(P.num_players());
+  G.re_seed();
+  vector<OctetStream> e(P.num_players());
+  vector<OctetStream> communication_e(P.num_players());
+  vector<OctetStream> open_e(P.num_players());
 
-  G.get_octetStream(e[P.my_num()],len);
-  Commit(Comm_e[P.my_num()],Open_e[P.my_num()],e[P.my_num()],P.my_num());
-  P.partial_broadcast(my_parties, my_parties, Comm_e);
+  G.get_octet_stream(e[P.my_num()],len);
+  Commit(communication_e[P.my_num()],open_e[P.my_num()],e[P.my_num()],P.my_num());
+  P.partial_broadcast(my_parties, my_parties, communication_e);
 
-  P.partial_broadcast(my_parties, my_parties, Open_e);
+  P.partial_broadcast(my_parties, my_parties, open_e);
 
-  memset(seed,0,len*sizeof(octet));
+  memset(seed,0,len*sizeof(Octet));
   for (int i = 0; i < P.num_players(); i++)
     if (my_parties.at(i))
       {
         if (i != P.my_num())
           {
-            if (!Open(e[i], Comm_e[i], Open_e[i], i))
-              throw invalid_commitment();
+            if (!Open(e[i], communication_e[i], open_e[i], i))
+              throw InvalidCommitment();
           }
         for (int j = 0; j < len; j++)
           seed[j] ^= *e[i].consume(1);
       }
     else
       {
-        if (Open_e[i].get_length() > 0)
+        if (open_e[i].get_length() > 0)
           throw runtime_error("unexpected information from " + to_string(i));
       }
 }
 
 
-void Commit_And_Open_(vector<octetStream>& datas, const Player& P, Coordinator& coordinator)
+void commit_and_open_(vector<OctetStream>& datas, const Player& P, Coordinator& coordinator)
 {
   CODE_LOCATION
-  vector<octetStream> Comm_data(P.num_players());
-  vector<octetStream> Open_data(P.num_players());
+  vector<OctetStream> communication_data(P.num_players());
+  vector<OctetStream> open_data(P.num_players());
 
-  Commit(Comm_data[P.my_num()],Open_data[P.my_num()],datas[P.my_num()],P.my_num());
-  P.Broadcast_Receive(Comm_data);
+  Commit(communication_data[P.my_num()],open_data[P.my_num()],datas[P.my_num()],P.my_num());
+  P.broadcast_receive(communication_data);
 
   coordinator.wait(P.get_id());
-  P.Broadcast_Receive(Open_data);
+  P.broadcast_receive(open_data);
 
   for (int i = 0; i < P.num_players(); i++)
     { if (i != P.my_num())
-        { if (!Open(datas[i],Comm_data[i],Open_data[i],i))
-             { throw invalid_commitment(); }
+        { if (!Open(datas[i],communication_data[i],open_data[i],i))
+             { throw InvalidCommitment(); }
         }
     }
 }
 
 
-void Commit_To_Seeds(vector<PRNG>& G,
-                     vector< vector<octetStream> >& seeds,
-                     vector< vector<octetStream> >& Comm_seeds,
-		     vector<octetStream>& Open_seeds,
+void commit_to_seeds(vector<PRNG>& G,
+                     vector< vector<OctetStream> >& seeds,
+                     vector< vector<OctetStream> >& communication_seeds,
+		     vector<OctetStream>& open_seeds,
 		     const Player& P,int num_runs)
 {
   CODE_LOCATION
   seeds.resize(num_runs);
-  Comm_seeds.resize(num_runs);
-  Open_seeds.resize(num_runs);
+  communication_seeds.resize(num_runs);
+  open_seeds.resize(num_runs);
   for (int i=0; i<num_runs; i++)
-    { G[i].ReSeed();
+    { G[i].re_seed();
       seeds[i].resize(P.num_players());
-      Comm_seeds[i].resize(P.num_players());
-      Open_seeds[i].resize(P.num_players());
+      communication_seeds[i].resize(P.num_players());
+      open_seeds[i].resize(P.num_players());
       seeds[i][P.my_num()].reset_write_head();
       seeds[i][P.my_num()].append(G[i].get_seed(),SEED_SIZE);
     }
-  Commit(Comm_seeds,Open_seeds,seeds,P,num_runs);
+  Commit(communication_seeds,open_seeds,seeds,P,num_runs);
 }

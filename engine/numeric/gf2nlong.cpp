@@ -23,7 +23,7 @@ bool is_ge(__m128i a, __m128i b)
 }
 
 
-ostream& operator<<(ostream& s, const int128& a)
+ostream& operator<<(ostream& s, const Int128& a)
 {
   word* tmp = (word*)&a.a;
   s << hex;
@@ -36,9 +36,9 @@ ostream& operator<<(ostream& s, const int128& a)
   return s;
 }
 
-istream& operator>>(istream& s, int128& a)
+istream& operator>>(istream& s, Int128& a)
 {
-  bigint tmp;
+  Bigint tmp;
   s >> hex >> tmp;
   a = 0;
   auto size = tmp.get_mpz_t()->_mp_size;
@@ -49,13 +49,13 @@ istream& operator>>(istream& s, int128& a)
   return s;
 }
 
-void int128::pack(octetStream& os) const
+void Int128::pack(OctetStream& os) const
 {
   os.store(get_lower());
   os.store(get_upper());
 }
 
-void int128::unpack(octetStream& os)
+void Int128::unpack(OctetStream& os)
 {
   word lower = os.get<word>();
   *this = {os.get<word>(), lower};

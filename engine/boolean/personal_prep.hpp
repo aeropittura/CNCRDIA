@@ -44,12 +44,12 @@ void PersonalPrep<T>::buffer_personal_triples(size_t batch_size, ThreadQueues* q
     else
         buffer_personal_triples(triples, 0, batch_size);
 
-    auto &party = ShareThread<typename T::whole_type>::s();
+    auto &party = ShareThread<typename T::WholeType>::s();
     assert(party.P != 0);
     assert(party.MC != 0);
-    auto& MC = party.MC->get_part_MC();
+    auto& MC = party.MC->get_part_opener();
     auto& P = *party.P;
-    GlobalPRNG G(P);
+    GlobalPrng G(P);
     vector<T> shares;
     for (int i = 0; i < sacri.C; i++)
     {
@@ -58,11 +58,11 @@ void PersonalPrep<T>::buffer_personal_triples(size_t batch_size, ThreadQueues* q
             shares.push_back(x);
         triples.erase(triples.begin() + challenge);
     }
-    PointerVector<typename T::open_type> opened;
+    PointerVector<typename T::OpenType> opened;
     MC.POpen(opened, shares, P);
     for (int i = 0; i < sacri.C; i++)
     {
-        array<typename T::open_type, 3> triple({{opened.next(), opened.next(),
+        array<typename T::OpenType, 3> triple({{opened.next(), opened.next(),
             opened.next()}});
         if (triple[0] * triple[1] != triple[2])
         {
@@ -84,15 +84,15 @@ void PersonalPrep<T>::buffer_personal_triples(vector<array<T, 3>>& triples,
     if (verbose)
         fprintf(stderr, "personal triples %zu to %zu\n", begin, end);
 
-    auto& party = ShareThread<typename T::whole_type>::s();
-    auto& MC = party.MC->get_part_MC();
+    auto& party = ShareThread<typename T::WholeType>::s();
+    auto& MC = party.MC->get_part_opener();
     auto& P = *party.P;
     assert(input_player < P.num_players());
     typename T::Input input(MC, *this, P);
     input.reset_all(P);
     for (size_t i = begin; i < end; i++)
     {
-        typename T::open_type x[2];
+        typename T::OpenType x[2];
         for (int j = 0; j < 2; j++)
             this->get_input(triples[i][j], x[j], input_player);
         if (P.my_num() == input_player)

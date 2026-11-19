@@ -22,14 +22,14 @@ void Z2<K>::reqbl(int n)
 {
 	if (n < 0 && N_BITS != -(int)n)
 	{
-		throw Processor_Error(
+		throw ProcessorError(
 				"Program compiled for rings of length " + to_string(-n)
 				+ " but VM supports only "
 				+ to_string(N_BITS));
 	}
 	else if (n > 0)
 	{
-		throw Processor_Error("Program compiled for fields not rings, "
+		throw ProcessorError("Program compiled for fields not rings, "
 		        "run compile.py with '-R " + to_string(K) + "'");
 	}
 }
@@ -41,13 +41,13 @@ bool Z2<K>::allows(Dtype dtype)
 }
 
 template<int K>
-void Z2<K>::specification(octetStream& os)
+void Z2<K>::specification(OctetStream& os)
 {
 	os.store(K);
 }
 
 template<int K>
-Z2<K>::Z2(const bigint& x) : Z2()
+Z2<K>::Z2(const Bigint& x) : Z2()
 {
 	auto mp = x.get_mpz_t();
 	memcpy(a, mp->_mp_d, min((size_t)N_BYTES, sizeof(mp_limb_t) * abs(mp->_mp_size)));
@@ -88,7 +88,7 @@ template<int K>
 Z2<K> Z2<K>::operator&(const Z2<K>& other) const
 {
     Z2<K> res;
-    mpn_and_fixed<limb_type, N_WORDS>(res.a, a, other.a);
+    mpn_and_fixed<LimbType, N_WORDS>(res.a, a, other.a);
     return res;
 }
 
@@ -96,7 +96,7 @@ template<int K>
 Z2<K> Z2<K>::operator^(const Z2<K>& other) const
 {
     Z2<K> res;
-	mpn_xor_fixed<limb_type, N_WORDS>(res.a, a, other.a);
+	mpn_xor_fixed<LimbType, N_WORDS>(res.a, a, other.a);
     return res;
 }
 
@@ -104,7 +104,7 @@ template<int K>
 Z2<K> Z2<K>::operator|(const Z2<K>& other) const
 {
     Z2<K> res;
-	mpn_or_fixed<limb_type, N_WORDS>(res.a, a, other.a);
+	mpn_or_fixed<LimbType, N_WORDS>(res.a, a, other.a);
     return res;
 }
 
@@ -115,14 +115,14 @@ bool Z2<K>::operator==(const Z2<K>& other) const
 	for (int i = 0; i < N_WORDS; i++)
 		cout << "cmp " << hex << a[i] << " " << other.a[i] << endl;
 #endif
-	return mpn_cmp_fixed<limb_type, N_WORDS>(a, other.a) == 0;
+	return mpn_cmp_fixed<LimbType, N_WORDS>(a, other.a) == 0;
 }
 
 template<int K>
 Z2<K> Z2<K>::invert() const
 {
     if (get_bit(0) != 1)
-        throw division_by_zero();
+        throw DivisionByZero();
 
     Z2<K> res = 1;
     for (int i = 0; i < K; i++)
@@ -133,7 +133,7 @@ Z2<K> Z2<K>::invert() const
 }
 
 template<int K>
-Z2<K> Z2<K>::sqrRoot()
+Z2<K> Z2<K>::square_root()
 {
 	assert(a[0] % 8 == 1);
 	Z2<K> res = 1;
@@ -148,12 +148,12 @@ Z2<K> Z2<K>::sqrRoot()
 }
 
 template<int K>
-void Z2<K>::from_random(const int128& other)
+void Z2<K>::from_random(const Int128& other)
 {
 	if (K > 128)
 	{
 		PRNG G;
-		G.SetSeedFrom(other);
+		G.set_seed_from(other);
 		G.next<true>();
 		randomize(G);
 	}
@@ -166,8 +166,8 @@ void Z2<K>::input(istream& s, bool human)
 {
 	if (human)
 	{
-	    s >> bigint::tmp;
-	    *this = bigint::tmp;
+	    s >> Bigint::tmp;
+	    *this = Bigint::tmp;
 	}
 	else
 	    s.read((char*)a, N_BYTES);
@@ -178,8 +178,8 @@ void Z2<K>::output(ostream& s, bool human) const
 {
 	if (human)
 	{
-	    bigint::tmp = *this;
-	    s << bigint::tmp;
+	    Bigint::tmp = *this;
+	    s << Bigint::tmp;
 	}
 	else
 		s.write((char*)a, N_BYTES);
@@ -204,9 +204,9 @@ ostream& operator<<(ostream& o, const Z2<K>& x)
 template<int K>
 istream& operator>>(istream& i, SignedZ2<K>& x)
 {
-    auto& tmp = bigint::tmp;
+    auto& tmp = Bigint::tmp;
     i >> tmp;
-    if (tmp.numBits() > K + 1)
+    if (tmp.num_bits() > K + 1)
         throw runtime_error(
                 tmp.get_str() + " out of range for signed " + to_string(K)
                         + "-bit numbers");

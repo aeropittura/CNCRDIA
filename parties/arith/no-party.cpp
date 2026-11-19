@@ -17,11 +17,11 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
-    OnlineOptions::singleton = {opt, argc, argv, NoShare<gf2n>()};
+    ez::EzOptionParser opt;
+    OnlineOptions::singleton = {opt, argc, argv, NoShare<Gf2n>()};
     OnlineMachine machine(argc, argv, opt, OnlineOptions::singleton);
     OnlineOptions::singleton.finalize(opt, argc, argv);
     machine.start_networking();
     // use primes of length 65 to 128 for arithmetic computation
-    machine.run<NoShare<gfp_<0, 2>>, NoShare<gf2n>>();
+    machine.run<NoShare<Gfp_<0, 2>>, NoShare<Gf2n>>();
 }

@@ -9,7 +9,7 @@ using namespace std;
 class Hash
 {
 	crypto_generichash_state* state;
-	octetStream tmp;
+	OctetStream tmp;
 
 public:
 	static const int hash_length = crypto_generichash_BYTES;
@@ -26,7 +26,7 @@ public:
 		crypto_generichash_update(state, (unsigned char*)dataIn, len);
 		size += len;
 	}
-	void update(const octetStream& os);
+	void update(const OctetStream& os);
 	template<class T>
 	void update(const T& x)
 	{
@@ -54,11 +54,11 @@ public:
 	    assert(crypto_generichash_final(state, hashout, length) == 0);
 	    reset();
 	}
-	void final(octetStream& os);
-	void append_final(octetStream& os);
-	octetStream final();
+	void final(OctetStream& os);
+	void append_final(OctetStream& os);
+	OctetStream final();
 
-	bool matches(octetStream& os);
+	bool matches(OctetStream& os);
 };
 
 void hash_update(Hash *ctx, const void *dataIn, unsigned long len);

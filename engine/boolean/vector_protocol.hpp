@@ -18,15 +18,15 @@ VectorProtocol<T>::VectorProtocol(Player& P) :
 
 template<class T>
 void VectorProtocol<T>::init(Preprocessing<T>& prep,
-        typename T::MAC_Check& MC)
+        typename T::MacCheck& MC)
 {
-    part_protocol.init(prep.get_part(), MC.get_part_MC());
+    part_protocol.init(prep.get_part(), MC.get_part_opener());
 }
 
 template<class T>
-void VectorProtocol<T>::init_mul()
+void VectorProtocol<T>::initialize_mult()
 {
-    part_protocol.init_mul();
+    part_protocol.initialize_mult();
 }
 
 template<class T>
@@ -58,7 +58,7 @@ void VectorProtocol<T>::finalize_mult(T& res, int n)
 {
     if (n == -1)
         n = T::default_length;
-    res.resize_regs(n);
+    res.resize_registers(n);
     for (int i = 0; i < n; i++)
         res.get_reg(i) = part_protocol.finalize_mul(1);
 }

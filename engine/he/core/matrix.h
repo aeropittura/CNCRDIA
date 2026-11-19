@@ -8,18 +8,18 @@ using namespace std;
 #include "numeric/modp.h"
 #include "support/bit_vector.h"
 
-typedef vector< vector<bigint> > matrix;
+typedef vector< vector<Bigint> > matrix;
 
-class imatrix : public vector< BitVector >
+class Imatrix : public vector< BitVector >
 {
-    typedef vector<BitVector> super;
+    typedef vector<BitVector> Super;
 
 public:
-    bool operator!=(const imatrix& other) const;
+    bool operator!=(const Imatrix& other) const;
 
-    void hash(octetStream& o) const;
-    void pack(octetStream& o) const;
-    void unpack(octetStream& o);
+    void hash(OctetStream& o) const;
+    void pack(OctetStream& o) const;
+    void unpack(OctetStream& o);
 };
 
 /* Uses Algorithm 2.7 from Pohst-Zassenhaus to compute H and U st
@@ -33,7 +33,7 @@ void HNF(matrix& H,matrix& U,const matrix& A);
 void SNF(matrix& S,const matrix& A,matrix& V);
 
 void print(const matrix& S);
-void print(const imatrix& S);
+void print(const Imatrix& S);
 
 // Special inverse routine, assumes A is unimodular and only
 // requires column operations to create the inverse
@@ -41,4 +41,4 @@ matrix inv(const matrix& A);
 
 // Finds a pseudo-inverse of a matrix A modulo 2
 //   - Input matrix is assumed to have more rows than columns
-void pinv(imatrix& Ai,const imatrix& A);
+void pinv(Imatrix& Ai,const Imatrix& A);

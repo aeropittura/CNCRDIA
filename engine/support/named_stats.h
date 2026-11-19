@@ -10,10 +10,10 @@
 
 using namespace std;
 
-class NamedStats : public map<string, long>
+class NamedStatistics : public map<string, long>
 {
 public:
-    NamedStats& operator+=(const NamedStats& other);
+    NamedStatistics& operator+=(const NamedStatistics& other);
 
     void print();
 };

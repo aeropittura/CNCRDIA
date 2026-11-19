@@ -14,17 +14,17 @@ class ThreadQueue
     WaitQueue<ThreadJob> in, out;
     Lock lock;
     int left;
-    ThreadStats thread_stats;
-    TimerWithComm timer, online_timer, online_prep_timer;
+    ThreadStatistics thread_statistics;
+    TimerWithCommunication timer, online_timer, online_prep_timer;
     Timer inside_wait_timer;
     bool debug;
 
 public:
     static thread_local ThreadQueue* thread_queue;
 
-    map<string, TimerWithComm> timers;
+    map<string, TimerWithCommunication> timers;
     Timer wait_timer;
-    NamedStats stats;
+    NamedStatistics statistics;
 
     ThreadQueue() :
             left(0), debug(false)
@@ -39,18 +39,18 @@ public:
     void schedule(const ThreadJob& job);
     ThreadJob next();
     void finished(const ThreadJob& job);
-    void finished(const ThreadJob& job, const ThreadStats& thread_stats,
-            const NamedStats& stats = {});
+    void finished(const ThreadJob& job, const ThreadStatistics& thread_statistics,
+            const NamedStatistics& statistics = {});
     ThreadJob result();
 
-    NamedCommStats get_comm_stats();
+    NamedCommunicationStatistics get_communication_statistics();
 
-    void set_stats(const ThreadStats& new_stats);
-    ThreadStats get_stats();
+    void set_statistics(const ThreadStatistics& new_statistics);
+    ThreadStatistics get_statistics();
 
     void start_timer();
     void stop_timer(Player& P);
 
-    void start_online(Player& P, const TimerWithComm& prep_time);
-    void stop_online(Player& P, const TimerWithComm& prep_time);
+    void start_online(Player& P, const TimerWithCommunication& prep_time);
+    void stop_online(Player& P, const TimerWithCommunication& prep_time);
 };

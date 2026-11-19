@@ -10,7 +10,7 @@
 class PlayerBuffer
 {
 public:
-    octet* data;
+    Octet* data;
     size_t size;
 
     PlayerBuffer() :
@@ -18,7 +18,7 @@ public:
     {
     }
 
-    PlayerBuffer(octet* data, size_t size) :
+    PlayerBuffer(Octet* data, size_t size) :
             data(data), size(size)
     {
     }

@@ -16,7 +16,7 @@ template<class T> class HemiPrep;
 template<class T>
 class HemiMatrixPrep : public BufferPrep<ShareMatrix<T>>
 {
-    typedef BufferPrep<ShareMatrix<T>> super;
+    typedef BufferPrep<ShareMatrix<T>> Super;
     typedef typename T::LivePrep LivePrep;
 
     int n_rows, n_inner, n_cols;
@@ -31,7 +31,7 @@ public:
 
     HemiMatrixPrep(int n_rows, int n_inner, int n_cols, LivePrep& prep,
             DataPositions& usage) :
-            super(usage), n_rows(n_rows), n_inner(n_inner),
+            Super(usage), n_rows(n_rows), n_inner(n_inner),
             n_cols(n_cols), prep(&prep)
     {
         swapped = n_rows > n_cols;

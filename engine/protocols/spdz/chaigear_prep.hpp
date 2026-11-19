@@ -16,12 +16,12 @@
 #include "protocols/spdz/cowgear_prep.hpp"
 
 template<class T>
-MultiplicativeMachineParams* ChaiGearPrep<T>::machine = 0;
+MultiplicativeMachineParameters* ChaiGearPrep<T>::machine = 0;
 template<class T>
 Lock ChaiGearPrep<T>::lock;
 
 template<class T>
-typename ChaiGearPrep<T>::mac_key_type ChaiGearPrep<T>::maybe_mac_key;
+typename ChaiGearPrep<T>::MacKeyType ChaiGearPrep<T>::maybe_mac_key;
 
 template<class T>
 ChaiGearPrep<T>::~ChaiGearPrep()
@@ -47,7 +47,7 @@ void ChaiGearPrep<T>::basic_setup(Player& P, bool read_only)
     Timer timer;
     timer.start();
     assert(machine == 0);
-    machine = new MultiplicativeMachineParams;
+    machine = new MultiplicativeMachineParameters;
     auto& setup = machine->setup.part<FD>();
     int lowgear_security = OnlineOptions::singleton.security_parameter;
 #ifdef VERBOSE
@@ -58,7 +58,7 @@ void ChaiGearPrep<T>::basic_setup(Player& P, bool read_only)
             << lowgear_security << endl;
 #endif
     machine->sec = lowgear_security;
-    secure_init(setup, P, *machine, typename T::clear(), lowgear_security,
+    secure_initialize(setup, P, *machine, typename T::clear(), lowgear_security,
             read_only);
     T::clear::template init<typename FD::T>();
 #ifdef VERBOSE
@@ -82,7 +82,7 @@ void ChaiGearPrep<T>::key_setup(Player& P, bool read_only)
             T::covert, T(), read_only);
 
     // generate minimal number of items
-    machine->nTriplesPerThread = 1;
+    machine->n_triples_per_thread = 1;
 #ifdef VERBOSE
     cerr << T::type_string() << " key setup took " << timer.elapsed()
             << " seconds" << endl;
@@ -102,24 +102,24 @@ void ChaiGearPrep<T>::adjust_mac_key(Player& P)
 {
     assert(machine);
     auto& setup = machine->get_setup<FD>();
-    mac_key_type diff = maybe_mac_key - setup.alphai;
+    MacKeyType diff = maybe_mac_key - setup.alphai;
     if (diff == 0 or maybe_mac_key == 0)
         return;
 
     setup.alphai = maybe_mac_key;
-    Bundle<octetStream> bundle(P);
+    Bundle<OctetStream> bundle(P);
     diff.pack(bundle.mine);
     P.unchecked_broadcast(bundle);
     for (int i = 0; i < P.num_players(); i++)
     {
-        Plaintext_<FD> mess(setup.FieldD);
-        mess.assign_constant(bundle[i].get<mac_key_type>(), Polynomial);
+        Plaintext_<FD> mess(setup.field_d);
+        mess.assign_constant(bundle[i].get<MacKeyType>(), Polynomial);
         setup.calpha += mess;
     }
 }
 
 template<class T>
-typename ChaiGearPrep<T>::mac_key_type ChaiGearPrep<T>::get_mac_key(Player& P,
+typename ChaiGearPrep<T>::MacKeyType ChaiGearPrep<T>::get_mac_key(Player& P,
         bool read_only)
 {
     return ::get_mac_key<ChaiGearPrep<T>>(P, read_only);
@@ -137,7 +137,7 @@ typename ChaiGearPrep<T>::Generator& ChaiGearPrep<T>::get_generator()
         if (machine == 0)
             basic_setup(P);
         key_setup(P);
-        BaseMachine::add_one_off(P.total_comm());
+        BaseMachine::add_one_off(P.total_communication());
     }
     lock.unlock();
     if (generator == 0)
@@ -171,12 +171,12 @@ void ChaiGearPrep<T>::buffer_squares()
     assert(this->proc);
     auto& setup = machine->setup.part<FD>();
     if (not square_producer)
-        square_producer = new SquareProducer<FD>(setup.FieldD,
+        square_producer = new SquareProducer<FD>(setup.field_d,
                 this->proc->P.my_num(), 0, false);
     assert(machine);
     square_producer->run_with_catch(this->proc->P, setup.pk, setup.calpha, generator.EC,
             generator.dd, {});
-    MAC_Check<typename FD::T> MC(this->proc->MC.get_alphai());
+    MacCheck<typename FD::T> MC(this->proc->MC.get_alphai());
     square_producer->sacrifice_with_catch(this->proc->P, MC);
     MC.Check(this->proc->P);
     auto& squares = square_producer->tuples;

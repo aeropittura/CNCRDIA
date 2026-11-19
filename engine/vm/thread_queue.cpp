@@ -52,17 +52,17 @@ void ThreadQueue::finished(const ThreadJob& job)
 }
 
 void ThreadQueue::finished(const ThreadJob& job,
-        const ThreadStats& thread_stats, const NamedStats& stats)
+        const ThreadStatistics& thread_statistics, const NamedStatistics& statistics)
 {
     finished(job);
-    set_stats(thread_stats);
-    this->stats = stats;
+    set_statistics(thread_statistics);
+    this->statistics = statistics;
 }
 
-void ThreadQueue::set_stats(const ThreadStats& new_stats)
+void ThreadQueue::set_statistics(const ThreadStatistics& new_statistics)
 {
     lock.lock();
-    thread_stats = new_stats;
+    thread_statistics = new_statistics;
     lock.unlock();
 }
 
@@ -81,19 +81,19 @@ ThreadJob ThreadQueue::result()
     lock.unlock();
     return res;
 }
-NamedCommStats ThreadQueue::get_comm_stats()
+NamedCommunicationStatistics ThreadQueue::get_communication_statistics()
 {
     lock.lock();
-    auto res = thread_stats.comm_stats;
+    auto res = thread_statistics.communication_statistics;
     lock.unlock();
     return res;
 }
 
 
-ThreadStats ThreadQueue::get_stats()
+ThreadStatistics ThreadQueue::get_statistics()
 {
     lock.lock();
-    auto res = thread_stats;
+    auto res = thread_statistics;
     lock.unlock();
     return res;
 }
@@ -106,7 +106,7 @@ void ThreadQueue::start_timer()
 
 void ThreadQueue::stop_timer(Player& P)
 {
-    timer.stop(P.total_comm());
+    timer.stop(P.total_communication());
 
     timers["wait"] = inside_wait_timer + wait_timer;
     timers["online"] = online_timer - online_prep_timer;
@@ -122,9 +122,9 @@ void ThreadQueue::stop_timer(Player& P)
     }
 }
 
-void ThreadQueue::start_online(Player& P, const TimerWithComm& prep_time)
+void ThreadQueue::start_online(Player& P, const TimerWithCommunication& prep_time)
 {
-    online_timer.start(P.total_comm());
+    online_timer.start(P.total_communication());
     online_prep_timer -= prep_time;
 
     if (debug)
@@ -132,9 +132,9 @@ void ThreadQueue::start_online(Player& P, const TimerWithComm& prep_time)
                 timer.elapsed());
 }
 
-void ThreadQueue::stop_online(Player& P, const TimerWithComm& prep_time)
+void ThreadQueue::stop_online(Player& P, const TimerWithCommunication& prep_time)
 {
-    online_timer.stop(P.total_comm());
+    online_timer.stop(P.total_communication());
     online_prep_timer += prep_time;
 
     if (debug)

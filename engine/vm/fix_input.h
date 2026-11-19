@@ -32,5 +32,5 @@ const char* FixInput_<T>::NAME = "real number";
 #ifdef LOW_PREC_INPUT
 typedef FixInput_<Integer> FixInput;
 #else
-typedef FixInput_<bigint> FixInput;
+typedef FixInput_<Bigint> FixInput;
 #endif

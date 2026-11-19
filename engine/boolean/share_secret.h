@@ -46,12 +46,12 @@ template<class U>
 class ShareSecret
 {
 public:
-    typedef U whole_type;
+    typedef U WholeType;
 
     typedef Memory<U> DynamicMemory;
-    typedef SwitchableOutput out_type;
+    typedef SwitchableOutput OutType;
 
-    typedef vector<vector<int>> shuffle_type;
+    typedef vector<vector<int>> ShuffleType;
     typedef SecureShuffleBase<ShareSecret> Shuffler;
 
     static const bool is_real = true;
@@ -119,23 +119,23 @@ public:
 template<class U, int L>
 class RepSecretBase : public FixedVec<BitVec, L>, public ShareSecret<U>
 {
-    typedef FixedVec<BitVec, L> super;
+    typedef FixedVec<BitVec, L> Super;
     typedef RepSecretBase This;
 
 public:
     typedef U part_type;
-    typedef U small_type;
-    typedef U whole_type;
+    typedef U SmallType;
+    typedef U WholeType;
 
     typedef BitVec clear;
-    typedef BitVec open_type;
-    typedef NoShare mac_type;
-    typedef NoValue mac_key_type;
-    typedef NoShare mac_share_type;
+    typedef BitVec OpenType;
+    typedef NoShare MacType;
+    typedef NoValue MacKeyType;
+    typedef NoShare MacShareType;
 
-    typedef NoShare bit_type;
+    typedef NoShare BitType;
 
-    typedef void DefaultMC;
+    typedef void DefaultOpener;
 
     static const int N_BITS = clear::N_BITS;
 
@@ -163,11 +163,11 @@ public:
             const ArgVector& args);
 
     template<class T>
-    static void generate_mac_key(mac_key_type, T)
+    static void generate_mac_key(MacKeyType, T)
     {
     }
 
-    static void read_or_generate_mac_key(string, const Player&, mac_key_type)
+    static void read_or_generate_mac_key(string, const Player&, MacKeyType)
     {
     }
 
@@ -181,9 +181,9 @@ public:
     }
 
     template<class T>
-    static string proto_fake_opts()
+    static string protocol_fake_options()
     {
-        return T::fake_opts();
+        return T::fake_options();
     }
 
     static size_t maximum_size()
@@ -196,7 +196,7 @@ public:
     }
     template <class T>
     RepSecretBase(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 
@@ -204,7 +204,7 @@ public:
     void bitdec(StackedVector<U>& S, const ArgVector& regs) const;
 
     This operator&(const Clear& other)
-    { return super::operator&(BitVec(other)); }
+    { return Super::operator&(BitVec(other)); }
 
     This lsb()
     { return *this & 1; }
@@ -216,13 +216,13 @@ public:
 template<class U>
 class ReplicatedSecret : public RepSecretBase<U, 2>
 {
-    typedef RepSecretBase<U, 2> super;
+    typedef RepSecretBase<U, 2> Super;
 
 public:
     typedef ReplicatedBase Protocol;
 
-    static ReplicatedSecret constant(const typename super::clear& value,
-        int my_num, typename super::mac_key_type = {}, int = -1)
+    static ReplicatedSecret constant(const typename Super::clear& value,
+        int my_num, typename Super::MacKeyType = {}, int = -1)
     {
       ReplicatedSecret res;
       if (my_num < 2)
@@ -232,11 +232,11 @@ public:
 
     ReplicatedSecret() {}
     template <class T>
-    ReplicatedSecret(const T& other) : super(other) {}
+    ReplicatedSecret(const T& other) : Super(other) {}
 
     void load_clear(int n, const Integer& x);
 
-    BitVec local_mul(const ReplicatedSecret& other) const;
+    BitVec local_mult(const ReplicatedSecret& other) const;
 
     void reveal(size_t n_bits, Clear& x);
 
@@ -248,18 +248,18 @@ public:
 
 class SemiHonestRepPrep;
 
-class SmallRepSecret : public FixedVec<BitVec_<unsigned char>, 2>
+class SmallRepSecret : public FixedVec<BitVector_<unsigned char>, 2>
 {
-    typedef FixedVec<BitVec_<unsigned char>, 2> super;
+    typedef FixedVec<BitVector_<unsigned char>, 2> Super;
     typedef SmallRepSecret This;
 
 public:
-    typedef ReplicatedMC<This> MC;
-    typedef BitVec_<unsigned char> open_type;
-    typedef open_type clear;
-    typedef NoValue mac_key_type;
+    typedef ReplicatedOpener<This> MC;
+    typedef BitVector_<unsigned char> OpenType;
+    typedef OpenType clear;
+    typedef NoValue MacKeyType;
 
-    static MC* new_mc(mac_key_type)
+    static MC* new_opener(MacKeyType)
     {
         return new MC;
     }
@@ -269,7 +269,7 @@ public:
     }
     template<class T>
     SmallRepSecret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 
@@ -281,29 +281,29 @@ public:
 
 class SemiHonestRepSecret : public ReplicatedSecret<SemiHonestRepSecret>
 {
-    typedef ReplicatedSecret<SemiHonestRepSecret> super;
+    typedef ReplicatedSecret<SemiHonestRepSecret> Super;
 
 public:
     typedef Memory<SemiHonestRepSecret> DynamicMemory;
 
-    typedef ReplicatedMC<SemiHonestRepSecret> MC;
+    typedef ReplicatedOpener<SemiHonestRepSecret> MC;
     typedef Replicated<SemiHonestRepSecret> Protocol;
-    typedef MC MAC_Check;
+    typedef MC MacCheck;
     typedef SemiHonestRepPrep LivePrep;
     typedef ReplicatedInput<SemiHonestRepSecret> Input;
 
     typedef SemiHonestRepSecret part_type;
-    typedef SmallRepSecret small_type;
-    typedef SemiHonestRepSecret whole_type;
+    typedef SmallRepSecret SmallType;
+    typedef SemiHonestRepSecret WholeType;
 
     static const bool expensive_triples = false;
     static const bool malicious = false;
 
-    static MC* new_mc(mac_key_type) { return new MC; }
+    static MC* new_opener(MacKeyType) { return new MC; }
 
     SemiHonestRepSecret() {}
     template<class T>
-    SemiHonestRepSecret(const T& other) : super(other) {}
+    SemiHonestRepSecret(const T& other) : Super(other) {}
 };
 
 }

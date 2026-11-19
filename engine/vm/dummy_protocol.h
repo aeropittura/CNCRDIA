@@ -29,34 +29,34 @@ template<class T> class ShareThread;
 }
 
 template<class T>
-class DummyMC : public MAC_Check_Base<T>
+class DummyOpener : public MacCheckBase<T>
 {
 public:
-    DummyMC()
+    DummyOpener()
     {
     }
 
     template<class U>
-    DummyMC(U, int = 0, int = 0)
+    DummyOpener(U, int = 0, int = 0)
     {
     }
 
     void exchange(const Player&)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
-    void CheckFor(const typename T::open_type&, const vector<T>&, const Player&)
+    void check_for(const typename T::OpenType&, const vector<T>&, const Player&)
     {
     }
 
-    DummyMC<typename T::part_type>& get_part_MC()
+    DummyOpener<typename T::part_type>& get_part_opener()
     {
-        return *new DummyMC<typename T::part_type>;
+        return *new DummyOpener<typename T::part_type>;
     }
 
-    typename T::mac_key_type get_alphai()
+    typename T::MacKeyType get_alphai()
     {
-        throw not_implemented();
+        throw NotImplemented();
         return {};
     }
 
@@ -75,7 +75,7 @@ public:
 
     static int get_n_relevant_players()
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
     static void multiply(vector<T>, vector<pair<T, T>>, int, int, SubProcessor<T>)
@@ -87,20 +87,20 @@ public:
     {
     }
 
-    void init_mul()
+    void initialize_mult()
     {
     }
     void prepare_mul(const T&, const T&, int = 0)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
     void exchange()
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
     T finalize_mul(int = 0)
     {
-        throw not_implemented();
+        throw NotImplemented();
         return {};
     }
     void check()
@@ -161,7 +161,7 @@ public:
     {
         fail();
     }
-    void get_input_no_count(T&, typename T::open_type&, int)
+    void get_input_no_count(T&, typename T::OpenType&, int)
     {
         fail();
     }
@@ -203,28 +203,28 @@ public:
     void start(int n, ArgVector regs)
     {
         (void) n, (void) regs;
-        throw not_implemented();
+        throw NotImplemented();
     }
     void stop(int n, ArgVector regs)
     {
         (void) n, (void) regs;
-        throw not_implemented();
+        throw NotImplemented();
     }
     void start(int n, int m)
     {
         (void) n, (void) m;
-        throw not_implemented();
+        throw NotImplemented();
     }
     void stop(int n, int m)
     {
         (void) n, (void) m;
-        throw not_implemented();
+        throw NotImplemented();
     }
     template<class T>
     static void input(SubProcessor<V>& proc, ArgVector regs, int)
     {
         (void) proc, (void) regs;
-        throw not_implemented();
+        throw NotImplemented();
     }
     static void input_mixed(SubProcessor<V>, ArgVector, int, int)
     {
@@ -232,39 +232,39 @@ public:
     void reset_all(Player& P)
     {
         (void) P;
-        throw not_implemented();
+        throw NotImplemented();
     }
     template<class U>
     void add_mine(U a, int b = 0)
     {
         (void) a, (void) b;
-        throw not_implemented();
+        throw NotImplemented();
     }
     void add_other(int)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
     template<class U>
     void add_from_all(U)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
     void exchange()
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
     V finalize(int a, int b = 0)
     {
         (void) a, (void) b;
-        throw not_implemented();
+        throw NotImplemented();
     }
     static void raw_input(SubProcessor<V>&, ArgVector, int)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
     static void input_mixed(SubProcessor<V>&, ArgVector, int, bool)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 };
 
@@ -280,7 +280,7 @@ public:
     void start(int player, int target, int source)
     {
         (void) player, (void) target, (void) source;
-        throw not_implemented();
+        throw NotImplemented();
     }
     void stop(int player, int source, int)
     {

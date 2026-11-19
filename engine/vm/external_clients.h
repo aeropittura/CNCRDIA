@@ -26,12 +26,12 @@ class ExternalClients
   int party_num;
 
   // Maps holding per client values (indexed by unique 32-bit id)
-  std::map<int,client_socket*> external_client_sockets;
+  std::map<int,ClientSocket*> external_client_sockets;
   std::map<int, int> client_ports;
 
-  ssl_service io_service;
-  client_ctx* ctx;
-  map<int, client_ctx*> peer_ctxs;
+  SslService io_service;
+  ClientContext* ctx;
+  map<int, ClientContext*> peer_ctxs;
 
   Lock lock;
 
@@ -43,12 +43,12 @@ class ExternalClients
   void start_listening(int portnum_base);
 
   int get_client_connection(int portnum_base);
-  int init_client_connection(const string& host, int portnum, int my_client_id);
+  int initialize_client_connection(const string& host, int portnum, int my_client_id);
 
   void close_connection(int client_id);
 
   // return the socket for a given client or server identifier
-  client_socket* get_socket(int socket_id);
+  ClientSocket* get_socket(int socket_id);
 
   int get_party_num();
 };

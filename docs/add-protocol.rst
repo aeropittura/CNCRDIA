@@ -42,7 +42,7 @@ tutorial for the lowest-level interface <lowest-level>`.
 1. Fill in the :c:func:`constant` static member function of
    :c:type:`NoShare` as well as the :c:func:`exchange` member function
    of :c:type:`NoOutput`. Check out
-   :c:func:`DirectSemiMC<T>::exchange_` in ``engine/protocols/semi/semi_mc.hpp``
+   :c:func:`DirectSemiOpener<T>::exchange_` in ``engine/protocols/semi/semi_mc.hpp``
    for a simple example. It opens an additive secret sharing by
    sending all shares to all other parties and then summing up the
    received. See :ref:`this reference <network-reference>` for
@@ -105,8 +105,8 @@ for networking-related classes.
 .. doxygenclass:: PRNG
    :members:
 
-.. doxygenclass:: SeededPRNG
+.. doxygenclass:: SeededPrng
    :members:
 
-.. doxygenclass:: GlobalPRNG
+.. doxygenclass:: GlobalPrng
    :members:

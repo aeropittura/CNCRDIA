@@ -47,7 +47,7 @@ class TruncPrTuple
 public:
     const static int n = 4;
 
-    int dest_base;
+    int destination_base;
     int source_base;
     int k;
     int m;
@@ -60,7 +60,7 @@ public:
 
     TruncPrTuple(ArgVector::const_iterator it)
     {
-        dest_base = *it++;
+        destination_base = *it++;
         source_base = *it++;
         k = *it++;
         m = *it++;
@@ -140,23 +140,23 @@ public:
 };
 
 template<class T>
-class TruncPrTupleWithRange : public TruncPrTupleWithGap<typename T::open_type>
+class TruncPrTupleWithRange : public TruncPrTupleWithGap<typename T::OpenType>
 {
-    typedef TruncPrTupleWithGap<typename T::open_type> super;
+    typedef TruncPrTupleWithGap<typename T::OpenType> Super;
 
 public:
-    Range<StackedVector<T>> source_range, dest_range;
+    Range<StackedVector<T>> source_range, destination_range;
 
-    TruncPrTupleWithRange(super info, StackedVector<T>& S, size_t size) :
-            super(info), source_range(S, info.source_base, size),
-            dest_range(S, info.dest_base, size)
+    TruncPrTupleWithRange(Super info, StackedVector<T>& S, size_t size) :
+            Super(info), source_range(S, info.source_base, size),
+            destination_range(S, info.destination_base, size)
     {
     }
 
     template<class U>
     U correction_shift(U bit)
     {
-        return bit.cheap_lshift(T::open_type::N_BITS - this->m);
+        return bit.cheap_lshift(T::OpenType::N_BITS - this->m);
     }
 };
 
@@ -169,7 +169,7 @@ class TruncPrTupleList : public vector<TruncPrTupleWithRange<T>>
 public:
     TruncPrTupleList(const ArgVector& args, StackedVector<T>& S, size_t size)
     {
-        ArgList<TruncPrTupleWithGap<typename T::open_type>> tmp(args);
+        ArgList<TruncPrTupleWithGap<typename T::OpenType>> tmp(args);
         for (auto x : tmp)
             this->push_back(TruncPrTupleWithRange<T>(x, S, size));
     }

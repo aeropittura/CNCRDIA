@@ -16,31 +16,31 @@
 
 //#define BASE_OT_DEBUG
 
-class OT_thread_info
+class OtThreadInfo
 {
     public:
  
     int thread_num;
     bool stop;
     int other_player_num;
-    OTExtensionWithMatrix* ot_ext;
-    int nOTs, nbase;
-    BitVector receiverInput;
+    OtExtensionWithMatrix* ot_ext;
+    int n_ots, nbase;
+    BitVector receiver_input;
     int nloops;
 };
 
 void* run_otext_thread(void* ptr)
 {
-    OT_thread_info *tinfo = (OT_thread_info*) ptr;
+    OtThreadInfo *tinfo = (OtThreadInfo*) ptr;
 
     //int num = tinfo->thread_num;
     //int other_player_num = tinfo->other_player_num;
     printf("\tI am in thread %d\n", tinfo->thread_num);
-    tinfo->ot_ext->transfer(tinfo->nOTs, tinfo->receiverInput, tinfo->nloops);
+    tinfo->ot_ext->transfer(tinfo->n_ots, tinfo->receiver_input, tinfo->nloops);
     return NULL;
 }
 
-OTMachine::OTMachine(int argc, const char** argv)
+OtMachine::OtMachine(int argc, const char** argv)
 {
     opt.add(
         "", // Default.
@@ -168,7 +168,7 @@ OTMachine::OTMachine(int argc, const char** argv)
     opt.get("-p")->getInt(my_num);
     opt.get("-pn")->getInt(portnum_base);
     opt.get("-h")->getString(hostname);
-    opt.get("-n")->getLong(nOTs);
+    opt.get("-n")->getLong(n_ots);
     opt.get("-m")->getString(ot_mode);
     opt.get("--nthreads")->getInt(nthreads);
     opt.get("--nloops")->getInt(nloops);
@@ -185,7 +185,7 @@ OTMachine::OTMachine(int argc, const char** argv)
     }
 
     cout << "Player 0 host name = " << hostname << endl;
-    cout << "Creating " << nOTs << " extended OTs in " << nthreads << " threads\n";
+    cout << "Creating " << n_ots << " extended OTs in " << nthreads << " threads\n";
     cout << "Running in mode " << ot_mode << endl;
 
     if (passive)
@@ -213,12 +213,12 @@ OTMachine::OTMachine(int argc, const char** argv)
     unsigned int pos = 0;
     while (pos < hostname.length())
     {
-        string::size_type new_pos = hostname.find(',', pos);
-        if (new_pos == string::npos)
-            new_pos = hostname.length();
-        int len = new_pos - pos;
+        string::size_type new_position = hostname.find(',', pos);
+        if (new_position == string::npos)
+            new_position = hostname.length();
+        int len = new_position - pos;
         string name = hostname.substr(pos, len);
-        pos = new_pos + 1;
+        pos = new_position + 1;
 
         vector<string> names(2);
         names[my_num] = "localhost";
@@ -234,7 +234,7 @@ OTMachine::OTMachine(int argc, const char** argv)
     if (opt.isSet("-r"))
         bot_ = new BaseOT(nbase, P, INV_ROLE(ot_role));
     else
-        bot_ = new FakeOT(nbase, P, INV_ROLE(ot_role));
+        bot_ = new FakeOt(nbase, P, INV_ROLE(ot_role));
     cout << "real mode " << opt.isSet("-r") << endl;
     BaseOT& bot = *bot_;
     bot.exec_base();
@@ -243,9 +243,9 @@ OTMachine::OTMachine(int argc, const char** argv)
     cout << "\t\tBaseTime (" << role_to_str(ot_role) << "): " << basetime/1000000 << endl << flush;
 
     // Receiver send something to force synchronization
-    // (since Sender finishes baseOTs before Receiver)
+    // (since Sender finishes base_ots before Receiver)
     int a = 3;
-    vector<octetStream> os(2);
+    vector<OctetStream> os(2);
     os[0].store(a);
     P->send_receive_player(os);
     os[1].get(a);
@@ -263,13 +263,13 @@ OTMachine::OTMachine(int argc, const char** argv)
     cout << "Verifying base OTs (debugging)\n";
 #endif
 
-    // convert baseOT selection bits to BitVector
+    // convert base_ot selection bits to BitVector
     // (not already BitVector due to legacy PVW code)
-    baseReceiverInput = bot.receiver_inputs;
-    baseReceiverInput.resize(nbase);
+    base_receiver_input = bot.receiver_inputs;
+    base_receiver_input.resize(nbase);
 }
 
-OTMachine::~OTMachine()
+OtMachine::~OtMachine()
 {
     for (auto names : N)
         delete names;
@@ -278,24 +278,24 @@ OTMachine::~OTMachine()
 }
 
 
-void OTMachine::run()
+void OtMachine::run()
 {
-    // divide nOTs between threads and loops
-    nOTs = DIV_CEIL(nOTs, nthreads * nloops);
+    // divide n_ots between threads and loops
+    n_ots = DIV_CEIL(n_ots, nthreads * nloops);
     // round up to multiple of base OTs and subloops
     // discount for discarded OTs
-    nOTs = DIV_CEIL(nOTs + 2 * 128, nbase * nsubloops) * nbase * nsubloops - 2 * 128;
-    cout << "Running " << nOTs << " OT extensions per thread and loop\n" << flush;
+    n_ots = DIV_CEIL(n_ots + 2 * 128, nbase * nsubloops) * nbase * nsubloops - 2 * 128;
+    cout << "Running " << n_ots << " OT extensions per thread and loop\n" << flush;
 
     // PRG for generating inputs etc
     PRNG G;
-    G.ReSeed();
-    BitVector receiverInput(nOTs);
-    receiverInput.randomize(G);
+    G.re_seed();
+    BitVector receiver_input(n_ots);
+    receiver_input.randomize(G);
     BaseOT& bot = *bot_;
 
     cout << "Initialize OT Extension\n";
-    vector<OT_thread_info> tinfos(nthreads);
+    vector<OtThreadInfo> tinfos(nthreads);
     vector<pthread_t> threads(nthreads);
     timeval OTextstart, OTextend;
     gettimeofday(&OTextstart, NULL);
@@ -308,9 +308,9 @@ void OTMachine::run()
 
     for (int i = 0; i < nthreads; i++)
     {
-        tinfos[i].receiverInput.assign(receiverInput);
+        tinfos[i].receiver_input.assign(receiver_input);
 
-        base_receiver_input_copy[i].assign(baseReceiverInput);
+        base_receiver_input_copy[i].assign(base_receiver_input);
         for (int j = 0; j < nbase; j++)
         {
             base_sender_inputs_copy[i][j][0].assign(bot.sender_inputs[j][0]);
@@ -323,8 +323,8 @@ void OTMachine::run()
                 "thread" + to_string(i));
         tinfos[i].thread_num = i+1;
         tinfos[i].other_player_num = 1 - my_num;
-        tinfos[i].nOTs = nOTs;
-        tinfos[i].ot_ext = new OTExtensionWithMatrix(
+        tinfos[i].n_ots = n_ots;
+        tinfos[i].ot_ext = new OtExtensionWithMatrix(
                 players[i],
                 ot_role,
                 passive,
@@ -367,11 +367,11 @@ void OTMachine::run()
         char filename[1024];
         snprintf(filename, 1024, RECEIVER_INPUT, my_num);
         ofstream outf(filename);
-        receiverInput.output(outf, false);
+        receiver_input.output(outf, false);
         outf.close();
         snprintf(filename, 1024, RECEIVER_OUTPUT, my_num);
         outf.open(filename);
-        for (unsigned int i = 0; i < nOTs; i++)
+        for (unsigned int i = 0; i < n_ots; i++)
         {
             receiver_output.assign_bytes((char*) tinfos[0].ot_ext->get_receiver_output(i), sizeof(__m128i));
             receiver_output.output(outf, false);
@@ -382,7 +382,7 @@ void OTMachine::run()
         {
             snprintf(filename,1024, SENDER_OUTPUT, my_num, i);
             outf.open(filename);
-            for (int j = 0; j < nOTs; j++)
+            for (int j = 0; j < n_ots; j++)
             {
                 sender_output.assign_bytes((char*) tinfos[0].ot_ext->get_sender_output(i, j), sizeof(__m128i));
                 sender_output.output(outf, false);

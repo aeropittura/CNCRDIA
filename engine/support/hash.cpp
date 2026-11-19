@@ -30,7 +30,7 @@ void Hash::reset()
     size = 0;
 }
 
-void Hash::update(const octetStream& os)
+void Hash::update(const OctetStream& os)
 {
     update(os.get_data(), os.get_length());
 }
@@ -40,7 +40,7 @@ void Hash::update(const string& str)
     update(str.data(), str.size());
 }
 
-void Hash::final(octetStream& os)
+void Hash::final(OctetStream& os)
 {
     os.resize_precise(hash_length);
     os.reset_write_head();
@@ -48,19 +48,19 @@ void Hash::final(octetStream& os)
 
 }
 
-void Hash::append_final(octetStream& os)
+void Hash::append_final(OctetStream& os)
 {
     final(os.append(hash_length));
 }
 
-octetStream Hash::final()
+OctetStream Hash::final()
 {
-    octetStream res;
+    OctetStream res;
     final(res);
     return res;
 }
 
-bool Hash::matches(octetStream& os)
+bool Hash::matches(OctetStream& os)
 {
     array<unsigned char, hash_length> a, b;
     final(a.data());

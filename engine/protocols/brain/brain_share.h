@@ -8,7 +8,7 @@
 #include "protocols/replicated/rep3_share.h"
 #include "protocols/semi/semi_share.h"
 
-template<class T> class HashMaliciousRepMC;
+template<class T> class HashMaliciousRepOpener;
 template<class T> class Beaver;
 template<class T> class BrainPrep;
 
@@ -22,21 +22,21 @@ class BrainShare : public Rep3Share<SignedZ2<K>>
 {
     typedef BrainShare This;
     typedef SignedZ2<K> T;
-    typedef Rep3Share<T> super;
+    typedef Rep3Share<T> Super;
 
 public:
     typedef T clear;
 
     typedef Beaver<BrainShare> BasicProtocol;
-    typedef HashMaliciousRepMC<BrainShare> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef HashMaliciousRepOpener<BrainShare> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ReplicatedInput<BrainShare> Input;
     typedef ::PrivateOutput<BrainShare> PrivateOutput;
     typedef BrainPrep<BrainShare> LivePrep;
     typedef MaybeHemi<This> Protocol;
     typedef DummyMatrixPrep<This> MatrixPrep;
 
-    typedef GC::MaliciousRepSecret bit_type;
+    typedef GC::MaliciousRepSecret BitType;
 
     const static int N_MASK_BITS = clear::N_BITS + S;
     const static int Z_BITS = 2 * (N_MASK_BITS) + 5 + S;

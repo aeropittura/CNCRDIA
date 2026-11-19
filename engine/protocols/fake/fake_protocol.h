@@ -18,10 +18,10 @@ template<class T>
 class FakeShuffle : public SecureShuffleBase<T>
 {
 public:
-    typedef vector<vector<int>> shuffle_type;
-    typedef ShuffleStore<shuffle_type> store_type;
+    typedef vector<vector<int>> ShuffleType;
+    typedef ShuffleStore<ShuffleType> StoreType;
 
-    map<long, long> stats;
+    map<long, long> statistics;
 
     FakeShuffle(SubProcessor<T>&)
     {
@@ -33,7 +33,7 @@ public:
         apply(a, n, unit_size, output_base, input_base, 0, 0);
     }
 
-    void generate(size_t, shuffle_type& shuffle)
+    void generate(size_t, ShuffleType& shuffle)
     {
         shuffle.push_back(vector<int>(1l));
     }
@@ -56,7 +56,7 @@ public:
     }
 
     void apply_multiple(StackedVector<T>& a,
-            vector<ShuffleTuple<typename T::Protocol::Shuffler::shuffle_type>>& shuffles)
+            vector<ShuffleTuple<typename T::Protocol::Shuffler::ShuffleType>>& shuffles)
     {
         for (auto &shuffle : shuffles)
             this->apply(a, shuffle.size, shuffle.unit_size, shuffle.dest,
@@ -68,7 +68,7 @@ template<class T>
 class FakeProtocol : public ProtocolBase<T>
 {
     PointerVector<T> results;
-    SeededPRNG G;
+    SeededPrng G;
 
     T dot_prod;
 
@@ -76,10 +76,10 @@ class FakeProtocol : public ProtocolBase<T>
 
     int fails;
 
-    vector<vector<size_t>> trunc_stats;
+    vector<vector<size_t>> trunc_statistics;
 
-    map<string, size_t> cisc_stats;
-    map<int, size_t> ltz_stats;
+    map<string, size_t> cisc_statistics;
+    map<int, size_t> ltz_statistics;
 
 public:
     typedef FakeShuffle<T> Shuffler;
@@ -87,7 +87,7 @@ public:
     Player& P;
 
     FakeProtocol(Player& P) :
-            fails(0), trunc_stats(T::MAX_N_BITS + 1,
+            fails(0), trunc_statistics(T::MAX_N_BITS + 1,
                     vector<size_t>(T::MAX_N_BITS + 1)), P(P)
     {
     }
@@ -101,14 +101,14 @@ public:
         vector<double> expected(T::MAX_N_BITS + 1);
         for (int i = 0; i <= T::MAX_N_BITS; i++)
         {
-            if (sum(trunc_stats[i]))
+            if (sum(trunc_statistics[i]))
             {
                 cerr << i << ": ";
                 for (int j = 0; j <= T::MAX_N_BITS; j++)
                 {
-                    cerr << trunc_stats[i][j] << " ";
+                    cerr << trunc_statistics[i][j] << " ";
                     for (int k = 0; k < T::MAX_N_BITS - i; k++)
-                        expected[k] += trunc_stats[i][j] * exp2(j - T::MAX_N_BITS);
+                        expected[k] += trunc_statistics[i][j] * exp2(j - T::MAX_N_BITS);
                 }
                 cerr << endl;
             }
@@ -131,11 +131,11 @@ public:
             }
             cerr << endl;
         }
-        for (auto& x : cisc_stats)
+        for (auto& x : cisc_statistics)
         {
             cerr << x.second << " " << x.first << endl;
         }
-        for (auto& x : ltz_stats)
+        for (auto& x : ltz_statistics)
             cerr << "LTZ " << x.first << ": " << x.second << endl;
     }
 
@@ -144,7 +144,7 @@ public:
     {
         if (trunc_max != T())
             cerr << "Maximum bit length in truncation: "
-                << (bigint(typename T::clear(trunc_max)).numBits() + 1)
+                << (Bigint(typename T::clear(trunc_max)).num_bits() + 1)
                 << " (" << trunc_max << ")" << endl;
     }
 
@@ -158,7 +158,7 @@ public:
         return P;
     }
 
-    void init_mul()
+    void initialize_mult()
     {
         results.clear();
     }
@@ -177,9 +177,9 @@ public:
         return results.next();
     }
 
-    void init_dotprod()
+    void initialize_dotprod()
     {
-        init_mul();
+        initialize_mult();
         dot_prod = {};
     }
 
@@ -212,7 +212,7 @@ public:
     template<int = 0>
     void trunc_pr(const vector<int>&, int, SubProcessor<T>&, true_type)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
     template<int = 0>
@@ -222,13 +222,13 @@ public:
         for (size_t i = 0; i < regs.size(); i += 4)
             for (int l = 0; l < size; l++)
             {
-                auto& res = proc.get_S_ref(regs[i] + l);
-                auto& source = proc.get_S_ref(regs[i + 1] + l);
+                auto& res = proc.get_s_ref(regs[i] + l);
+                auto& source = proc.get_s_ref(regs[i + 1] + l);
                 T tmp = source;
                 tmp = tmp < T() ? (T() - tmp) : tmp;
                 trunc_max = max(trunc_max, tmp);
 #ifdef TRUNC_PR_EMULATION_STATS
-                trunc_stats.at(regs[i + 2]).at(tmp == T() ? 0 : tmp.bit_length())++;
+                trunc_statistics.at(regs[i + 2]).at(tmp == T() ? 0 : tmp.bit_length())++;
 #endif
 #ifdef CHECK_BOUNDS_IN_TRUNC_PR_EMULATION
                 auto test = (source >> (regs[i + 2]));
@@ -307,7 +307,7 @@ public:
     void cisc(SubProcessor<T>&, const StackedVector<Integer>&,
             MemoryPart<T>&, const Instruction&, true_type)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
     template<int = 0>
@@ -316,19 +316,19 @@ public:
     {
         int r0 = instruction.get_r(0);
         string tag((char*)&r0, 4);
-        cisc_stats[tag.c_str()]++;
+        cisc_statistics[tag.c_str()]++;
         auto& args = instruction.get_start();
         if (tag == string("LTZ\0", 4))
         {
             for (size_t i = 0; i < args.size(); i += args[i])
             {
-                ltz_stats[args[i + 4]] += args[i + 1];
+                ltz_statistics[args[i + 4]] += args[i + 1];
                 assert(i + args[i] <= args.size());
                 assert(args[i] >= 5);
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
-                    res = T(processor.get_S()[args[i + 3] + j]).get_bit(
+                    auto& res = processor.get_s()[args[i + 2] + j];
+                    res = T(processor.get_s()[args[i + 3] + j]).get_bit(
                             args[i + 4] - 1);
                 }
             }
@@ -341,8 +341,8 @@ public:
                 assert(args[i] >= 5);
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
-                    res = processor.get_S()[args[i + 3] + j] == 0;
+                    auto& res = processor.get_s()[args[i + 2] + j];
+                    res = processor.get_s()[args[i + 3] + j] == 0;
                 }
             }
         }
@@ -358,8 +358,8 @@ public:
                 assert((s == 0) or (s == 1));
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
-                    res = ((T(processor.get_S()[args[i + 3] + j])
+                    auto& res = processor.get_s()[args[i + 2] + j];
+                    res = ((T(processor.get_s()[args[i + 3] + j])
                             + (T(s) << (k - 1))) >> m) - (T(s) << (k - m - 1));
                 }
             }
@@ -375,8 +375,8 @@ public:
                 assert((s == 0) or (s == 1));
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
-                    auto x = processor.get_S()[args[i + 3] + j];
+                    auto& res = processor.get_s()[args[i + 2] + j];
+                    auto x = processor.get_s()[args[i + 3] + j];
                     bool sign = x.negative();
                     res = abs(x) & ((T(1) << m) - 1);
                     if (sign)
@@ -392,13 +392,13 @@ public:
                 int f = args.at(i + 6);
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
+                    auto& res = processor.get_s()[args[i + 2] + j];
                     mpf_class a[2];
                     for (int k = 0; k < 2; k++)
-                        a[k] = bigint(typename T::clear(
-                                processor.get_S()[args[i + 3 + k] + j]));
+                        a[k] = Bigint(typename T::clear(
+                                processor.get_s()[args[i + 3 + k] + j]));
                     if (a[1] != 0)
-                        res = bigint(a[0] / a[1] * exp2(f));
+                        res = Bigint(a[0] / a[1] * exp2(f));
                     else
                         res = 0;
                 }
@@ -412,10 +412,10 @@ public:
                 int f = args.at(i + 5);
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
-                    auto a = bigint(typename T::clear(
-                                    processor.get_S()[args[i + 3] + j]));
-                    res = bigint(round(exp2(mpf_class(a).get_d() / exp2(f) + f)));
+                    auto& res = processor.get_s()[args[i + 2] + j];
+                    auto a = Bigint(typename T::clear(
+                                    processor.get_s()[args[i + 3] + j]));
+                    res = Bigint(round(exp2(mpf_class(a).get_d() / exp2(f) + f)));
                 }
             }
         }
@@ -427,10 +427,10 @@ public:
                 int f = args.at(i + 5);
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
-                    auto a = bigint(typename T::clear(
-                                    processor.get_S()[args[i + 3] + j]));
-                    res = bigint(round((log2(mpf_class(a).get_d()) - f) * exp2(f)));
+                    auto& res = processor.get_s()[args[i + 2] + j];
+                    auto a = Bigint(typename T::clear(
+                                    processor.get_s()[args[i + 3] + j]));
+                    res = Bigint(round((log2(mpf_class(a).get_d()) - f) * exp2(f)));
                 }
             }
         }
@@ -442,8 +442,8 @@ public:
                 assert(args[i] == 5);
                 for (size_t j = 0; j < args[i + 1]; j++)
                 {
-                    auto& res = processor.get_S()[args[i + 2] + j];
-                    auto& source = processor.get_S()[args[i + 3] + j];
+                    auto& res = processor.get_s()[args[i + 2] + j];
+                    auto& source = processor.get_s()[args[i + 3] + j];
                     res = source.get_bit(Ci[args[i + 4]].get());
                 }
             }
@@ -454,7 +454,7 @@ public:
             int n = args[1];
             vector<pair<T, int>> tmp;
             tmp.reserve(n);
-            auto k = processor.get_S().begin() + args[2];
+            auto k = processor.get_s().begin() + args[2];
             for (int i = 0; i < n; i++)
                 tmp.push_back({*(k + i), i});
             stable_sort(tmp.begin(), tmp.end(), [](const auto& a, const auto& b) {
@@ -483,7 +483,7 @@ public:
         {
             assert(args[0] == args.size());
             int n = args[1];
-            auto base = processor.get_S().begin();
+            auto base = processor.get_s().begin();
             auto dest = base + args[2];
             auto g = base + args[3];
             auto x = base + args[4];

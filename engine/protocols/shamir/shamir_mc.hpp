@@ -11,7 +11,7 @@
 #include "protocols/shamir/shamir.hpp"
 
 template<class T>
-ShamirMC<T>::ShamirMC(int t) :
+ShamirOpener<T>::ShamirOpener(int t) :
         os(0), player(0), threshold()
 {
     if (t > 0)
@@ -21,14 +21,14 @@ ShamirMC<T>::ShamirMC(int t) :
 }
 
 template<class T>
-ShamirMC<T>::~ShamirMC()
+ShamirOpener<T>::~ShamirOpener()
 {
     if (os)
         delete os;
 }
 
 template<class T>
-void ShamirMC<T>::POpen_Begin(vector<typename T::open_type>& values,
+void ShamirOpener<T>::POpen_Begin(vector<typename T::OpenType>& values,
         const vector<T>& S, const Player& P)
 {
     (void) values;
@@ -37,12 +37,12 @@ void ShamirMC<T>::POpen_Begin(vector<typename T::open_type>& values,
 }
 
 template<class T>
-vector<typename T::open_type::Scalar> ShamirMC<T>::get_reconstruction(
+vector<typename T::OpenType::Scalar> ShamirOpener<T>::get_reconstruction(
         const Player& P, int n_relevant_players)
 {
     if (n_relevant_players == 0)
         n_relevant_players = threshold + 1;
-    vector<rec_type> reconstruction(n_relevant_players);
+    vector<RecType> reconstruction(n_relevant_players);
     vector<int> points(n_relevant_players);
     for (int i = 0; i < n_relevant_players; i++)
         points[i] = P.get_player(i);
@@ -50,7 +50,7 @@ vector<typename T::open_type::Scalar> ShamirMC<T>::get_reconstruction(
 }
 
 template<class T>
-void ShamirMC<T>::init_open(const Player& P, int n)
+void ShamirOpener<T>::initialize_open(const Player& P, int n)
 {
     if (reconstruction.empty())
     {
@@ -58,7 +58,7 @@ void ShamirMC<T>::init_open(const Player& P, int n)
     }
 
     if (not os)
-        os = new Bundle<octetStream>(P);
+        os = new Bundle<OctetStream>(P);
 
     for (auto& o : *os)
         o.reset_write_head();
@@ -67,21 +67,21 @@ void ShamirMC<T>::init_open(const Player& P, int n)
 }
 
 template<class T>
-void ShamirMC<T>::prepare(const vector<T>& S, const Player& P)
+void ShamirOpener<T>::prepare(const vector<T>& S, const Player& P)
 {
-    init_open(P, S.size());
+    initialize_open(P, S.size());
     for (auto& share : S)
         prepare_open(share);
 }
 
 template<class T>
-void ShamirMC<T>::prepare_open(const T& share, int)
+void ShamirOpener<T>::prepare_open(const T& share, int)
 {
     share.pack(os->mine);
 }
 
 template<class T>
-void ShamirMC<T>::POpen(vector<typename T::open_type>& values, const vector<T>& S,
+void ShamirOpener<T>::POpen(vector<typename T::OpenType>& values, const vector<T>& S,
         const Player& P)
 {
     prepare(S, P);
@@ -90,7 +90,7 @@ void ShamirMC<T>::POpen(vector<typename T::open_type>& values, const vector<T>& 
 }
 
 template<class T>
-void ShamirMC<T>::exchange(const Player& P)
+void ShamirOpener<T>::exchange(const Player& P)
 {
     CODE_LOCATION
     vector<bool> my_senders(P.num_players()), my_receivers(P.num_players());
@@ -103,19 +103,19 @@ void ShamirMC<T>::exchange(const Player& P)
 }
 
 template<class T>
-void ShamirMC<T>::start_exchange(const Player& P)
+void ShamirOpener<T>::start_exchange(const Player& P)
 {
     P.send_all(os->mine);
 }
 
 template<class T>
-void ShamirMC<T>::stop_exchange(const Player& P)
+void ShamirOpener<T>::stop_exchange(const Player& P)
 {
     P.receive_all(*os);
 }
 
 template<class T>
-void ShamirMC<T>::POpen_End(vector<typename T::open_type>& values,
+void ShamirOpener<T>::POpen_End(vector<typename T::OpenType>& values,
         const vector<T>& S, const Player& P)
 {
     P.receive_all(*os);
@@ -123,7 +123,7 @@ void ShamirMC<T>::POpen_End(vector<typename T::open_type>& values,
 }
 
 template<class T>
-void ShamirMC<T>::finalize(vector<typename T::open_type>& values,
+void ShamirOpener<T>::finalize(vector<typename T::OpenType>& values,
         const vector<T>& S)
 {
     values.clear();
@@ -132,22 +132,22 @@ void ShamirMC<T>::finalize(vector<typename T::open_type>& values,
 }
 
 template<class T>
-array<typename T::open_type*, 2> ShamirMC<T>::finalize_several(size_t n)
+array<typename T::OpenType*, 2> ShamirOpener<T>::finalize_several(size_t n)
 {
     this->values.clear();
     finalize(this->values, vector<T>(n));
-    return MAC_Check_Base<T>::finalize_several(n);
+    return MacCheckBase<T>::finalize_several(n);
 }
 
 template<class T>
-typename T::open_type ShamirMC<T>::finalize_raw()
+typename T::OpenType ShamirOpener<T>::finalize_raw()
 {
     assert(reconstruction.size());
-    typename T::open_type res;
+    typename T::OpenType res;
     for (size_t j = 0; j < reconstruction.size(); j++)
     {
         res +=
-                (*os)[player->get_player(j)].template get<typename T::open_type>()
+                (*os)[player->get_player(j)].template get<typename T::OpenType>()
                         * reconstruction[j];
     }
 
@@ -155,10 +155,10 @@ typename T::open_type ShamirMC<T>::finalize_raw()
 }
 
 template<class T>
-typename T::open_type ShamirMC<T>::reconstruct(const vector<open_type>& shares)
+typename T::OpenType ShamirOpener<T>::reconstruct(const vector<OpenType>& shares)
 {
     assert(reconstruction.size());
-    typename T::open_type res;
+    typename T::OpenType res;
     for (size_t j = 0; j < reconstruction.size(); j++)
     {
         res += shares[j] * reconstruction[j];
@@ -168,7 +168,7 @@ typename T::open_type ShamirMC<T>::reconstruct(const vector<open_type>& shares)
 }
 
 template<class T>
-void IndirectShamirMC<T>::exchange(const Player& P)
+void IndirectShamirOpener<T>::exchange(const Player& P)
 {
     CODE_LOCATION
     oss.resize(P.num_players());

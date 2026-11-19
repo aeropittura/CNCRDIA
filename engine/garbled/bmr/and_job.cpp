@@ -23,7 +23,7 @@ int AndJob::run()
 		for (size_t j = 0; j < args[i]; j++)
 		{
 			i_gate++;
-			gate->init_inputs(gate_id + i_gate,
+			gate->initialize_inputs(gate_id + i_gate,
 					ProgramParty::s().get_n_parties());
 			int dl = GC::Clear::N_BITS;
 			GC::Secret<EvalRegister>& dest = S[args[i + 1] + j / dl];

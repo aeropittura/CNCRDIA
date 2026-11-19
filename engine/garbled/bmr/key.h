@@ -49,7 +49,7 @@ ostream& operator<<(ostream& o, const __m128i& x);
 
 
 inline bool Key::operator==(const Key& other) const {
-    return int128(r) == other.r;
+    return Int128(r) == other.r;
 }
 
 inline Key& Key::operator-=(const Key& other) {

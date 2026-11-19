@@ -12,16 +12,16 @@
 
 class Gate {
 public:
-	wire_id_t _left;
-	wire_id_t _right;
-	wire_id_t _out;
+	WireId _left;
+	WireId _right;
+	WireId _out;
 	Function _func;
 
 	int _layer;
 
 	Gate() : _left(-1), _right(-1), _out(-1), _layer(-1) {}
 
-	inline void init(wire_id_t left, wire_id_t right, wire_id_t out,std::string func) {
+	inline void init(WireId left, WireId right, WireId out,std::string func) {
 		_left = left;
 		_right = right;
 		_out = out;

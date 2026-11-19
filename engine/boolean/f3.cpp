@@ -33,7 +33,7 @@ GC::RowMatrix<F3VectorBitWise> F3VectorBitWise::transpose(
         for (size_t j = 0; j < m; j += 128)
             for (int k = 0; k < 2; k++)
             {
-                square128 square;
+                Square128 square;
                 square.set_zero();
                 for (int ii = 0; ii < min(128, int(n - i)); ii++)
                     square.rows[ii] = tmp.col(i + ii).bits[k].get_int128(j / 128).a;
@@ -83,7 +83,7 @@ void F3VectorBitWise::randomize(PRNG& G)
 
         for (int j = 0; j < 64; j += 5)
         {
-            octet r = 243;
+            Octet r = 243;
             while (r >= 243)
                 r = G.get_uchar();
             auto part = table[r];

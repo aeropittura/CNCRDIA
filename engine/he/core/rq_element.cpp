@@ -5,12 +5,12 @@
 
 #include "numeric/modp.hpp"
 
-Rq_Element::Rq_Element(const FHE_PK& pk) :
-        Rq_Element(pk.get_params().FFTD(), evaluation, evaluation)
+RqElement::RqElement(const FHE_PK& pk) :
+        RqElement(pk.get_parameters().FFTD(), evaluation, evaluation)
 {
 }
 
-Rq_Element::Rq_Element(const vector<FFT_Data>& prd, RepType r0, RepType r1)
+RqElement::RqElement(const vector<FftData>& prd, RepType r0, RepType r1)
 {
     if (prd.size() > 0)
         a.push_back({prd[0], r0});
@@ -22,7 +22,7 @@ Rq_Element::Rq_Element(const vector<FFT_Data>& prd, RepType r0, RepType r1)
     lev = n_mults();
 }
 
-void Rq_Element::set_data(const vector<FFT_Data>& prd)
+void RqElement::set_data(const vector<FftData>& prd)
 {
     a.resize(prd.size(), {});
     for(size_t i = 0; i < a.size(); i++)
@@ -30,50 +30,50 @@ void Rq_Element::set_data(const vector<FFT_Data>& prd)
     lev=n_mults();
 }
 
-void Rq_Element::assign_zero(const vector<FFT_Data>& prd)
+void RqElement::assign_zero(const vector<FftData>& prd)
 {
     set_data(prd);
     assign_zero();
 }
 
-void Rq_Element::assign_zero()
+void RqElement::assign_zero()
 {
 	for (int i=0; i<=lev; ++i)
 		a[i].assign_zero();
 }
 
-void Rq_Element::assign_one()
+void RqElement::assign_one()
 {
 	for (int i=0; i<=lev; ++i)
 		a[i].assign_one();
 }
 
-void Rq_Element::partial_assign(const Rq_Element& other)
+void RqElement::partial_assign(const RqElement& other)
 {
 	lev=other.lev;
 	a.resize(other.a.size(), {});
 }
 
-void Rq_Element::negate()
+void RqElement::negate()
 {
 	for (int i=0; i<=lev; ++i)
 		a[i].negate();
 }
 
-Rq_Element Rq_Element::mul_by_X_i(int i) const
+RqElement RqElement::mult_by_x_i(int i) const
 {
-  Rq_Element res;
+  RqElement res;
   res.lev = lev;
   res.a.clear();
   for (auto& x : a)
     {
-      auto tmp = x.mul_by_X_i(i);
+      auto tmp = x.mult_by_x_i(i);
       res.a.push_back(tmp);
     }
   return res;
 }
 
-void add(Rq_Element& ans,const Rq_Element& ra,const Rq_Element& rb)
+void add(RqElement& ans,const RqElement& ra,const RqElement& rb)
 {
   ans.partial_assign(ra, rb);
   for (int i=0; i<=ans.lev; ++i)
@@ -82,7 +82,7 @@ void add(Rq_Element& ans,const Rq_Element& ra,const Rq_Element& rb)
 	  ans.a[1].partial_assign(ra.a[1]);
   }
 }
-void sub(Rq_Element& ans,const Rq_Element& a,const Rq_Element& b)
+void sub(RqElement& ans,const RqElement& a,const RqElement& b)
 {
   ans.partial_assign(a, b);
   for (int i=0; i<=ans.lev; ++i)
@@ -92,7 +92,7 @@ void sub(Rq_Element& ans,const Rq_Element& a,const Rq_Element& b)
   }
 }
 
-void mul(Rq_Element& ans,const Rq_Element& a,const Rq_Element& b)
+void mul(RqElement& ans,const RqElement& a,const RqElement& b)
 {
   ans.partial_assign(a, b);
   for (int i=0; i<=ans.lev; ++i)
@@ -102,49 +102,49 @@ void mul(Rq_Element& ans,const Rq_Element& a,const Rq_Element& b)
   }
 }
 
-void mul(Rq_Element& ans,const Rq_Element& a,const bigint& b)
+void mul(RqElement& ans,const RqElement& a,const Bigint& b)
 {
   ans.partial_assign(a);
   modp bp;
   for (int i=0; i<=ans.lev; ++i)
   {
-	  to_modp(bp,b,a.a[i].get_prD());
+	  to_modp(bp,b,a.a[i].get_pr_d());
 	  mul(ans.a[i],a.a[i],bp);
   }
 }
 
-void Rq_Element::randomize(PRNG& G,int l)
+void RqElement::randomize(PRNG& G,int l)
 {
   set_level(l);
   for (int i=0; i<=lev; ++i)
 	  a[i].randomize(G);
 }
 
-bool Rq_Element::equals(const Rq_Element& other) const
+bool RqElement::equals(const RqElement& other) const
 {
-  if (lev!=other.lev)                 { throw level_mismatch(); }
+  if (lev!=other.lev)                 { throw LevelMismatch(); }
   for (int i=0; i<=lev; ++i)
 	  if (!a[i].equals(other.a[i])) return false;
   return true;
 }
 
 
-vector<bigint> Rq_Element::to_vec_bigint() const
+vector<Bigint> RqElement::to_vector_bigint() const
 {
-  vector<bigint> v;
-  to_vec_bigint(v);
+  vector<Bigint> v;
+  to_vector_bigint(v);
   return v;
 }
 
 // Doing sort of CRT;
 // result mod p0 = a[0]; result mod p1 = a[1]
-void Rq_Element::to_vec_bigint(vector<bigint>& v) const
+void RqElement::to_vector_bigint(vector<Bigint>& v) const
 {
   CODE_LOCATION_NO_SCOPE
 
-  a[0].to_vec_bigint(v);
+  a[0].to_vector_bigint(v);
   if (n_mults() == 0) {
-	  bigint p0 = a[0].get_prime();
+	  Bigint p0 = a[0].get_prime();
 	  for (size_t i = 0; i < v.size(); ++i) {
 		  if (v[i] > p0 / 2) {
 			  v[i] = (v[i] - p0);
@@ -152,13 +152,13 @@ void Rq_Element::to_vec_bigint(vector<bigint>& v) const
 	  }
   }
   if (lev==1)
-    { vector<bigint> v1;
-      a[1].to_vec_bigint(v1);
+    { vector<Bigint> v1;
+      a[1].to_vector_bigint(v1);
       assert(v.size() == v1.size());
-      bigint p0=a[0].get_prime();
-      bigint p1=a[1].get_prime();
-      bigint p0i,lambda,Q=p0*p1;
-      invMod(p0i,p0%p1,p1);
+      Bigint p0=a[0].get_prime();
+      Bigint p1=a[1].get_prime();
+      Bigint p0i,lambda,Q=p0*p1;
+      inverse_mod(p0i,p0%p1,p1);
       for (unsigned int i=0; i<v.size(); i++)
 	{ lambda=((v1[i]-v[i])*p0i)%Q;
           v[i]=(v[i]+p0*lambda)%Q;
@@ -166,22 +166,22 @@ void Rq_Element::to_vec_bigint(vector<bigint>& v) const
     }
 }
 
-ConversionIterator Rq_Element::get_iterator() const
+ConversionIterator RqElement::get_iterator() const
 {
   if (lev != 0)
-    throw not_implemented();
+    throw NotImplemented();
   return a[0].get_iterator();
 }
 
-bigint Rq_Element::infinity_norm() const
+Bigint RqElement::infinity_norm() const
 {
-  bigint Q = 1, ans = 0;
+  Bigint Q = 1, ans = 0;
   for (int i = 0; i <= n_mults(); ++i)
   {
 	  Q *= a[i].get_prime();
   }
-  bigint t;
-  vector<bigint> te=to_vec_bigint();
+  Bigint t;
+  vector<Bigint> te=to_vector_bigint();
   for (unsigned int i=0; i<te.size(); i++)
     { // Take rounded value and then abs value
       if (te[i]<Q/2) { t=te[i]; }
@@ -191,20 +191,20 @@ bigint Rq_Element::infinity_norm() const
   return ans;
 }
 
-void Rq_Element::change_rep(RepType r)
+void RqElement::change_rep(RepType r)
 {
-  if (lev==1) { throw level_mismatch(); }
+  if (lev==1) { throw LevelMismatch(); }
   a[0].change_rep(r);
 }
 
-void Rq_Element::change_rep(RepType r0,RepType r1)
+void RqElement::change_rep(RepType r0,RepType r1)
 {
-  if (lev==0 or n_mults() != 1) { throw level_mismatch(); }
+  if (lev==0 or n_mults() != 1) { throw LevelMismatch(); }
   a[0].change_rep(r0);
   a[1].change_rep(r1);
 }
 
-void Rq_Element::Scale(const bigint& p)
+void RqElement::Scale(const Bigint& p)
 {
   if (lev==0) { return; }
 
@@ -218,33 +218,33 @@ void Rq_Element::Scale(const bigint& p)
 
   if (n_mults() == 0) {
 	  //for some reason we scale but we have just one level
-	  throw level_mismatch();
+	  throw LevelMismatch();
   }
-  bigint p0=a[0].get_prime(),p1=a[1].get_prime(),p1i,lambda,n=p1*p;
-  invMod(p1i,p1%p,p);
+  Bigint p0=a[0].get_prime(),p1=a[1].get_prime(),p1i,lambda,n=p1*p;
+  inverse_mod(p1i,p1%p,p);
 
   // First multiply input by [p1]_p
-  bigint te=p1%p;
+  Bigint te=p1%p;
   if (te>p/2) { te-=p; }
   modp tep;
-  to_modp(tep,te,a[0].get_prD());
+  to_modp(tep,te,a[0].get_pr_d());
   mul(a[0],a[0],tep);
-  to_modp(tep,te,a[1].get_prD());
+  to_modp(tep,te,a[1].get_pr_d());
   mul(a[1],a[1],tep);
 
   // Now compute delta
-  Ring_Element b0(a[0].get_FFTD(),evaluation);
-  Ring_Element b1(a[1].get_FFTD(),evaluation);
+  RingElement b0(a[0].get_fftd(),evaluation);
+  RingElement b1(a[1].get_fftd(),evaluation);
   // scope to ensure deconstruction of write iterators
   {
-    auto poly_a1 = a[1];
-    poly_a1.change_rep(polynomial);
-    auto it = poly_a1.get_iterator();
+    auto polynomial_a1 = a[1];
+    polynomial_a1.change_rep(polynomial);
+    auto it = polynomial_a1.get_iterator();
     auto it0 = b0.get_write_iterator();
     auto it1 = b1.get_write_iterator();
-    bigint half_n = n / 2;
-    bigint delta;
-    for (int i=0; i < a[1].get_FFTD().phi_m(); i++)
+    Bigint half_n = n / 2;
+    Bigint delta;
+    for (int i=0; i < a[1].get_fftd().phi_m(); i++)
       {
         it.get(delta);
         lambda = delta;
@@ -261,53 +261,53 @@ void Rq_Element::Scale(const bigint& p)
   }
 
   // Now add delta back onto a0
-  Rq_Element bb(b0,b1);
+  RqElement bb(b0,b1);
   ::add(*this,*this,bb);
 
   // Now divide by p1 mod p0
-  modp p1_inv,pp;
-  to_modp(pp,p1,a[0].get_prD());
-  Inv(p1_inv,pp,a[0].get_prD());
+  modp p1_inverse,pp;
+  to_modp(pp,p1,a[0].get_pr_d());
+  Inv(p1_inverse,pp,a[0].get_pr_d());
   lev=0;
-  mul(a[0],a[0],p1_inv);
+  mul(a[0],a[0],p1_inverse);
 }
 
-void Rq_Element::mul_by_p1()
+void RqElement::mult_by_p1()
 {
 
-  if (n_mults() == 0) {throw level_mismatch();}
+  if (n_mults() == 0) {throw LevelMismatch();}
   lev=1;
-  bigint m=a[1].get_prime()%a[0].get_prime();
+  Bigint m=a[1].get_prime()%a[0].get_prime();
   modp mp;
-  to_modp(mp,m,a[0].get_prD());
+  to_modp(mp,m,a[0].get_pr_d());
   mul(a[0],a[0],mp);
   a[1].assign_zero();
 }
 
-void Rq_Element::raise_level()
+void RqElement::raise_level()
 {
   if (lev==n_mults()) { return; }
   lev=1;
   a[1].from(a[0].get_copy_iterator());
 }
 
-void Rq_Element::check_level() const
+void RqElement::check_level() const
 {
   if ((unsigned)lev > (unsigned)n_mults())
     throw range_error(
         "level out of range: " + to_string(lev) + "/" + to_string(n_mults()));
 }
 
-void Rq_Element::partial_assign(const Rq_Element& x, const Rq_Element& y)
+void RqElement::partial_assign(const RqElement& x, const RqElement& y)
 {
   x.check_level();
   y.check_level();
   if (x.lev != y.lev or x.n_mults() != y.n_mults())
-    throw level_mismatch();
+    throw LevelMismatch();
   partial_assign(x);
 }
 
-void Rq_Element::pack(octetStream& o, int) const
+void RqElement::pack(OctetStream& o, int) const
 {
   check_level();
   o.store(lev);
@@ -315,7 +315,7 @@ void Rq_Element::pack(octetStream& o, int) const
 	  a[i].pack(o);
 }
 
-void Rq_Element::unpack(octetStream& o, int)
+void RqElement::unpack(OctetStream& o, int)
 {
   unsigned int ll;  o.get(ll); lev=ll;
 
@@ -333,7 +333,7 @@ void Rq_Element::unpack(octetStream& o, int)
 	  a[i].unpack(o);
 }
 
-void Rq_Element::output(ostream& s) const
+void RqElement::output(ostream& s) const
 {
   check_level();
   s.write((char*)&lev, sizeof(lev));
@@ -341,7 +341,7 @@ void Rq_Element::output(ostream& s) const
     a[i].output(s);
 }
 
-void Rq_Element::input(istream& s)
+void RqElement::input(istream& s)
 {
   s.read((char*)&lev, sizeof(lev));
   check_level();
@@ -349,15 +349,15 @@ void Rq_Element::input(istream& s)
     a[i].input(s);
 }
 
-void Rq_Element::check(const FHE_Params& params) const
+void RqElement::check(const FheParameters& params) const
 {
   if (n_mults() != params.n_mults())
-    throw level_mismatch();
+    throw LevelMismatch();
   for (int i = 0; i <= lev; i++)
     a[i].check(params.FFTD()[i]);
 }
 
-size_t Rq_Element::report_size(ReportType type) const
+size_t RqElement::report_size(ReportType type) const
 {
   size_t sz = a[0].report_size(type);
   if (lev == 1 || type == CAPACITY)
@@ -366,15 +366,15 @@ size_t Rq_Element::report_size(ReportType type) const
   return sz;
 }
 
-void Rq_Element::unpack(octetStream& o, const FHE_Params& params)
+void RqElement::unpack(OctetStream& o, const FheParameters& params)
 {
   set_data(params.FFTD());
   unpack(o);
 }
 
-void Rq_Element::print_first_non_zero() const
+void RqElement::print_first_non_zero() const
 {
-  vector<bigint> v = to_vec_bigint();
+  vector<Bigint> v = to_vector_bigint();
   size_t i;
   for (i = 0; i < v.size(); i++)
   {
@@ -389,5 +389,5 @@ void Rq_Element::print_first_non_zero() const
   cout << endl;
 }
 
-template void Rq_Element::from<bigint>(const Generator<bigint>&, int);
-template void Rq_Element::from<int>(const Generator<int>&, int);
+template void RqElement::from<Bigint>(const Generator<Bigint>&, int);
+template void RqElement::from<int>(const Generator<int>&, int);

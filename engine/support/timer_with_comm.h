@@ -9,30 +9,30 @@
 #include "net/player.h"
 #include "vm/thread_stats.h"
 
-class TimerWithComm : public Timer
+class TimerWithCommunication : public Timer
 {
-    ThreadStats total_stats, last_stats;
+    ThreadStatistics total_statistics, last_statistics;
     Timer cpu_timer;
 
 public:
-    TimerWithComm(const Timer& other = {});
-    TimerWithComm(double time);
+    TimerWithCommunication(const Timer& other = {});
+    TimerWithCommunication(double time);
 
-    void start(const ThreadStats& stats = {});
-    void stop(const ThreadStats& stats = {});
+    void start(const ThreadStatistics& statistics = {});
+    void stop(const ThreadStatistics& statistics = {});
 
     size_t bytes_sent() const;
     double mb_sent() const;
     size_t rounds() const;
 
-    const ExecutionStats& exe_stats() const;
+    const ExecutionStats& exe_statistics() const;
 
-    TimerWithComm operator+(const TimerWithComm& other);
-    TimerWithComm operator-(const TimerWithComm& other);
-    TimerWithComm& operator+=(const TimerWithComm& other);
-    TimerWithComm& operator-=(const TimerWithComm& other);
+    TimerWithCommunication operator+(const TimerWithCommunication& other);
+    TimerWithCommunication operator-(const TimerWithCommunication& other);
+    TimerWithCommunication& operator+=(const TimerWithCommunication& other);
+    TimerWithCommunication& operator-=(const TimerWithCommunication& other);
 
     string full();
 
-    friend ostream& operator<<(ostream& os, const TimerWithComm& stats);
+    friend ostream& operator<<(ostream& os, const TimerWithCommunication& statistics);
 };

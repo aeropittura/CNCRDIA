@@ -14,7 +14,7 @@
 namespace GC
 {
 
-typename AtlasSecret::MC* AtlasSecret::new_mc(typename AtlasSecret::mac_key_type mac_key)
+typename AtlasSecret::MC* AtlasSecret::new_opener(typename AtlasSecret::MacKeyType mac_key)
 {
     return new MC(mac_key);
 }

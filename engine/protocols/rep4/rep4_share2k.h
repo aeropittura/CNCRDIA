@@ -9,7 +9,7 @@
 #include "vm/dummy_protocol.h"
 #include "boolean/square64.h"
 
-template<class T> class Rep4MC;
+template<class T> class Rep4Opener;
 template<class T> class Rep4Input;
 template<class T> class Rep4RingOnlyPrep;
 
@@ -17,15 +17,15 @@ template<int K>
 class Rep4Share2 : public Rep4Share<Z2<K>>
 {
     typedef Rep4Share2 This;
-    typedef Rep4Share<Z2<K>> super;
+    typedef Rep4Share<Z2<K>> Super;
 
 public:
     typedef SignedZ2<K> clear;
     typedef Rep4Share<Z2<K + 2>> SquareToBitShare;
 
     typedef Rep4<This> Protocol;
-    typedef Rep4MC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef Rep4Opener<This> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef Rep4Input<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef Rep4RingOnlyPrep<This> LivePrep;
@@ -37,7 +37,7 @@ public:
     {
     }
     template<class T>
-    Rep4Share2(const FixedVec<T, 3>& other) : super(other)
+    Rep4Share2(const FixedVec<T, 3>& other) : Super(other)
     {
     }
 
@@ -74,7 +74,7 @@ public:
                     int base = l;
                     int n_left = min(n_bits - base, unit);
 
-                    square64 square;
+                    Square64 square;
 
                     for (int j = 0; j < m; j++)
                         square.rows[j] = source[j + start][i].get_limb(
@@ -84,11 +84,11 @@ public:
 
                     for (int j = 0; j < n_left; j++)
                     {
-                        auto& dest_reg = dest.at(
+                        auto& destination_reg = dest.at(
                                 regs.at(4 * (base + j) + ((my_num + i + 1) % 4))
                                         + k);
-                        dest_reg = {};
-                        dest_reg[i] = square.rows[j];
+                        destination_reg = {};
+                        destination_reg[i] = square.rows[j];
                     }
                 }
             }

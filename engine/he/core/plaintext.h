@@ -1,14 +1,14 @@
 #pragma once
 
 /* 
- * Defines plaintext either as a vector of field elements (gfp or gf2n_short)
- * or as a vector of int (for gf2n_short) or bigints (for gfp)
+ * Defines plaintext either as a vector of field elements (gfp or Gf2nShort)
+ * or as a vector of int (for Gf2nShort) or bigints (for gfp)
  *
  * The first format is the actual data we want, the second format
  * is the data we use to encrypt/decrypt. Passing between the two
- * depends on whether we have a gfp or a gf2n_short base type.
+ * depends on whether we have a gfp or a Gf2nShort base type.
  *   - The former uses the FFT (in the case of special m/p values
- *     and using FFT_Data), or naive methods (for general m/p values
+ *     and using FftData), or naive methods (for general m/p values
  *     and using PPData), the second uses a precomputed linear
  *     map
  *
@@ -24,9 +24,9 @@
 using namespace std;
 
 class FHE_PK;
-class Rq_Element;
-class FHE_Params;
-class FFT_Data;
+class RqElement;
+class FheParameters;
+class FftData;
 template<class T> class AddableVector;
 
 // Forward declaration as apparently this is needed for friends in templates
@@ -38,11 +38,11 @@ template<class T,class FD,class S> void sqr(Plaintext<T,FD,S>& z,const Plaintext
 
 enum condition { Full, Diagonal, Bits };
 
-enum PT_Type   { Polynomial, Evaluation, Both }; 
+enum PtType   { Polynomial, Evaluation, Both }; 
 
 /**
  * BGV plaintext.
- * Use ``Plaintext_mod_prime`` instead of filling in the templates.
+ * Use ``PlaintextModPrime`` instead of filling in the templates.
  * The plaintext is held in one of the two representations or both,
  * polynomial and evaluation. The latter is the one allowing element-wise
  * multiplication over a vector.
@@ -57,35 +57,35 @@ class Plaintext
   mutable vector<T> a;  // The thing in evaluation/FFT form
   mutable vector<S> b;  // Now in polynomial form
 
-  mutable PT_Type type;
+  mutable PtType type;
 
   /* We keep pointers to the basic data here 
-   *   - FD is of type FFT_Data or PPData if T is of type gfp
-   *   - FD is of type P2Data if T is of type gf2n_short
+   *   - FD is of type FftData or PPData if T is of type gfp
+   *   - FD is of type P2Data if T is of type Gf2nShort
    */
 
-  const FD   *Field_Data;
+  const FD   *field_data;
 
   int degree() const;
 
   public:
   
-  const FD& get_field() const { return *Field_Data; }
+  const FD& get_field() const { return *field_data; }
 
   /// Number of slots
   unsigned int num_slots() const;
 
-  Plaintext(const FD& FieldD, PT_Type type = Polynomial)
-  { Field_Data=&FieldD; allocate(type); }
+  Plaintext(const FD& field_d, PtType type = Polynomial)
+  { field_data=&field_d; allocate(type); }
 
-  Plaintext(const FD& FieldD, const Rq_Element& other);
+  Plaintext(const FD& field_d, const RqElement& other);
 
   /// Initialization
-  Plaintext(const FHE_Params& params);
+  Plaintext(const FheParameters& params);
 
-  void allocate(PT_Type type) const;
+  void allocate(PtType type) const;
   void allocate() const { allocate(type); }
-  void allocate_slots(const bigint& value);
+  void allocate_slots(const Bigint& value);
   int get_min_alloc();
 
   /**
@@ -95,7 +95,7 @@ class Plaintext
    */
   T element(int i) const
     {  if (type==Polynomial)  
-         { from_poly(); }
+         { from_polynomial(); }
        return a[i]; 
     }
   /**
@@ -105,7 +105,7 @@ class Plaintext
    */
   void set_element(int i,const T& e)
     { if (type==Polynomial)
-        { throw not_implemented(); }
+        { throw NotImplemented(); }
       a.resize(num_slots());
       a[i]=e;
       type=Evaluation;
@@ -114,13 +114,13 @@ class Plaintext
   // Access poly representation
   const S& coeff(int i) const
     {  if (type!=Polynomial)
-         { to_poly(); }
+         { to_polynomial(); }
        return b[i];
     }
 
-  void set_coeff(int i,const S& e)
+  void set_coefficient(int i,const S& e)
     {
-      to_poly();
+      to_polynomial();
       type=Polynomial;
       b[i]=e;
     }
@@ -129,40 +129,40 @@ class Plaintext
 
   // Assumes v is of the correct length (phi_m) for the given ring
   // and is already reduced modulo the correct prime etc
-  void set_poly(const vector<S>& v)
+  void set_polynomial(const vector<S>& v)
     { type=Polynomial; b=v; }
-  const vector<S>& get_poly() const
+  const vector<S>& get_polynomial() const
     {
-      to_poly();
+      to_polynomial();
       return b;
     }
 
-  Iterator<S> get_iterator() const { to_poly(); return b; }
+  Iterator<S> get_iterator() const { to_polynomial(); return b; }
 
-  void from(const Generator<bigint>& source) const;
+  void from(const Generator<Bigint>& source) const;
 
   // This sets a poly from a vector of bigint's which needs centering
   // modulo mod, before assigning (used in decryption)
   //    vv[i] is already assumed reduced modulo mod though but in 
   //    range [0,...,mod)
-  void set_poly_mod(const vector<bigint>& vv,const bigint& mod)
+  void set_polynomial_mod(const vector<Bigint>& vv,const Bigint& mod)
   {
-    set_poly_mod(Iterator<bigint>(vv), mod);
+    set_polynomial_mod(Iterator<Bigint>(vv), mod);
   }
-  void set_poly_mod(const Generator<bigint>& generator, const bigint& mod);
+  void set_polynomial_mod(const Generator<Bigint>& generator, const Bigint& mod);
 
   // Converts between Evaluation,Polynomial and Both representations
   //    Marked as const because does not change value, only changes the
   //    internal representation
-  void from_poly() const;
-  void to_poly() const;
+  void from_polynomial() const;
+  void to_polynomial() const;
 
   void randomize(PRNG& G,condition cond=Full);
-  void randomize(PRNG& G, int n_bits, bool Diag=false, PT_Type type=Polynomial);
+  void randomize(PRNG& G, int n_bits, bool Diag=false, PtType type=Polynomial);
 
-  void assign_zero(PT_Type t = Evaluation);
-  void assign_one(PT_Type t = Evaluation);
-  void assign_constant(T constant, PT_Type t = Evaluation);
+  void assign_zero(PtType t = Evaluation);
+  void assign_one(PtType t = Evaluation);
+  void assign_constant(T constant, PtType t = Evaluation);
 
   friend void add<>(Plaintext& z,const Plaintext& x,const Plaintext& y);
   friend void sub<>(Plaintext& z,const Plaintext& x,const Plaintext& y);
@@ -170,23 +170,23 @@ class Plaintext
   friend void sqr<>(Plaintext& z,const Plaintext& x);
 
   Plaintext operator+(const Plaintext& x) const
-  { Plaintext res(*Field_Data); add(res, *this, x); return res; }
+  { Plaintext res(*field_data); add(res, *this, x); return res; }
   Plaintext operator-(const Plaintext& x) const
-  { Plaintext res(*Field_Data); sub(res, *this, x); return res; }
+  { Plaintext res(*field_data); sub(res, *this, x); return res; }
 
   void mul(const Plaintext& x, const Plaintext& y)
-  { x.from_poly(); y.from_poly(); ::mul(*this, x, y); }
+  { x.from_polynomial(); y.from_polynomial(); ::mul(*this, x, y); }
 
   Plaintext operator*(const Plaintext& x)
-  { Plaintext res(*Field_Data); res.mul(*this, x); return res; }
+  { Plaintext res(*field_data); res.mul(*this, x); return res; }
 
   Plaintext& operator+=(const Plaintext& y);
   Plaintext& operator-=(const Plaintext& y)
-  { to_poly(); y.to_poly(); ::sub(*this, *this, y); return *this; }
+  { to_polynomial(); y.to_polynomial(); ::sub(*this, *this, y); return *this; }
 
   void negate();
 
-  AddableVector<S> mul_by_X_i(int i, const FHE_PK& pk) const;
+  AddableVector<S> mult_by_x_i(int i, const FHE_PK& pk) const;
 
   bool equals(const Plaintext& x) const;
   bool operator!=(const Plaintext& x) { return !equals(x); }
@@ -194,10 +194,10 @@ class Plaintext
   bool is_diagonal() const;
 
   /// Append to buffer
-  void pack(octetStream& o) const;
+  void pack(OctetStream& o) const;
 
   /// Read from buffer. Assumes parameters are set correctly
-  void unpack(octetStream& o);
+  void unpack(OctetStream& o);
 
   size_t report_size(ReportType type);
 
@@ -207,4 +207,4 @@ class Plaintext
 template <class FD>
 using Plaintext_ = Plaintext<typename FD::T, FD, typename FD::S>;
 
-typedef Plaintext_<FFT_Data> Plaintext_mod_prime;
+typedef Plaintext_<FftData> PlaintextModPrime;

@@ -64,7 +64,7 @@ void Square<U>::conditional_add(BitVector& conditions,
 }
 
 template<class U>
-void Square<U>::pack(octetStream& os) const
+void Square<U>::pack(OctetStream& os) const
 {
     for (int i = 0; i < U::length(); i++)
         switch (DIV_CEIL(U::length(), 8))
@@ -78,7 +78,7 @@ void Square<U>::pack(octetStream& os) const
 }
 
 template<class U>
-void Square<U>::unpack(octetStream& os)
+void Square<U>::unpack(OctetStream& os)
 {
     for (int i = 0; i < U::length(); i++)
         switch (DIV_CEIL(U::length(), 8))
@@ -100,7 +100,7 @@ void Square<U>::to(U& result)
 template<class U>
 void Square<U>::to(U& result, true_type)
 {
-    int t = U::get_ZpD().get_t();
+    int t = U::get_zp_d().get_t();
     const int L = MAX_MOD_SZ;
     mp_limb_t product[2 * L], sum[2 * L], tmp[L][2 * L];
     memset(tmp, 0, sizeof(tmp));
@@ -115,6 +115,6 @@ void Square<U>::to(U& result, true_type)
         mpn_add_n(sum, product, sum, 2 * t);
     }
     mp_limb_t q[2 * L], ans[2 * L];
-    mpn_tdiv_qr(q, ans, 0, sum, 2 * t, U::get_ZpD().get_prA(), t);
+    mpn_tdiv_qr(q, ans, 0, sum, 2 * t, U::get_zp_d().get_pr_a(), t);
     result.assign((void*) ans);
 }

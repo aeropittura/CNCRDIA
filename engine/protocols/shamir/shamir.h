@@ -11,10 +11,10 @@ using namespace std;
 #include "protocols/replicated/replicated.h"
 
 template<class T> class SubProcessor;
-template<class T> class ShamirMC;
+template<class T> class ShamirOpener;
 template<class T> class ShamirShare;
 template<class T> class ShamirInput;
-template<class T> class IndirectShamirMC;
+template<class T> class IndirectShamirOpener;
 
 class Player;
 
@@ -24,23 +24,23 @@ class Player;
 template<class T>
 class Shamir : public ProtocolBase<T>
 {
-    typedef typename T::open_type::Scalar U;
+    typedef typename T::OpenType::Scalar U;
 
     vector<U> reconstruction;
     U rec_factor;
     ShamirInput<T>* resharing;
     ShamirInput<T>* random_input;
 
-    SeededPRNG secure_prng;
+    SeededPrng secure_prng;
 
-    map<int, vector<vector<typename T::open_type>>> hypers;
+    map<int, vector<vector<typename T::OpenType>>> hypers;
 
-    typename T::open_type dotprod_share;
+    typename T::OpenType dotprod_share;
 
     void buffer_random();
 
     int threshold;
-    int n_mul_players;
+    int n_mult_players;
 
 public:
     static const bool uses_triples = false;
@@ -60,7 +60,7 @@ public:
 
     void reset();
 
-    void init_mul();
+    void initialize_mult();
 
     void prepare_mul(const T& x, const T& y, int n = -1);
 
@@ -72,14 +72,14 @@ public:
 
     T finalize(int n_input_players);
 
-    void init_dotprod();
+    void initialize_dotprod();
     void prepare_dotprod(const T& x, const T& y);
     void next_dotprod();
     T finalize_dotprod(int length);
 
     vector<T> get_randoms(PRNG& G, int t);
 
-    vector<vector<typename T::open_type>>& get_hyper(int t);
-    static void get_hyper(vector<vector<typename T::open_type>>& hyper, int t, int n);
+    vector<vector<typename T::OpenType>>& get_hyper(int t);
+    static void get_hyper(vector<vector<typename T::OpenType>>& hyper, int t, int n);
     static string hyper_filename(int t, int n);
 };

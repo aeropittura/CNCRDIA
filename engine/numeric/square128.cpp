@@ -1,5 +1,5 @@
 /*
- * numeric/square128.cpp
+ * numeric/Square128.cpp
  *
  */
 
@@ -13,34 +13,34 @@
 
 #include "ot/bit_matrix.hpp"
 
-union matrix16x8
+union Matrix16x8
 {
     __m128i whole;
-    octet rows[16];
+    Octet rows[16];
 
-    matrix16x8() : whole(_mm_setzero_si128()) {}
-    matrix16x8(__m128i x) { whole = x; }
+    Matrix16x8() : whole(_mm_setzero_si128()) {}
+    Matrix16x8(__m128i x) { whole = x; }
 
     bool get_bit(int x, int y)
     { return (rows[x] >> y) & 1; }
 
-    void input(square128& input, int x, int y);
-    void transpose(square128& output, int x, int y);
+    void input(Square128& input, int x, int y);
+    void transpose(Square128& output, int x, int y);
 };
 
-class square16
+class Square16
 {
 public:
     // 16x16 in two halves, 128 bits each
-    matrix16x8 halves[2];
+    Matrix16x8 halves[2];
 
     bool get_bit(int x, int y)
     { return halves[y/8].get_bit(x, y % 8); }
 
-    void input(square128& output, int x, int y);
-    void transpose(square128& output, int x, int y);
+    void input(Square128& output, int x, int y);
+    void transpose(Square128& output, int x, int y);
 
-    void check_transpose(square16& dual);
+    void check_transpose(Square16& dual);
     void print();
 };
 
@@ -51,21 +51,21 @@ public:
 #endif
 
 UNROLL_LOOPS
-inline void matrix16x8::input(square128& input, int x, int y)
+inline void Matrix16x8::input(Square128& input, int x, int y)
 {
     for (int l = 0; l < 16; l++)
         rows[l] = input.bytes[16*x+l][y];
 }
 
 UNROLL_LOOPS
-inline void square16::input(square128& input, int x, int y)
+inline void Square16::input(Square128& input, int x, int y)
 {
     for (int i = 0; i < 2; i++)
         halves[i].input(input, x, 2 * y + i);
 }
 
 UNROLL_LOOPS
-inline void matrix16x8::transpose(square128& output, int x, int y)
+inline void Matrix16x8::transpose(Square128& output, int x, int y)
 {
     for (int j = 0; j < 8; j++)
     {
@@ -78,50 +78,50 @@ inline void matrix16x8::transpose(square128& output, int x, int y)
 }
 
 UNROLL_LOOPS
-inline void square16::transpose(square128& output, int x, int y)
+inline void Square16::transpose(Square128& output, int x, int y)
 {
     for (int i = 0; i < 2; i++)
         halves[i].transpose(output, 2 * x + i, y);
 }
 
 #ifdef __AVX2__
-union matrix32x8
+union Matrix32x8
 {
     __m256i whole;
-    octet rows[32];
+    Octet rows[32];
 
-    matrix32x8() : whole(_mm256_setzero_si256()) {}
-    matrix32x8(__m256i x) { whole = x; }
+    Matrix32x8() : whole(_mm256_setzero_si256()) {}
+    Matrix32x8(__m256i x) { whole = x; }
 
-    void input(square128& input, int x, int y);
-    void transpose(square128& output, int x, int y);
+    void input(Square128& input, int x, int y);
+    void transpose(Square128& output, int x, int y);
 };
 
 class square32
 {
 public:
-    matrix32x8 quarters[4];
+    Matrix32x8 quarters[4];
 
-    void input(square128& input, int x, int y);
-    void transpose(square128& output, int x, int y);
+    void input(Square128& input, int x, int y);
+    void transpose(Square128& output, int x, int y);
 };
 
 UNROLL_LOOPS
-inline void matrix32x8::input(square128& input, int x, int y)
+inline void Matrix32x8::input(Square128& input, int x, int y)
 {
     for (int l = 0; l < 32; l++)
         rows[l] = input.bytes[32*x+l][y];
 }
 
 UNROLL_LOOPS
-inline void square32::input(square128& input, int x, int y)
+inline void square32::input(Square128& input, int x, int y)
 {
     for (int i = 0; i < 4; i++)
         quarters[i].input(input, x, 4 * y + i);
 }
 
 UNROLL_LOOPS
-inline void matrix32x8::transpose(square128& output, int x, int y)
+inline void Matrix32x8::transpose(Square128& output, int x, int y)
 {
     for (int j = 0; j < 8; j++)
     {
@@ -134,7 +134,7 @@ inline void matrix32x8::transpose(square128& output, int x, int y)
 }
 
 UNROLL_LOOPS
-inline void square32::transpose(square128& output, int x, int y)
+inline void square32::transpose(Square128& output, int x, int y)
 {
     for (int i = 0; i < 4; i++)
         quarters[i].transpose(output, 4 * x + i, y);
@@ -142,10 +142,10 @@ inline void square32::transpose(square128& output, int x, int y)
 #endif
 
 #ifdef __AVX2__
-typedef square32 subsquare;
+typedef square32 Subsquare;
 #define N_SUBSQUARES 4
 #else
-typedef square16 subsquare;
+typedef Square16 Subsquare;
 #define N_SUBSQUARES 8
 #endif
 
@@ -157,7 +157,7 @@ const int perm2[] = { 0, 4, 2, 6, 1, 5, 3, 7, 8, 0xc, 0xa, 0xe, 9, 0xd, 0xb, 0xf
 #endif
 
 UNROLL_LOOPS
-void square128::transpose(int n_rows, int n_cols)
+void Square128::transpose(int n_rows, int n_cols)
 {
     assert(n_rows <= 128);
     assert(n_cols <= 128);
@@ -165,7 +165,7 @@ void square128::transpose(int n_rows, int n_cols)
     for (int j = 0; j < N_SUBSQUARES; j++)
         for (int k = 0; k < j; k++)
         {
-            subsquare a, b;
+            Subsquare a, b;
             a.input(*this, k, j);
             b.input(*this, j, k);
             a.transpose(*this, j, k);
@@ -174,7 +174,7 @@ void square128::transpose(int n_rows, int n_cols)
 
     for (int j = 0; j < N_SUBSQUARES; j++)
     {
-        subsquare a;
+        Subsquare a;
         a.input(*this, j, j);
         a.transpose(*this, j, j);
     }
@@ -210,7 +210,7 @@ void square128::transpose(int n_rows, int n_cols)
         } \
     }
 
-    square128 tmp;
+    Square128 tmp;
     for (int k = 0; k < DIV_CEIL(n_rows, 32); k++)
     {
         int base = k * 16 * 2;
@@ -237,10 +237,10 @@ void square128::transpose(int n_rows, int n_cols)
     for (int i = 0; i < DIV_CEIL(n_cols, 8); i++)
     {
         for (int k = 0; k < 4; k++)
-            matrix32x8(tmp.doublerows[k * 16 + i]).transpose(*this, i, k);
+            Matrix32x8(tmp.doublerows[k * 16 + i]).transpose(*this, i, k);
     }
 #else // __AVX2__
-    square128 tmp;
+    Square128 tmp;
     for (int k = 0; k < 8; k++)
     {
         int base = k * 16;
@@ -255,24 +255,24 @@ void square128::transpose(int n_rows, int n_cols)
     for (int i = 0; i < 16; i++)
     {
         for (int k = 0; k < 8; k++)
-            matrix16x8(tmp.rows[k * 16 + i]).transpose(*this, i, k);
+            Matrix16x8(tmp.rows[k * 16 + i]).transpose(*this, i, k);
     }
 #endif // __AVX2__
 #endif // __USE_SUBSQUARES__
 }
 
-void square128::randomize(PRNG& G)
+void Square128::randomize(PRNG& G)
 {
-    G.get_octets((octet*)&rows, sizeof(rows));
+    G.get_octets((Octet*)&rows, sizeof(rows));
 }
 
-void square128::randomize(int row, PRNG& G)
+void Square128::randomize(int row, PRNG& G)
 {
     rows[row] = G.get_doubleword();
 }
 
 
-void square128::conditional_add(BitVector& conditions, square128& other, int offset)
+void Square128::conditional_add(BitVector& conditions, Square128& other, int offset)
 {
     for (int i = 0; i < 128; i++)
         if (conditions.get_bit(128 * offset + i))
@@ -280,10 +280,10 @@ void square128::conditional_add(BitVector& conditions, square128& other, int off
 }
 
 template <>
-void Square<gf2n_long>::to(gf2n_long& result, false_type)
+void Square<Gf2nLong>::to(Gf2nLong& result, false_type)
 {
-    int128 high, low;
-    for (int i = 0; i < gf2n_long::degree(); i++)
+    Int128 high, low;
+    for (int i = 0; i < Gf2nLong::degree(); i++)
     {
         low ^= rows[i].get() << i;
         high ^= rows[i].get() >> (128 - i);
@@ -291,7 +291,7 @@ void Square<gf2n_long>::to(gf2n_long& result, false_type)
     result.reduce(high, low);
 }
 
-void square128::check_transpose(square128& dual, int i, int k)
+void Square128::check_transpose(Square128& dual, int i, int k)
 {
     for (int j = 0; j < 16; j++)
         for (int l = 0; l < 16; l++)
@@ -305,14 +305,14 @@ void square128::check_transpose(square128& dual, int i, int k)
             }
 }
 
-void square128::check_transpose(square128& dual)
+void Square128::check_transpose(Square128& dual)
 {
     for (int i = 0; i < 8; i++)
         for (int k = 0; k < 8; k++)
             check_transpose(dual, i, k);
 }
 
-void square16::print()
+void Square16::print()
 {
     for (int i = 0; i < 2; i++)
     {
@@ -330,14 +330,14 @@ void square16::print()
     }
 }
 
-void square128::print(int i, int k)
+void Square128::print(int i, int k)
 {
-    square16 a;
+    Square16 a;
     a.input(*this, i, k);
     a.print();
 }
 
-void square128::print()
+void Square128::print()
 {
     for (int i = 0; i < 128; i++)
     {
@@ -347,7 +347,7 @@ void square128::print()
     }
 }
 
-void square128::print_octets()
+void Square128::print_octets()
 {
     for (int i = 0; i < 128; i++)
     {
@@ -358,7 +358,7 @@ void square128::print_octets()
     cout << dec;
 }
 
-void square128::print_doublerows()
+void Square128::print_doublerows()
 {
     for (int i = 0; i < 64; i++)
     {
@@ -372,35 +372,35 @@ void square128::print_doublerows()
     cout << dec;
 }
 
-void square128::set_zero()
+void Square128::set_zero()
 {
     for (int i = 0; i < 128; i++)
         rows[i] = _mm_setzero_si128();
 }
 
-square128& square128::operator^=(square128& other)
+Square128& Square128::operator^=(Square128& other)
 {
     for (int i = 0; i < 128; i++)
         rows[i] ^= other.rows[i];
     return *this;
 }
 
-square128& square128::add(square128& other)
+Square128& Square128::add(Square128& other)
 {
     return *this ^= other;
 }
 
-square128& square128::sub(square128& other)
+Square128& Square128::sub(Square128& other)
 {
     return *this ^= other;
 }
 
-square128& square128::rsub(square128& other)
+Square128& Square128::rsub(Square128& other)
 {
     return *this ^= other;
 }
 
-square128& square128::operator^=(const __m128i* other)
+Square128& Square128::operator^=(const __m128i* other)
 {
     __m128i value = _mm_loadu_si128(other);
     for (int i = 0; i < 128; i++)
@@ -408,34 +408,34 @@ square128& square128::operator^=(const __m128i* other)
     return *this;
 }
 
-square128& square128::sub(const __m128i* other)
+Square128& Square128::sub(const __m128i* other)
 {
     return *this ^= other;
 }
 
-square128& square128::operator^=(BitVector& other)
+Square128& Square128::operator^=(BitVector& other)
 {
     return *this ^= (__m128i*)other.get_ptr();
 }
 
-bool square128::operator==(square128& other)
+bool Square128::operator==(Square128& other)
 {
     for (int i = 0; i < 128; i++)
     {
-        if (int128(rows[i]) != other.rows[i])
+        if (Int128(rows[i]) != other.rows[i])
             return false;
     }
     return true;
 }
 
-void square128::pack(octetStream& o) const
+void Square128::pack(OctetStream& o) const
 {
-    o.append((octet*)this->bytes, sizeof(bytes));
+    o.append((Octet*)this->bytes, sizeof(bytes));
 }
 
-void square128::unpack(octetStream &o)
+void Square128::unpack(OctetStream &o)
 {
-    o.consume((octet*)this->bytes, sizeof(bytes));
+    o.consume((Octet*)this->bytes, sizeof(bytes));
 }
 
 
@@ -453,7 +453,7 @@ __m128i& BitMatrix::at(size_t i)
 void BitMatrix::resize(int length)
 {
     if (length % 128 != 0)
-        throw invalid_length(
+        throw InvalidLength(
                 to_string(length) + " not divisible by "
                         + to_string(128));
     squares.resize(length / 128);
@@ -503,7 +503,7 @@ BitVector BitMatrix::lsbs() const
         {
             word tmp = 0;
             for (int j = 0; j < 64; j++)
-                tmp ^= word(int128(squares[i].rows[k * 64 + j]).get_bit(0)) << j;
+                tmp ^= word(Int128(squares[i].rows[k * 64 + j]).get_bit(0)) << j;
             assert(tmp);
             res.set_word(2 * i + k, tmp);
         }

@@ -25,10 +25,10 @@ int main(int argc, char** argv)
     Names N(my_number, n_parties, "localhost", port_base);
 
     // template parameters are share types for integer and GF(2^n) computation
-    Machine<Share<gfp0>, Share<gf2n>> machine(N);
+    Machine<Share<Gfp0>, Share<Gf2n>> machine(N);
 
     // protocols to be used directly
-    ProtocolSet<Share<gfp0>> set(machine.get_player(), machine.get_sint_mac_key());
+    ProtocolSet<Share<Gfp0>> set(machine.get_player(), machine.get_sint_mac_key());
 
     // data to be used in steps
     set.input.reset_all(machine.get_player());

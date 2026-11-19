@@ -13,33 +13,33 @@
 template <class T>
 void check_triples(int n_players, string type_char = "")
 {
-    ifstream* inputFiles = new ifstream[n_players];
+    ifstream* input_files = new ifstream[n_players];
     for (int i = 0; i < n_players; i++)
     {
         stringstream ss;
-        ss << get_prep_sub_dir<Share<T>>(n_players) << "Triples-";
+        ss << get_prep_sub_directory<Share<T>>(n_players) << "Triples-";
         if (type_char.size())
             ss << type_char;
         else
             ss << T::type_char();
         ss << "-P" << i;
-        inputFiles[i].open(ss.str().c_str());
+        input_files[i].open(ss.str().c_str());
         cout << "Opening file " << ss.str() << endl;
-        octetStream tmp, tmp2 = file_signature<SemiShare<T>>();
-        tmp.input(inputFiles[i]);
+        OctetStream tmp, tmp2 = file_signature<SemiShare<T>>();
+        tmp.input(input_files[i]);
         assert(tmp == tmp2);
     }
 
     int j = 0;
-    while (inputFiles[0].peek() != EOF)
+    while (input_files[0].peek() != EOF)
     {
         T a,b,c,cc,tmp,prod;
         vector<T> as(n_players), bs(n_players), cs(n_players);
         for (int i = 0; i < n_players; i++)
         {
-            as[i].input(inputFiles[i], false);
-            bs[i].input(inputFiles[i], false);
-            cs[i].input(inputFiles[i], false);
+            as[i].input(input_files[i], false);
+            bs[i].input(input_files[i], false);
+            cs[i].input(input_files[i], false);
         }
 
         a = accumulate(as.begin(), as.end(), T());
@@ -71,7 +71,7 @@ void check_triples(int n_players, string type_char = "")
     }
 
     cout << j << " correct triples of type " << T::type_string() << endl;
-    delete[] inputFiles;
+    delete[] input_files;
 }
 
 int main(int argc, char** argv)
@@ -79,9 +79,9 @@ int main(int argc, char** argv)
     int n_players = 2;
     if (argc > 1)
         n_players = atoi(argv[1]);
-    read_setup(get_prep_sub_dir<Share<gfp>>(PREP_DIR, n_players, 128));
-    gfp::init_field(gfp::pr(), false);
-    gf2n::init_field();
-    check_triples<gf2n>(n_players);
-    check_triples<gfp>(n_players);
+    read_setup(get_prep_sub_directory<Share<Gfp>>(PREP_DIR, n_players, 128));
+    Gfp::initialize_field(Gfp::pr(), false);
+    Gf2n::initialize_field();
+    check_triples<Gf2n>(n_players);
+    check_triples<Gfp>(n_players);
 }

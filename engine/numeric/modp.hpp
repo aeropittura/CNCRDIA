@@ -12,82 +12,82 @@
  ***********************************************************************/
 
 template<int L>
-modp_<L> modp_<L>::add(const modp_& other, const Zp_Data& ZpD) const
+Modp_<L> Modp_<L>::add(const Modp_& other, const ZpData& zp_d) const
 {
-  modp_ res;
-  Add(res, *this, other, ZpD);
+  Modp_ res;
+  Add(res, *this, other, zp_d);
   return res;
 }
 
 template<int L>
-modp_<L> modp_<L>::sub(const modp_& other, const Zp_Data& ZpD) const
+Modp_<L> Modp_<L>::sub(const Modp_& other, const ZpData& zp_d) const
 {
-  modp_ res;
-  Sub(res, *this, other, ZpD);
+  Modp_ res;
+  Sub(res, *this, other, zp_d);
   return res;
 }
 
 template<int L>
-modp_<L> modp_<L>::mul(const modp_& other, const Zp_Data& ZpD) const
+Modp_<L> Modp_<L>::mul(const Modp_& other, const ZpData& zp_d) const
 {
-  modp_ res;
-  Mul(res, *this, other, ZpD);
+  Modp_ res;
+  Mul(res, *this, other, zp_d);
   return res;
 }
 
 template<int L>
-void modp_<L>::randomize(PRNG& G, const Zp_Data& ZpD)
+void Modp_<L>::randomize(PRNG& G, const ZpData& zp_d)
 {
   const int M = sizeof(mp_limb_t) * L;
-  switch (ZpD.pr_byte_length)
+  switch (zp_d.pr_byte_length)
   {
-#define X(LL) case LL: G.randomBnd<LL>(x, ZpD.get_prA(), ZpD.overhang_mask()); break;
+#define X(LL) case LL: G.random_bnd<LL>(x, zp_d.get_pr_a(), zp_d.overhang_mask()); break;
   X(M) X(M-1) X(M-2) X(M-3) X(M-4) X(M-5) X(M-6) X(M-7)
 #undef X
   default:
-    G.randomBnd(x, ZpD.get_prA(), ZpD.pr_byte_length, ZpD.overhang_mask());
+    G.random_bnd(x, zp_d.get_pr_a(), zp_d.pr_byte_length, zp_d.overhang_mask());
   }
 }
 
 template<int L>
-void modp_<L>::unpack(octetStream& o,const Zp_Data& ZpD)
+void Modp_<L>::unpack(OctetStream& o,const ZpData& zp_d)
 {
-  o.consume((octet*) x,ZpD.t*sizeof(mp_limb_t));
+  o.consume((Octet*) x,zp_d.t*sizeof(mp_limb_t));
 }
 
 template<int L>
 template<int LL>
-void modp_<L>::unpack(octetStream& o)
+void Modp_<L>::unpack(OctetStream& o)
 {
-  o.consume((octet*) x, LL);
+  o.consume((Octet*) x, LL);
 }
 
 template<int L>
 template<int LL>
-void modp_<L>::pack(octetStream& o) const
+void Modp_<L>::pack(OctetStream& o) const
 {
-  o.append((octet*) x, LL);
+  o.append((Octet*) x, LL);
 }
 
 template<int L>
-void Negate(modp_<L>& ans,const modp_<L>& x,const Zp_Data& ZpD)
+void Negate(Modp_<L>& ans,const Modp_<L>& x,const ZpData& zp_d)
 { 
-  if (isZero(x,ZpD)) { ans=x; return; }
-  mpn_sub_n(ans.x,ZpD.prA,x.x,ZpD.t); 
+  if (isZero(x,zp_d)) { ans=x; return; }
+  mpn_sub_n(ans.x,zp_d.pr_a,x.x,zp_d.t); 
 }
 
 
 template<int L>
-bool areEqual(const modp_<L>& x,const modp_<L>& y,const Zp_Data& ZpD)
-{ if (mpn_cmp(x.x,y.x,ZpD.t)!=0)
+bool areEqual(const Modp_<L>& x,const Modp_<L>& y,const ZpData& zp_d)
+{ if (mpn_cmp(x.x,y.x,zp_d.t)!=0)
     { return false; }
   return true;
 }
 
 template<int L>
-bool isZero(const modp_<L>& ans,const Zp_Data& ZpD)
+bool isZero(const Modp_<L>& ans,const ZpData& zp_d)
 {
-  for (int i=0; i<ZpD.t; i++)
+  for (int i=0; i<zp_d.t; i++)
     { if (ans.x[i]!=0) { return false; } }
   return true;
 }
@@ -101,25 +101,25 @@ bool isZero(const modp_<L>& ans,const Zp_Data& ZpD)
 
 
 template<int L>
-void assignOne(modp_<L>& x,const Zp_Data& ZpD)
-{ if (ZpD.montgomery)
-    { mpn_copyi(x.x,ZpD.R,ZpD.get_t()); }
+void assignOne(Modp_<L>& x,const ZpData& zp_d)
+{ if (zp_d.montgomery)
+    { mpn_copyi(x.x,zp_d.R,zp_d.get_t()); }
   else
-    { assignZero(x,ZpD); 
+    { assignZero(x,zp_d); 
       x.x[0]=1; 
     }
 }
 
 
 template<int L>
-bool isOne(const modp_<L>& x,const Zp_Data& ZpD)
-{ if (ZpD.montgomery)
-    { if (mpn_cmp(x.x,ZpD.R,ZpD.t)!=0)
+bool isOne(const Modp_<L>& x,const ZpData& zp_d)
+{ if (zp_d.montgomery)
+    { if (mpn_cmp(x.x,zp_d.R,zp_d.t)!=0)
         { return false; }
     }
   else
     { if (x.x[0]!=1) { return false; }
-      for (int i=1; i<min(ZpD.t, L); i++)
+      for (int i=1; i<min(zp_d.t, L); i++)
 	{ if (x.x[i]!=0) { return false; } }
     }
   return true;
@@ -128,22 +128,22 @@ bool isOne(const modp_<L>& x,const Zp_Data& ZpD)
 
 
 template<int L>
-void modp_<L>::to_bigint(bigint& ans,const Zp_Data& ZpD,bool reduce) const
+void Modp_<L>::to_bigint(Bigint& ans,const ZpData& zp_d,bool reduce) const
 { 
   auto& x = *this;
   mpz_ptr a = ans.get_mpz_t();
-  if (a->_mp_alloc < ZpD.t)
-      mpz_realloc(a, ZpD.t);
-  if (ZpD.montgomery)
+  if (a->_mp_alloc < zp_d.t)
+      mpz_realloc(a, zp_d.t);
+  if (zp_d.montgomery)
     {
       mp_limb_t one[MAX_MOD_SZ];
       inline_mpn_zero(one,L);
       one[0]=1;
-      ZpD.Mont_Mult(a->_mp_d,x.x,one);
+      zp_d.mont_mult(a->_mp_d,x.x,one);
     }
   else
-    { inline_mpn_copyi(a->_mp_d,x.x,ZpD.t); }
-  a->_mp_size=ZpD.t;
+    { inline_mpn_copyi(a->_mp_d,x.x,zp_d.t); }
+  a->_mp_size=zp_d.t;
   if (reduce)
     while (a->_mp_size>=1 && (a->_mp_d)[a->_mp_size-1]==0)
       { a->_mp_size--; }
@@ -152,19 +152,19 @@ void modp_<L>::to_bigint(bigint& ans,const Zp_Data& ZpD,bool reduce) const
 
 template<int L>
 template<int M>
-void modp_<L>::to_bigint(bigint& ans,const Zp_Data& ZpD,bool reduce) const
+void Modp_<L>::to_bigint(Bigint& ans,const ZpData& zp_d,bool reduce) const
 {
-  assert(M == ZpD.t);
+  assert(M == zp_d.t);
   auto& x = *this;
   mpz_ptr a = ans.get_mpz_t();
   if (a->_mp_alloc < M)
       mpz_realloc(a, M);
-  if (ZpD.montgomery)
+  if (zp_d.montgomery)
     {
       mp_limb_t one[M];
       inline_mpn_zero(one,M);
       one[0]=1;
-      ZpD.Mont_Mult_<M>(a->_mp_d,x.x,one);
+      zp_d.mont_mult_<M>(a->_mp_d,x.x,one);
     }
   else
     { inline_mpn_copyi(a->_mp_d,x.x,M); }
@@ -176,188 +176,188 @@ void modp_<L>::to_bigint(bigint& ans,const Zp_Data& ZpD,bool reduce) const
 
 
 template<int L>
-void to_modp(modp_<L>& ans,int x,const Zp_Data& ZpD)
+void to_modp(Modp_<L>& ans,int x,const ZpData& zp_d)
 {
-  inline_mpn_zero(ans.x,ZpD.get_t());
+  inline_mpn_zero(ans.x,zp_d.get_t());
   if (x>=0)
     { ans.x[0]=x;
-      if (ZpD.t==1) { ans.x[0]=ans.x[0]%ZpD.prA[0]; }
+      if (zp_d.t==1) { ans.x[0]=ans.x[0]%zp_d.pr_a[0]; }
     }
   else
-    { if (ZpD.t==1)
-	{ ans.x[0]=(ZpD.prA[0]+x)%ZpD.prA[0]; }
+    { if (zp_d.t==1)
+	{ ans.x[0]=(zp_d.pr_a[0]+x)%zp_d.pr_a[0]; }
       else
-        { bigint& xx = bigint::tmp = ZpD.pr+x;
-          to_modp(ans,xx,ZpD);
+        { Bigint& xx = Bigint::tmp = zp_d.pr+x;
+          to_modp(ans,xx,zp_d);
           return;
         }
     }
-  if (ZpD.montgomery)
-    { ZpD.Mont_Mult(ans.x,ans.x,ZpD.R2); }
+  if (zp_d.montgomery)
+    { zp_d.mont_mult(ans.x,ans.x,zp_d.R2); }
 }
 
 
 template<int L>
-void to_modp(modp_<L>& ans,const mpz_class& x,const Zp_Data& ZpD)
+void to_modp(Modp_<L>& ans,const mpz_class& x,const ZpData& zp_d)
 {
   if (x == 0)
   {
-    assignZero(ans, ZpD);
+    assignZero(ans, zp_d);
     return;
   }
   else if (x == 1)
   {
-    assignOne(ans, ZpD);
+    assignOne(ans, zp_d);
     return;
   }
-  bigint::tmp = x;
-  ans.convert_destroy(bigint::tmp, ZpD);
+  Bigint::tmp = x;
+  ans.convert_destroy(Bigint::tmp, zp_d);
 }
 
 
 template<int L>
-void modp_<L>::convert_destroy(bigint& xx,
-    const Zp_Data& ZpD)
+void Modp_<L>::convert_destroy(Bigint& xx,
+    const ZpData& zp_d)
 {
-  xx %= ZpD.pr;
-  //mpz_mod(xx.get_mpz_t(),x.get_mpz_t(),ZpD.pr.get_mpz_t());
-  convert(xx.get_mpz_t()->_mp_d, abs(xx.get_mpz_t()->_mp_size), ZpD, xx < 0);
+  xx %= zp_d.pr;
+  //mpz_mod(xx.get_mpz_t(),x.get_mpz_t(),zp_d.pr.get_mpz_t());
+  convert(xx.get_mpz_t()->_mp_d, abs(xx.get_mpz_t()->_mp_size), zp_d, xx < 0);
 }
 
 template<int L>
 template<int M>
-void modp_<L>::convert_destroy(const fixint<M>& xx,
-    const Zp_Data& ZpD)
+void Modp_<L>::convert_destroy(const Fixint<M>& xx,
+    const ZpData& zp_d)
 {
   assert(xx.size_in_limbs() <= L);
   SignedZ2<64 * L> tmp = xx;
   if (xx.negative())
-    tmp += ZpD.pr;
-  convert(tmp.get(), ZpD.get_t(), ZpD, false);
+    tmp += zp_d.pr;
+  convert(tmp.get(), zp_d.get_t(), zp_d, false);
 }
 
 template<int L>
-void modp_<L>::convert(const mp_limb_t* source, mp_size_t size, const Zp_Data& ZpD, bool negative)
+void Modp_<L>::convert(const mp_limb_t* source, mp_size_t size, const ZpData& zp_d, bool negative)
 {
-  assert(size <= ZpD.get_t());
+  assert(size <= zp_d.get_t());
   if (negative)
-    mpn_sub(x, ZpD.prA, ZpD.t, source, size);
+    mpn_sub(x, zp_d.pr_a, zp_d.t, source, size);
   else
     {
-      inline_mpn_zero(x + size, ZpD.t - size);
+      inline_mpn_zero(x + size, zp_d.t - size);
       inline_mpn_copyi(x, source, size);
     }
-  if (ZpD.montgomery)
-    ZpD.Mont_Mult(x, x, ZpD.R2);
+  if (zp_d.montgomery)
+    zp_d.mont_mult(x, x, zp_d.R2);
 }
 
 template<int L>
-void modp_<L>::zero_overhang(const Zp_Data& ZpD)
+void Modp_<L>::zero_overhang(const ZpData& zp_d)
 {
-  x[ZpD.get_t() - 1] &= ZpD.overhang_mask();
+  x[zp_d.get_t() - 1] &= zp_d.overhang_mask();
 }
 
 
 
 template<int L>
-void Sqr(modp_<L>& ans,const modp_<L>& x,const Zp_Data& ZpD)
+void Sqr(Modp_<L>& ans,const Modp_<L>& x,const ZpData& zp_d)
 { 
-  if (ZpD.montgomery)
-    { ZpD.Mont_Mult(ans.x,x.x,x.x); }
+  if (zp_d.montgomery)
+    { zp_d.mont_mult(ans.x,x.x,x.x); }
   else
-    { //ans.x=(x.x*x.x)%ZpD.pr;
+    { //ans.x=(x.x*x.x)%zp_d.pr;
       mp_limb_t aa[2*L],q[2*L];
-      mpn_sqr(aa,x.x,ZpD.t);
-      mpn_tdiv_qr(q,ans.x,0,aa,2*ZpD.t,ZpD.prA,ZpD.t);     
+      mpn_sqr(aa,x.x,zp_d.t);
+      mpn_tdiv_qr(q,ans.x,0,aa,2*zp_d.t,zp_d.pr_a,zp_d.t);     
     }
 }
 
 
 template<int L>
-void Inv(modp_<L>& ans,const modp_<L>& x,const Zp_Data& ZpD)
+void Inv(Modp_<L>& ans,const Modp_<L>& x,const ZpData& zp_d)
 { 
   mp_limb_t g[L],xx[L],yy[L];
   mp_size_t sz;
-  mpn_copyi(xx,x.x,ZpD.t);
-  mpn_copyi(yy,ZpD.prA,ZpD.t);
-  mpn_gcdext(g,ans.x,&sz,xx,ZpD.t,yy,ZpD.t);
+  mpn_copyi(xx,x.x,zp_d.t);
+  mpn_copyi(yy,zp_d.pr_a,zp_d.t);
+  mpn_gcdext(g,ans.x,&sz,xx,zp_d.t,yy,zp_d.t);
   if (sz<0)
     {
       assert(-sz <= L);
-      mpn_sub(ans.x,ZpD.prA,ZpD.t,ans.x,-sz);
+      mpn_sub(ans.x,zp_d.pr_a,zp_d.t,ans.x,-sz);
       sz=-sz;
     }
   else
-    { for (int i=sz; i<ZpD.t; i++) { ans.x[i]=0; } }
-  if (ZpD.montgomery)
-    { ZpD.Mont_Mult_max(ans.x,ans.x,ZpD.R3,L); }
+    { for (int i=sz; i<zp_d.t; i++) { ans.x[i]=0; } }
+  if (zp_d.montgomery)
+    { zp_d.mont_mult_max(ans.x,ans.x,zp_d.R3,L); }
 }
 
 
 template<int L>
-void Power(modp_<L>& ans,const modp_<L>& x,int exp,const Zp_Data& ZpD)
+void Power(Modp_<L>& ans,const Modp_<L>& x,int exp,const ZpData& zp_d)
 {
   if (exp==1) { ans=x; return; }
-  if (exp==0) { assignOne(ans,ZpD); return; }
-  if (exp<0)  { throw not_implemented(); }
-  modp_<L> t=x;
-  assignOne(ans,ZpD);
+  if (exp==0) { assignOne(ans,zp_d); return; }
+  if (exp<0)  { throw NotImplemented(); }
+  Modp_<L> t=x;
+  assignOne(ans,zp_d);
   while (exp!=0)
-    { if ((exp&1)==1) { Mul(ans,ans,t,ZpD); }
+    { if ((exp&1)==1) { Mul(ans,ans,t,zp_d); }
       exp>>=1;
-      Sqr(t,t,ZpD);
+      Sqr(t,t,zp_d);
     }
 }
 
 
 template<int L>
-void Power(modp_<L>& ans,const modp_<L>& x,const bigint& exp,const Zp_Data& ZpD)
+void Power(Modp_<L>& ans,const Modp_<L>& x,const Bigint& exp,const ZpData& zp_d)
 {
   if (exp==1) { ans=x; return; }
-  if (exp==0) { assignOne(ans,ZpD); return; }
-  if (exp<0)  { throw not_implemented();  }
+  if (exp==0) { assignOne(ans,zp_d); return; }
+  if (exp<0)  { throw NotImplemented();  }
   modp t=x;
-  assignOne(ans,ZpD);
-  bigint& e = bigint::tmp = exp;
+  assignOne(ans,zp_d);
+  Bigint& e = Bigint::tmp = exp;
   while (e!=0)
-     { if ((e&1)==1) { Mul(ans,ans,t,ZpD); }
+     { if ((e&1)==1) { Mul(ans,ans,t,zp_d); }
        e>>=1;
-       Sqr(t,t,ZpD);
+       Sqr(t,t,zp_d);
      }
 }
 
 
 template<int L>
-void modp_<L>::output(ostream& s, const Zp_Data& ZpD, bool human, bool signed_) const
+void Modp_<L>::output(ostream& s, const ZpData& zp_d, bool human, bool signed_) const
 {
   if (human)
-    { bigint te;
-      to_bigint(te, ZpD);
-      if (te <= ZpD.pr_half or not signed_)
+    { Bigint te;
+      to_bigint(te, zp_d);
+      if (te <= zp_d.pr_half or not signed_)
           s << te;
       else
-          s << (te - ZpD.pr);
+          s << (te - zp_d.pr);
     }
   else
-    { s.write((char*) x,ZpD.t*sizeof(mp_limb_t)); }
+    { s.write((char*) x,zp_d.t*sizeof(mp_limb_t)); }
 }
 
 template<int L>
-void modp_<L>::input(istream& s,const Zp_Data& ZpD,bool human)
+void Modp_<L>::input(istream& s,const ZpData& zp_d,bool human)
 {
   if (s.peek() == EOF)
     { if (s.tellg() == 0)
         { cout << "IO problem. Empty file?" << endl;
           throw file_error("modp input");
         }
-      throw end_of_file("modp");
+      throw EndOfFile("modp");
     }
 
   if (human)
-    { bigint te;
+    { Bigint te;
       s >> te;
-      to_modp(*this,te,ZpD);
+      to_modp(*this,te,zp_d);
     }
   else
-    { s.read((char*) x,ZpD.t*sizeof(mp_limb_t)); }
+    { s.read((char*) x,zp_d.t*sizeof(mp_limb_t)); }
 }

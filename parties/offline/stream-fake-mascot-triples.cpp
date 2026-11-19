@@ -16,21 +16,21 @@ class Info
 public:
     int thread_num;
     int nplayers;
-    KeySetup<Share<gfpvar>> key;
+    KeySetup<Share<Gfpvar>> key;
     pthread_t thread;
 };
 
 void* run(void* arg)
 {
     auto& info = *(Info*) arg;
-    SeededPRNG G;
-    Files<Share<gfpvar>> files(info.nplayers, info.key, PREP_DIR, DATA_TRIPLE, G, info.thread_num);
+    SeededPrng G;
+    Files<Share<Gfpvar>> files(info.nplayers, info.key, PREP_DIR, DATA_TRIPLE, G, info.thread_num);
     int count = 0;
     while (true)
     {
         for (int i = 0; i < 100000; i++)
         {
-            gfpvar triple[3];
+            Gfpvar triple[3];
             for (int i = 0; i < 2; i++)
                 triple[i].randomize(G);
             triple[2] = triple[0] * triple[1];
@@ -48,13 +48,13 @@ void* run(void* arg)
 int main()
 {
     insecure_fake();
-    typedef Share<gfpvar> T;
+    typedef Share<Gfpvar> T;
     int nplayers = 2;
     int lgp = 128;
     string prep_data_prefix = PREP_DIR;
-    gfpvar::generate_setup<T>(prep_data_prefix, nplayers, lgp);
+    Gfpvar::generate_setup<T>(prep_data_prefix, nplayers, lgp);
     KeySetup<T> keyp;
-    SeededPRNG G;
+    SeededPrng G;
     generate_mac_keys<T>(keyp, nplayers, prep_data_prefix, G);
 
     int nthreads = 3;

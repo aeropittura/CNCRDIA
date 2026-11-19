@@ -33,7 +33,7 @@ typename T::Protocol SpdzWise<T>::branch()
 }
 
 template<class T>
-void SpdzWise<T>::init(Preprocessing<T>&, typename T::MAC_Check& MC)
+void SpdzWise<T>::init(Preprocessing<T>&, typename T::MacCheck& MC)
 {
     mac_key = MC.get_alphai();
 }
@@ -47,11 +47,11 @@ void SpdzWise<T>::maybe_check()
 }
 
 template<class T>
-void SpdzWise<T>::init_mul()
+void SpdzWise<T>::initialize_mult()
 {
     maybe_check();
-    internal.init_mul();
-    internal2.init_mul();
+    internal.initialize_mult();
+    internal2.initialize_mult();
 }
 
 template<class T>
@@ -79,11 +79,11 @@ void SpdzWise<T>::exchange()
 }
 
 template<class T>
-void SpdzWise<T>::init_dotprod()
+void SpdzWise<T>::initialize_dotprod()
 {
     maybe_check();
-    internal.init_dotprod();
-    internal2.init_dotprod();
+    internal.initialize_dotprod();
+    internal2.initialize_dotprod();
 }
 
 template<class T>
@@ -123,7 +123,7 @@ void SpdzWise<T>::check()
         return;
 
     CODE_LOCATION
-    internal.init_dotprod();
+    internal.initialize_dotprod();
     coefficients.clear();
 
     // need one extra in zero_check
@@ -149,16 +149,16 @@ void SpdzWise<T>::check()
 }
 
 template<class T>
-void SpdzWise<T>::zero_check(check_type t)
+void SpdzWise<T>::zero_check(CheckType t)
 {
     assert(T::clear::invertible);
     check_field_size<typename T::clear>();
     auto r = internal.get_random();
-    internal.init_mul();
+    internal.initialize_mult();
     internal.prepare_mul(t, r);
     internal.exchange();
-    typename T::part_type::MAC_Check MC;
-    MC.CheckFor(0, {internal.finalize_mul()}, P);
+    typename T::part_type::MacCheck MC;
+    MC.check_for(0, {internal.finalize_mul()}, P);
 }
 
 template<class T>
@@ -176,7 +176,7 @@ void SpdzWise<T>::buffer_random()
     // cannot use member instance
     typename T::part_type::Honest::Protocol internal(P);
     BufferScope scope(internal, batch_size);
-    internal.init_mul();
+    internal.initialize_mult();
     for (int i = 0; i < batch_size; i++)
     {
         rs.push_back(internal.get_random());
@@ -195,10 +195,10 @@ void SpdzWise<T>::randoms_inst(StackedVector<T>& S,
         const Instruction& instruction)
 {
     CODE_LOCATION
-    internal.init_mul();
+    internal.initialize_mult();
     for (int i = 0; i < instruction.get_size(); i++)
     {
-        typename T::share_type res;
+        typename T::ShareType res;
         internal.randoms(res, instruction.get_n());
         internal.prepare_mul(res, mac_key);
         S[instruction.get_r(0) + i].set_share(res);

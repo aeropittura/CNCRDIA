@@ -54,7 +54,7 @@ public:
     static void basic_setup(Player& P);
     static void teardown();
 
-    static const FD& get_FTD();
+    static const FD& get_ftd();
     static const FHE_PK& get_pk();
     static const TemiSetup<FD>& get_setup();
 

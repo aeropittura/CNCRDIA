@@ -4,26 +4,26 @@
 #include "support/pprint.h"
 
 template<class T, class V>
-typename Share_<T, V>::mac_key_type Share_<T, V>::mac_key;
+typename Share_<T, V>::MacKeyType Share_<T, V>::mac_key;
 
 template<class T, class V>
 string Share_<T, V>::secrets_filename;
 
 
 template<class T, class V>
-typename Share_<T, V>::mac_key_type Share_<T, V>::get_mac_key()
+typename Share_<T, V>::MacKeyType Share_<T, V>::get_mac_key()
 {
     return mac_key;
 }
 
 template<class T, class V>
-void Share_<T, V>::set_mac_key(const mac_key_type& mac_key)
+void Share_<T, V>::set_mac_key(const MacKeyType& mac_key)
 {
     Share_<T, V>::mac_key = mac_key;
 
     if (OnlineOptions::singleton.has_option("output_mac"))
     {
-        octetStream os;
+        OctetStream os;
         mac_key.pack(os);
         cerr << mac_key.type_string() << " MAC key: " << mac_key << ", ";
         pprint_bytes("raw", (unsigned char*) os.get_data(), os.get_length(),
@@ -32,7 +32,7 @@ void Share_<T, V>::set_mac_key(const mac_key_type& mac_key)
 }
 
 template<class T, class V>
-void Share_<T, V>::specification(octetStream& os)
+void Share_<T, V>::specification(OctetStream& os)
 {
     T::specification(os);
 }
@@ -45,7 +45,7 @@ void Share_<T, V>::randomize(PRNG& G)
 }
 
 template<class T, class V>
-inline void Share_<T, V>::pack(octetStream& os, bool full) const
+inline void Share_<T, V>::pack(OctetStream& os, bool full) const
 {
   a.pack(os, full);
   if (full)
@@ -53,7 +53,7 @@ inline void Share_<T, V>::pack(octetStream& os, bool full) const
 }
 
 template<class T, class V>
-inline void Share_<T, V>::unpack(octetStream& os, bool full)
+inline void Share_<T, V>::unpack(OctetStream& os, bool full)
 {
   a.unpack(os, full);
   if (full)

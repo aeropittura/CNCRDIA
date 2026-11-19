@@ -70,7 +70,7 @@ was to use two connections in two threads.
 
 If you wish to use a different networking facility, we recommend to
 subclass :cpp:class:`Player` and fill in the virtual-only functions
-required by the compiler (e.g., :cpp:func:`send_to_no_stats` for
+required by the compiler (e.g., :cpp:func:`send_to_no_statistics` for
 sending to one other party). Note that not all protocols require all
 functions, so you only need to properly implement those you need. You
 can then replace uses of :cpp:class:`PlainPlayer` or
@@ -100,5 +100,5 @@ Reference
 .. doxygenclass:: CryptoPlayer
    :members:
 
-.. doxygenclass:: octetStream
+.. doxygenclass:: OctetStream
    :members:

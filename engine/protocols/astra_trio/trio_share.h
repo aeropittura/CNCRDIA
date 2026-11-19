@@ -9,25 +9,25 @@
 
 template<class T> class Trio;
 template<class T> class TrioPrepProtocol;
-template<class T> class TrioMC;
+template<class T> class TrioOpener;
 template<class T> class TrioInput;
 
 template<class T>
 class TrioShare : public AstraShare<T>
 {
     typedef TrioShare This;
-    typedef AstraShare<T> super;
+    typedef AstraShare<T> Super;
 
 public:
     // type for clear values in relevant domain
     typedef T clear;
-    typedef clear open_type;
+    typedef clear OpenType;
 
-    typedef GC::AstraSecret<TrioShare<BitVec>> bit_type;
+    typedef GC::AstraSecret<TrioShare<BitVec>> BitType;
 
     // opening facility
-    typedef TrioMC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef TrioOpener<This> MacCheck;
+    typedef MacCheck DirectOpener;
 
     // multiplication protocol
     typedef Trio<This> Protocol;
@@ -42,11 +42,11 @@ public:
     typedef ::PrivateOutput<This> PrivateOutput;
 
     template<class U>
-    using mc_template = TrioMC<U>;
+    using OpenerTemplate = TrioOpener<U>;
     template<class U>
-    using protocol_template = Trio<U>;
+    using ProtocolTemplate = Trio<U>;
     template<class U>
-    using input_template = TrioInput<U>;
+    using InputTemplate = TrioInput<U>;
 
     static string type_string()
     {
@@ -65,7 +65,7 @@ public:
 
     template<class U>
     TrioShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 
@@ -111,11 +111,11 @@ public:
     }
 
     template<class U, int MY_NUM>
-    static void pre_reduced_mul(U& a, U& b, U& c, Trio<U>& protocol,
+    static void pre_reduced_mult(U& a, U& b, U& c, Trio<U>& protocol,
             const T& aa, const T& bb);
 
     template<class U, int MY_NUM>
-    static pair<U, clear> post_reduced_mul(typename U::Protocol & protocol);
+    static pair<U, clear> post_reduced_mult(typename U::Protocol & protocol);
 
     template<class U, int MY_NUM>
     static This post_input0(typename U::Protocol& protocol);
@@ -125,8 +125,8 @@ public:
     {
         for (int i = 0; i < inst.get_size(); i++)
         {
-            auto& dest = proc.get_S_ref(inst.get_r(0) + i);
-            auto& source = proc.get_S_ref(inst.get_r(1) + i);
+            auto& dest = proc.get_s_ref(inst.get_r(0) + i);
+            auto& source = proc.get_s_ref(inst.get_r(1) + i);
             dest = from_rep3(source.to_rep3() >> inst.get_n());
         }
     }
@@ -136,14 +136,14 @@ template<class T>
 class TrioPrepShare : public AstraPrepShare<T>
 {
     typedef TrioPrepShare This;
-    typedef AstraPrepShare<T> super;
+    typedef AstraPrepShare<T> Super;
 
 public:
-    typedef GC::AstraSecret<TrioPrepShare<BitVec>> bit_type;
+    typedef GC::AstraSecret<TrioPrepShare<BitVec>> BitType;
 
     // opening facility
-    typedef ReplicatedMC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef ReplicatedOpener<This> MacCheck;
+    typedef MacCheck DirectOpener;
 
     // multiplication protocol
     typedef TrioPrepProtocol<This> Protocol;
@@ -158,7 +158,7 @@ public:
     typedef ::PrivateOutput<This> PrivateOutput;
 
     template<class U>
-    using protocol_template = TrioPrepProtocol<U>;
+    using ProtocolTemplate = TrioPrepProtocol<U>;
 
     // used for preprocessing storage location
     static string type_short()
@@ -172,7 +172,7 @@ public:
 
     template<class U>
     TrioPrepShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 

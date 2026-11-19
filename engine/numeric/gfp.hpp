@@ -10,94 +10,94 @@
 #include "numeric/setup.hpp"
 
 template<int X, int L>
-const true_type gfp_<X, L>::invertible;
+const true_type Gfp_<X, L>::invertible;
 template<int X, int L>
-const int gfp_<X, L>::MAX_N_BITS;
+const int Gfp_<X, L>::MAX_N_BITS;
 
 template<int X, int L>
-inline void gfp_<X, L>::read_or_generate_setup(string dir,
+inline void Gfp_<X, L>::read_or_generate_setup(string dir,
         const OnlineOptions& opts)
 {
   if (opts.prime == 0)
-    read_setup<gfp_<X, L>>(dir, opts.lgp);
+    read_setup<Gfp_<X, L>>(dir, opts.lgp);
   else
-    init_field(opts.prime);
+    initialize_field(opts.prime);
 }
 
 template<int X, int L>
-void gfp_<X, L>::check_setup(string dir)
+void Gfp_<X, L>::check_setup(string dir)
 {
-  ZpD.check_setup(dir);
+  zp_d.check_setup(dir);
 }
 
 template<int X, int L>
-const bigint& gfp_<X, L>::pr(bool allow_zero)
+const Bigint& Gfp_<X, L>::pr(bool allow_zero)
 {
-  if (not allow_zero and ZpD.pr == 0)
+  if (not allow_zero and zp_d.pr == 0)
     throw runtime_error("gfp not initialized");
 
-  return ZpD.pr;
+  return zp_d.pr;
 }
 
 template<int X, int L>
-void gfp_<X, L>::init_field(const bigint& p, bool mont)
+void Gfp_<X, L>::initialize_field(const Bigint& p, bool mont)
 {
-  ZpD.init(p, mont);
+  zp_d.init(p, mont);
   char name[100];
   snprintf(name, 100, "gfp_<%d, %d>", X, L);
-  if (ZpD.get_t() > L)
+  if (zp_d.get_t() > L)
     {
-      throw wrong_gfp_size(name, p, "GFP_MOD_SZ", ZpD.get_t());
+      throw WrongGfpSize(name, p, "GFP_MOD_SZ", zp_d.get_t());
     }
-  if (ZpD.get_t() < L)
+  if (zp_d.get_t() < L)
     {
       if (mont)
-        throw wrong_gfp_size(name, p, "GFP_MOD_SZ", ZpD.get_t());
+        throw WrongGfpSize(name, p, "GFP_MOD_SZ", zp_d.get_t());
       else
         cerr << name << " larger than necessary for modulus " << p << endl;
     }
-  two = bigint::tmp = 2;
+  two = Bigint::tmp = 2;
 }
 
 template <int X, int L>
-void gfp_<X, L>::init_default(int lgp, bool mont)
+void Gfp_<X, L>::initialize_default(int lgp, bool mont)
 {
-  init_field(SPDZ_Data_Setup_Primes(lgp), mont);
+  initialize_field(spdz_data_setup_primes(lgp), mont);
 }
 
 template<int X, int L>
-gfp_<X, L>::gfp_(const gfpvar& other)
+Gfp_<X, L>::Gfp_(const Gfpvar& other)
 {
-  assert(ZpD.pr == other.get_ZpD().pr);
+  assert(zp_d.pr == other.get_zp_d().pr);
   a = other.get();
 }
 
 template <int X, int L>
-void gfp_<X, L>::check()
+void Gfp_<X, L>::check()
 {
-  assert(mpn_cmp(a.x, ZpD.get_prA(), t()) < 0);
+  assert(mpn_cmp(a.x, zp_d.get_pr_a(), t()) < 0);
 }
 
 template <int X, int L>
-void gfp_<X, L>::almost_randomize(PRNG& G)
+void Gfp_<X, L>::almost_randomize(PRNG& G)
 {
-  G.get_octets((octet*)a.x,t()*sizeof(mp_limb_t));
-  a.x[t()-1]&=ZpD.mask;
+  G.get_octets((Octet*)a.x,t()*sizeof(mp_limb_t));
+  a.x[t()-1]&=zp_d.mask;
 }
 
 
 template<int X, int L>
-void gfp_<X, L>::from_random(const int128& other)
+void Gfp_<X, L>::from_random(const Int128& other)
 {
     PRNG G;
-    G.SetSeedFrom(other);
+    G.set_seed_from(other);
     G.next<true>();
     randomize(G);
 }
 
 
 template <int X, int L>
-gfp_<X, L> gfp_<X, L>::operator<<(int n) const
+Gfp_<X, L> Gfp_<X, L>::operator<<(int n) const
 {
   if (!is_zero())
     {
@@ -116,13 +116,13 @@ gfp_<X, L> gfp_<X, L>::operator<<(int n) const
 
 
 template <int X, int L>
-gfp_<X, L> gfp_<X, L>::operator>>(int n) const
+Gfp_<X, L> Gfp_<X, L>::operator>>(int n) const
 {
   if (!is_zero())
     {
       if (n != 0)
         {
-          return (bigint::tmp = *this) >>= n;
+          return (Bigint::tmp = *this) >>= n;
         }
       else
         return *this;
@@ -135,56 +135,56 @@ gfp_<X, L> gfp_<X, L>::operator>>(int n) const
 
 
 template<int X, int L>
-gfp_<X, L> gfp_<X, L>::signed_rshift(int i) const
+Gfp_<X, L> Gfp_<X, L>::signed_rshift(int i) const
 {
-  to_signed_bigint(bigint::tmp, *this);
-  auto& tmp = bigint::tmp;
+  to_signed_bigint(Bigint::tmp, *this);
+  auto& tmp = Bigint::tmp;
   if (tmp < 0)
       return tmp = -(-tmp >> i);
   else
-      return bigint::tmp >>= i;
+      return Bigint::tmp >>= i;
 }
 
 
 template <int X, int L>
-gfp_<X, L> gfp_<X, L>::operator<<(const gfp_& i) const
+Gfp_<X, L> Gfp_<X, L>::operator<<(const Gfp_& i) const
 {
-    return *this << (bigint::tmp = i).get_ui();
+    return *this << (Bigint::tmp = i).get_ui();
 }
 
 
 template <int X, int L>
-gfp_<X, L> gfp_<X, L>::operator>>(const gfp_& i) const
+Gfp_<X, L> Gfp_<X, L>::operator>>(const Gfp_& i) const
 {
-    return *this >> (bigint::tmp = i).get_ui();
+    return *this >> (Bigint::tmp = i).get_ui();
 }
 
 
 template<int X, int L>
-gfp_<X, L> gfp_<X, L>::invert() const
+Gfp_<X, L> Gfp_<X, L>::invert() const
 {
-    gfp_ res;
-    Inv(res.a, a, ZpD);
+    Gfp_ res;
+    Inv(res.a, a, zp_d);
     return res;
 }
 
 template<int X, int L>
-gfp_<X, L> gfp_<X, L>::sqrRoot()
+Gfp_<X, L> Gfp_<X, L>::square_root()
 {
-    // Temp move to bigint so as to call sqrRootMod
-    bigint ti;
-    ti = sqrRootMod(*this);
-    if (!isOdd(ti))
-        ti = ZpD.pr - ti;
-    gfp_<X, L> temp;
+    // Temp move to bigint so as to call square_root_mod
+    Bigint ti;
+    ti = square_root_mod(*this);
+    if (!is_odd(ti))
+        ti = zp_d.pr - ti;
+    Gfp_<X, L> temp;
     to_gfp(temp, ti);
     return temp;
 }
 
 template <int X, int L>
-void gfp_<X, L>::reqbl(int n)
+void Gfp_<X, L>::reqbl(int n)
 {
-  if ((int)n > 0 && pr() < bigint(1) << (n-1))
+  if ((int)n > 0 && pr() < Bigint(1) << (n-1))
     {
       cerr << "Program requires a prime of bit length " << n << ". "
           << "Run with '-lgp " << n << "' or compile with '--prime "
@@ -200,27 +200,27 @@ void gfp_<X, L>::reqbl(int n)
 }
 
 template<int X, int L>
-bool gfp_<X, L>::allows(Dtype type)
+bool Gfp_<X, L>::allows(Dtype type)
 {
     return type <= DATA_INVERSE;
 }
 
 template<int X, int L>
-void gfp_<X, L>::specification(octetStream& os)
+void Gfp_<X, L>::specification(OctetStream& os)
 {
-    ZpD.pack(os);
+    zp_d.pack(os);
 }
 
 template <int X, int L>
-gfp_<X, L> gfp_<X, L>::power_of_two(bool bit, int exp)
+Gfp_<X, L> Gfp_<X, L>::power_of_two(bool bit, int exp)
 {
     if (bit)
     {
         while (exp >= int(powers.size()))
         {
-            bigint::tmp = 1;
-            bigint::tmp <<= powers.size();
-            powers.push_back(bigint::tmp);
+            Bigint::tmp = 1;
+            Bigint::tmp <<= powers.size();
+            powers.push_back(Bigint::tmp);
         }
         return powers.at(exp);
     }
@@ -229,10 +229,10 @@ gfp_<X, L> gfp_<X, L>::power_of_two(bool bit, int exp)
 }
 
 template<int X, int L>
-bool gfp_<X, L>::get_bit(int i) const
+bool Gfp_<X, L>::get_bit(int i) const
 {
-    bigint::tmp = *this;
-    assert(bigint::tmp.numBits());
+    Bigint::tmp = *this;
+    assert(Bigint::tmp.num_bits());
     assert(i == 0);
-    return bigint::tmp.get_ui() & 1;
+    return Bigint::tmp.get_ui() & 1;
 }

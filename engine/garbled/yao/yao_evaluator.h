@@ -16,13 +16,13 @@
 class YaoEvaluator: public GC::Thread<GC::Secret<YaoEvalWire>>,
 		public YaoCommon<YaoEvalWire>
 {
-	typedef GC::Thread<GC::Secret<YaoEvalWire>> super;
+	typedef GC::Thread<GC::Secret<YaoEvalWire>> Super;
 
 protected:
 	static thread_local YaoEvaluator* singleton;
 
-	ReceivedMsg gates;
-	ReceivedMsgStore gates_store;
+	ReceivedMessage gates;
+	ReceivedMessageStore gates_store;
 
 	YaoEvalMaster& master;
 
@@ -30,13 +30,13 @@ protected:
 	friend class YaoEvalWire;
 
 public:
-	ReceivedMsg output_masks;
-	ReceivedMsgStore output_masks_store;
+	ReceivedMessage output_masks;
+	ReceivedMessageStore output_masks_store;
 
 	MMO mmo;
 
 	RealTwoPartyPlayer player;
-	OTExtensionWithMatrix ot_ext;
+	OtExtensionWithMatrix ot_ext;
 
 	static YaoEvaluator& s();
 
@@ -58,7 +58,7 @@ public:
 	int get_n_worker_threads()
 	{ return max(1u, thread::hardware_concurrency() / master.machine.nthreads); }
 
-	NamedCommStats extra_comm();
+	NamedCommunicationStatistics extra_communication();
 };
 
 inline void YaoEvaluator::load_gate(YaoGate& gate)

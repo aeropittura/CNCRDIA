@@ -17,65 +17,65 @@
  * Homomorphic key component generation (modulo a prime) using MASCOT
  */
 template<int X, int L>
-class KeyGenProtocol
+class KeyGeneratorProtocol
 {
 public:
-    typedef Share<gfpvar_<X, MAX_MOD_SZ>> share_type;
-    typedef typename share_type::open_type open_type;
-    typedef ShareVector<share_type> vector_type;
+    typedef Share<Gfpvar_<X, MAX_MOD_SZ>> ShareType;
+    typedef typename ShareType::OpenType OpenType;
+    typedef ShareVector<ShareType> VectorType;
 
     int backup_batch_size;
 
 protected:
     Player& P;
-    const FHE_Params& params;
-    const FFT_Data& fftd;
+    const FheParameters& params;
+    const FftData& fftd;
 
-    SeededPRNG G;
+    SeededPrng G;
     DataPositions usage;
 
-    share_type get_bit()
+    ShareType get_bit()
     {
         return prep->get_bit();
     }
 
 public:
-    Preprocessing<share_type>* prep;
-    MAC_Check_<share_type>* MC;
-    SubProcessor<share_type>* proc;
+    Preprocessing<ShareType>* prep;
+    MacCheck_<ShareType>* MC;
+    SubProcessor<ShareType>* proc;
 
-    KeyGenProtocol(Player& P, const FHE_Params& params, int level = 0);
-    ~KeyGenProtocol();
+    KeyGeneratorProtocol(Player& P, const FheParameters& params, int level = 0);
+    ~KeyGeneratorProtocol();
 
-    void input(vector<vector_type>& shares, const Rq_Element& secret);
+    void input(vector<VectorType>& shares, const RqElement& secret);
     template<class T>
-    void binomial(vector_type& shares, T& prep);
+    void binomial(VectorType& shares, T& prep);
     template<class T>
-    void secret_key(vector_type& shares, T& prep);
-    vector_type schur_product(const vector_type& x, const vector_type& y);
-    void output_to(int player, vector<open_type>& opened,
-            vector<share_type>& shares);
+    void secret_key(VectorType& shares, T& prep);
+    VectorType schur_product(const VectorType& x, const VectorType& y);
+    void output_to(int player, vector<OpenType>& opened,
+            vector<ShareType>& shares);
 };
 
 /**
  * Semi-homomorphic key generation using MASCOT
  */
 template<int L>
-class LowGearKeyGen : public KeyGenProtocol<1, L>
+class LowGearKeyGenerator : public KeyGeneratorProtocol<1, L>
 {
-    typedef KeyGenProtocol<1, L> super;
+    typedef KeyGeneratorProtocol<1, L> Super;
 
-    typedef typename super::share_type share_type;
-    typedef typename super::open_type open_type;
-    typedef typename super::vector_type vector_type;
+    typedef typename Super::ShareType ShareType;
+    typedef typename Super::OpenType OpenType;
+    typedef typename Super::VectorType VectorType;
 
     Player& P;
     PairwiseMachine& machine;
 
-    void generate_keys(FHE_Params& params);
+    void generate_keys(FheParameters& params);
 
 public:
-    LowGearKeyGen(Player& P, PairwiseMachine& machine, FHE_Params& params);
+    LowGearKeyGenerator(Player& P, PairwiseMachine& machine, FheParameters& params);
 
     template<class FD>
     void run(PairwiseSetup<FD>& setup);

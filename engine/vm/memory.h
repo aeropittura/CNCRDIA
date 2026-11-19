@@ -130,25 +130,25 @@ class Memory
   size_t size_c()
     { return MC.size(); }
 
-  const typename T::clear& read_C(size_t i) const
+  const typename T::clear& read_c(size_t i) const
     {
       return MC[i];
     }
-  const T& read_S(size_t i) const
+  const T& read_s(size_t i) const
     {
       return MS[i];
     }
 
-  void write_C(size_t i,const typename T::clear& x)
+  void write_c(size_t i,const typename T::clear& x)
     {
       MC[i]=x;
     }
-  void write_S(size_t i,const T& x)
+  void write_s(size_t i,const T& x)
     {
       MS[i]=x;
     }
 
-  void minimum_size(RegType secret_type, RegType clear_type,
+  void minimum_size(RegType SecretType, RegType clear_type,
       const Program& program, const string& threadname);
 
   friend ostream& operator<< <>(ostream& s,const Memory<T>& M);

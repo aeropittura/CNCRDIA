@@ -8,10 +8,10 @@
 #include "protocols/spdz/spdz.h"
 
 template<class T>
-class SPDZ2k : public SPDZ<T>
+class Spdz2k : public SPDZ<T>
 {
 public:
-    SPDZ2k(Player& P) :
+    Spdz2k(Player& P) :
             SPDZ<T>(P)
     {
     }

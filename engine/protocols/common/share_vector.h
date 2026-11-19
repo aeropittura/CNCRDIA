@@ -50,5 +50,5 @@ public:
         return res;
     }
 
-    void fft(const FFT_Data& fftd);
+    void fft(const FftData& fftd);
 };

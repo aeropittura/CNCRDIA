@@ -17,21 +17,21 @@ namespace GC
 {
 
 inline
-SemiSecret::MC* SemiSecret::new_mc(
-        typename super::mac_key_type)
+SemiSecret::MC* SemiSecret::new_opener(
+        typename Super::MacKeyType)
 {
     if (OnlineOptions::singleton.direct)
-        return new Direct_MC;
+        return new DirectOpener;
     else
         return new MC;
 }
 
 inline
-DealerSecret::MC* DealerSecret::new_mc(
-        typename super::mac_key_type)
+DealerSecret::MC* DealerSecret::new_opener(
+        typename Super::MacKeyType)
 {
     if (OnlineOptions::singleton.direct)
-        return new Direct_MC;
+        return new DirectOpener;
     else
         return new MC;
 }
@@ -52,7 +52,7 @@ void GC::SemiSecretBase<T, V>::trans(StackedVector<T>& dest,
     for (int j = 0; j < DIV_CEIL(n_outputs, N_BITS); j++)
         for (int l = 0; l < DIV_CEIL(args.size() - n_outputs, N_BITS); l++)
         {
-            square64 square;
+            Square64 square;
             size_t input_base = n_outputs + l * N_BITS;
             for (size_t i = input_base;
                     i < min(input_base + N_BITS, args.size()); i++)
@@ -76,7 +76,7 @@ void SemiSecret::andrsvec(Processor<SemiSecret>& processor,
     int N_BITS = default_length;
     auto protocol = ShareThread<SemiSecret>::s().protocol;
     assert(protocol);
-    protocol->init_mul();
+    protocol->initialize_mult();
     auto it = args.begin();
     int total_bits = 0, total_ops = 0;
     while (it < args.end())
@@ -91,7 +91,7 @@ void SemiSecret::andrsvec(Processor<SemiSecret>& processor,
             for (int k = 0; k < n_args; k += N_BITS)
             {
                 int left = min(N_BITS, n_args - k);
-                square64 square;
+                Square64 square;
                 for (int j = 0; j < left; j++)
                     square.rows[j] = processor.S.at(
                             *(it + k + j) + i / N_BITS).get();
@@ -125,7 +125,7 @@ void SemiSecret::andrsvec(Processor<SemiSecret>& processor,
             {
                 int left = min(N_BITS, n_args - base);
                 int n_ops = min(N_BITS, size - i);
-                square64 square;
+                Square64 square;
                 for (int j = 0; j < n_ops; j++)
                     square.rows[j] = protocol->finalize_mul(left).get();
                 square.transpose(n_ops, left);

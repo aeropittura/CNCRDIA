@@ -9,7 +9,7 @@
 #include <iostream>
 using namespace std;
 
-RingOptions::RingOptions(ez::ezOptionParser& opt, int argc, const char** argv)
+RingOptions::RingOptions(ez::EzOptionParser& opt, int argc, const char** argv)
 {
     opt.add(
         "64", // Default.
@@ -22,13 +22,13 @@ RingOptions::RingOptions(ez::ezOptionParser& opt, int argc, const char** argv)
     );
     opt.parse(argc, argv);
     opt.get("-R")->getInt(R);
-    R_is_set = opt.isSet("-R");
-    opt.resetArgs();
-    if (R_is_set)
+    r_is_set = opt.isSet("-R");
+    opt.reset_args();
+    if (r_is_set)
         cerr << "Trying to run " << R << "-bit computation" << endl;
 }
 
-int RingOptions::ring_size_from_opts_or_schedule(string progname)
+int RingOptions::ring_size_from_options_or_schedule(string progname)
 {
     if (BaseMachine::prime_from_schedule(progname)
             or BaseMachine::prime_length_from_schedule(progname))
@@ -40,7 +40,7 @@ int RingOptions::ring_size_from_opts_or_schedule(string progname)
     }
 
     int r = BaseMachine::ring_size_from_schedule(progname);
-    if (R_is_set)
+    if (r_is_set)
     {
         if (r and r != R)
             cerr << "Different -R option in compilation and run-time: " << r

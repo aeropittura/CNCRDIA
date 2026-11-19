@@ -22,7 +22,7 @@ class MaliciousCcdShare: public MaliciousShamirShare<T>, public ShareSecret<
     typedef MaliciousCcdShare This;
 
 public:
-    typedef MaliciousShamirShare<T> super;
+    typedef MaliciousShamirShare<T> Super;
 
     typedef Bit clear;
 
@@ -30,12 +30,12 @@ public:
     typedef ShamirInput<This> Input;
     typedef Beaver<This> Protocol;
 
-    typedef MaliciousShamirMC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef MaliciousShamirOpener<This> MacCheck;
+    typedef MacCheck DirectOpener;
 
-    typedef This small_type;
+    typedef This SmallType;
 
-    typedef NoShare bit_type;
+    typedef NoShare BitType;
 
     static const int default_length = 1;
 
@@ -44,9 +44,9 @@ public:
         return "Malicious CCD";
     }
 
-    static MAC_Check* new_mc(typename super::mac_key_type)
+    static MacCheck* new_opener(typename Super::MacKeyType)
     {
-        return new MAC_Check;
+        return new MacCheck;
     }
 
     MaliciousCcdShare()
@@ -54,13 +54,13 @@ public:
     }
 
     MaliciousCcdShare(const MaliciousCcdSecret<T>& other) :
-            super(other.get_bit(0))
+            Super(other.get_bit(0))
     {
     }
 
     template<class U>
     MaliciousCcdShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 

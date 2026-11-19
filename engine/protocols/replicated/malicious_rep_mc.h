@@ -8,26 +8,26 @@
 #include "protocols/replicated/replicated_mc.h"
 
 template<class T>
-class MaliciousRepMC : public ReplicatedMC<T>
+class MaliciousRepOpener : public ReplicatedOpener<T>
 {
 protected:
-    typedef ReplicatedMC<T> super;
+    typedef ReplicatedOpener<T> Super;
 
 public:
-    MaliciousRepMC(typename T::mac_key_type = {})
+    MaliciousRepOpener(typename T::MacKeyType = {})
     {
     }
 
-    virtual void POpen(vector<typename T::open_type>&,
+    virtual void POpen(vector<typename T::OpenType>&,
             const vector<T>&, const Player&)
     {
         throw runtime_error("use subclass");
     }
 
-    virtual void POpen_Begin(vector<typename T::open_type>& values,
+    virtual void POpen_Begin(vector<typename T::OpenType>& values,
             const vector<T>& S, const Player& P);
 
-    virtual void POpen_End(vector<typename T::open_type>&,
+    virtual void POpen_End(vector<typename T::OpenType>&,
             const vector<T>&, const Player&)
     {
         throw runtime_error("use subclass");
@@ -38,7 +38,7 @@ public:
         throw runtime_error("use subclass");
     }
 
-    MaliciousRepMC& get_part_MC()
+    MaliciousRepOpener& get_part_opener()
     {
         return *this;
     }
@@ -48,52 +48,52 @@ public:
  * 3-party replicated opening with checking via hash
  */
 template<class T>
-class HashMaliciousRepMC : public MaliciousRepMC<T>
+class HashMaliciousRepOpener : public MaliciousRepOpener<T>
 {
     Hash hash;
 
-    octetStream os;
+    OctetStream os;
 
     bool needs_checking;
 
-    vector<octetStream> to_send, to_receive;
-    octetStream hash_buffer;
+    vector<OctetStream> to_send, to_receive;
+    OctetStream hash_buffer;
 
     void reset();
     void update();
 
     void prepare(const vector<T>& secrets, const Player& P);
-    void finalize(vector<typename T::open_type>& values,
+    void finalize(vector<typename T::OpenType>& values,
             const vector<T>& secrets, const Player& P);
 
 public:
-    // emulate MAC_Check
-    HashMaliciousRepMC(const typename T::mac_key_type& _, int __ = 0, int ___ = 0) : HashMaliciousRepMC()
+    // emulate MacCheck
+    HashMaliciousRepOpener(const typename T::MacKeyType& _, int __ = 0, int ___ = 0) : HashMaliciousRepOpener()
     { (void)_; (void)__; (void)___; }
 
-    // emulate Direct_MAC_Check
-    HashMaliciousRepMC(const typename T::mac_key_type& _, Names& ____, int __ = 0, int ___ = 0) : HashMaliciousRepMC()
+    // emulate DirectMacCheck
+    HashMaliciousRepOpener(const typename T::MacKeyType& _, Names& ____, int __ = 0, int ___ = 0) : HashMaliciousRepOpener()
     { (void)_; (void)__; (void)___; (void)____; }
 
-    HashMaliciousRepMC();
-    ~HashMaliciousRepMC();
+    HashMaliciousRepOpener();
+    ~HashMaliciousRepOpener();
 
-    void POpen(vector<typename T::open_type>& values,const vector<T>& S,const Player& P);
-    void POpen_Begin(vector<typename T::open_type>& values,const vector<T>& S,const Player& P);
-    void POpen_End(vector<typename T::open_type>& values,const vector<T>& S,const Player& P);
+    void POpen(vector<typename T::OpenType>& values,const vector<T>& S,const Player& P);
+    void POpen_Begin(vector<typename T::OpenType>& values,const vector<T>& S,const Player& P);
+    void POpen_End(vector<typename T::OpenType>& values,const vector<T>& S,const Player& P);
 
     virtual void exchange(const Player& P);
-    virtual typename T::open_type finalize_raw();
+    virtual typename T::OpenType finalize_raw();
 
-    void CheckFor(const typename T::open_type& value, const vector<T>& shares, const Player& P);
+    void check_for(const typename T::OpenType& value, const vector<T>& shares, const Player& P);
 
     void Check(const Player& P);
 };
 
 template<class T>
-class CommMaliciousRepMC : public MaliciousRepMC<T>
+class CommunicationMaliciousRepOpener : public MaliciousRepOpener<T>
 {
-    vector<octetStream> os;
+    vector<OctetStream> os;
 
 public:
     void POpen(vector<typename T::clear>& values, const vector<T>& S,

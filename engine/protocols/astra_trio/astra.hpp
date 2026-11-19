@@ -13,7 +13,7 @@ template<class T>
 string AstraBase<T>::get_filename(bool preprocessing, const char* name)
 {
     int base = 1 - preprocessing;
-    auto res = get_prep_sub_dir<T>(P.num_players() + base, preprocessing) + name
+    auto res = get_prep_sub_directory<T>(P.num_players() + base, preprocessing) + name
             + suffix + "-P" + to_string(P.my_num() + base) + "-T"
             + to_string(BaseMachine::thread_num);
     if (OnlineOptions::singleton.has_option("verbose_astra"))
@@ -46,7 +46,7 @@ template<class T>
 void AstraBase<T>::set_suffix(const string& suffix)
 {
     this->suffix = "-" + suffix;
-    init_prep();
+    initialize_prep();
 }
 
 template<class T>
@@ -85,7 +85,7 @@ AstraPrepProtocol<T>::~AstraPrepProtocol()
 }
 
 template<class T>
-void AstraOnlineBase<T>::init_prep()
+void AstraOnlineBase<T>::initialize_prep()
 {
     try
     {
@@ -101,14 +101,14 @@ void AstraOnlineBase<T>::init_prep()
 }
 
 template<class T>
-void AstraPrepProtocol<T>::init_prep()
+void AstraPrepProtocol<T>::initialize_prep()
 {
     if (this->P.my_num() > 0)
         prep.open(this->get_filename(true));
 }
 
 template<class T>
-void AstraBase<T>::init_mul()
+void AstraBase<T>::initialize_mult()
 {
     input_pairs.clear();
     inputs.clear();
@@ -123,9 +123,9 @@ void AstraBase<T>::prepare_mul(const T& x, const T& y, int)
 }
 
 template<class T>
-void AstraBase<T>::init_dotprod()
+void AstraBase<T>::initialize_dotprod()
 {
-    init_mul();
+    initialize_mult();
 }
 
 template<class T>
@@ -213,16 +213,16 @@ void AstraPrepProtocol<T>::pre()
     if (my_num == 0)
     {
         os.clear();
-        os.reserve(n_mults * T::open_type::size());
+        os.reserve(n_mults * T::OpenType::size());
     }
     else
     {
         os_prep.clear();
-        os_prep.reserve(n_mults * 2 * T::open_type::size());
+        os_prep.reserve(n_mults * 2 * T::OpenType::size());
     }
 
     T res;
-    open_type gamma;
+    OpenType gamma;
 
     for (auto& input : inputs)
     {
@@ -233,7 +233,7 @@ void AstraPrepProtocol<T>::pre()
 
     for (auto& x : this->input_pairs)
     {
-        open_type input;
+        OpenType input;
 #define X(I) if (my_num == I) input = x[0].local_mul_P##I(x[1]);
         X(0) X(1) X(2)
 #undef X
@@ -256,7 +256,7 @@ void AstraPrepProtocol<T>::pre_element(T& res)
 
 template<class T>
 template<int my_num>
-void AstraPrepProtocol<T>::pre_gamma(T& res, open_type& gamma, const open_type& input)
+void AstraPrepProtocol<T>::pre_gamma(T& res, OpenType& gamma, const OpenType& input)
 {
     if (my_num < 2)
     {
@@ -291,10 +291,10 @@ void AstraPrepProtocol<T>::exchange()
 
     if (my_num == 2)
     {
-        if (os.left() < open_type::size() * results.size())
+        if (os.left() < OpenType::size() * results.size())
             throw runtime_error("insufficient data in Astra");
         for (auto& res : results)
-            post(res, os.get_no_check<open_type>());
+            post(res, os.get_no_check<OpenType>());
     }
 
     store(os_prep);
@@ -302,20 +302,20 @@ void AstraPrepProtocol<T>::exchange()
 }
 
 template<class T>
-void AstraPrepProtocol<T>::post(T& res, const open_type& gamma)
+void AstraPrepProtocol<T>::post(T& res, const OpenType& gamma)
 {
     os_prep.store_no_resize(gamma);
     os_prep.store_no_resize(res[1]);
 }
 
 template<class T>
-T Astra<T>::pre(const open_type& input)
+T Astra<T>::pre(const OpenType& input)
 {
     int my_num = this->astra_num;
-    typename T::open_type gamma;
-    gamma = os_prep.get_no_check<open_type>();
+    typename T::OpenType gamma;
+    gamma = os_prep.get_no_check<OpenType>();
     T res;
-    res[1] = os_prep.get_no_check<open_type>();
+    res[1] = os_prep.get_no_check<OpenType>();
     auto m_z = input - res.neg_lambda(my_num) + gamma;
     os.store_no_resize(m_z);
     res.m(my_num) = m_z;
@@ -341,9 +341,9 @@ void Astra<T>::exchange()
     {
         this->read(os_prep);
         os.clear();
-        os.reserve(n_mults * T::open_type::size());
+        os.reserve(n_mults * T::OpenType::size());
 
-        if (os_prep.left() < open_type::size() * n_mults)
+        if (os_prep.left() < OpenType::size() * n_mults)
             throw runtime_error("insufficient preprocessing");
 
         for (auto& input : inputs)
@@ -356,14 +356,14 @@ void Astra<T>::exchange()
             for (auto& x : this->input_pairs)
                 results.push_back(pre(x[0].local_mul_P2(x[1])));
 
-        octetStream recv_os;
+        OctetStream recv_os;
         P.exchange(1 - P.my_num(), os, recv_os);
 
-        if (recv_os.left() < open_type::size() * results.size())
+        if (recv_os.left() < OpenType::size() * results.size())
             throw runtime_error("insufficient data in Astra");
 
         for (auto& res : results)
-            res.m(my_num) += recv_os.get_no_check<typename T::open_type>();
+            res.m(my_num) += recv_os.get_no_check<typename T::OpenType>();
 
         assert(not os_prep.left());
     }
@@ -388,7 +388,7 @@ template<class U>
 U AstraOnlineBase<T>::read()
 {
     U res;
-    octetStream os;
+    OctetStream os;
     read(os);
     os.get(res);
     assert(not os.left());
@@ -396,17 +396,17 @@ U AstraOnlineBase<T>::read()
 }
 
 template<class T>
-void AstraOnlineBase<T>::read(octetStream& os)
+void AstraOnlineBase<T>::read(OctetStream& os)
 {
     if (not prep.is_open())
-        init_prep();
+        initialize_prep();
     Timer timer;
     TimeScope ts(timer);
     this->debug();
     os.input(prep);
     if (not prep.good())
         throw runtime_error("error in preprocessing reading");
-    this->P.comm_stats["Preprocessing transmission"].add(os, ts);
+    this->P.communication_statistics["Preprocessing transmission"].add(os, ts);
 }
 
 template<class T>
@@ -415,20 +415,20 @@ void AstraPrepProtocol<T>::store(const U& value)
 {
     if (this->P.my_num() > 0)
     {
-        octetStream os;
+        OctetStream os;
         os.store(value);
         store(os);
     }
 }
 
 template<class T>
-void AstraPrepProtocol<T>::store(const octetStream& os)
+void AstraPrepProtocol<T>::store(const OctetStream& os)
 {
     if (this->P.my_num() > 0)
     {
         if (not prep.is_open())
-            init_prep();
-        TimeScope ts(this->P.comm_stats["Preprocessing transmission"].add(os));
+            initialize_prep();
+        TimeScope ts(this->P.communication_statistics["Preprocessing transmission"].add(os));
         this->debug();
         os.output(prep);
         prep.flush();
@@ -458,15 +458,15 @@ void AstraPrepProtocol<T>::sync(vector<U>& values, Player& P)
 
         Timer timer;
         TimeScope ts(timer);
-        octetStream os;
+        OctetStream os;
         os.input(outputs);
         os.get(values);
-        this->P.comm_stats["Output transmission"].add(os, ts);
+        this->P.communication_statistics["Output transmission"].add(os, ts);
         P.send_all(os);
     }
     else
     {
-        octetStream os;
+        OctetStream os;
         P.receive_player(1, os);
         os.get(values);
     }
@@ -481,9 +481,9 @@ void AstraOnlineBase<T>::sync(vector<U>& values, Player& P)
         if (not outputs.is_open())
             outputs.open(this->get_output_filename());
 
-        octetStream os;
+        OctetStream os;
         os.store(values);
-        TimeScope ts(this->P.comm_stats["Output transmission"].add(os));
+        TimeScope ts(this->P.communication_statistics["Output transmission"].add(os));
         os.output(outputs);
         outputs.flush();
     }
@@ -562,7 +562,7 @@ T AstraOnlineBase<T>::get_random()
 template<class T>
 void AstraOnlineBase<T>::randoms_inst(StackedVector<T>& S, const Instruction& instruction)
 {
-    octetStream os;
+    OctetStream os;
     read(os);
 
     for (int j = 0; j < instruction.get_size(); j++)
@@ -578,7 +578,7 @@ template<class T>
 void AstraPrepProtocol<T>::randoms_inst(StackedVector<T>& S,
         const Instruction& instruction)
 {
-    octetStream os;
+    OctetStream os;
 
     for (int j = 0; j < instruction.get_size(); j++)
     {
@@ -598,7 +598,7 @@ template<int>
 void AstraOnlineBase<T>::trunc_pr(const ArgVector& regs, int size,
         SubProcessor<T>& proc, false_type)
 {
-    TruncPrTupleList<T> infos(regs, proc.get_S(), size);
+    TruncPrTupleList<T> infos(regs, proc.get_s(), size);
 
     if (infos.have_big_gap())
         trunc_pr_big_gap(infos.get_big_gap(), size, proc);
@@ -611,7 +611,7 @@ template<int>
 void AstraPrepProtocol<T>::trunc_pr(const ArgVector& regs, int size,
         SubProcessor<T>& proc, false_type)
 {
-    TruncPrTupleList<T> infos(regs, proc.get_S(), size);
+    TruncPrTupleList<T> infos(regs, proc.get_s(), size);
 
     if (infos.have_big_gap())
         trunc_pr_big_gap(infos.get_big_gap(), size, proc);
@@ -631,7 +631,7 @@ void AstraOnlineBase<T>::trunc_pr_big_gap(
     bool compute = my_astra_num() == this->comp_player;
     int my_num = my_astra_num();
 
-    octetStream cs;
+    OctetStream cs;
     read(cs);
 
     for (auto info : infos)
@@ -646,7 +646,7 @@ void AstraOnlineBase<T>::trunc_pr_big_gap(
     {
         cs.require<T>(infos.size() * size);
         for (auto info : infos)
-            for (auto& y : info.dest_range)
+            for (auto& y : info.destination_range)
                 y = cs.get_no_check<T>();
     }
 
@@ -655,11 +655,11 @@ void AstraOnlineBase<T>::trunc_pr_big_gap(
         cs.require<value_type>(infos.size() * size);
         for (auto info : infos)
         {
-            auto dest_it = info.dest_range.begin();
+            auto destination_it = info.destination_range.begin();
             for (auto& x : info.source_range)
             {
                 {
-                    auto& y = *dest_it++;
+                    auto& y = *destination_it++;
                     y.neg_lambda(my_num) = cs.get_no_check<value_type>();
                     y.set_common_m(x.common_m() >> info.m);
                 }
@@ -673,10 +673,10 @@ void AstraOnlineBase<T>::trunc_pr_big_gap(
             if (info.big_gap())
             {
                 cs.require<value_type>(size);
-                auto dest_it = info.dest_range.begin();
+                auto destination_it = info.destination_range.begin();
                 for (auto& x : info.source_range)
                 {
-                    auto& y = *dest_it++;
+                    auto& y = *destination_it++;
                     y.neg_lambda(my_num) = cs.get_no_check<value_type>();
                     y.set_common_m(x.common_m() >> info.m);
                 }
@@ -695,11 +695,11 @@ void AstraPrepProtocol<T>::trunc_pr_big_gap(
     CODE_LOCATION
     assert(proc.P.num_players() == 3);
     typedef typename T::clear value_type;
-    auto& S = proc.get_S();
+    auto& S = proc.get_s();
     bool generate = my_astra_num() == this->gen_player;
     bool compute = my_astra_num() == this->comp_player;
 
-    octetStream cs;
+    OctetStream cs;
 
     for (auto info : infos)
     {
@@ -711,13 +711,13 @@ void AstraPrepProtocol<T>::trunc_pr_big_gap(
 
     if (generate)
     {
-        SeededPRNG G;
+        SeededPrng G;
         for (auto info : infos)
         {
-            auto dest_it = info.dest_range.begin();
+            auto destination_it = info.destination_range.begin();
             for (auto& x : info.source_range)
             {
-                auto& y = *dest_it++;
+                auto& y = *destination_it++;
                 auto r =
                         prng_protocol.shared_prngs[1].template get<value_type>();
                 y[0] = -value_type(
@@ -734,14 +734,14 @@ void AstraPrepProtocol<T>::trunc_pr_big_gap(
     if (compute)
     {
         this->P.receive_player(this->gen_player, cs);
-        octetStream os;
+        OctetStream os;
         for (auto info : infos)
         {
             cs.require<value_type>(size);
             for (int i = 0; i < size; i++)
             {
                 {
-                    auto& y = S[info.dest_base + i];
+                    auto& y = S[info.destination_base + i];
                     y.neg_lambda(my_num) = cs.get_no_check<value_type>();
                     os.store(y.neg_lambda(my_num));
                 }
@@ -756,7 +756,7 @@ void AstraPrepProtocol<T>::trunc_pr_big_gap(
             if (info.big_gap())
                 for (int i = 0; i < size; i++)
                 {
-                    auto& y = S[info.dest_base + i];
+                    auto& y = S[info.destination_base + i];
                     y.neg_lambda(my_num) =
                             prng_protocol.shared_prngs[0].template get<
                                     value_type>();
@@ -790,7 +790,7 @@ void AstraBase<T>::trunc_pr_small_gap(
 }
 
 template<class T>
-void AstraPrepProtocol<T>::add_gen(octetStream& cs, const typename T::open_type& value)
+void AstraPrepProtocol<T>::add_gen(OctetStream& cs, const typename T::OpenType& value)
 {
     T res;
     res[1].randomize(prng_protocol_for_input0.shared_prngs[1]);
@@ -839,10 +839,10 @@ AstraShare<T> AstraShare<T>::post_input0(typename U::Protocol& protocol)
 }
 
 template<class T>
-void AstraPrepProtocol<T>::init_input0(size_t n_inputs)
+void AstraPrepProtocol<T>::initialize_input0(size_t n_inputs)
 {
     cs.reset_write_head();
-    cs.reserve<open_type>(n_inputs);
+    cs.reserve<OpenType>(n_inputs);
 }
 
 template<class T>
@@ -858,7 +858,7 @@ void AstraPrepProtocol<T>::exchange_input0(size_t n_inputs)
     else if (P.my_num() == 1)
     {
         P.receive_player(0, cs);
-        cs.require<open_type>(n_inputs);
+        cs.require<OpenType>(n_inputs);
     }
 }
 
@@ -868,7 +868,7 @@ void AstraPrepProtocol<T>::finalize_input0(size_t n_inputs)
     if (this->P.my_num() != 0)
     {
         cs.reset_read_head();
-        cs.require<open_type>(n_inputs);
+        cs.require<OpenType>(n_inputs);
         store(cs);
     }
 
@@ -879,7 +879,7 @@ template<class T>
 void AstraOnlineBase<T>::exchange_input0(size_t n_inputs)
 {
     read(cs_prep);
-    cs_prep.require<open_type>(n_inputs);
+    cs_prep.require<OpenType>(n_inputs);
 }
 
 template<class T>
@@ -891,18 +891,18 @@ void AstraBase<T>::trunc_pr_small_gap_finish(
     bool generate = MY_NUM == gen_player;
 
     auto& protocol = proc.protocol;
-    protocol.init_mul();
+    protocol.initialize_mult();
     gen_values.reset();
 
-    init_reduced_mul(size * infos.size());
-    init_input0(size * infos.size());
+    initialize_reduced_mult(size * infos.size());
+    initialize_input0(size * infos.size());
 
     for (auto info : infos)
     {
         if (info.small_gap())
         {
             auto source_it = info.source_range.begin();
-            for (auto& x : info.dest_range)
+            for (auto& x : info.destination_range)
             {
                 auto y = *source_it++;
                 T c_prime, c_dprime;
@@ -923,7 +923,7 @@ void AstraBase<T>::trunc_pr_small_gap_finish(
                 }
 
                 T r_dprime, prod;
-                T::template pre_reduced_mul<T, MY_NUM>(r_dprime, c_dprime, prod,
+                T::template pre_reduced_mult<T, MY_NUM>(r_dprime, c_dprime, prod,
                         protocol, r_msb, c_msb);
 
                 x = c_prime;
@@ -932,16 +932,16 @@ void AstraBase<T>::trunc_pr_small_gap_finish(
         }
     }
 
-    exchange_reduced_mul(size * infos.size());
+    exchange_reduced_mult(size * infos.size());
     exchange_input0(size * infos.size());
 
     for (auto info : infos)
-        for (auto& x : info.dest_range)
+        for (auto& x : info.destination_range)
         {
             if (info.small_gap())
             {
                 auto r_prime = T::template post_input0<T, MY_NUM>(protocol);
-                auto res = T::template post_reduced_mul<T, MY_NUM>(protocol);
+                auto res = T::template post_reduced_mult<T, MY_NUM>(protocol);
                 x += r_prime - T::constant(info.subtract_after() - 1);
                 x[0] += info.correction_shift(res.second);
            }
@@ -952,7 +952,7 @@ void AstraBase<T>::trunc_pr_small_gap_finish(
 
 template<class T>
 void AstraOnlineBase<T>::unsplit(StackedVector<T>& dest,
-        StackedVector<typename T::bit_type>& source,
+        StackedVector<typename T::BitType>& source,
         const Instruction& instruction)
 {
     if (instruction.get_start().size() == 1)
@@ -960,18 +960,18 @@ void AstraOnlineBase<T>::unsplit(StackedVector<T>& dest,
 
     CODE_LOCATION
     int n_bits = instruction.get_size();
-    int unit = T::bit_type::default_length;
+    int unit = T::BitType::default_length;
     assert(instruction.get_start().size() == 2);
     int my_num = my_astra_num();
 
-    octetStream os;
+    OctetStream os;
     read(os);
     os.require<T>(n_bits);
 
     for (int i = 0; i < DIV_CEIL(n_bits, unit); i++)
     {
         // conversion symmetric in binary
-        auto x = T::bit_type::from_rep3(source.at(instruction.get_r(0) + i));
+        auto x = T::BitType::from_rep3(source.at(instruction.get_r(0) + i));
         int left = min(unit, n_bits - unit * i);
         typename vector<T>::iterator its[2];
         for (int k = 0; k < 2; k++)
@@ -989,7 +989,7 @@ void AstraOnlineBase<T>::unsplit(StackedVector<T>& dest,
 
 template<class T>
 void AstraPrepProtocol<T>::unsplit(StackedVector<T>& dest,
-        StackedVector<typename T::bit_type>& source,
+        StackedVector<typename T::BitType>& source,
         const Instruction& instruction)
 {
     if (instruction.get_start().size() == 1)
@@ -997,7 +997,7 @@ void AstraPrepProtocol<T>::unsplit(StackedVector<T>& dest,
 
     CODE_LOCATION
     int n_bits = instruction.get_size();
-    int unit = T::bit_type::default_length;
+    int unit = T::BitType::default_length;
     assert(instruction.get_start().size() == 2);
     auto& P = this->P;
 
@@ -1053,22 +1053,22 @@ void AstraPrepProtocol<T>::unsplit_finish(StackedVector<T>& dest,
 
 template<class T>
 template<class U, int MY_NUM>
-void AstraShare<T>::pre_reduced_mul(U& a, U& b, U& c,
+void AstraShare<T>::pre_reduced_mult(U& a, U& b, U& c,
         Astra<U>& protocol, const T&, const T& bb)
 {
     auto& os_prep = protocol.os_prep;
     os_prep.get_no_check(a[1]);
     os_prep.get_no_check(c[1]);
-    auto Mi = bb * a.neg_lambda(-1) - c.neg_lambda(-1);
-    protocol.os.store_no_resize(Mi);
+    auto mi = bb * a.neg_lambda(-1) - c.neg_lambda(-1);
+    protocol.os.store_no_resize(mi);
     b.m(-1) = bb;
-    c.m(-1) = Mi;
+    c.m(-1) = mi;
     protocol.results.push_back({});
 }
 
 template<class T>
 template<class U, int MY_NUM>
-pair<U, T> AstraShare<T>::post_reduced_mul(typename U::Protocol& protocol)
+pair<U, T> AstraShare<T>::post_reduced_mult(typename U::Protocol& protocol)
 {
     pair<U, T> res;
     res.first = protocol.results.next();
@@ -1077,31 +1077,31 @@ pair<U, T> AstraShare<T>::post_reduced_mul(typename U::Protocol& protocol)
 }
 
 template<class T>
-void Astra<T>::init_reduced_mul(size_t n_mul)
+void Astra<T>::initialize_reduced_mult(size_t n_mult)
 {
     this->read(os_prep);
-    os_prep.require<clear>(2 * n_mul);
+    os_prep.require<clear>(2 * n_mult);
 
     os.reset_write_head();
-    os.reserve<clear>(n_mul);
+    os.reserve<clear>(n_mult);
     auto& results = this->results;
     results.clear();
-    results.reserve(n_mul);
+    results.reserve(n_mult);
 }
 
 template<class T>
-void Astra<T>::exchange_reduced_mul(size_t n_mul)
+void Astra<T>::exchange_reduced_mult(size_t n_mult)
 {
     auto& P = this->P;
     P.pass_around(os, recv_os, 1);
-    recv_os.require<clear>(n_mul);
+    recv_os.require<clear>(n_mult);
     this->results.reset();
-    assert(this->results.left() == n_mul);
+    assert(this->results.left() == n_mult);
 }
 
 template<class T>
 void Astra<T>::unsplit1(StackedVector<T>& dest,
-        StackedVector<typename T::bit_type>& source,
+        StackedVector<typename T::BitType>& source,
         const Instruction& instruction)
 {
     CODE_LOCATION
@@ -1109,7 +1109,7 @@ void Astra<T>::unsplit1(StackedVector<T>& dest,
     assert(instruction.get_start().size() == 1);
     auto& results = this->results;
 
-    init_reduced_mul(n_bits);
+    initialize_reduced_mult(n_bits);
     auto range = BlockRange(source, instruction.get_r(0), n_bits);
 
     for (auto& x : range)
@@ -1117,16 +1117,16 @@ void Astra<T>::unsplit1(StackedVector<T>& dest,
         for (typename T::clear bit : BitLeftRange(x.m(-1), x, range))
         {
             T a, b, c;
-            T::template pre_reduced_mul<T, -1>(a, b, c, *this, {}, bit);
+            T::template pre_reduced_mult<T, -1>(a, b, c, *this, {}, bit);
             results.back() = a + b - 2 * c;
         }
     }
 
-    exchange_reduced_mul(n_bits);
+    exchange_reduced_mult(n_bits);
 
     for (auto& x : Range(dest, instruction.get_start()[0], n_bits))
     {
-        auto res = T::template post_reduced_mul<T, 1>(*this);
+        auto res = T::template post_reduced_mult<T, 1>(*this);
         x = res.first;
         x.m(-1) -= res.second * 2;
     }

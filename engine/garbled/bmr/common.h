@@ -14,9 +14,9 @@ using namespace std;
 
 #include "support/check_vector.h"
 
-typedef unsigned long wire_id_t;
-typedef unsigned long gate_id_t;
-typedef unsigned int party_id_t;
+typedef unsigned long WireId;
+typedef unsigned long GateId;
+typedef unsigned int PartyId;
 
 class Function {
 	bool rep[4];

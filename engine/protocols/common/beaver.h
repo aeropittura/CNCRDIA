@@ -14,7 +14,7 @@ using namespace std;
 #include "support/code_locations.h"
 
 template<class T> class SubProcessor;
-template<class T> class MAC_Check_Base;
+template<class T> class MacCheckBase;
 class Player;
 
 /**
@@ -23,26 +23,26 @@ class Player;
 template<class T>
 class Beaver : public ProtocolBase<T>
 {
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
 
 protected:
     vector<T> shares;
-    vector<typename T::open_type> opened;
+    vector<typename T::OpenType> opened;
     vector<array<T, 3>> triples;
     vector<int> lengths;
     vector<array<T, 2>> multiplicands;
     PointerVector<T> results;
-    typename vector<typename T::open_type>::iterator it;
+    typename vector<typename T::OpenType>::iterator it;
     typename vector<array<T, 3>>::iterator triple;
     Preprocessing<T>* prep;
-    typename T::MAC_Check* MC;
+    typename T::MacCheck* MC;
     bool fast_mode;
 
     void pre_fast_exchange();
     void post_fast_exchange();
 
-    T finalize(array<T, 3>& triple, const open_type& eps,
-            const open_type& delta, int my_num);
+    T finalize(array<T, 3>& triple, const OpenType& eps,
+            const OpenType& delta, int my_num);
 
 public:
     static const bool uses_triples = true;
@@ -55,14 +55,14 @@ public:
 
     void set_fast_mode(bool change);
 
-    void init(Preprocessing<T>& prep, typename T::MAC_Check& MC);
+    void init(Preprocessing<T>& prep, typename T::MacCheck& MC);
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1);
-    void prepare_mul_fast(const T& x, const T& y);
+    void prepare_mult_fast(const T& x, const T& y);
     void exchange();
     T finalize_mul(int n = -1);
-    T finalize_mul_fast();
+    T finalize_mult_fast();
 
     void check();
 

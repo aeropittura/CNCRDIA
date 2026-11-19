@@ -11,7 +11,7 @@ template<class T, class U = T, class V = T>
 class PrepBuffer : public BufferOwner<T, U, V>
 {
     int num_players;
-    string fake_opts;
+    string fake_options;
 
 public:
     PrepBuffer() :
@@ -23,7 +23,7 @@ public:
             const string& type_string = "", const char* data_type = "")
     {
         this->num_players = num_players;
-        fake_opts = V::template proto_fake_opts<typename V::open_type>();
+        fake_options = V::template protocol_fake_options<typename V::OpenType>();
         BufferOwner<T, U, V>::setup(filename, tuple_length, type_string, data_type);
     }
 
@@ -35,7 +35,7 @@ public:
         }
         catch (exception& e)
         {
-            throw prep_setup_error(e.what(), num_players, fake_opts);
+            throw PrepSetupError(e.what(), num_players, fake_options);
         }
     }
 };

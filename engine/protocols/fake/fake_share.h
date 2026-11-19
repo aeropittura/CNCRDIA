@@ -18,18 +18,18 @@ class FakeShare : public T, public ShareInterface
     typedef FakeShare This;
 
 public:
-    typedef T open_type;
+    typedef T OpenType;
     typedef T clear;
-    typedef This share_type;
+    typedef This ShareType;
 
     typedef FakePrep<This> LivePrep;
-    typedef FakeMC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef FakeOpener<This> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef FakeInput<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef FakeProtocol<This> Protocol;
 
-    typedef GC::FakeSecret bit_type;
+    typedef GC::FakeSecret BitType;
 
     static const bool has_trunc_pr = true;
     static const bool dishonest_majority = false;
@@ -49,7 +49,7 @@ public:
         return 0;
     }
 
-    static T constant(T value, int = 0, mac_key_type = {})
+    static T constant(T value, int = 0, MacKeyType = {})
     {
         return value;
     }
@@ -64,7 +64,7 @@ public:
     {
     }
 
-    static void split(StackedVector<bit_type>& dest, const ArgVector& regs,
+    static void split(StackedVector<BitType>& dest, const ArgVector& regs,
             int n_bits, const This* source, int n_inputs,
             GC::FakeSecret::Protocol& protocol);
 };

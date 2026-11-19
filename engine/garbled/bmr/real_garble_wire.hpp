@@ -10,7 +10,7 @@
 #include "protocols/spdz/mascot_prep.h"
 
 template<class T>
-void RealGarbleWire<T>::garble(PRFOutputs& prf_output,
+void RealGarbleWire<T>::garble(PrfOutputs& prf_output,
 		const RealGarbleWire<T>& left, const RealGarbleWire<T>& right)
 {
 	auto& party = RealProgramParty<T>::s();
@@ -19,12 +19,12 @@ void RealGarbleWire<T>::garble(PRFOutputs& prf_output,
 	auto& inputter = *party.garble_inputter;
 	int n = party.N.num_players();
 	int me = party.N.my_num();
-	inputter.add_from_all(int128(keys[0][me].r));
+	inputter.add_from_all(Int128(keys[0][me].r));
 	for (int k = 0; k < 4; k++)
 		for (int j = 0; j < n; j++)
-			inputter.add_from_all(int128(prf_output[j].for_garbling(k).r));
+			inputter.add_from_all(Int128(prf_output[j].for_garbling(k).r));
 
-	assert(party.shared_proc != 0);
+	assert(party.shared_processor != 0);
 	assert(party.garble_protocol != 0);
 	auto& protocol = *party.garble_protocol;
 	protocol.prepare_mul(left.mask, right.mask);
@@ -91,7 +91,7 @@ void GarbleJob<T>::last_round(RealProgramParty<T>& party, Inputter& inputter,
 template<class T>
 void RealGarbleWire<T>::XOR(const RealGarbleWire<T>& left, const RealGarbleWire<T>& right)
 {
-	PRFRegister::XOR(left, right);
+	PrfRegister::XOR(left, right);
 	mask = left.mask + right.mask;
 }
 
@@ -137,14 +137,14 @@ void RealGarbleWire<T>::other_input(Input& inputter, int from)
 template<class T>
 void GarbleInputter<T>::exchange()
 {
-	assert(party.shared_proc != 0);
-	auto& inputter = party.shared_proc->input;
+	assert(party.shared_processor != 0);
+	auto& inputter = party.shared_processor->input;
 	inputter.reset_all(*party.P);
 	for (auto& tuple : tuples)
 	{
 		int from = tuple.second;
-		party_id_t from_id = from + 1;
-		tuple.first->PRFRegister::input(from_id, -1);
+		PartyId from_id = from + 1;
+		tuple.first->PrfRegister::input(from_id, -1);
 		if (from_id == party.get_id())
 		{
 			char my_mask;
@@ -172,12 +172,12 @@ void GarbleInputter<T>::exchange()
 		for (auto& tuple : tuples)
 			tuple.first->mask.force_to_bit();
 	}
-	catch (not_implemented& e)
+	catch (NotImplemented& e)
 	{
 		assert(party.P != 0);
 		assert(party.MC != 0);
-		auto& protocol = party.shared_proc->protocol;
-		protocol.init_mul();
+		auto& protocol = party.shared_processor->protocol;
+		protocol.initialize_mult();
 		for (auto& tuple : tuples)
 			protocol.prepare_mul(tuple.first->mask,
 					T::constant(1, party.P->my_num(), party.mac_key)
@@ -191,9 +191,9 @@ void GarbleInputter<T>::exchange()
 		}
 		try
 		{
-			party.MC->CheckFor(0, to_check, *party.P);
+			party.MC->check_for(0, to_check, *party.P);
 		}
-		catch (mac_fail&)
+		catch (MacFail&)
 		{
 			throw runtime_error("input mask not a bit");
 		}
@@ -211,7 +211,7 @@ void RealGarbleWire<T>::finalize_input(GarbleInputter<T>&, int, int)
 template<class T>
 void RealGarbleWire<T>::public_input(bool value)
 {
-	PRFRegister::public_input(value);
+	PrfRegister::public_input(value);
 	mask = {};
 }
 
@@ -219,7 +219,7 @@ template<class T>
 void RealGarbleWire<T>::random()
 {
 	// no need to randomize keys
-	PRFRegister::public_input(0);
+	PrfRegister::public_input(0);
 	auto& party = RealProgramParty<T>::s();
 	assert(party.prep != 0);
 	party.prep->get_one(DATA_BIT, mask);
@@ -231,7 +231,7 @@ void RealGarbleWire<T>::random()
 template<class T>
 void RealGarbleWire<T>::output()
 {
-	PRFRegister::output();
+	PrfRegister::output();
 	auto& party = RealProgramParty<T>::s();
 	assert(party.MC != 0);
 	assert(party.P != 0);
@@ -250,7 +250,7 @@ void RealGarbleWire<T>::store(NoMemory& dest,
 	(void) dest;
 	auto& party = RealProgramParty<T>::s();
 	for (auto access : accesses)
-		for (auto& reg : access.source.get_regs())
+		for (auto& reg : access.source.get_registers())
 		{
 			party.push_spdz_wire(SPDZ_STORE, reg);
 		}
@@ -261,11 +261,11 @@ void RealGarbleWire<T>::load(
 		vector<GC::ReadAccess<GC::Secret<RealGarbleWire> > >& accesses,
 		const NoMemory& source)
 {
-	PRFRegister::load(accesses, source);
+	PrfRegister::load(accesses, source);
 	auto& party = RealProgramParty<T>::s();
 	assert(party.prep != 0);
 	for (auto access : accesses)
-		for (auto& reg : access.dest.get_regs())
+		for (auto& reg : access.dest.get_registers())
 		{
 			party.prep->get_one(DATA_BIT, reg.mask);
 			party.push_spdz_wire(SPDZ_LOAD, reg);

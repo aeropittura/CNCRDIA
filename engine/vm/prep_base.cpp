@@ -19,31 +19,31 @@ string PrepBase::get_suffix(int thread_num)
         return "";
 }
 
-string PrepBase::get_filename(const string& prep_data_dir,
+string PrepBase::get_filename(const string& prep_data_directory,
         Dtype dtype, const string& type_short, int my_num, int thread_num)
 {
-    return prep_data_dir + DataPositions::dtype_names[dtype] + "-" + type_short
+    return prep_data_directory + DataPositions::dtype_names[dtype] + "-" + type_short
             + "-P" + to_string(my_num) + get_suffix(thread_num);
 }
 
-string PrepBase::get_input_filename(const string& prep_data_dir,
+string PrepBase::get_input_filename(const string& prep_data_directory,
         const string& type_short, int input_player, int my_num, int thread_num)
 {
-    return prep_data_dir + "Inputs-" + type_short + "-P" + to_string(my_num)
+    return prep_data_directory + "Inputs-" + type_short + "-P" + to_string(my_num)
             + "-" + to_string(input_player) + get_suffix(thread_num);
 }
 
-string PrepBase::get_edabit_filename(const string& prep_data_dir,
+string PrepBase::get_edabit_filename(const string& prep_data_directory,
         int n_bits, int my_num, int thread_num)
 {
-    return prep_data_dir + "edaBits-" + to_string(n_bits) + "-P"
+    return prep_data_directory + "edaBits-" + to_string(n_bits) + "-P"
             + to_string(my_num) + get_suffix(thread_num);
 }
 
-string PrepBase::get_matrix_prefix(const string& prep_data_dir,
+string PrepBase::get_matrix_prefix(const string& prep_data_directory,
         const array<int, 3>& dim)
 {
-    return prep_data_dir + "Matrix-" + to_string(dim[0]) + "x"
+    return prep_data_directory + "Matrix-" + to_string(dim[0]) + "x"
             + to_string(dim[1]) + "x" + to_string(dim[2]);
 }
 

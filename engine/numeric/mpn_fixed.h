@@ -286,7 +286,7 @@ inline void mpn_addmul_1_fixed__(mp_limb_t* res, const mp_limb_t* y, mp_limb_t x
 }
 
 template <int L, int M>
-inline void mpn_mul_1_fixed(mp_limb_t* res, const mp_limb_t* y, mp_limb_t x)
+inline void mpn_mult_1_fixed(mp_limb_t* res, const mp_limb_t* y, mp_limb_t x)
 {
     mpn_addmul_1_fixed__<L, M, false>(res, y, x);
 }
@@ -307,7 +307,7 @@ inline void mpn_addmul_1_fixed_(mp_limb_t* res, const mp_limb_t* y, mp_limb_t x)
 }
 
 template <int L, int M>
-inline void mpn_mul_1_fixed(mp_limb_t* res, const mp_limb_t* y, mp_limb_t x)
+inline void mpn_mult_1_fixed(mp_limb_t* res, const mp_limb_t* y, mp_limb_t x)
 {
     mp_limb_t tmp[L];
     memset(tmp, 0, sizeof(tmp));
@@ -323,7 +323,7 @@ inline void mpn_addmul_1_fixed(mp_limb_t* res, const mp_limb_t* y, mp_limb_t x)
 }
 
 template <int L, int N, int M>
-inline void mpn_mul_fixed_(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
+inline void mpn_mult_fixed_(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
 {
     assert(L <= N + M + 2);
     mp_limb_t tmp[N + M + 2];
@@ -334,46 +334,46 @@ inline void mpn_mul_fixed_(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* 
 }
 
 template <>
-inline void mpn_mul_fixed_<1,1,1>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
+inline void mpn_mult_fixed_<1,1,1>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
 {
     *res = *x * *y;
 }
 
 template <int L, int N, int M>
-inline void mpn_mul_fixed_(uint32_t* res, const uint32_t* x, const uint32_t* y);
+inline void mpn_mult_fixed_(uint32_t* res, const uint32_t* x, const uint32_t* y);
 
 template <int L, int N, int M>
-inline void mpn_mul_fixed_(mp_limb_t* res, const uint32_t* x, const mp_limb_t* y)
+inline void mpn_mult_fixed_(mp_limb_t* res, const uint32_t* x, const mp_limb_t* y)
 {
 	assert(N == 1);
 	mp_limb_t tmp[1] = {*x};
-	mpn_mul_fixed_<L, 1, M>(res, tmp, y);
+	mpn_mult_fixed_<L, 1, M>(res, tmp, y);
 }
 
 template <int L, int N, int M>
-inline void mpn_mul_fixed_(mp_limb_t* res, const mp_limb_t* x, const uint32_t* y)
+inline void mpn_mult_fixed_(mp_limb_t* res, const mp_limb_t* x, const uint32_t* y)
 {
 	assert(M == 1);
 	mp_limb_t tmp[1] = {*y};
-	mpn_mul_fixed_<L, N, 1>(res, x, tmp);
+	mpn_mult_fixed_<L, N, 1>(res, x, tmp);
 }
 
 template <>
-inline void mpn_mul_fixed_<1,1,1>(uint32_t* res, const uint32_t* x, const uint32_t* y)
+inline void mpn_mult_fixed_<1,1,1>(uint32_t* res, const uint32_t* x, const uint32_t* y)
 {
     *res = *x * *y;
 }
 
 template <>
-inline void mpn_mul_fixed_<2,2,2>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
+inline void mpn_mult_fixed_<2,2,2>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
 {
     mp_limb_t* tmp = res;
-    mpn_mul_1_fixed<2,2>(tmp, y, x[0]);
+    mpn_mult_1_fixed<2,2>(tmp, y, x[0]);
     mpn_addmul_1_fixed_<1,1>(tmp + 1, y, x[1]);
 }
 
 template <>
-inline void mpn_mul_fixed_<3,3,3>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
+inline void mpn_mult_fixed_<3,3,3>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
 {
     inline_mpn_zero(res, 3);
     mp_limb_t* tmp = res;
@@ -383,7 +383,7 @@ inline void mpn_mul_fixed_<3,3,3>(mp_limb_t* res, const mp_limb_t* x, const mp_l
 }
 
 template <>
-inline void mpn_mul_fixed_<4,4,2>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
+inline void mpn_mult_fixed_<4,4,2>(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
 {
     inline_mpn_zero(res, 4);
     mp_limb_t* tmp = res;
@@ -394,9 +394,9 @@ inline void mpn_mul_fixed_<4,4,2>(mp_limb_t* res, const mp_limb_t* x, const mp_l
 }
 
 template <int N, int M>
-inline void mpn_mul_fixed(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
+inline void mpn_mult_fixed(mp_limb_t* res, const mp_limb_t* x, const mp_limb_t* y)
 {
-    mpn_mul_fixed_<N + M, N, M>(res, x, y);
+    mpn_mult_fixed_<N + M, N, M>(res, x, y);
 }
 
 template <class T, int N>

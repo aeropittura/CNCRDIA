@@ -11,7 +11,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
-    DishonestMajorityFieldMachine<SemiShare, SemiShare, gf2n,
+    ez::EzOptionParser opt;
+    DishonestMajorityFieldMachine<SemiShare, SemiShare, Gf2n,
             OfflineMachine<DishonestMajorityMachine>>(argc, argv, opt);
 }

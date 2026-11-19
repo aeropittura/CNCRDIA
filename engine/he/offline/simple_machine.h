@@ -44,15 +44,15 @@ public:
     size_t report_size(ReportType type);
 
     template<class FD>
-    string get_prep_dir(Player& P) const
-    { return get_prep_sub_dir<Share<typename FD::T>>(P.num_players()); }
+    string get_prep_directory(Player& P) const
+    { return get_prep_sub_directory<Share<typename FD::T>>(P.num_players()); }
 
     string tradeoff();
 
     void mult_performance();
 
-    void pack(octetStream&) const {}
-    void unpack(octetStream&) {}
+    void pack(OctetStream&) const {}
+    void unpack(OctetStream&) {}
 
     void check(Player&) const {}
 
@@ -60,12 +60,12 @@ public:
     int comp_sec() { return 0; }
 };
 
-class MultiplicativeMachineParams : public MachineBase
+class MultiplicativeMachineParameters : public MachineBase
 {
 public:
     DataSetup setup;
 
-    virtual ~MultiplicativeMachineParams() {}
+    virtual ~MultiplicativeMachineParameters() {}
 
     virtual int get_covert() const { return 0; }
 
@@ -73,7 +73,7 @@ public:
     PartSetup<FD>& get_setup() { return setup.part<FD>(); }
 };
 
-class MultiplicativeMachine : public MultiplicativeMachineParams
+class MultiplicativeMachine : public MultiplicativeMachineParameters
 {
     PlainPlayer P;
 

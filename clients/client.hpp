@@ -12,7 +12,7 @@ Client::Client(const vector<string>& hostnames, int port_base,
         int my_client_id) :
         ctx("C" + to_string(my_client_id))
 {
-    bigint::init_thread();
+    Bigint::initialize_thread();
 
     // Setup connections from this client to each party socket
     int nparties = hostnames.size();
@@ -21,14 +21,14 @@ Client::Client(const vector<string>& hostnames, int port_base,
     for (int i = 0; i < nparties; i++)
     {
         set_up_client_socket(plain_sockets[i], hostnames[i].c_str(), port_base + i);
-        octetStream(to_string(my_client_id)).Send(plain_sockets[i]);
-        sockets[i] = new client_socket(io_service, ctx, plain_sockets[i],
+        OctetStream(to_string(my_client_id)).Send(plain_sockets[i]);
+        sockets[i] = new ClientSocket(io_service, ctx, plain_sockets[i],
                 "P" + to_string(i), "C" + to_string(my_client_id), true);
         if (i == 0)
             specification.Receive(sockets[0]);
         else
         {
-            octetStream spec;
+            OctetStream spec;
             spec.Receive(sockets[i]);
             if (spec != specification)
                 throw runtime_error("inconsistent specification");
@@ -52,7 +52,7 @@ template<class T>
 void Client::send_private_inputs(const vector<T>& values)
 {
     int num_inputs = values.size();
-    octetStream os;
+    OctetStream os;
     vector< vector<T> > triples(num_inputs, vector<T>(3));
     vector<T> triple_shares(3);
     bool active = true;
@@ -105,7 +105,7 @@ void Client::send_private_inputs(const vector<T>& values)
             {
                 cerr << triples[i][2] << " != " << triples[i][0] << " * " << triples[i][1] << endl;
                 cerr << "Incorrect triple at " << i << ", aborting\n";
-                throw mac_fail();
+                throw MacFail();
             }
         }
 
@@ -127,7 +127,7 @@ template<class T, class U>
 vector<U> Client::receive_outputs(int n)
 {
     vector<T> triples(3 * n);
-    octetStream os;
+    OctetStream os;
     bool active = true;
     for (auto& socket : sockets)
     {
@@ -165,7 +165,7 @@ vector<U> Client::receive_outputs(int n)
             if (T(triples[i] * triples[i + 1]) != triples[i + 2])
             {
                 cerr << "Unable to authenticate output value as correct, aborting." << endl;
-                throw mac_fail();
+                throw MacFail();
             }
             output_values.push_back(triples[i]);
         }

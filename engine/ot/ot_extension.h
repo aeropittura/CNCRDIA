@@ -20,68 +20,68 @@ using namespace std;
 //#define OTEXT_TIMER
 //#define OTEXT_DEBUG
 
-class OTTripleSetup;
+class OtTripleSetup;
 
-class OTExtension
+class OtExtension
 {
 public:
     map<string,long long> times;
 
-    OTExtension(const BaseOT& baseOT, TwoPartyPlayer* player, bool passive);
+    OtExtension(const BaseOT& base_ot, TwoPartyPlayer* player, bool passive);
 
-    OTExtension(TwoPartyPlayer* player,
+    OtExtension(TwoPartyPlayer* player,
                 OT_ROLE role=BOTH,
                 bool passive=false)
-        : passive_only(passive), nbaseOTs(-1),
+        : passive_only(passive), nbase_ots(-1),
           ot_role(role), player(player)
     {
     }
 
-    void init(const OTTripleSetup& setup, int index);
+    void init(const OtTripleSetup& setup, int index);
 
-    void init(const BitVector& baseReceiverInput,
-            const vector< array<BitVector, 2> >& baseSenderInput,
-            const vector<BitVector>& baseReceiverOutput)
+    void init(const BitVector& base_receiver_input,
+            const vector< array<BitVector, 2> >& base_sender_input,
+            const vector<BitVector>& base_receiver_output)
     {
-        nbaseOTs = baseReceiverInput.size();
-        this->baseReceiverInput = baseReceiverInput;
+        nbase_ots = base_receiver_input.size();
+        this->base_receiver_input = base_receiver_input;
 
-        if (baseSenderInput.size() != baseReceiverOutput.size())
+        if (base_sender_input.size() != base_receiver_output.size())
             throw runtime_error("mismatch in number of base OTs");
-        assert(baseReceiverInput.size() == baseSenderInput.size());
-        G_sender.resize(nbaseOTs, vector<PRNG>(2));
-        G_receiver.resize(nbaseOTs);
+        assert(base_receiver_input.size() == base_sender_input.size());
+        g_sender.resize(nbase_ots, vector<PRNG>(2));
+        g_receiver.resize(nbase_ots);
 
         // set up PRGs for expanding the seed OTs
-        for (int i = 0; i < nbaseOTs; i++)
+        for (int i = 0; i < nbase_ots; i++)
         {
-            assert(baseSenderInput.at(i).size() == 2);
-            assert(baseSenderInput.at(i)[0].size_bytes() >= AES_BLK_SIZE);
-            assert(baseSenderInput.at(i)[1].size_bytes() >= AES_BLK_SIZE);
-            assert(baseReceiverOutput.at(i).size_bytes() >= AES_BLK_SIZE);
+            assert(base_sender_input.at(i).size() == 2);
+            assert(base_sender_input.at(i)[0].size_bytes() >= AES_BLK_SIZE);
+            assert(base_sender_input.at(i)[1].size_bytes() >= AES_BLK_SIZE);
+            assert(base_receiver_output.at(i).size_bytes() >= AES_BLK_SIZE);
 
             if (ot_role & RECEIVER)
             {
-                if (baseSenderInput[i][0].get_int128(0) == baseSenderInput[i][1].get_int128(0))
+                if (base_sender_input[i][0].get_int128(0) == base_sender_input[i][1].get_int128(0))
                     throw runtime_error("base sender outputs are the same");
-                G_sender[i][0].SetSeed(baseSenderInput[i][0].get_ptr());
-                G_sender[i][1].SetSeed(baseSenderInput[i][1].get_ptr());
+                g_sender[i][0].SetSeed(base_sender_input[i][0].get_ptr());
+                g_sender[i][1].SetSeed(base_sender_input[i][1].get_ptr());
             }
             if (ot_role & SENDER)
             {
-                G_receiver[i].SetSeed(baseReceiverOutput[i].get_ptr());
+                g_receiver[i].SetSeed(base_receiver_output[i].get_ptr());
             }
 
 #ifdef OTEXT_DEBUG
             // sanity check for base OTs
-            vector<octetStream> os(2);
+            vector<OctetStream> os(2);
             BitVector t0(128);
 
             if (ot_role & RECEIVER)
             {
                 // send both inputs to test
-                baseSenderInput[i][0].pack(os[0]);
-                baseSenderInput[i][1].pack(os[0]);
+                base_sender_input[i][0].pack(os[0]);
+                base_sender_input[i][1].pack(os[0]);
             }
             send_if_ot_receiver(player, os, ot_role);
 
@@ -89,9 +89,9 @@ public:
             {
                 // sender checks results
                 t0.unpack(os[1]);
-                if (baseReceiverInput.get_bit(i) == 1)
+                if (base_receiver_input.get_bit(i) == 1)
                     t0.unpack(os[1]);
-                if (!t0.equals(baseReceiverOutput[i]))
+                if (!t0.equals(base_receiver_output[i]))
                 {
                     cerr << "Incorrect base OT\n";
                     exit(1);
@@ -108,11 +108,11 @@ public:
     void set_role(OT_ROLE role) { ot_role = role; }
 
 protected:
-    BitVector baseReceiverInput;
+    BitVector base_receiver_input;
     bool passive_only;
-    int nbaseOTs;
+    int nbase_ots;
     OT_ROLE ot_role;
     TwoPartyPlayer* player;
-    vector< vector<PRNG> > G_sender;
-    vector<PRNG> G_receiver;
+    vector< vector<PRNG> > g_sender;
+    vector<PRNG> g_receiver;
 };

@@ -9,32 +9,32 @@
 #include "net/all_but_last_player.h"
 
 template<class T>
-class DealerMC : public MAC_Check_Base<T>
+class DealerOpener : public MacCheckBase<T>
 {
-    typedef SemiMC<SemiShare<typename T::clear>> internal_type;
-    internal_type& internal;
+    typedef SemiOpener<SemiShare<typename T::clear>> InternalType;
+    InternalType& internal;
     AllButLastPlayer* sub_player;
 
 public:
-    DealerMC(typename T::mac_key_type = {}, int = 0, int = 0);
-    DealerMC(internal_type& internal);
-    ~DealerMC();
+    DealerOpener(typename T::MacKeyType = {}, int = 0, int = 0);
+    DealerOpener(InternalType& internal);
+    ~DealerOpener();
 
-    void init_open(const Player& P, int n = 0);
+    void initialize_open(const Player& P, int n = 0);
     void prepare_open(const T& secret, int n_bits = -1);
     void exchange(const Player& P);
-    typename T::open_type finalize_raw();
-    array<typename T::open_type*, 2> finalize_several(size_t n);
+    typename T::OpenType finalize_raw();
+    array<typename T::OpenType*, 2> finalize_several(size_t n);
 
-    DealerMC& get_part_MC()
+    DealerOpener& get_part_opener()
     {
         return *this;
     }
 };
 
 template<class T>
-class DirectDealerMC : public DealerMC<T>
+class DirectDealerOpener : public DealerOpener<T>
 {
 public:
-    DirectDealerMC(typename T::mac_key_type = {});
+    DirectDealerOpener(typename T::MacKeyType = {});
 };

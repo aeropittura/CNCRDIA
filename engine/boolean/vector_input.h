@@ -17,14 +17,14 @@ class VectorInput : public InputBase<T>
     deque<int> input_lengths;
 
 public:
-    VectorInput(typename T::MAC_Check& MC, Preprocessing<T>& prep, Player& P,
+    VectorInput(typename T::MacCheck& MC, Preprocessing<T>& prep, Player& P,
             typename T::Protocol* = 0) :
-            part_input(MC.get_part_MC(), prep.get_part(), P)
+            part_input(MC.get_part_opener(), prep.get_part(), P)
     {
         part_input.reset_all(P);
     }
 
-    VectorInput(SubProcessor<T>& proc, typename T::MAC_Check&) :
+    VectorInput(SubProcessor<T>& proc, typename T::MacCheck&) :
             part_input(proc.MC, proc.DataF, proc.P)
     {
     }
@@ -34,7 +34,7 @@ public:
         part_input.reset(player);
     }
 
-    void add_mine(const typename T::open_type& input, int n_bits)
+    void add_mine(const typename T::OpenType& input, int n_bits)
     {
         if (n_bits == -1)
             n_bits = T::default_length;
@@ -64,18 +64,18 @@ public:
     T finalize_mine()
     {
         T res;
-        res.resize_regs(input_lengths.front());
+        res.resize_registers(input_lengths.front());
         for (int i = 0; i < input_lengths.front(); i++)
             res.get_reg(i) = part_input.finalize_mine();
         input_lengths.pop_front();
         return res;
     }
 
-    void finalize_other(int player, T& target, octetStream&, int n_bits)
+    void finalize_other(int player, T& target, OctetStream&, int n_bits)
     {
         if (n_bits == -1)
             n_bits = T::default_length;
-        target.resize_regs(n_bits);
+        target.resize_registers(n_bits);
         for (int i = 0; i < n_bits; i++)
             part_input.finalize_other(player, target.get_reg(i),
                     part_input.InputBase<typename T::part_type>::os[player]);

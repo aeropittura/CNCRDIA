@@ -19,13 +19,13 @@ class ProcessorBase;
 
 class YaoGarbleWire : public YaoWire
 {
-	typedef GC::Secret<YaoGarbleWire> whole_type;
+	typedef GC::Secret<YaoGarbleWire> WholeType;
 
 public:
 	typedef YaoGarbler Party;
 	typedef YaoGarbleInput Input;
 	typedef GC::Processor<GC::Secret<YaoGarbleWire>> Processor;
-	typedef SwitchableOutput out_type;
+	typedef SwitchableOutput OutType;
 
 	static string name() { return "YaoGarbleWire"; }
 
@@ -61,7 +61,7 @@ public:
 	static void sync(vector<Integer>& values, Player* P);
 	static void reveal_inst(Processor& processor, const ArgVector& args);
 
-	static void convcbit2s(GC::Processor<whole_type>& processor,
+	static void convcbit2s(GC::Processor<WholeType>& processor,
 			const BaseInstruction& instruction);
 
 	static void run_tapes(const ArgVector& args);

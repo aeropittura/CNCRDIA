@@ -33,7 +33,7 @@ void Coordinator::run()
     string id;
     while (in.pop(id))
     {
-        Bundle<octetStream> bundle(P);
+        Bundle<OctetStream> bundle(P);
         bundle.mine = id;
         P.unchecked_broadcast(bundle);
         for (auto& x : bundle)

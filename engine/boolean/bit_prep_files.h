@@ -12,12 +12,12 @@ namespace GC
 {
 
 template<class T>
-class BitPrepFiles : public ShiftableTripleBuffer<T>, public Sub_Data_Files<T>
+class BitPrepFiles : public ShiftableTripleBuffer<T>, public SubDataFiles<T>
 {
 public:
-    BitPrepFiles(const Names& N, const string& prep_data_dir,
+    BitPrepFiles(const Names& N, const string& prep_data_directory,
             DataPositions& usage, int thread_num = -1) :
-            Sub_Data_Files<T>(N, prep_data_dir, usage, thread_num)
+            SubDataFiles<T>(N, prep_data_directory, usage, thread_num)
     {
     }
 
@@ -28,7 +28,7 @@ public:
 
     void get(Dtype type, T* data)
     {
-        Sub_Data_Files<T>::get(type, data);
+        SubDataFiles<T>::get(type, data);
     }
 };
 

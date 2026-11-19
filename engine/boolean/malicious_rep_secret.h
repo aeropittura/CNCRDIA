@@ -12,7 +12,7 @@
 #include "protocols/replicated/malicious_rep_mc.h"
 #include "vm/dummy_protocol.h"
 
-template<class T> class MaliciousRepMC;
+template<class T> class MaliciousRepOpener;
 
 namespace GC
 {
@@ -20,20 +20,20 @@ namespace GC
 template<class T> class ShareThread;
 template<class T> class RepPrep;
 
-class SmallMalRepSecret : public FixedVec<BitVec_<unsigned char>, 2>
+class SmallMalRepSecret : public FixedVec<BitVector_<unsigned char>, 2>
 {
-    typedef FixedVec<BitVec_<unsigned char>, 2> super;
+    typedef FixedVec<BitVector_<unsigned char>, 2> Super;
     typedef SmallMalRepSecret This;
 
 public:
-    typedef MaliciousRepMC<This> MC;
-    typedef BitVec_<unsigned char> open_type;
-    typedef open_type clear;
-    typedef NoValue mac_key_type;
+    typedef MaliciousRepOpener<This> MC;
+    typedef BitVector_<unsigned char> OpenType;
+    typedef OpenType clear;
+    typedef NoValue MacKeyType;
 
-    static MC* new_mc(mac_key_type)
+    static MC* new_opener(MacKeyType)
     {
-        return new HashMaliciousRepMC<This>;
+        return new HashMaliciousRepOpener<This>;
     }
 
     SmallMalRepSecret()
@@ -41,7 +41,7 @@ public:
     }
     template<class T>
     SmallMalRepSecret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 
@@ -54,55 +54,55 @@ public:
 template<class U>
 class MalRepSecretBase : public ReplicatedSecret<U>
 {
-    typedef ReplicatedSecret<U> super;
+    typedef ReplicatedSecret<U> Super;
 
 public:
     typedef Memory<U> DynamicMemory;
 
-    typedef MaliciousRepMC<U> MC;
-    typedef MC MAC_Check;
-    typedef HashMaliciousRepMC<U> DefaultMC;
+    typedef MaliciousRepOpener<U> MC;
+    typedef MC MacCheck;
+    typedef HashMaliciousRepOpener<U> DefaultOpener;
 
     typedef ReplicatedInput<U> Input;
     typedef RepPrep<U> LivePrep;
 
     typedef U part_type;
-    typedef U whole_type;
+    typedef U WholeType;
 
     static const bool expensive_triples = true;
     static const bool malicious = true;
 
-    static MC* new_mc(typename super::mac_key_type)
+    static MC* new_opener(typename Super::MacKeyType)
     {
         try
         {
-            if (ThreadMaster<U>::s().machine.more_comm_less_comp)
-                return new CommMaliciousRepMC<U>;
+            if (ThreadMaster<U>::s().machine.more_communication_less_comp)
+                return new CommunicationMaliciousRepOpener<U>;
         }
-        catch(no_singleton& e)
+        catch(NoSingleton& e)
         {
         }
-        return new HashMaliciousRepMC<U>;
+        return new HashMaliciousRepOpener<U>;
     }
 
     MalRepSecretBase() {}
     template<class T>
-    MalRepSecretBase(const T& other) : super(other) {}
+    MalRepSecretBase(const T& other) : Super(other) {}
 };
 
 class MaliciousRepSecret : public MalRepSecretBase<MaliciousRepSecret>
 {
     typedef MaliciousRepSecret This;
-    typedef MalRepSecretBase<This> super;
+    typedef MalRepSecretBase<This> Super;
 
 public:
     typedef Beaver<MaliciousRepSecret> Protocol;
 
-    typedef SmallMalRepSecret small_type;
+    typedef SmallMalRepSecret SmallType;
 
     MaliciousRepSecret() {}
     template<class T>
-    MaliciousRepSecret(const T& other) : super(other) {}
+    MaliciousRepSecret(const T& other) : Super(other) {}
 };
 
 }

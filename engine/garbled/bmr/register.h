@@ -63,11 +63,11 @@ private:
 #else
 class BaseKeyVector : public CheckVector<Key>
 {
-    typedef CheckVector<Key> super;
+    typedef CheckVector<Key> Super;
 
 public:
-	BaseKeyVector(int size = 0) : super(size, Key(0)) {}
-	void resize(int size) { super::resize(size, Key(0)); }
+	BaseKeyVector(int size = 0) : Super(size, Key(0)) {}
+	void resize(int size) { Super::resize(size, Key(0)); }
 };
 #endif
 
@@ -83,7 +83,7 @@ public:
     void serialize_no_allocate(T& output) const { output.serialize_no_allocate(data(), byte_size()); }
     template <class T>
     void serialize(T& output) const { output.serialize(data(), byte_size()); }
-    void unserialize(ReceivedMsg& source, int n_parties);
+    void unserialize(ReceivedMessage& source, int n_parties);
     friend ostream& operator<<(ostream& os, const KeyVector& kv);
 };
 
@@ -109,21 +109,21 @@ public:
 	const KeyVector& operator[](int i) const { return keys[i]; }
 	KeyTuple<I> operator^(const KeyTuple<I>& other) const;
 	void copy_to(Key* dest);
-	void unserialize(ReceivedMsg& source, int n_parties);
+	void unserialize(ReceivedMessage& source, int n_parties);
 	void copy_from(Key* source, int n_parties, int except);
 	template <class T>
 	void serialize_no_allocate(T& output) const;
 	template <class T>
 	void serialize(T& output) const;
 	template <class T>
-	void serialize(T& output, party_id_t pid) const;
+	void serialize(T& output, PartyId pid) const;
 	void unserialize(vector<char>& output);
 	template <class T>
 	void unserialize(T& output);
 	void randomize();
 	void reset();
 	void print(int wire_id) const;
-	void print(int wire_id, party_id_t pid);
+	void print(int wire_id, PartyId pid);
 };
 
 namespace GC
@@ -158,13 +158,13 @@ public:
 	void init(int n_parties);
 	void init(int rfd, int n_parties);
 	KeyVector& operator[](int i) { return keys[i]; }
-    const Key& key(party_id_t i, int b) const { return keys[b][i-1]; }
-    Key& key(party_id_t i, int b) { return keys[b][i-1]; }
+    const Key& key(PartyId i, int b) const { return keys[b][i-1]; }
+    Key& key(PartyId i, int b) { return keys[b][i-1]; }
     void set_eval_keys();
     void set_eval_keys(Key* keys, int n_parties, int except);
-    const Key& external_key(party_id_t i) const { return garbled_entry[i-1]; }
-    void set_external_key(party_id_t i, const Key& key);
-    void reset_non_external_key(party_id_t i);
+    const Key& external_key(PartyId i) const { return garbled_entry[i-1]; }
+    void set_external_key(PartyId i, const Key& key);
+    void reset_non_external_key(PartyId i);
     void set_external(char ext);
     char get_external() const { check_external(); return external; }
     char get_external_no_check() const { return external; }
@@ -174,7 +174,7 @@ public:
     char get_output() { check_external(); check_mask(); return mask ^ external; }
     char get_output_no_check() { return mask ^ external; }
     const KeyVector& get_garbled_entry() const { return garbled_entry; }
-    const Key& get_garbled_wire(party_id_t i) const { return garbled_entry[i-1]; }
+    const Key& get_garbled_wire(PartyId i) const { return garbled_entry[i-1]; }
     void print_input(int id);
     void print() const { keys.print(get_id()); }
     void check_external() const;
@@ -182,10 +182,10 @@ public:
     void check_signal_key(int my_id, KeyVector& garbled_entry);
 
     void eval(const Register& left, const Register& right, GarbledGate& gate,
-            party_id_t my_id, char* prf_output, int, int, int);
+            PartyId my_id, char* prf_output, int, int, int);
 
     void garble(const Register& left, const Register& right, Function func,
-            Gate* gate, int g, vector<ReceivedMsg>& prf_outputs, SendBuffer& buffer);
+            Gate* gate, int g, vector<ReceivedMessage>& prf_outputs, SendBuffer& buffer);
 
     size_t get_id() const { return (size_t)this; }
 
@@ -221,7 +221,7 @@ class Phase
 public:
     typedef NoMemory DynamicMemory;
 
-	typedef BlackHole out_type;
+	typedef BlackHole OutType;
 
 	static const bool actual_inputs = true;
 
@@ -233,10 +233,10 @@ public:
 
 	template<class T>
 	static void store(NoMemory&, const vector<GC::WriteAccess<T> >&)
-	{ throw no_dynamic_memory(); }
+	{ throw NoDynamicMemory(); }
 	template<class T>
 	static void load(vector<GC::ReadAccess<T> >&, const NoMemory&)
-	{ throw no_dynamic_memory(); }
+	{ throw NoDynamicMemory(); }
 
 	template <class T>
 	static void andrs(T& processor, const ArgVector& args) { processor.andrs(args); }
@@ -251,7 +251,7 @@ public:
 	static void inputb(T& processor, const ArgVector& args) { processor.input(args); }
 	template <class T>
 	static void inputbvec(T&, ProcessorBase&, const ArgVector&)
-	{ throw not_implemented(); }
+	{ throw NotImplemented(); }
 	template <class T>
 	static T get_input(int from, GC::Processor<T>& processor, int n_bits)
 	{ return T::input(from, processor.get_input(n_bits), n_bits); }
@@ -260,9 +260,9 @@ public:
 	{ processor.reveal(args); }
 
 	static void sync(vector<Integer>&, Player*)
-	{ throw not_implemented(); }
+	{ throw NotImplemented(); }
 
-	void input(party_id_t from, char value = -1) { (void)from; (void)value; }
+	void input(PartyId from, char value = -1) { (void)from; (void)value; }
 	void public_input(bool value) { (void)value; }
 	void random() {}
 	void output() {}
@@ -295,7 +295,7 @@ public:
 	// only true for evaluation
 	static const bool actual_inputs = false;
 
-	static int threshold(int) { throw not_implemented(); }
+	static int threshold(int) { throw NotImplemented(); }
 
 	template<class T>
 	static void store(NoMemory& dest,
@@ -326,7 +326,7 @@ public:
 	char get_output() { return 0; }
 };
 
-class PRFRegister : public ProgramRegister
+class PrfRegister : public ProgramRegister
 {
 public:
 	static string name() { return "PRF"; }
@@ -335,9 +335,9 @@ public:
 	static void load(vector<GC::ReadAccess<T> >& accesses,
 			const NoMemory& source);
 
-	void op(const PRFRegister& left, const PRFRegister& right, Function func);
+	void op(const PrfRegister& left, const PrfRegister& right, Function func);
 	void XOR(const Register& left, const Register& right);
-	void input(party_id_t from, char input = -1);
+	void input(PartyId from, char input = -1);
 	void public_input(bool value);
 	void random();
 	void output();
@@ -366,7 +366,7 @@ class EvalInputter : public InputterBase
 public:
 	ProgramParty& party;
 
-	Bundle<octetStream> oss;
+	Bundle<OctetStream> oss;
 	vector<Tuple> tuples;
 
 	EvalInputter();
@@ -381,7 +381,7 @@ public:
 
     typedef EvalInputter Input;
 
-    typedef SwitchableOutput out_type;
+    typedef SwitchableOutput OutType;
 
 	static const bool actual_inputs = true;
 
@@ -421,8 +421,8 @@ public:
 	static void store_clear_in_dynamic(GC::Memory<T>& mem,
 			const vector<GC::ClearWriteAccess>& accesses);
 	static void check_input(long long input, int n_bits);
-	void input(party_id_t from, char value = -1);
-	void input_helper(char value, octetStream& os);
+	void input(PartyId from, char value = -1);
+	void input_helper(char value, OctetStream& os);
 
 	void my_input(EvalInputter& inputter, bool input, int);
 	void other_input(EvalInputter& inputter, int from);
@@ -440,7 +440,7 @@ public:
 
 	void op(const Register& left, const Register& right, Function func);
 	void XOR(const Register& left, const Register& right);
-        void input(party_id_t from, char value = -1);
+        void input(PartyId from, char value = -1);
 	void public_input(bool value);
 	void random();
 	void output() {}
@@ -466,7 +466,7 @@ public:
 	void op(const Register& left, const Register& right, Function func);
 	void XOR(const Register& left, const Register& right);
 
-	void input(party_id_t from, char value = -1);
+	void input(PartyId from, char value = -1);
 	void public_input(bool value);
 	void random();
 	void output();
@@ -482,7 +482,7 @@ inline void KeyVector::operator=(const KeyVector& other)
 	avx_memcpy(data(), other.data(), byte_size());
 }
 
-inline void KeyVector::unserialize(ReceivedMsg& source, int n_parties)
+inline void KeyVector::unserialize(ReceivedMessage& source, int n_parties)
 {
 	resize(n_parties);
 	source.unserialize(data(), size() * sizeof(Key));
@@ -503,7 +503,7 @@ inline void KeyTuple<I>::reset()
 }
 
 template <int I>
-inline void KeyTuple<I>::unserialize(ReceivedMsg& source, int n_parties) {
+inline void KeyTuple<I>::unserialize(ReceivedMessage& source, int n_parties) {
 	for (int b = 0; b < I; b++)
 		keys[b].unserialize(source, n_parties);
 }
@@ -522,7 +522,7 @@ void KeyTuple<I>::serialize(T& output) const {
 }
 
 template<int I> template <class T>
-void KeyTuple<I>::serialize(T& output, party_id_t pid) const {
+void KeyTuple<I>::serialize(T& output, PartyId pid) const {
 	for (int i = 0; i < I; i++)
 		keys[i][pid - 1].serialize(output);
 }

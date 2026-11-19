@@ -8,13 +8,13 @@
 #include "protocols/rep4/rep4_mc.h"
 
 template<class T>
-void Rep4MC<T>::exchange(const Player& P)
+void Rep4Opener<T>::exchange(const Player& P)
 {
     CODE_LOCATION
 
     bool malicious = not OnlineOptions::singleton.semi_honest;
 
-    octetStream right, tmp;
+    OctetStream right, tmp;
     for (auto& secret : this->secrets)
     {
         secret[0].pack(right);
@@ -29,7 +29,7 @@ void Rep4MC<T>::exchange(const Player& P)
     this->values.resize(this->secrets.size());
     for (size_t i = 0; i < this->secrets.size(); i++)
     {
-        typename T::open_type a, b;
+        typename T::OpenType a, b;
         a.unpack(right);
         this->values[i] = this->secrets[i].sum() + a;
     }
@@ -42,17 +42,17 @@ void Rep4MC<T>::exchange(const Player& P)
 }
 
 template<class T>
-void Rep4MC<T>::Check(const Player& P)
+void Rep4Opener<T>::Check(const Player& P)
 {
     if (check_hash.size == 0)
         return;
 
     CODE_LOCATION
-    octetStream left;
+    OctetStream left;
     check_hash.final(left);
     P.pass_around(left, -1);
-    octetStream os;
+    OctetStream os;
     receive_hash.final(os);
     if (os != left)
-        throw mac_fail();
+        throw MacFail();
 }

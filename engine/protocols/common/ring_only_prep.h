@@ -20,6 +20,6 @@ protected:
     {
     }
 
-    void buffer_dabits_from_bits_without_check(vector<dabit<T>>& dabits,
+    void buffer_dabits_from_bits_without_check(vector<Dabit<T>>& dabits,
             int buffer_size, ThreadQueues* queues);
 };

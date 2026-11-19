@@ -38,8 +38,8 @@ public:
     void to(U& result, false_type);
     void to(U& result, true_type);
     template<int X, int L>
-    void to(gfp_<X, L>& result, true_type);
+    void to(Gfp_<X, L>& result, true_type);
 
-    void pack(octetStream& os) const;
-    void unpack(octetStream& os);
+    void pack(OctetStream& os) const;
+    void unpack(OctetStream& os);
 };

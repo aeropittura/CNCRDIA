@@ -10,18 +10,18 @@
 #include "support/benchmarking.h"
 
 
-OTExtension::OTExtension(const BaseOT& baseOT, TwoPartyPlayer* player,
+OtExtension::OtExtension(const BaseOT& base_ot, TwoPartyPlayer* player,
         bool passive) : player(player)
 {
-    ot_role = INV_ROLE(baseOT.ot_role);
+    ot_role = INV_ROLE(base_ot.ot_role);
     passive_only = passive;
-    init(baseOT.receiver_inputs, baseOT.sender_inputs, baseOT.receiver_outputs);
+    init(base_ot.receiver_inputs, base_ot.sender_inputs, base_ot.receiver_outputs);
 }
 
-void OTExtension::init(const OTTripleSetup& setup, int index)
+void OtExtension::init(const OtTripleSetup& setup, int index)
 {
-    init(setup.base_receiver_inputs, setup.baseSenderInputs.at(index),
-            setup.baseReceiverOutputs.at(index));
+    init(setup.base_receiver_inputs, setup.base_sender_inputs.at(index),
+            setup.base_receiver_outputs.at(index));
 }
 
 
@@ -34,10 +34,10 @@ int eq_m128i(__m128i a, __m128i b)
 }
 
 
-bool OTExtensionWithMatrix::warned = false;
+bool OtExtensionWithMatrix::warned = false;
 
-void OTExtensionWithMatrix::check_correlation(int nOTs,
-    const BitVector& receiverInput)
+void OtExtensionWithMatrix::check_correlation(int n_ots,
+    const BitVector& receiver_input)
 {
     if (not warned)
     {
@@ -51,12 +51,12 @@ void OTExtensionWithMatrix::check_correlation(int nOTs,
     timeval startv, endv;
     gettimeofday(&startv, NULL);
 #endif
-    if (nbaseOTs != 128)
+    if (nbase_ots != 128)
     {
         cerr << "Correlation check not implemented for length != 128\n";
-        throw not_implemented();
+        throw NotImplemented();
     }
-    GlobalPRNG G(*player);
+    GlobalPrng G(*player);
 #ifdef OTEXT_TIMER
     gettimeofday(&endv, NULL);
     double elapsed = timeval_diff(&startv, &endv);
@@ -66,10 +66,10 @@ void OTExtensionWithMatrix::check_correlation(int nOTs,
 #endif
 
     __m128i Delta, x128i;
-    Delta = _mm_load_si128((__m128i*)&(baseReceiverInput.get_ptr()[0]));
+    Delta = _mm_load_si128((__m128i*)&(base_receiver_input.get_ptr()[0]));
 
-    BitVector chi(nbaseOTs);
-    BitVector x(nbaseOTs);
+    BitVector chi(nbase_ots);
+    BitVector x(nbase_ots);
     __m128i t = _mm_setzero_si128();
     __m128i q = _mm_setzero_si128();
     __m128i t2 = _mm_setzero_si128();
@@ -77,7 +77,7 @@ void OTExtensionWithMatrix::check_correlation(int nOTs,
     __m128i chii, ti, qi, ti2, qi2;
     x128i = _mm_setzero_si128();
 
-    for (int i = 0; i < nOTs; i++)
+    for (int i = 0; i < n_ots; i++)
     {
 //        chi.randomize(G);
 //        chii = _mm_load_si128((__m128i*)&(chi.get_ptr()[0]));
@@ -85,7 +85,7 @@ void OTExtensionWithMatrix::check_correlation(int nOTs,
 
         if (ot_role & RECEIVER)
         {
-            if (receiverInput.get_bit(i) == 1)
+            if (receiver_input.get_bit(i) == 1)
             {
                 x128i = _mm_xor_si128(x128i, chii);
             }
@@ -107,9 +107,9 @@ void OTExtensionWithMatrix::check_correlation(int nOTs,
     if (ot_role & RECEIVER)
     {
         cout << "\tSending x,t\n";
-        cout << "\tsend x = " << __m128i_toString<octet>(x128i) << endl;
-        cout << "\tsend t = " << __m128i_toString<octet>(t) << endl;
-        cout << "\tsend t2 = " << __m128i_toString<octet>(t2) << endl;
+        cout << "\tsend x = " << __m128i_toString<Octet>(x128i) << endl;
+        cout << "\tsend t = " << __m128i_toString<Octet>(t) << endl;
+        cout << "\tsend t2 = " << __m128i_toString<Octet>(t2) << endl;
     }
 #endif
     check_iteration(Delta, q, q2, t, t2, x128i);
@@ -121,25 +121,25 @@ void OTExtensionWithMatrix::check_correlation(int nOTs,
 #endif
 }
 
-void OTExtensionWithMatrix::check_iteration(__m128i delta, __m128i q, __m128i q2,
+void OtExtensionWithMatrix::check_iteration(__m128i delta, __m128i q, __m128i q2,
     __m128i t, __m128i t2, __m128i x)
 {
-    vector<octetStream> os(2);
+    vector<OctetStream> os(2);
     // send x, t;
     __m128i received_t, received_t2, received_x, tmp1, tmp2;
     if (ot_role & RECEIVER)
     {
-        os[0].append((octet*)&x, sizeof(x));
-        os[0].append((octet*)&t, sizeof(t));
-        os[0].append((octet*)&t2, sizeof(t2));
+        os[0].append((Octet*)&x, sizeof(x));
+        os[0].append((Octet*)&t, sizeof(t));
+        os[0].append((Octet*)&t2, sizeof(t2));
     }
     send_if_ot_receiver(player, os, ot_role);
 
     if (ot_role & SENDER)
     {
-        os[1].consume((octet*)&received_x, sizeof(received_x));
-        os[1].consume((octet*)&received_t, sizeof(received_t));
-        os[1].consume((octet*)&received_t2, sizeof(received_t2));
+        os[1].consume((Octet*)&received_x, sizeof(received_x));
+        os[1].consume((Octet*)&received_t, sizeof(received_t));
+        os[1].consume((Octet*)&received_t2, sizeof(received_t2));
 
         // check t = x * Delta + q
         //gfmul128(received_x, delta, &tmp1);
@@ -154,9 +154,9 @@ void OTExtensionWithMatrix::check_iteration(__m128i delta, __m128i q, __m128i q2
         else
         {
             cerr << "Correlation check failed\n";
-            cout << "rec t = " << __m128i_toString<octet>(received_t) << endl;
-            cout << "tmp1  = " << __m128i_toString<octet>(tmp1) << endl;
-            cout << "q  = " << __m128i_toString<octet>(q) << endl;
+            cout << "rec t = " << __m128i_toString<Octet>(received_t) << endl;
+            cout << "tmp1  = " << __m128i_toString<Octet>(tmp1) << endl;
+            cout << "q  = " << __m128i_toString<Octet>(q) << endl;
             throw runtime_error("correlation check");
         }
     }

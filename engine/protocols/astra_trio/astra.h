@@ -18,7 +18,7 @@ class AstraBase : public ProtocolBase<T>
     friend class AstraShare<typename T::clear>;
 
 protected:
-    vector<typename T::open_type> inputs;
+    vector<typename T::OpenType> inputs;
     vector<array<T, 2>> input_pairs;
     IteratorVector<T> results;
     size_t n_mults;
@@ -38,15 +38,15 @@ protected:
 
     virtual int my_astra_num() = 0;
 
-    virtual bool local_mul_for(int player) = 0;
+    virtual bool local_mult_for(int player) = 0;
     void prepare_exchange();
 
-    virtual void init_reduced_mul(size_t n_mul) = 0;
-    virtual void exchange_reduced_mul(size_t n_mul) = 0;
+    virtual void initialize_reduced_mult(size_t n_mult) = 0;
+    virtual void exchange_reduced_mult(size_t n_mult) = 0;
 
-    virtual void init_input0(size_t n_mul) = 0;
-    virtual void exchange_input0(size_t n_mul) = 0;
-    virtual void finalize_input0(size_t n_mul) = 0;
+    virtual void initialize_input0(size_t n_mult) = 0;
+    virtual void exchange_input0(size_t n_mult) = 0;
+    virtual void finalize_input0(size_t n_mult) = 0;
 
     template<int MY_NUM>
     void trunc_pr_small_gap_finish(const TruncPrTupleList<T>& infos,
@@ -58,18 +58,18 @@ public:
     AstraBase(Player& P);
     virtual ~AstraBase();
 
-    virtual void init_prep() = 0;
+    virtual void initialize_prep() = 0;
 
     /// Initialize multiplication round
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1) final;
-    void prepare_mul_fast(const T& x, const T& y)
+    void prepare_mult_fast(const T& x, const T& y)
     {
         prepare_mul(x, y);
     }
 
     /// Initialize dot product round
-    void init_dotprod();
+    void initialize_dotprod();
     /// Add operand pair to current dot product
     void prepare_dotprod(const T& x, const T& y);
     /// Finish dot product
@@ -90,34 +90,34 @@ public:
 
     Player& branch()
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 };
 
 template<class T>
 class AstraOnlineBase : public AstraBase<T>
 {
-    typedef typename T::open_type open_type;
-    typedef open_type value_type;
+    typedef typename T::OpenType OpenType;
+    typedef OpenType value_type;
 
 protected:
     ifstream prep;
     ofstream outputs;
     int astra_num;
 
-    octetStream cs_prep;
+    OctetStream cs_prep;
 
     int my_astra_num()
     {
         return astra_num;
     }
 
-    bool local_mul_for(int player)
+    bool local_mult_for(int player)
     {
         return player == my_astra_num();
     }
 
-    void init_input0(size_t)
+    void initialize_input0(size_t)
     {
     }
 
@@ -130,11 +130,11 @@ protected:
 public:
     AstraOnlineBase(Player& P);
 
-    void init_prep();
+    void initialize_prep();
 
     template<class U>
     U read();
-    void read(octetStream& os);
+    void read(OctetStream& os);
 
     template<class U>
     void sync(vector<U>& values, Player& P);
@@ -153,10 +153,10 @@ public:
             SubProcessor<T>& proc);
 
     void unsplit(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction);
     virtual void unsplit1(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction) = 0;
 };
 
@@ -165,19 +165,19 @@ class Astra : public AstraOnlineBase<T>
 {
     friend class AstraShare<typename T::clear>;
 
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
     typedef typename T::clear clear;
-    typedef open_type value_type;
+    typedef OpenType value_type;
 
-    octetStream os, os_prep, recv_os;
+    OctetStream os, os_prep, recv_os;
 
-    T pre(const open_type& input);
+    T pre(const OpenType& input);
 
-    void init_reduced_mul(size_t n_mul);
-    void exchange_reduced_mul(size_t n_mul);
+    void initialize_reduced_mult(size_t n_mult);
+    void exchange_reduced_mult(size_t n_mult);
 
     void unsplit1(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction);
 
 public:
@@ -187,7 +187,7 @@ public:
     void exchange();
     /// Get next multiplication result
     T finalize_mul(int n = -1) final;
-    T finalize_mul_fast()
+    T finalize_mult_fast()
     {
         return finalize_mul();
     }
@@ -201,23 +201,23 @@ class AstraPrepProtocol : public AstraBase<T>
     friend class TrioPrepShare<typename T::clear>;
     friend class ReplicatedInput<T>;
 
-    typedef typename T::open_type open_type;
-    typedef open_type value_type;
+    typedef typename T::OpenType OpenType;
+    typedef OpenType value_type;
 
-    octetStream os_prep;
-    octetStream cs, cs_prep;
+    OctetStream os_prep;
+    OctetStream cs, cs_prep;
 
     ReplicatedInput<Rep3Share<typename T::clear>>* unsplit_input;
 
     template<int MY_NUM>
     void unsplit_finish(StackedVector<T>& dest, const Instruction& instruction);
 
-    void init_reduced_mul(size_t n_mul);
-    void exchange_reduced_mul(size_t n_mul);
+    void initialize_reduced_mult(size_t n_mult);
+    void exchange_reduced_mult(size_t n_mult);
 
-    void init_input0(size_t n_mul);
-    void exchange_input0(size_t n_mul);
-    void finalize_input0(size_t n_mul);
+    void initialize_input0(size_t n_mult);
+    void exchange_input0(size_t n_mult);
+    void finalize_input0(size_t n_mult);
 
 protected:
     ofstream prep;
@@ -225,7 +225,7 @@ protected:
     ReplicatedBase prng_protocol;
     ReplicatedBase prng_protocol_for_input0;
     int my_num;
-    octetStream os;
+    OctetStream os;
 
     int my_astra_num()
     {
@@ -235,24 +235,24 @@ protected:
     int rep_index(int i);
     int rep_index(int i, int my_num);
 
-    void add_gen(octetStream& cs, const typename T::open_type& value);
+    void add_gen(OctetStream& cs, const typename T::OpenType& value);
 
     template<int my_num>
     void pre();
     template<int my_num>
     void pre_element(T& res);
     template<int my_num>
-    void pre_gamma(T& res, open_type& gamma, const open_type& input);
+    void pre_gamma(T& res, OpenType& gamma, const OpenType& input);
 
-    void post(T& res, const open_type& gamma);
+    void post(T& res, const OpenType& gamma);
 
 public:
     AstraPrepProtocol(Player& P);
     ~AstraPrepProtocol();
 
-    void init_prep();
+    void initialize_prep();
 
-    virtual bool local_mul_for(int player)
+    virtual bool local_mult_for(int player)
     {
         return player == my_astra_num();
     }
@@ -261,14 +261,14 @@ public:
     void exchange();
 
     T finalize_mul(int n = -1) final;
-    T finalize_mul_fast()
+    T finalize_mult_fast()
     {
         return finalize_mul();
     }
 
     template<class U>
     void store(const U& value);
-    void store(const octetStream& os);
+    void store(const OctetStream& os);
 
     template<class U>
     void sync(vector<U>& values, Player& P);
@@ -292,9 +292,9 @@ public:
     AstraPrepShare<U> from_rep3(const FixedVec<U, 2>& x, int my_num);
 
     void unsplit(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction);
     void unsplit1(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction);
 };

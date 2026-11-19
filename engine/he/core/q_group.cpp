@@ -26,7 +26,7 @@ void QGroup::assign(int mm,int seed)
           npr++;
         }
     }
-  matrix A(npr*2, vector<bigint>(npr));
+  matrix A(npr*2, vector<Bigint>(npr));
   int i,j,te,ord,e;
 
   /* Basic relations...*/
@@ -51,7 +51,7 @@ void QGroup::assign(int mm,int seed)
      { te=1;
        for (j=0; j<npr; j++)
          { e=rand()%m;
-	   te=(te*powerMod(pr[j],e,m))%m;
+	   te=(te*power_mod(pr[j],e,m))%m;
            A[i+npr][j]=e;
          }
        j=0;
@@ -77,12 +77,12 @@ void QGroup::assign(int mm,int seed)
     cout << "Quotient Group Generators :\n";
   g.resize(npr); d.resize(npr);
   ngen=0;  Gord=1;
-  bigint temp;
+  Bigint temp;
   for (i=0; i<npr; i++)
     { if (S[i][i]!=1)
 	{ temp=1;
           for (j=0; j<npr; j++)
-            { temp=(temp*powerMod(pr[j],Vi[i][j],m))%m; }
+            { temp=(temp*power_mod(pr[j],Vi[i][j],m))%m; }
           g[ngen]=mpz_get_ui(temp.get_mpz_t());
           d[ngen]=mpz_get_ui(S[i][i].get_mpz_t());
 	  Gord=Gord*d[ngen];
@@ -109,7 +109,7 @@ int QGroup::nth_element(int n) const
   for (i=ngen-1; i>=0; i--)
     { int ei=nn%d[i];
       nn=(nn-ei)/d[i];
-      elem=(elem*powerMod(g[i],ei,m))%m; 
+      elem=(elem*power_mod(g[i],ei,m))%m; 
     }
   elems[n]=elem;
   return elem;

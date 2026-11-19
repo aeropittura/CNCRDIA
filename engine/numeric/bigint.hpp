@@ -10,25 +10,25 @@
 #include "vm/base_machine.h"
 
 template<int X, int L>
-bigint& bigint::from_signed(const gfp_<X, L>& other)
+Bigint& Bigint::from_signed(const Gfp_<X, L>& other)
 {
     to_signed_bigint(*this, other);
     return *this;
 }
 
 template<class T>
-bigint& bigint::from_signed(const T& other)
+Bigint& Bigint::from_signed(const T& other)
 {
     *this = other;
     return *this;
 }
 
 template<class T>
-mpf_class bigint::get_float(T v, T p, T z, T s)
+mpf_class Bigint::get_float(T v, T p, T z, T s)
 {
     // GMP can't handle more precision in exponent
     Integer exp = Integer(p, 31).get();
-    bigint tmp;
+    Bigint tmp;
     tmp.from_signed(v);
     if (abs(tmp) == 1)
         BaseMachine::s().mini_warning = min(BaseMachine::s().mini_warning,
@@ -47,13 +47,13 @@ mpf_class bigint::get_float(T v, T p, T z, T s)
     if (not z.is_bit() or not s.is_bit())
       {
         cerr << "z=" << z << " s=" << s << endl;
-        throw Processor_Error("invalid floating point number");
+        throw ProcessorError("invalid floating point number");
       }
     return res;
 }
 
 template<class U, class T>
-void bigint::output_float(U& o, const mpf_class& x, T nan)
+void Bigint::output_float(U& o, const mpf_class& x, T nan)
 {
     if (nan.is_zero())
         o << x;
@@ -65,23 +65,23 @@ void bigint::output_float(U& o, const mpf_class& x, T nan)
 }
 
 
-class gmp_random
+class GmpRandom
 {
 public:
     gmp_randclass Gen;
-    gmp_random() : Gen(gmp_randinit_default)
+    GmpRandom() : Gen(gmp_randinit_default)
     {
         Gen.seed(0);
     }
 };
 
 template<class T>
-bigint sqrRootMod(const T& aa)
+Bigint square_root_mod(const T& aa)
 {
-    bigint a = aa;
-    bigint p = T::pr();
+    Bigint a = aa;
+    Bigint p = T::pr();
 
-    bigint ans;
+    Bigint ans;
     if (a == 0)
     {
         ans = 0;
@@ -92,16 +92,16 @@ bigint sqrRootMod(const T& aa)
     if (mpz_tstbit(p.get_mpz_t(), 1) == 1)
     {
         // First do case with p=3 mod 4
-        bigint exp = (p + 1) / 4;
+        Bigint exp = (p + 1) / 4;
         mpz_powm(ans.get_mpz_t(), a.get_mpz_t(), exp.get_mpz_t(),
                 p.get_mpz_t());
     }
     else
     {
         // Shanks algorithm
-        bigint n, q, yy, xx, temp;
+        Bigint n, q, yy, xx, temp;
         int r;
-        T::get_ZpD().get_shanks_parameters(yy, temp, r);
+        T::get_zp_d().get_shanks_parameters(yy, temp, r);
         mpz_powm(xx.get_mpz_t(), a.get_mpz_t(), temp.get_mpz_t(), p.get_mpz_t());
         // b=a*x^2 mod p, x=a*x mod p
         T x = xx;

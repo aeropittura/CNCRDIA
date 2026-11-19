@@ -11,8 +11,8 @@ template<class T>
 class Rep3Shuffler : public SecureShuffleBase<T>
 {
 public:
-    typedef array<CheckVector<int>, 2> shuffle_type;
-    typedef ShuffleStore<shuffle_type> store_type;
+    typedef array<CheckVector<int>, 2> ShuffleType;
+    typedef ShuffleStore<ShuffleType> StoreType;
 
 private:
     SubProcessor<T>& proc;
@@ -21,15 +21,15 @@ private:
     CheckVector<typename T::clear> to_share;
 
 public:
-    map<long, long> stats;
+    map<long, long> statistics;
 
     Rep3Shuffler(SubProcessor<T>& proc);
 
-    void generate(int n_shuffle, shuffle_type& shuffle);
+    void generate(int n_shuffle, ShuffleType& shuffle);
 
-    void apply_multiple(StackedVector<T>& a, vector<ShuffleTuple<shuffle_type>> &shuffles,
+    void apply_multiple(StackedVector<T>& a, vector<ShuffleTuple<ShuffleType>> &shuffles,
             bool multithread = true);
 
-    void shuffle_job(StackedVector<T>& a, const vector<ShuffleTuple<shuffle_type>>& shuffles,
+    void shuffle_job(StackedVector<T>& a, const vector<ShuffleTuple<ShuffleType>>& shuffles,
             long begin, long end, Player& P, ThreadQueues* queues);
 };

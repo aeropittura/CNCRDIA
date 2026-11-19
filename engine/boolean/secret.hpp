@@ -18,7 +18,7 @@ Secret<T> Secret<T>::input(Processor<Secret<T>>& processor, const InputArgs& arg
 }
 
 template<class T>
-Secret<T> Secret<T>::input(party_id_t from, const int128& input, int n_bits)
+Secret<T> Secret<T>::input(PartyId from, const Int128& input, int n_bits)
 {
     Secret<T> res;
     if (n_bits < 0)
@@ -48,7 +48,7 @@ Secret<T> Secret<T>::input(party_id_t from, const int128& input, int n_bits)
 	for (auto& reg : res.registers)
 	    cout << (int)reg.get_external_no_check();
 	cout << " ext " << endl;
-    int128 a;
+    Int128 a;
     res.reveal(a);
 	cout << " input " << hex << a << "(" << res.size() << ") from " << from
 			<< " (" << input << ", " << dec << n_bits << ")" << endl;
@@ -60,7 +60,7 @@ template<class T>
 template<class U>
 void GC::Secret<T>::my_input(U& inputter, BitVec value, int n_bits)
 {
-    resize_regs(n_bits);
+    resize_registers(n_bits);
     for (int i = 0; i < n_bits; i++)
         get_reg(i).my_input(inputter, value.get_bit(i), 1);
 }
@@ -69,7 +69,7 @@ template<class T>
 template<class U>
 void GC::Secret<T>::other_input(U& inputter, int from, int n_bits)
 {
-    resize_regs(n_bits);
+    resize_registers(n_bits);
     for (int i = 0; i < n_bits; i++)
         get_reg(i).other_input(inputter, from);
 }
@@ -78,22 +78,22 @@ template<class T>
 template<class U>
 void GC::Secret<T>::finalize_input(U& inputter, int from, int n_bits)
 {
-    resize_regs(n_bits);
+    resize_registers(n_bits);
     for (int i = 0; i < n_bits; i++)
         get_reg(i).finalize_input(inputter, from, 1);
 }
 
 template<class T>
-void Secret<T>::random(int n_bits, int128 share)
+void Secret<T>::random(int n_bits, Int128 share)
 {
     (void)share;
     if (n_bits > 128)
         throw runtime_error("too many bits");
-    resize_regs(n_bits);
+    resize_registers(n_bits);
     for (int i = 0; i < n_bits; i++)
     	get_reg(i).random();
 #ifdef DEBUG_RANDOM
-    int128 revealed;
+    Int128 revealed;
     reveal(revealed);
     cout << "random " << revealed << " share " << share << endl;
 #endif
@@ -144,7 +144,7 @@ void Secret<T>::load_clear(int n, const Integer& x)
 #ifdef DEBUG_ROUNDS2
     cout << "secret from integer " << hex << this << dec << " " << endl;
 #endif
-    resize_regs(n);
+    resize_registers(n);
     for (int i = 0; i < n; i++)
     {
         get_reg(i).public_input((x.get() >> i) & 1);
@@ -170,7 +170,7 @@ void Secret<T>::load(vector<ReadAccess <V> >& accesses, const U& mem)
         int n = access.length;
         if (n <= 0 || n > default_length)
             throw runtime_error("invalid length for dynamic loading");
-        access.dest.resize_regs(n);
+        access.dest.resize_registers(n);
     }
     T::load(accesses, mem);
 }
@@ -203,7 +203,7 @@ void Secret<T>::bitcom(StackedVector<U>& S, const ArgVector& regs)
     for (unsigned int i = 0; i < regs.size(); i++)
     {
         if (strict and S[regs[i]].registers.size() != 1)
-            throw Processor_Error("can only compose bits");
+            throw ProcessorError("can only compose bits");
         registers.push_back(S[regs[i]].registers.at(0));
     }
 }
@@ -232,7 +232,7 @@ void Secret<T>::bitdec(StackedVector<U>& S, const ArgVector& regs) const
 
 template<class T>
 template<class U>
-void Secret<T>::trans(StackedVector<U>& dest_stack,
+void Secret<T>::trans(StackedVector<U>& destination_stack,
         const StackedVector<U>& source_stack, int n_outputs,
         const ArgVector& args)
 {
@@ -241,11 +241,11 @@ void Secret<T>::trans(StackedVector<U>& dest_stack,
     for (int i = 0; i < n_outputs; i++)
     {
         for (int j = 0; j < DIV_CEIL(n_inputs, dl); j++)
-            dest_stack[args[i] + j].resize_regs(min(dl, n_inputs - j * dl));
+            destination_stack[args[i] + j].resize_registers(min(dl, n_inputs - j * dl));
         for (int j = 0; j < n_inputs; j++)
         {
             auto& source = source_stack[args[n_outputs + j] + i / dl].registers;
-            auto& dest = dest_stack[args[i] + j / dl].registers[j % dl];
+            auto& dest = destination_stack[args[i] + j / dl].registers[j % dl];
             if (size_t(i % dl) < source.size())
                 dest = source[i % dl];
             else
@@ -299,9 +299,9 @@ template<class T>
 void Secret<T>::mask(Secret& res, size_t n_bits) const
 {
     if (this != &res)
-        res.get_regs().assign(this->get_regs().begin(),
-                this->get_regs().begin()
-                        + min(size_t(n_bits), this->get_regs().size()));
+        res.get_registers().assign(this->get_registers().begin(),
+                this->get_registers().begin()
+                        + min(size_t(n_bits), this->get_registers().size()));
 
     while (res.registers.size() < n_bits)
     {

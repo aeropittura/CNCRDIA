@@ -26,9 +26,9 @@ class Awaiter
     PlayerCoSocket& socket;
 
 public:
-    typedef std::coroutine_handle<macoro::detail::task_promise<void, true>> handle_type;
+    typedef std::coroutine_handle<macoro::detail::task_promise<void, true>> HandleType;
 
-    Awaiter(span<octet> buffer, bool send, PlayerCoSocket& socket) :
+    Awaiter(span<Octet> buffer, bool send, PlayerCoSocket& socket) :
             buffer(buffer.data(), buffer.size()), send(send), socket(socket)
     {
         debug = OnlineOptions::singleton.has_option("debug_co");
@@ -39,7 +39,7 @@ public:
         return false;
     }
 
-    void await_suspend(handle_type h);
+    void await_suspend(HandleType h);
 
     tuple<std::error_code &, unsigned long &>  await_resume()
     {
@@ -51,14 +51,14 @@ public:
 
 class PlayerCoSocket
 {
-    typedef pair<PlayerBuffer, Awaiter::handle_type> queue_type;
+    typedef pair<PlayerBuffer, Awaiter::HandleType> QueueType;
 
     class HandleThread
     {
     public:
         PlayerCoSocket& socket;
         pthread_t thread;
-        WaitQueue<Awaiter::handle_type> queue;
+        WaitQueue<Awaiter::HandleType> queue;
 
         static void* run_thread(void* obj)
         {
@@ -79,7 +79,7 @@ class PlayerCoSocket
 
         void run()
         {
-            Awaiter::handle_type handle;
+            Awaiter::HandleType handle;
             while (queue.pop(handle))
             {
                 handle.resume();
@@ -119,7 +119,7 @@ class PlayerCoSocket
     }
 
 public:
-    WaitQueue<queue_type> send_queue, receive_queue;
+    WaitQueue<QueueType> send_queue, receive_queue;
 
     bool tamper;
 
@@ -148,7 +148,7 @@ public:
     }
 
     template<class T>
-    Awaiter send(span<octet> buffer, const T&)
+    Awaiter send(span<Octet> buffer, const T&)
     {
         if (debug)
         {
@@ -164,7 +164,7 @@ public:
     }
 
     template<class T>
-    Awaiter recv(span<octet> buffer, const T&)
+    Awaiter recv(span<Octet> buffer, const T&)
     {
         if (debug)
             cout << "recv " << buffer.size() << " on "
@@ -182,7 +182,7 @@ public:
 
     void send()
     {
-        queue_type entry;
+        QueueType entry;
         while (send_queue.pop(entry))
         {
             if (debug)
@@ -215,7 +215,7 @@ public:
 
     void receive()
     {
-        queue_type entry;
+        QueueType entry;
         while (receive_queue.pop(entry))
         {
             auto buffer = entry.first;
@@ -254,7 +254,7 @@ public:
     }
 };
 
-inline void Awaiter::await_suspend(Awaiter::handle_type h)
+inline void Awaiter::await_suspend(Awaiter::HandleType h)
 {
     if (debug)
         cout << "suspend " << buffer.size << endl;

@@ -8,7 +8,7 @@
 #include "protocols/replicated/replicated_mc.h"
 
 template<class T>
-void ReplicatedMC<T>::POpen(vector<typename T::open_type>& values,
+void ReplicatedOpener<T>::POpen(vector<typename T::OpenType>& values,
         const vector<T>& S, const Player& P)
 {
     CODE_LOCATION
@@ -18,7 +18,7 @@ void ReplicatedMC<T>::POpen(vector<typename T::open_type>& values,
 }
 
 template<class T>
-void ReplicatedMC<T>::POpen_Begin(vector<typename T::open_type>&,
+void ReplicatedOpener<T>::POpen_Begin(vector<typename T::OpenType>&,
         const vector<T>& S, const Player& P)
 {
     CODE_LOCATION
@@ -27,7 +27,7 @@ void ReplicatedMC<T>::POpen_Begin(vector<typename T::open_type>&,
 }
 
 template<class T>
-void ReplicatedMC<T>::prepare(const vector<T>& S)
+void ReplicatedOpener<T>::prepare(const vector<T>& S)
 {
     assert(T::vector_length == 2);
     o.reset_write_head();
@@ -39,7 +39,7 @@ void ReplicatedMC<T>::prepare(const vector<T>& S)
 }
 
 template<class T>
-void ReplicatedMC<T>::exchange(const Player& P)
+void ReplicatedOpener<T>::exchange(const Player& P)
 {
     CODE_LOCATION
     prepare(this->secrets);
@@ -47,7 +47,7 @@ void ReplicatedMC<T>::exchange(const Player& P)
 }
 
 template<class T>
-void ReplicatedMC<T>::POpen_End(vector<typename T::open_type>& values,
+void ReplicatedOpener<T>::POpen_End(vector<typename T::OpenType>& values,
         const vector<T>& S, const Player& P)
 {
     P.receive_relative(1, o);
@@ -55,29 +55,29 @@ void ReplicatedMC<T>::POpen_End(vector<typename T::open_type>& values,
 }
 
 template<class T>
-void ReplicatedMC<T>::finalize(vector<typename T::open_type>& values,
+void ReplicatedOpener<T>::finalize(vector<typename T::OpenType>& values,
         const vector<T>& S)
 {
     values.resize(S.size());
     for (size_t i = 0; i < S.size(); i++)
     {
-        typename T::open_type tmp;
+        typename T::OpenType tmp;
         tmp.unpack(o);
         values[i] = S[i].sum() + tmp;
     }
 }
 
 template<class T>
-typename T::open_type ReplicatedMC<T>::finalize_raw()
+typename T::OpenType ReplicatedOpener<T>::finalize_raw()
 {
     auto a = this->secrets.next().sum();
-    return a + o.get<typename T::open_type>();
+    return a + o.get<typename T::OpenType>();
 }
 
 template<class T>
-array<typename T::open_type*, 2> ReplicatedMC<T>::finalize_several(size_t n)
+array<typename T::OpenType*, 2> ReplicatedOpener<T>::finalize_several(size_t n)
 {
     if (this->values.empty())
         finalize(this->values, this->secrets);
-    return MAC_Check_Base<T>::finalize_several(n);
+    return MacCheckBase<T>::finalize_several(n);
 }

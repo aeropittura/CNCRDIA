@@ -12,7 +12,7 @@ using namespace std;
 
 void ident(matrix& U,int n)
 {
-  U.resize(n, vector<bigint>(n) );
+  U.resize(n, vector<Bigint>(n) );
   for (int i=0; i<n; i++)
     { for (int j=0; j<n; j++)
         { U[i][j]=0; }
@@ -21,9 +21,9 @@ void ident(matrix& U,int n)
 }
 
 
-void ident(imatrix& U,int n)
+void ident(Imatrix& U,int n)
 {
-  U.resize(n, imatrix::value_type(n));
+  U.resize(n, Imatrix::value_type(n));
   for (int i=0; i<n; i++)
     { for (int j=0; j<n; j++)
         { U[i][j]=0; }
@@ -37,7 +37,7 @@ void ident(imatrix& U,int n)
 matrix transpose(const matrix& A)
 {
   int m=A.size(),n=A[0].size();
-  matrix B(n, vector<bigint>(m) );
+  matrix B(n, vector<Bigint>(m) );
   for (int i=0; i<m; i++)
     { for (int j=0; j<n; j++)
         { B[j][i]=A[i][j]; }
@@ -49,8 +49,8 @@ matrix transpose(const matrix& A)
 matrix Mul(const matrix& A,const matrix& B)
 {
   unsigned int m=A.size(),n=B[0].size(),t=A[0].size();
-  if (t!=B.size()) { throw invalid_length(); }
-  matrix C(m, vector<bigint>(n) );
+  if (t!=B.size()) { throw InvalidLength(); }
+  matrix C(m, vector<Bigint>(n) );
   for (unsigned int i=0; i<m; i++)
     { for (unsigned int j=0; j<n; j++)
 	{ C[i][j]=0;
@@ -78,13 +78,13 @@ void HNF(matrix& H,matrix& U,const matrix& A)
   r=min(m,n);
   i=0;
   bool flag=true;
-  bigint mn,te;
+  Bigint mn,te;
   int step=2;
   while (flag)
     { if (step==2)
         { // Step 2
           k=-1;
-          mn=bigint(0);
+          mn=Bigint(0);
           for (j=i; j<n; j++)
 	    { if (H[i][j]!=0 && (abs(H[i][j])<mn || mn == 0))
 	        { k=j; mn=abs(H[i][j]); }
@@ -154,7 +154,7 @@ bool IsDiag(const matrix& A)
 bool IsIdent(const matrix& A)
 {
   unsigned int i,j,r=A.size();
-  if (A[0].size()!=r) { throw bad_value(); }
+  if (A[0].size()!=r) { throw BadValue(); }
   for (i=0; i<r; i++)
     { for (j=0; j<r; j++)
         { if (i!=j && A[i][j]!=0) { return false; } }
@@ -175,7 +175,7 @@ void print(const matrix& S)
 }
 
 
-void print(const imatrix& S)
+void print(const Imatrix& S)
 {
   int m=S.size(),n=S[0].size();
   for (int i=0; i<m; i++)
@@ -186,9 +186,9 @@ void print(const imatrix& S)
 }
 
 
-void SNF_Step(matrix& S,matrix& V)
+void snf_step(matrix& S,matrix& V)
 { 
-  //cout << "Entering SNF_Step " << endl;
+  //cout << "Entering snf_step " << endl;
   //print(S); cout << endl; print(V);
   int m=S.size();
   matrix U2,V2;
@@ -222,7 +222,7 @@ void SNF(matrix& S,const matrix& A,matrix& V)
 
   /* First get a diagonal matrix using the HNF */
   matrix U2,V2;
-  SNF_Step(S,V); 
+  snf_step(S,V); 
 
   /* Now get the divisibility condition */
   int i,r;
@@ -231,7 +231,7 @@ void SNF(matrix& S,const matrix& A,matrix& V)
     { if ((S[i+1][i+1]%S[i][i])!=0)
 	{ // Add row i+1 to row i
 	  S[i][i+1]=S[i+1][i+1];
-          SNF_Step(S,V);
+          snf_step(S,V);
 	}
     }
 }
@@ -244,16 +244,16 @@ matrix inv(const matrix& A)
   matrix HA,UA;
   HNF(HA,UA,A);
 
-  if (!IsIdent(HA)) { cout << "Error in inverse" << endl; throw bad_value(); }
+  if (!IsIdent(HA)) { cout << "Error in inverse" << endl; throw BadValue(); }
   return UA;
 }
 
 
 
 /* Input matrix is assumed to have more rows than columns */
-void pinv(imatrix& Ai,const imatrix& B)
+void pinv(Imatrix& Ai,const Imatrix& B)
 {
-  imatrix A=B;
+  Imatrix A=B;
   int nr=A.size(),nc=A[0].size();
   ident(Ai,nr);
 
@@ -292,7 +292,7 @@ void pinv(imatrix& Ai,const imatrix& B)
 }
 
 
-bool imatrix::operator!=(const imatrix& other) const
+bool Imatrix::operator!=(const Imatrix& other) const
 {
   if (size() != other.size())
     return true;
@@ -307,7 +307,7 @@ bool imatrix::operator!=(const imatrix& other) const
   return false;
 }
 
-void imatrix::hash(octetStream& o) const
+void Imatrix::hash(OctetStream& o) const
 {
   Hash hash;
   for (auto& row : *this)
@@ -315,18 +315,18 @@ void imatrix::hash(octetStream& o) const
   o.concat(hash.final());
 }
 
-void imatrix::pack(octetStream& o) const
+void Imatrix::pack(OctetStream& o) const
 {
   for (auto& x : *this)
     {
       assert(x.size() == size());
     }
-  o.store(static_cast<const super&>(*this));
+  o.store(static_cast<const Super&>(*this));
 }
 
-void imatrix::unpack(octetStream& o)
+void Imatrix::unpack(OctetStream& o)
 {
-  o.get(static_cast<super&>(*this));
+  o.get(static_cast<Super&>(*this));
   for (auto& x : *this)
     {
       assert(x.size() == size());

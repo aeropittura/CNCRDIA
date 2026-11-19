@@ -10,23 +10,23 @@
 /* Computes the FFT via Horner's Rule
    theta is assumed to be an Nth root of unity
 */
-void NaiveFFT(vector<modp>& ans,vector<modp>& a,int N,const modp& theta,const Zp_Data& PrD)
+void naive_fft(vector<modp>& ans,vector<modp>& a,int N,const modp& theta,const ZpData& pr_d)
 {
   int i,j;
-  modp thetaPow;
-  assignOne(thetaPow,PrD);
+  modp theta_pow;
+  assignOne(theta_pow,pr_d);
   for (i=0; i<N; i++)
     { ans[i]=a[N-1];
       for (j=N-2; j>=0; j--)
-	{ Mul(ans[i],ans[i],thetaPow,PrD);
-          Add(ans[i],ans[i],a[j],PrD);
+	{ Mul(ans[i],ans[i],theta_pow,pr_d);
+          Add(ans[i],ans[i],a[j],pr_d);
         }
-      Mul(thetaPow,thetaPow,theta,PrD); 
+      Mul(theta_pow,theta_pow,theta,pr_d); 
     }
 }
 
 
-void FFT(vector<modp>& a,int N,const modp& theta,const Zp_Data& PrD)
+void FFT(vector<modp>& a,int N,const modp& theta,const ZpData& pr_d)
 {
   CODE_LOCATION_NO_SCOPE
 
@@ -34,7 +34,7 @@ void FFT(vector<modp>& a,int N,const modp& theta,const Zp_Data& PrD)
 
   if (N<5)
     { vector<modp> b(N);
-      NaiveFFT(b,a,N,theta,PrD);
+      naive_fft(b,a,N,theta,pr_d);
       a=b;
       return;
     }
@@ -46,15 +46,15 @@ void FFT(vector<modp>& a,int N,const modp& theta,const Zp_Data& PrD)
       a1[i]=a[2*i+1];
     }
   modp theta2,w,t;
-  Sqr(theta2,theta,PrD);
-  FFT(a0,N/2,theta2,PrD);
-  FFT(a1,N/2,theta2,PrD);
-  assignOne(w,PrD);
+  Sqr(theta2,theta,pr_d);
+  FFT(a0,N/2,theta2,pr_d);
+  FFT(a1,N/2,theta2,pr_d);
+  assignOne(w,pr_d);
   for (i=0; i<N/2; i++)
-    { Mul(t,w,a1[i],PrD);
-      Add(a[i],a0[i],t,PrD);
-      Sub(a[i+N/2],a0[i],t,PrD);
-      Mul(w,w,theta,PrD);
+    { Mul(t,w,a1[i],pr_d);
+      Add(a[i],a0[i],t,pr_d);
+      Sub(a[i+N/2],a0[i],t,pr_d);
+      Mul(w,w,theta,pr_d);
     }
 }
 
@@ -63,7 +63,7 @@ void FFT(vector<modp>& a,int N,const modp& theta,const Zp_Data& PrD)
  * Standard FFT for n a power of two, root a n-th primitive root of unity.
  */
 template<class T,class P>
-void FFT_Iter(vector<T>& ioput, int n, const T& root, const P& PrD)
+void fft_iter(vector<T>& ioput, int n, const T& root, const P& pr_d)
 {
     int i, j, m;
     T t;
@@ -93,19 +93,19 @@ void FFT_Iter(vector<T>& ioput, int n, const T& root, const P& PrD)
     for (int s = 1; s < n; s = 2*s)
     {
         m = 2*s;
-        Power(alpha, root, n/m, PrD);
-        assignOne(alpha2,PrD);
+        Power(alpha, root, n/m, pr_d);
+        assignOne(alpha2,pr_d);
         for (int j = 0; j < m/2; ++j)
         {
             //root = root_table[j*n/m];
             for (int k = j; k < n; k += m)
             {
-                Mul(t, alpha2, ioput[k + m/2], PrD);
+                Mul(t, alpha2, ioput[k + m/2], pr_d);
                 u = ioput[k];
-                Add(ioput[k], u, t, PrD);
-                Sub(ioput[k + m/2], u, t, PrD);
+                Add(ioput[k], u, t, pr_d);
+                Sub(ioput[k + m/2], u, t, pr_d);
             }
-            Mul(alpha2, alpha2, alpha, PrD);
+            Mul(alpha2, alpha2, alpha, pr_d);
         }
     }
 }
@@ -117,29 +117,29 @@ void FFT_Iter(vector<T>& ioput, int n, const T& root, const P& PrD)
  *
  * n must be a power of two, root a 2n-th primitive root of unity.
  */
-void FFT_Iter2(vector<modp>& ioput, int n, const modp& root, const Zp_Data& PrD)
+void fft_iter2(vector<modp>& ioput, int n, const modp& root, const ZpData& pr_d)
 {
-    FFT_Iter(ioput, n, root, PrD, false);
+    fft_iter(ioput, n, root, pr_d, false);
 }
 
-void FFT_Iter2(vector<modp>& ioput, int n, const vector<modp>& roots,
-        const Zp_Data& PrD)
+void fft_iter2(vector<modp>& ioput, int n, const vector<modp>& roots,
+        const ZpData& pr_d)
 {
-    FFT_Iter(ioput, n, roots, PrD, false);
+    fft_iter(ioput, n, roots, pr_d, false);
 }
 
-void FFT_Iter(vector<modp>& ioput, int n, const modp& root, const Zp_Data& PrD,
+void fft_iter(vector<modp>& ioput, int n, const modp& root, const ZpData& pr_d,
         bool start_with_one)
 {
     vector<modp> roots(n + 1);
-    assignOne(roots[0], PrD);
+    assignOne(roots[0], pr_d);
     for (int i = 1; i < n + 1; i++)
-        Mul(roots[i], roots[i - 1], root, PrD);
-    FFT_Iter(ioput, n, roots, PrD, start_with_one);
+        Mul(roots[i], roots[i - 1], root, pr_d);
+    fft_iter(ioput, n, roots, pr_d, start_with_one);
 }
 
-void FFT_Iter(vector<modp>& ioput, int n, const vector<modp>& roots,
-        const Zp_Data& PrD, bool start_with_one)
+void fft_iter(vector<modp>& ioput, int n, const vector<modp>& roots,
+        const ZpData& pr_d, bool start_with_one)
 {
     CODE_LOCATION_NO_SCOPE
 
@@ -186,16 +186,16 @@ void FFT_Iter(vector<modp>& ioput, int n, const vector<modp>& roots,
         if (BaseMachine::thread_num == 0 and BaseMachine::has_singleton())
         {
             auto& queues = BaseMachine::s().queues;
-            FftJob job(ioput, alpha2, m, PrD);
+            FftJob job(ioput, alpha2, m, pr_d);
             int start = queues.distribute(job, n / 2);
             for (int i = start; i < n / 2; i++)
-                FFT_Iter2_body(ioput, alpha2, i, m, PrD);
+                fft_iter2_body(ioput, alpha2, i, m, pr_d);
             if (start > 0)
                 queues.wrap_up(job);
         }
         else
             for (int i = 0; i < n / 2; i++)
-                FFT_Iter2_body(ioput, alpha2, i, m, PrD);
+                fft_iter2_body(ioput, alpha2, i, m, pr_d);
     }
 }
 
@@ -205,7 +205,7 @@ void FFT_Iter(vector<modp>& ioput, int n, const vector<modp>& roots,
    alpha is assumed to be a generator of the N'th roots of unity mod p
    Starts at w=alpha and updates by alpha^2
 */
-void FFT2(vector<modp>& a, int N, const modp& alpha, const Zp_Data& PrD)
+void FFT2(vector<modp>& a, int N, const modp& alpha, const ZpData& pr_d)
 {
   int i;
   if (N==1) { return; }
@@ -217,20 +217,20 @@ void FFT2(vector<modp>& a, int N, const modp& alpha, const Zp_Data& PrD)
     }
 
   modp w,alpha2,temp;
-  Sqr(alpha2,alpha,PrD);
-  FFT2(a0,N/2,alpha2,PrD);    FFT2(a1,N/2,alpha2,PrD);
+  Sqr(alpha2,alpha,pr_d);
+  FFT2(a0,N/2,alpha2,pr_d);    FFT2(a1,N/2,alpha2,pr_d);
 
   w=alpha;
   for (i=0; i<N/2; i++)
-    { Mul(temp,w,a1[i],PrD);
-      Add(a[i],a0[i],temp,PrD);
-      Sub(a[i+N/2],a0[i],temp,PrD);
-      Mul(w,w,alpha2,PrD);
+    { Mul(temp,w,a1[i],pr_d);
+      Add(a[i],a0[i],temp,pr_d);
+      Sub(a[i+N/2],a0[i],temp,pr_d);
+      Mul(w,w,alpha2,pr_d);
     }
 }
 
 
-void FFT_non_power_of_two(vector<modp>& res, const vector<modp>& input, const FFT_Data& FFTD)
+void fft_non_power_of_two(vector<modp>& res, const vector<modp>& input, const FftData& FFTD)
 {
     vector<modp> tmp(FFTD.m());
     BFFT(tmp, input, FFTD);
@@ -238,7 +238,7 @@ void FFT_non_power_of_two(vector<modp>& res, const vector<modp>& input, const FF
         res[i] = tmp[(FFTD).p(i)];
 }
 
-void BFFT(vector<modp>& ans,const vector<modp>& a,const FFT_Data& FFTD,bool forward)
+void BFFT(vector<modp>& ans,const vector<modp>& a,const FftData& FFTD,bool forward)
 {
   int k2=FFTD.twop,n=FFTD.m();
   if (k2<0) { k2=-k2; }
@@ -248,19 +248,19 @@ void BFFT(vector<modp>& ans,const vector<modp>& a,const FFT_Data& FFTD,bool forw
   if (FFTD.twop>0)
      { vector<modp> x(k2);
        for (unsigned int i=0; i<a.size(); i++)
-         { Mul(x[i],FFTD.powers[r][i],a[i],FFTD.get_prD()); }
+         { Mul(x[i],FFTD.powers[r][i],a[i],FFTD.get_pr_d()); }
        for (int i=a.size(); i<k2; i++)
-         { assignZero(x[i],FFTD.get_prD()); }
-       FFT_Iter(x,k2,FFTD.two_root[0],FFTD.get_prD());
+         { assignZero(x[i],FFTD.get_pr_d()); }
+       fft_iter(x,k2,FFTD.two_root[0],FFTD.get_pr_d());
      
        for (int i=0; i<k2; i++)
-          { Mul(x[i],x[i],FFTD.b[r][i],FFTD.get_prD()); }
+          { Mul(x[i],x[i],FFTD.b[r][i],FFTD.get_pr_d()); }
      
-       FFT_Iter(x,k2,FFTD.two_root[1],FFTD.get_prD());
+       fft_iter(x,k2,FFTD.two_root[1],FFTD.get_pr_d());
        
        for (int i=0; i<n; i++)
-         { Mul(ans[i],x[i+n-1],FFTD.powers_i[r][i],FFTD.get_prD()); }
+         { Mul(ans[i],x[i+n-1],FFTD.powers_i[r][i],FFTD.get_pr_d()); }
      }
   else
-     { throw crash_requested(); }
+     { throw CrashRequested(); }
 }

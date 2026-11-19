@@ -34,8 +34,8 @@ class AstraPrepPrep : public ReplicatedPrep<T>
 {
     SubProcessor<T>* proc;
 
-    typedef Rep3Share<typename T::clear> rep3_type;
-    MixedProtocolSet<rep3_type>* rep3_set;
+    typedef Rep3Share<typename T::clear> Rep3Type;
+    MixedProtocolSet<Rep3Type>* rep3_set;
 
 public:
     AstraPrepPrep(SubProcessor<T>* proc, DataPositions& usage);

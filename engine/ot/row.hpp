@@ -13,7 +13,7 @@ template<class T>
 Row<T>& Row<T>::operator +=(const Row<T>& other)
 {
     if (rows.size() != other.size()) {
-        throw invalid_length();
+        throw InvalidLength();
     }
     for (size_t i = 0; i < this->size(); i++)
         rows[i] += other.rows[i];
@@ -24,7 +24,7 @@ template<class T>
 Row<T>& Row<T>::operator -=(const Row<T>& other)
 {
     if (rows.size() != other.size()) {
-        throw invalid_length();
+        throw InvalidLength();
     }
     for (size_t i = 0; i < this->size(); i++)
         rows[i] -= other.rows[i];
@@ -93,7 +93,7 @@ void Row<T>::randomize(PRNG& G, size_t size)
 template<class T>
 Row<T> Row<T>::operator<<(int i) const {
     if (i >= T::size() * 8) {
-        throw invalid_params();
+        throw InvalidParameters();
     }
     Row<T> res = *this;
     for (size_t j = 0; j < this->size(); j++)
@@ -102,7 +102,7 @@ Row<T> Row<T>::operator<<(int i) const {
 }
 
 template<class T, class U>
-void DeferredPlus<T, U>::pack(octetStream& o) const
+void DeferredPlus<T, U>::pack(OctetStream& o) const
 {
     o.store(this->size());
     for (size_t i = 0; i < this->size(); i++)
@@ -110,13 +110,13 @@ void DeferredPlus<T, U>::pack(octetStream& o) const
 }
 
 template<class T>
-void Row<T>::pack(octetStream& o) const
+void Row<T>::pack(OctetStream& o) const
 {
     o.store(rows);
 }
 
 template<class T>
-void Row<T>::unpack(octetStream& o)
+void Row<T>::unpack(OctetStream& o)
 {
     o.get(rows);
 }

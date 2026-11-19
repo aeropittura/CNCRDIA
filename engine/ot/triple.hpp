@@ -28,11 +28,11 @@ public:
         case 1:
             return 1;
         default:
-            throw bad_value();
+            throw BadValue();
         }
     }
 
-    T& byIndex(int l, int j)
+    T& by_index(int l, int j)
     {
         switch (l)
         {
@@ -43,31 +43,31 @@ public:
         case 2:
             return c[j];
         default:
-            throw bad_value();
+            throw BadValue();
         }
     }
 
     template <int M>
-    void amplify(const Triple<T,M>& uncheckedTriple, PRNG& G)
+    void amplify(const Triple<T,M>& unchecked_triple, PRNG& G)
     {
-        b = uncheckedTriple.b;
+        b = unchecked_triple.b;
         for (int i = 0; i < N; i++)
             for (int j = 0; j < M; j++)
             {
                 typename T::value_type r;
                 r.randomize(G);
-                a[i] += r * uncheckedTriple.a[j];
-                c[i] += r * uncheckedTriple.c[j];
+                a[i] += r * unchecked_triple.a[j];
+                c[i] += r * unchecked_triple.c[j];
             }
     }
 
-    void output(ostream& outputStream, int n = N, bool human = false)
+    void output(ostream& output_stream, int n = N, bool human = false)
     {
         for (int i = 0; i < n; i++)
         {
-            a[i].output(outputStream, human);
-            b.output(outputStream, human);
-            c[i].output(outputStream, human);
+            a[i].output(output_stream, human);
+            b.output(output_stream, human);
+            c[i].output(output_stream, human);
         }
     }
 
@@ -76,7 +76,7 @@ public:
     {
         Triple<V, 1> triple;
         for (int i = 0; i < 3; i++)
-            triple.byIndex(i, 0) = byIndex(i, 0);
+            triple.by_index(i, 0) = by_index(i, 0);
         return triple;
     }
 };
@@ -85,13 +85,13 @@ template <class T, int N>
 class PlainTriple : public Triple<T,N>
 {
 public:
-    // this assumes that valueBits[1] is still set to the bits of b
-    void to(vector<BitVector>& valueBits, int i, int repeat = N)
+    // this assumes that value_bits[1] is still set to the bits of b
+    void to(vector<BitVector>& value_bits, int i, int repeat = N)
     {
         for (int j = 0; j < N; j++)
         {
-            valueBits[0].set_portion(i * repeat + j, this->a[j]);
-            valueBits[2].set_portion(i * repeat + j, this->c[j]);
+            value_bits[0].set_portion(i * repeat + j, this->a[j]);
+            value_bits[2].set_portion(i * repeat + j, this->c[j]);
         }
     }
 };
@@ -127,24 +127,24 @@ public:
 template <class U, int N>
 class ShareTriple : public Triple<U, N>
 {
-    typedef typename U::open_type T;
+    typedef typename U::OpenType T;
 
 public:
     template<class V>
     void from(PlainTriple<T,N>& triple,
-            int iTriple, const NPartyTripleGenerator<V>& generator)
+            int i_triple, const NPartyTripleGenerator<V>& generator)
     {
         for (int l = 0; l < 3; l++)
         {
             int repeat = this->repeat(l, generator.machine.check);
             for (int j = 0; j < repeat; j++)
             {
-                typename U::share_type value = triple.byIndex(l,j);
-                typename U::mac_type mac;
+                typename U::ShareType value = triple.by_index(l,j);
+                typename U::MacType mac;
                 mac = (value * generator.get_mac_key());
                 for (int i = 0; i < generator.nparties-1; i++)
-                    mac += generator.ot_multipliers[i]->macs.at(l).at(iTriple * repeat + j);
-                U& share = this->byIndex(l,j);
+                    mac += generator.ot_multipliers[i]->macs.at(l).at(i_triple * repeat + j);
+                U& share = this->by_index(l,j);
                 share.set_share(value);
                 share.set_mac(mac);
             }
@@ -157,17 +157,17 @@ class TripleToSacrifice : public Triple<T, 1>
 {
 public:
     template <class W>
-    void prepare_sacrifice(const Triple<T, 2>& uncheckedTriple, PRNG& G)
+    void prepare_sacrifice(const Triple<T, 2>& unchecked_triple, PRNG& G)
     {
-        this->b = uncheckedTriple.b;
-        typename W::mac_key_type t;
+        this->b = unchecked_triple.b;
+        typename W::MacKeyType t;
         t.randomize(G);
-        this->a[0] = uncheckedTriple.a[0] * t - uncheckedTriple.a[1];
-        this->c[0] = uncheckedTriple.c[0] * t - uncheckedTriple.c[1];
+        this->a[0] = unchecked_triple.a[0] * t - unchecked_triple.a[1];
+        this->c[0] = unchecked_triple.c[0] * t - unchecked_triple.c[1];
     }
 
-    T computeCheckShare(const typename T::open_type& maskedA)
+    T compute_check_share(const typename T::OpenType& masked_a)
     {
-        return this->c[0] - maskedA * this->b;
+        return this->c[0] - masked_a * this->b;
     }
 };

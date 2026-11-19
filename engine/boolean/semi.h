@@ -15,11 +15,11 @@ class SemiSecureShuffle;
 
 class Semi : public Beaver<SemiSecret>
 {
-    typedef Beaver<SemiSecret> super;
+    typedef Beaver<SemiSecret> Super;
 
 public:
     Semi(Player& P) :
-            super(P)
+            Super(P)
     {
     }
 

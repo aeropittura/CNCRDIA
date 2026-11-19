@@ -12,7 +12,7 @@
  * This creates the "pseudo-encryption" of the R_q element mess,
  *   - As required for key switching.
  */
-void Encrypt_Rq_Element(Ciphertext& c,const Rq_Element& mess, const Random_Coins& rc,
+void Encrypt_Rq_Element(Ciphertext& c,const RqElement& mess, const RandomCoins& rc,
         const FHE_PK& pk)
 {
     auto c1 = pk.a() * rc.u() + rc.v() * pk.p();
@@ -26,17 +26,17 @@ void Encrypt_Rq_Element(Ciphertext& c,const Rq_Element& mess, const Random_Coins
 }
 
 
-void DistKeyGen::fake(FHE_PK& pk, vector<FHE_SK>& sks, const bigint& p, int nparties)
+void DistKeyGenerator::fake(FHE_PK& pk, vector<FHE_SK>& sks, const Bigint& p, int nparties)
 {
-    vector<DistKeyGen> dkgs(nparties, {pk.get_params(), p});
-    sks.resize(nparties, {pk.get_params(), p});
-    vector<Rq_Element> secrets(nparties, pk.get_params());
+    vector<DistKeyGenerator> dkgs(nparties, {pk.get_parameters(), p});
+    sks.resize(nparties, {pk.get_parameters(), p});
+    vector<RqElement> secrets(nparties, pk.get_parameters());
     PRNG G;
-    G.ReSeed();
+    G.re_seed();
     for (int i = 0; i < nparties; i++)
-        dkgs[i].Gen_Random_Data(G);
+        dkgs[i].gen_random_data(G);
 
-    Rq_Element a = dkgs[0].a;
+    RqElement a = dkgs[0].a;
     for (size_t i = 1; i < dkgs.size(); i++)
         a += dkgs[i].a;
     for (int i = 0; i < nparties; i++)
@@ -46,7 +46,7 @@ void DistKeyGen::fake(FHE_PK& pk, vector<FHE_SK>& sks, const bigint& p, int npar
         secrets[i] = dkgs[i].secret;
     }
 
-    Rq_Element b = dkgs[0].b;
+    RqElement b = dkgs[0].b;
     for (size_t i = 1; i < dkgs.size(); i++)
         b += dkgs[i].b;
     pk.check_noise(b - a * sum(secrets));
@@ -69,9 +69,9 @@ void DistKeyGen::fake(FHE_PK& pk, vector<FHE_SK>& sks, const bigint& p, int npar
         pk.check_noise(dkgs[i].b - dkgs[i].a * sum(secrets));
     }
 
-    Rq_Element s = sum(secrets);
+    RqElement s = sum(secrets);
     s.lower_level();
-    FHE_SK sk(pk.get_params(), p);
+    FHE_SK sk(pk.get_parameters(), p);
     sk.assign(s);
 
     Ciphertext enc = dkgs[0].enc;
@@ -93,7 +93,7 @@ void DistKeyGen::fake(FHE_PK& pk, vector<FHE_SK>& sks, const bigint& p, int npar
 }
 
 
-DistKeyGen::DistKeyGen(const FHE_Params& params, const bigint& p) :
+DistKeyGenerator::DistKeyGenerator(const FheParameters& params, const Bigint& p) :
         params(params), rc1(params), rc2(params), secret(params, evaluation,
                 evaluation), a(params, evaluation, evaluation), e(params,
                 evaluation, evaluation), b(params, evaluation, evaluation), pk(
@@ -104,16 +104,16 @@ DistKeyGen::DistKeyGen(const FHE_Params& params, const bigint& p) :
 /*
  * Generate the random data used in key generation
  */
-void DistKeyGen::Gen_Random_Data(PRNG& G)
+void DistKeyGenerator::gen_random_data(PRNG& G)
 {
-    secret.from(GaussianGenerator<bigint>(params.get_DG(), G));
+    secret.from(GaussianGenerator<Bigint>(params.get_dg(), G));
     rc1.generate(G);
     rc2.generate(G);
     a.randomize(G);
-    e.from(GaussianGenerator<bigint>(params.get_DG(), G));
+    e.from(GaussianGenerator<Bigint>(params.get_dg(), G));
 }
 
-DistKeyGen& DistKeyGen::operator+=(const DistKeyGen& other)
+DistKeyGenerator& DistKeyGenerator::operator+=(const DistKeyGenerator& other)
 {
     secret += other.secret;
     a += other.a;
@@ -121,12 +121,12 @@ DistKeyGen& DistKeyGen::operator+=(const DistKeyGen& other)
     return *this;
 }
 
-void DistKeyGen::sum_a(const vector<Rq_Element>& as)
+void DistKeyGenerator::sum_a(const vector<RqElement>& as)
 {
     a = sum(as);
 }
 
-void DistKeyGen::compute_b()
+void DistKeyGenerator::compute_b()
 {
     mul(b, a, secret);
     mul(e, e, p);
@@ -134,40 +134,40 @@ void DistKeyGen::compute_b()
     pk.check_noise(b - a * secret);
 }
 
-void DistKeyGen::compute_enc_dash(const vector<Rq_Element>& bs)
+void DistKeyGenerator::compute_enc_dash(const vector<RqElement>& bs)
 {
     b = sum(bs);
     compute_enc_dash();
 }
 
-void DistKeyGen::compute_enc_dash()
+void DistKeyGenerator::compute_enc_dash()
 {
-    Rq_Element dummy(params);
+    RqElement dummy(params);
     pk.assign(a,b,dummy,dummy);
 
     secret.raise_level();
-    Rq_Element ps(secret);
-    ps.mul_by_p1();
+    RqElement ps(secret);
+    ps.mult_by_p1();
     ps.negate();
     Encrypt_Rq_Element(enc_dash, ps, rc1, pk);
 }
 
-void DistKeyGen::compute_enc(const vector<Ciphertext>& enc_dashs)
+void DistKeyGenerator::compute_enc(const vector<Ciphertext>& enc_dashs)
 {
     enc_dash = sum(enc_dashs);
     compute_enc();
 }
 
-void DistKeyGen::compute_enc()
+void DistKeyGenerator::compute_enc()
 {
     Ciphertext enc_zero(params);
-    Rq_Element zero(Rq_Element(params.FFTD(), polynomial,polynomial));
+    RqElement zero(RqElement(params.FFTD(), polynomial,polynomial));
     zero.assign_zero();
     pk.quasi_encrypt(enc_zero, zero, rc2);
 
     // Create global key-switching data
-    Rq_Element e0(enc_dash.c0());
-    Rq_Element e1(enc_dash.c1());
+    RqElement e0(enc_dash.c0());
+    RqElement e1(enc_dash.c1());
     mul(e0, e0, secret);
     mul(e1, e1, secret);
     enc.set(e0, e1, pk);
@@ -175,19 +175,19 @@ void DistKeyGen::compute_enc()
     add(enc, enc, enc_zero);
 }
 
-void DistKeyGen::sum_enc(const vector<Ciphertext>& encs)
+void DistKeyGenerator::sum_enc(const vector<Ciphertext>& encs)
 {
     enc = sum(encs);
 }
 
-void DistKeyGen::finalize(FHE_PK& pk, FHE_SK& sk)
+void DistKeyGenerator::finalize(FHE_PK& pk, FHE_SK& sk)
 {
     pk.assign(a, b, enc.c1(), enc.c0());
     secret.lower_level();
     sk.assign(secret);
 }
 
-void DistKeyGen::check_equality(const DistKeyGen& other)
+void DistKeyGenerator::check_equality(const DistKeyGenerator& other)
 {
     if (a != other.a)
         throw runtime_error("no match at a");
@@ -201,21 +201,21 @@ void DistKeyGen::check_equality(const DistKeyGen& other)
 
 
 /*
- * Simulate an execution of KeyGen to check that these nplayers seeds
+ * Simulate an execution of key_gen to check that these nplayers seeds
  * produce the correct public key.
  */
-void check_randomness(vector<octetStream>& seeds,
+void check_randomness(vector<OctetStream>& seeds,
                       const Ciphertext& actual_sw,const FHE_PK& pk,
                       const Ciphertext& enc_dash,
                       int num_players)
 {
-    const FHE_Params& params=actual_sw.get_params();
+    const FheParameters& params=actual_sw.get_parameters();
 
-    vector<DistKeyGen> playerKeys(num_players, {params, pk.p()});
-    DistKeyGen globalKey(params, pk.p());
+    vector<DistKeyGenerator> player_keys(num_players, {params, pk.p()});
+    DistKeyGenerator global_key(params, pk.p());
 
-    Rq_Element b(Rq_Element(params.FFTD(), evaluation, evaluation));
-    Rq_Element zero(Rq_Element(params.FFTD(), polynomial,polynomial));
+    RqElement b(RqElement(params.FFTD(), evaluation, evaluation));
+    RqElement zero(RqElement(params.FFTD(), polynomial,polynomial));
     zero.assign_zero();
 
     Ciphertext ed(params), ed_sum(params), ezero(params), ezero_sum(params);
@@ -227,47 +227,47 @@ void check_randomness(vector<octetStream>& seeds,
 #ifdef VERBOSE_KEYGEN
         cout << "\tSeed for player " << i << " is..." << seeds[i] << endl;
 #endif
-        playerKeys[i].Gen_Random_Data(G);
-        globalKey += playerKeys[i];
+        player_keys[i].gen_random_data(G);
+        global_key += player_keys[i];
       }
-    mul(b, globalKey.a, globalKey.secret);
-    mul(globalKey.e, globalKey.e, pk.p());
-    add(b, b, globalKey.e);
+    mul(b, global_key.a, global_key.secret);
+    mul(global_key.e, global_key.e, pk.p());
+    add(b, b, global_key.e);
 
     // Check the main pk (a,b)
-    if (!pk.a().equals(globalKey.a))
-        throw bad_keygen("a doesn't match");
+    if (!pk.a().equals(global_key.a))
+        throw BadKeygen("a doesn't match");
     if (!pk.b().equals(b))
-        throw bad_keygen("b doesn't match");
+        throw BadKeygen("b doesn't match");
 
 
     // Compute the key-switching data
     for (int i = 0; i < num_players; i++)
     {
-        Rq_Element zero_q(params.FFTD(), evaluation, evaluation);
+        RqElement zero_q(params.FFTD(), evaluation, evaluation);
         zero_q.assign_zero();
-        Encrypt_Rq_Element(ed, zero_q, playerKeys[i].rc1, pk);
+        Encrypt_Rq_Element(ed, zero_q, player_keys[i].rc1, pk);
         add(ed_sum, ed_sum, ed);
-        pk.quasi_encrypt(ezero, zero, playerKeys[i].rc2);
+        pk.quasi_encrypt(ezero, zero, player_keys[i].rc2);
         add(ezero_sum, ezero_sum, ezero);
     }
 
-    globalKey.secret.raise_level();
-    Rq_Element ps(globalKey.secret);
-    ps.mul_by_p1(); ps.negate();
+    global_key.secret.raise_level();
+    RqElement ps(global_key.secret);
+    ps.mult_by_p1(); ps.negate();
 
-    Rq_Element enc0(ed_sum.c0());
-    Rq_Element enc1(ed_sum.c1());
+    RqElement enc0(ed_sum.c0());
+    RqElement enc1(ed_sum.c1());
 
     add(enc0, enc0, ps);
 
     if (enc1 != enc_dash.c1())
-        throw bad_keygen("c1 of enc_dash");
+        throw BadKeygen("c1 of enc_dash");
     if (enc0 != enc_dash.c0())
-        throw bad_keygen("c0 of enc_dash");
+        throw BadKeygen("c0 of enc_dash");
 
-    mul(enc0, enc0, globalKey.secret);
-    mul(enc1, enc1, globalKey.secret);
+    mul(enc0, enc0, global_key.secret);
+    mul(enc1, enc1, global_key.secret);
     ed_sum.set(enc0, enc1, pk);
     add(ed_sum, ed_sum, ezero_sum);
 
@@ -275,7 +275,7 @@ void check_randomness(vector<octetStream>& seeds,
     if (!ed_sum.c0().equals(actual_sw.c0()) ||
         !ed_sum.c1().equals(actual_sw.c1()))
       {
-        throw bad_keygen("switching key doesn't match");
+        throw BadKeygen("switching key doesn't match");
       }
 }
 
@@ -285,11 +285,11 @@ void check_randomness(vector<octetStream>& seeds,
 /* sk will become the share of the secret key
  * pk will become the global public key
  */
-void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
+void run_gen_protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
                       bool commit)
 {
   CODE_LOCATION
-  const FHE_Params& params=pk.get_params();
+  const FheParameters& params=pk.get_parameters();
 
 #ifdef VERBOSE_KEYGEN
   double start,stop;
@@ -301,9 +301,9 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
 
   // First compute and commit to the challenge value
   vector<unsigned int> e(P.num_players());
-  vector<octetStream> Comm_e(P.num_players());
-  vector<octetStream> Open_e(P.num_players());
-  Commit_To_Challenge(e,Comm_e,Open_e,P,num_runs);
+  vector<OctetStream> communication_e(P.num_players());
+  vector<OctetStream> open_e(P.num_players());
+  commit_to_challenge(e,communication_e,open_e,P,num_runs);
 
 #ifdef VERBOSE_KEYGEN
   cout << "Done Step 1 " << endl;
@@ -316,12 +316,12 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
   /***********************
    *       Step 2        *
    ***********************/
-  vector< vector<octetStream> > seeds(num_runs, vector<octetStream>(P.num_players()));
-  vector< vector<octetStream> > Comm_seeds(num_runs,  vector<octetStream>(P.num_players()));
-  vector<octetStream> Open_seeds(num_runs);
+  vector< vector<OctetStream> > seeds(num_runs, vector<OctetStream>(P.num_players()));
+  vector< vector<OctetStream> > communication_seeds(num_runs,  vector<OctetStream>(P.num_players()));
+  vector<OctetStream> open_seeds(num_runs);
 
   vector<PRNG> G(num_runs);
-  Commit_To_Seeds(G,seeds,Comm_seeds,Open_seeds,P,num_runs);
+  commit_to_seeds(G,seeds,communication_seeds,open_seeds,P,num_runs);
 
 #ifdef VERBOSE_KEYGEN
   cout << "Done Step 2 " << endl;
@@ -336,14 +336,14 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
    ***********************/
 
   // Generate my random data
-  vector<DistKeyGen> keys(num_runs, {params, pk.p()});
+  vector<DistKeyGenerator> keys(num_runs, {params, pk.p()});
 
-  vector< vector<Rq_Element> > a(num_runs, vector<Rq_Element>(P.num_players(),Rq_Element(params.FFTD(), evaluation, evaluation)));
+  vector< vector<RqElement> > a(num_runs, vector<RqElement>(P.num_players(),RqElement(params.FFTD(), evaluation, evaluation)));
 
 
   for (int i = 0; i < num_runs; i++)
     {
-      keys[i].Gen_Random_Data(G[i]);
+      keys[i].gen_random_data(G[i]);
       a[i][P.my_num()] = keys[i].a;
     }
 
@@ -354,7 +354,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
     }
   else
     {
-      Transmit_Data(a,P,num_runs);
+      transmit_data(a,P,num_runs);
     }
   for (int i=0; i<num_runs; i++)
     keys[i].sum_a(a[i]);
@@ -371,7 +371,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
   /***********************
    *       Step 3        *
    ***********************/
-  vector< vector<Rq_Element> > b(num_runs, vector<Rq_Element>(P.num_players(),Rq_Element(params.FFTD(), evaluation, evaluation)));
+  vector< vector<RqElement> > b(num_runs, vector<RqElement>(P.num_players(),RqElement(params.FFTD(), evaluation, evaluation)));
   for (int i=0; i<num_runs; i++)
     {
       keys[i].compute_b();
@@ -392,7 +392,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
   if (commit)
     Commit_And_Open(b,P,num_runs);
   else
-    Transmit_Data(b,P,num_runs);
+    transmit_data(b,P,num_runs);
 
 #ifdef VERBOSE_KEYGEN
   cout << "Done Step 4 " << endl;
@@ -427,7 +427,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
   if (commit)
     Commit_And_Open(enc_dash,P,num_runs);
   else
-    Transmit_Data(enc_dash,P,num_runs);
+    transmit_data(enc_dash,P,num_runs);
 
 #ifdef VERBOSE_KEYGEN
   cout << "Done Step 7 " << endl;
@@ -461,7 +461,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
   if (commit)
     Commit_And_Open(enc,P,num_runs);
   else
-    Transmit_Data(enc,P,num_runs);
+    transmit_data(enc,P,num_runs);
 
 #ifdef VERBOSE_KEYGEN
   cout << "Done Step 11 " << endl;
@@ -489,7 +489,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
    *     Step 13/14      *
    ***********************/
 
-  int challenge=Open_Challenge(e,Open_e,Comm_e,P,num_runs);
+  int challenge=open_challenge(e,open_e,communication_e,P,num_runs);
 
 #ifdef VERBOSE_KEYGEN
   cout << "Done Step 13/14 " << endl;
@@ -503,7 +503,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
    *       Step 15       *
    ***********************/
   // Dont open the challenge run
-  Open(seeds,Comm_seeds,Open_seeds,P,num_runs,challenge);
+  Open(seeds,communication_seeds,open_seeds,P,num_runs,challenge);
 
   /********************************************************************/
 
@@ -529,7 +529,7 @@ void Run_Gen_Protocol(FHE_PK& pk,FHE_SK& sk,const Player& P,int num_runs,
   start=clock();
 #endif
 
-  P.Check_Broadcast();
+  P.check_broadcast();
 #ifdef VERBOSE_KEYGEN
   cout << "Broadcast check all passed" << endl;
 

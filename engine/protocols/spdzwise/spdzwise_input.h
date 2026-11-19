@@ -21,7 +21,7 @@ class SpdzWiseInput : public InputBase<T>
     typename T::Protocol checker;
     SubProcessor<T>* proc;
 
-    typename T::mac_key_type mac_key;
+    typename T::MacKeyType mac_key;
 
     vector<int> counters;
     vector<PointerVector<T>> shares;
@@ -29,11 +29,11 @@ class SpdzWiseInput : public InputBase<T>
 public:
     SpdzWiseInput(SubProcessor<T>& proc, Player& P);
     SpdzWiseInput(SubProcessor<T>* proc, Player& P);
-    SpdzWiseInput(SubProcessor<T>& proc, typename T::MAC_Check& MC);
+    SpdzWiseInput(SubProcessor<T>& proc, typename T::MacCheck& MC);
     ~SpdzWiseInput();
 
     void reset(int player);
-    void add_mine(const typename T::open_type& input, int n_bits = -1);
+    void add_mine(const typename T::OpenType& input, int n_bits = -1);
     void add_other(int player, int n_bits = -1);
     void exchange();
     T finalize(int player, int n_bits = -1);

@@ -8,5 +8,5 @@
 
 int main(int argc, const char** argv)
 {
-    RealProgramParty<Rep3Share<gf2n_long>>(argc, argv);
+    RealProgramParty<Rep3Share<Gf2nLong>>(argc, argv);
 }

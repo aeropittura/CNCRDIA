@@ -18,7 +18,7 @@ template <class U>
 bool Matrix<U>::operator==(Matrix<U>& other)
 {
     if (squares.size() != other.squares.size())
-        throw invalid_length("Matrix");
+        throw InvalidLength("Matrix");
     for (size_t i = 0; i < squares.size(); i++)
         if (not(squares[i] == other.squares[i]))
             return false;
@@ -78,14 +78,14 @@ void Matrix<U>::print_conditional(BitVector& conditions)
 }
 
 template <class U>
-void Matrix<U>::pack(octetStream& os) const
+void Matrix<U>::pack(OctetStream& os) const
 {
     for (size_t i = 0; i < squares.size(); i++)
         squares[i].pack(os);
 }
 
 template <class U>
-void Matrix<U>::unpack(octetStream& os)
+void Matrix<U>::unpack(OctetStream& os)
 {
     for (size_t i = 0; i < squares.size(); i++)
         squares[i].unpack(os);
@@ -108,7 +108,7 @@ template <class U>
 Slice<U>& Slice<U>::rsub(Slice<U>& other)
 {
     if (bm.squares.size() < other.end)
-        throw invalid_length("rsub");
+        throw InvalidLength("rsub");
     for (size_t i = other.start; i < other.end; i++)
         bm.squares[i].rsub(other.bm.squares[i]);
     return *this;
@@ -118,11 +118,11 @@ template <class U>
 Slice<U>& Slice<U>::sub(BitVector& other, int repeat)
 {
     if (end * U::PartType::n_columns() > other.size() * repeat)
-        throw invalid_length(to_string(U::PartType::n_columns()));
+        throw InvalidLength(to_string(U::PartType::n_columns()));
     for (size_t i = start; i < end; i++)
     {
         if (repeat > 0)
-            bm.squares[i].sub(other.get_ptr_to_byte(i / repeat,
+            bm.squares[i].sub(other.get_pointer_to_byte(i / repeat,
                     U::PartType::n_row_bytes()));
         else
             bm.squares[i].bit_sub(other, i * U::PartType::n_rows_allocated());
@@ -138,10 +138,10 @@ void Slice<U>::randomize(int row, PRNG& G)
 }
 
 template <class U>
-void Slice<U>::conditional_add(BitVector& conditions, U& other, bool useOffset)
+void Slice<U>::conditional_add(BitVector& conditions, U& other, bool use_offset)
 {
     for (size_t i = start; i < end; i++)
-        bm.squares[i].conditional_add(conditions, other.squares[i], useOffset * i);
+        bm.squares[i].conditional_add(conditions, other.squares[i], use_offset * i);
 }
 
 template <class U>
@@ -157,7 +157,7 @@ void Slice<U>::print()
 }
 
 template <class U>
-void Slice<U>::pack(octetStream& os) const
+void Slice<U>::pack(OctetStream& os) const
 {
     os.reserve(U::PartType::size() * (end - start));
     for (size_t i = start; i < end; i++)
@@ -165,7 +165,7 @@ void Slice<U>::pack(octetStream& os) const
 }
 
 template <class U>
-void Slice<U>::unpack(octetStream& os)
+void Slice<U>::unpack(OctetStream& os)
 {
     for (size_t i = start; i < end; i++)
         bm.squares[i].unpack(os);

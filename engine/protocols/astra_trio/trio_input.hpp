@@ -14,14 +14,14 @@ T TrioInput<T>::finalize_offset(int offset)
     if (offset == 0)
     {
         res = this->my_results.next();
-        res.m(-1) = this->send_os.template get_no_check<typename T::open_type>()
+        res.m(-1) = this->send_os.template get_no_check<typename T::OpenType>()
                 + res.neg_lambda(-1);
     }
     else
     {
         res = this->results.next();
         res.m(-1) = this->recv_os.template get_no_check<
-                typename T::open_type>();
+                typename T::OpenType>();
     }
     return res;
 }

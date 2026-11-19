@@ -11,7 +11,7 @@
 template<class T>
 class MatrixFile : public Preprocessing<ShareMatrix<T>>
 {
-    typedef Preprocessing<ShareMatrix<T>> super;
+    typedef Preprocessing<ShareMatrix<T>> Super;
 
     array<int, 3> dims;
 
@@ -19,10 +19,10 @@ class MatrixFile : public Preprocessing<ShareMatrix<T>>
 
 public:
     MatrixFile(array<int, 3> dims, DataPositions& usage, Player& P) :
-            super(usage), dims(dims)
+            Super(usage), dims(dims)
     {
         string filename = PrepBase::get_matrix_prefix(
-                        get_prep_sub_dir<T>(P.num_players()), dims) + "-P"
+                        get_prep_sub_directory<T>(P.num_players()), dims) + "-P"
                         + to_string(P.my_num());
         file.open(filename);
         check_file_signature<T>(file, filename);

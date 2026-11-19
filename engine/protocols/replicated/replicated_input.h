@@ -30,10 +30,10 @@ public:
     virtual ~PrepLessInput() {}
 
     virtual void reset(int player) = 0;
-    virtual void add_mine(const typename T::open_type& input,
+    virtual void add_mine(const typename T::OpenType& input,
             int n_bits = -1) = 0;
     virtual void add_other(int player, int n_bits = - 1) = 0;
-    virtual void finalize_other(int player, T& target, octetStream& o,
+    virtual void finalize_other(int player, T& target, OctetStream& o,
             int n_bits = -1) = 0;
 
     T finalize_mine() final;
@@ -47,24 +47,24 @@ class ReplicatedInput : public PrepLessInput<T>
 {
     SubProcessor<T>* proc;
     Player& P;
-    vector<octetStream> os;
-    SeededPRNG secure_prng;
+    vector<OctetStream> os;
+    SeededPrng secure_prng;
     ReplicatedBase protocol;
     vector<bool> expect;
-    octetStream dest;
-    octetStream* to_send;
+    OctetStream dest;
+    OctetStream* to_send;
 
 public:
     ReplicatedInput(SubProcessor<T>& proc) :
             ReplicatedInput(&proc, proc.P)
     {
     }
-    ReplicatedInput(SubProcessor<T>& proc, ReplicatedMC<T>& MC) :
+    ReplicatedInput(SubProcessor<T>& proc, ReplicatedOpener<T>& MC) :
             ReplicatedInput(proc)
     {
         (void) MC;
     }
-    ReplicatedInput(typename T::MAC_Check& MC, Preprocessing<T>& prep, Player& P,
+    ReplicatedInput(typename T::MacCheck& MC, Preprocessing<T>& prep, Player& P,
             typename T::Protocol* = 0) :
             ReplicatedInput(P)
     {
@@ -99,12 +99,12 @@ public:
 
     void reset(int player);
     void prepare(size_t n_inputs);
-    void add_mine(const typename T::open_type& input, int n_bits = -1) final;
-    void add_mine_prepared(T& share, const typename T::open_type& input);
+    void add_mine(const typename T::OpenType& input, int n_bits = -1) final;
+    void add_mine_prepared(T& share, const typename T::OpenType& input);
     void add_other(int player, int n_bits = -1);
     void send_mine();
     void exchange();
-    void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
+    void finalize_other(int player, T& target, OctetStream& o, int n_bits = -1);
     T finalize_offset(int offset);
 
     void add_mine(const span<T>& shares,

@@ -9,16 +9,16 @@
 using namespace std;
 
 template<class T>
-class dabit : public pair<T, typename T::bit_type::part_type>
+class Dabit : public pair<T, typename T::BitType::part_type>
 {
-    typedef pair<T, typename T::bit_type::part_type> super;
+    typedef pair<T, typename T::BitType::part_type> Super;
 
 public:
-    typedef typename T::bit_type::part_type bit_type;
+    typedef typename T::BitType::part_type BitType;
 
     static int size()
     {
-        return T::size() + bit_type::size();
+        return T::size() + BitType::size();
     }
 
     static string type_string()
@@ -26,17 +26,17 @@ public:
         return T::type_string();
     }
 
-    static void specification(octetStream& os)
+    static void specification(OctetStream& os)
     {
         T::specification(os);
     }
 
-    dabit()
+    Dabit()
     {
     }
 
-    dabit(const T& a, const bit_type& b) :
-            super(a, b)
+    Dabit(const T& a, const BitType& b) :
+            Super(a, b)
     {
     }
 
@@ -52,13 +52,13 @@ public:
         this->second.output(out, human);
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         this->first.pack(os);
         this->second.pack(os);
     }
 
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
         this->first.unpack(os);
         this->second.unpack(os);

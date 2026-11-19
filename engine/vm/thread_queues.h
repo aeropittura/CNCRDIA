@@ -51,10 +51,10 @@ public:
     void wrap_up(ThreadJob job);
     void wrap_up(ThreadJob job, vector<int>& to_use);
 
-    TimerWithComm sum(const string& phase);
+    TimerWithCommunication sum(const string& phase);
 
     void print_breakdown();
 
-    ThreadStats total_stats();
-    NamedCommStats max_comm();
+    ThreadStatistics total_statistics();
+    NamedCommunicationStatistics max_communication();
 };

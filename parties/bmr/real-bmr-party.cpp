@@ -11,5 +11,5 @@
 
 int main(int argc, const char** argv)
 {
-	RealProgramParty<Share<gf2n_long>>(argc, argv);
+	RealProgramParty<Share<Gf2nLong>>(argc, argv);
 }

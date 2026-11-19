@@ -54,14 +54,14 @@ void Thread<T>::run()
          throw runtime_error("there can only be one");
     singleton = this;
     BaseMachine::s().thread_num = thread_num;
-    secure_prng.ReSeed();
+    secure_prng.re_seed();
     string id = "T" + to_string(thread_num);
     if (machine.use_encryption)
         P = new CryptoPlayer(N, id);
     else
         P = new PlainPlayer(N, id);
     processor.open_input_file(N.my_num(), thread_num,
-            master.opts.cmd_private_input_file);
+            master.opts.command_private_input_file);
     processor.setup_redirection(P->my_num(), thread_num, master.opts,
             processor.out);
 

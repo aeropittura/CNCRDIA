@@ -24,21 +24,21 @@ class TinyShare : public Spdz2kShare<1, S>, public ShareSecret<TinySecret<S>>
     typedef TinyShare This;
 
 public:
-    typedef Spdz2kShare<1, S> super;
+    typedef Spdz2kShare<1, S> Super;
 
     typedef void DynamicMemory;
 
     typedef Beaver<This> Protocol;
-    typedef MAC_Check_Z2k_<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef MacCheckZ2k_<This> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ::Input<This> Input;
     typedef TinierSharePrep<This> LivePrep;
 
-    typedef SwitchableOutput out_type;
+    typedef SwitchableOutput OutType;
 
-    typedef This small_type;
+    typedef This SmallType;
 
-    typedef NoShare bit_type;
+    typedef NoShare BitType;
 
     static string name()
     {
@@ -48,12 +48,12 @@ public:
     TinyShare()
     {
     }
-    TinyShare(const typename super::super::super& other) :
-            super(other)
+    TinyShare(const typename Super::Super::Super& other) :
+            Super(other)
     {
     }
-    TinyShare(const super& other) :
-            super(other)
+    TinyShare(const Super& other) :
+            Super(other)
     {
     }
 
@@ -65,7 +65,7 @@ public:
     void public_input(bool input)
     {
         auto& party = this->get_party();
-        *this = super::constant(input, party.P->my_num(),
+        *this = Super::constant(input, party.P->my_num(),
                 party.MC->get_alphai());
     }
 };

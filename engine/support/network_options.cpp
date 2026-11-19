@@ -8,7 +8,7 @@
 
 using namespace std;
 
-NetworkOptions::NetworkOptions(ez::ezOptionParser& opt, int argc,
+NetworkOptions::NetworkOptions(ez::EzOptionParser& opt, int argc,
         const char** argv)
 {
     opt.add(
@@ -32,10 +32,10 @@ NetworkOptions::NetworkOptions(ez::ezOptionParser& opt, int argc,
     opt.parse(argc, argv);
     opt.get("-pn")->getInt(portnum_base);
     opt.get("-h")->getString(hostname);
-    opt.resetArgs();
+    opt.reset_args();
 }
 
-NetworkOptionsWithNumber::NetworkOptionsWithNumber(ez::ezOptionParser& opt,
+NetworkOptionsWithNumber::NetworkOptionsWithNumber(ez::EzOptionParser& opt,
         int argc, const char** argv, int default_nplayers, bool variable_nplayers) :
         NetworkOptions(opt, argc, argv)
 {
@@ -69,7 +69,7 @@ NetworkOptionsWithNumber::NetworkOptionsWithNumber(ez::ezOptionParser& opt,
 
     opt.get("-ip")->getString(ip_filename);
 
-    opt.resetArgs();
+    opt.reset_args();
 }
 
 Server* NetworkOptionsWithNumber::start_networking(Names& N, int my_num)

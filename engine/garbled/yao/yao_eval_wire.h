@@ -19,7 +19,7 @@ class ProcessorBase;
 
 class YaoEvalWire : public YaoWire
 {
-	typedef GC::Secret<YaoEvalWire> whole_type;
+	typedef GC::Secret<YaoEvalWire> WholeType;
 
 public:
 	typedef YaoEvaluator Party;
@@ -28,7 +28,7 @@ public:
 
 	static string name() { return "YaoEvalWire"; }
 
-	typedef SwitchableOutput out_type;
+	typedef SwitchableOutput OutType;
 
 	static void andrs(GC::Processor<GC::Secret<YaoEvalWire>>& processor,
 			const ArgVector& args)
@@ -60,7 +60,7 @@ public:
 	static void sync(vector<Integer>& values, Player* P);
 	static void reveal_inst(Processor& processor, const ArgVector& args);
 
-	static void convcbit2s(GC::Processor<whole_type>& processor,
+	static void convcbit2s(GC::Processor<WholeType>& processor,
 			const BaseInstruction& instruction);
 
 	static void run_tapes(const ArgVector& args);

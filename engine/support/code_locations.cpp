@@ -18,7 +18,7 @@ void CodeLocations::maybe_output(const char* file, int line,
 void CodeLocations::output(const char* file, int line,
         const char* function)
 {
-    location_type location({file, line, function});
+    LocationType location({file, line, function});
     lock.lock();
     bool always = OnlineOptions::singleton.has_option("all_locations");
     if (always or done.find(location) == done.end())

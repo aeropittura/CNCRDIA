@@ -10,16 +10,16 @@
 
 template<class T>
 void RingOnlyPrep<T>::buffer_dabits_from_bits_without_check(
-        vector<dabit<T> >& dabits, int buffer_size, ThreadQueues*)
+        vector<Dabit<T> >& dabits, int buffer_size, ThreadQueues*)
 {
     CODE_LOCATION
-    vector<dabit<T>> new_dabits;
+    vector<Dabit<T>> new_dabits;
     assert(this->proc != 0);
-    auto& party = GC::ShareThread<typename T::bit_type>::s();
-    typedef typename T::bit_type::part_type BT;
-    SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+    auto& party = GC::ShareThread<typename T::BitType>::s();
+    typedef typename T::BitType::part_type BT;
+    SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
             this->proc->bit_prep, this->proc->P);
-    typename T::bit_type::part_type::Input input(bit_proc);
+    typename T::BitType::part_type::Input input(bit_processor);
     input.reset_all(this->proc->P);
     BufferScope scope(*this, buffer_size);
     for (int i = 0; i < buffer_size; i++)

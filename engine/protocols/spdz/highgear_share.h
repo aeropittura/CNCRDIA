@@ -11,11 +11,11 @@ template<class T>
 class HighGearShare : public ChaiGearShare<T>
 {
     typedef HighGearShare This;
-    typedef ChaiGearShare<T> super;
+    typedef ChaiGearShare<T> Super;
 
 public:
-    typedef MAC_Check_<This> MAC_Check;
-    typedef Direct_MAC_Check<This> Direct_MC;
+    typedef MacCheck_<This> MacCheck;
+    typedef DirectMacCheck<This> DirectOpener;
     typedef ::Input<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef Beaver<This> BasicProtocol;
@@ -31,7 +31,7 @@ public:
 
     template<class U>
     HighGearShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 };

@@ -13,11 +13,11 @@ template<class T>
 class SohoShare : public SemiShare<T>
 {
     typedef SohoShare This;
-    typedef SemiShare<T> super;
+    typedef SemiShare<T> Super;
 
 public:
-    typedef SemiMC<This> MAC_Check;
-    typedef DirectSemiMC<This> Direct_MC;
+    typedef SemiOpener<This> MacCheck;
+    typedef DirectSemiOpener<This> DirectOpener;
     typedef SemiInput<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef Beaver<This> BasicProtocol;
@@ -33,7 +33,7 @@ public:
 
     template<class U>
     SohoShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 };

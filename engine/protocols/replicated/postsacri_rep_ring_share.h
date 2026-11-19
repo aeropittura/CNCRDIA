@@ -16,7 +16,7 @@ template<class T> class PostSacrifice;
 template<int K, int S>
 class PostSacriRepRingShare : public Rep3Share2<K>
 {
-    typedef Rep3Share2<K> super;
+    typedef Rep3Share2<K> Super;
     typedef PostSacriRepRingShare This;
 
 public:
@@ -27,21 +27,21 @@ public:
     static const bool malicious = true;
 
     typedef SignedZ2<K> clear;
-    typedef MaliciousRep3Share<Z2<K + S>> prep_type;
+    typedef MaliciousRep3Share<Z2<K + S>> PrepType;
     typedef Z2<S> random_type;
     typedef MalRepRingShare<K + 2, S> SquareToBitShare;
 
     typedef PostSacrifice<PostSacriRepRingShare> BasicProtocol;
-    typedef HashMaliciousRepMC<PostSacriRepRingShare> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef HashMaliciousRepOpener<PostSacriRepRingShare> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ReplicatedInput<PostSacriRepRingShare> Input;
-    typedef ReplicatedPO<This> PO;
+    typedef ReplicatedPo<This> PO;
     typedef SpecificPrivateOutput<This> PrivateOutput;
     typedef MalRepRingPrepWithBits<PostSacriRepRingShare> LivePrep;
     typedef MaybeHemi<This> Protocol;
     typedef DummyMatrixPrep<This> MatrixPrep;
 
-    typedef GC::MaliciousRepSecret bit_type;
+    typedef GC::MaliciousRepSecret BitType;
 
     const static bool expensive = true;
 
@@ -54,18 +54,18 @@ public:
     {
     }
     template<class U>
-    PostSacriRepRingShare(const U& other) : super(other)
+    PostSacriRepRingShare(const U& other) : Super(other)
     {
     }
 
     template<class U>
     static void split(StackedVector<U>& dest, const ArgVector& regs, int n_bits,
-            const super* source, int n_inputs,
-            typename bit_type::Protocol& protocol)
+            const Super* source, int n_inputs,
+            typename BitType::Protocol& protocol)
     {
         if (regs.size() / n_bits != 3)
             throw runtime_error("only secure with three-way split");
 
-        super::split(dest, regs, n_bits, source, n_inputs, protocol);
+        Super::split(dest, regs, n_bits, source, n_inputs, protocol);
     }
 };

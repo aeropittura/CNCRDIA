@@ -18,7 +18,7 @@ class HonestMajorityRingMachine
 {
 public:
     HonestMajorityRingMachine(int argc, const char** argv, int nplayers = 3);
-    HonestMajorityRingMachine(int argc, const char** argv, ez::ezOptionParser& opt,
+    HonestMajorityRingMachine(int argc, const char** argv, ez::EzOptionParser& opt,
             int nplayers = 3);
 };
 
@@ -26,8 +26,8 @@ template<template<int L> class U, template<class T> class V, class W>
 class RingMachine
 {
 public:
-    RingMachine(int argc, const char** argv, ez::ezOptionParser& opt,
-            OnlineOptions& online_opts, int nplayers = 0);
+    RingMachine(int argc, const char** argv, ez::EzOptionParser& opt,
+            OnlineOptions& online_options, int nplayers = 0);
 };
 
 template<template<int K, int S> class U, template<class T> class V>
@@ -35,7 +35,7 @@ class HonestMajorityRingMachineWithSecurity
 {
 public:
     HonestMajorityRingMachineWithSecurity(int argc, const char** argv,
-            ez::ezOptionParser& opt);
+            ez::EzOptionParser& opt);
 };
 
 template<template<int K> class T, template<class V> class U,
@@ -44,11 +44,11 @@ class DishonestMajorityRingMachine
 {
 public:
     DishonestMajorityRingMachine(int argc, const char** argv,
-            ez::ezOptionParser& opt, bool live_prep_default = true)
+            ez::EzOptionParser& opt, bool live_prep_default = true)
     {
-        OnlineOptions& online_opts = OnlineOptions::singleton;
-        online_opts = {opt, argc, argv, T<64>(), live_prep_default};
+        OnlineOptions& online_options = OnlineOptions::singleton;
+        online_options = {opt, argc, argv, T<64>(), live_prep_default};
 
-        RingMachine<T, U, W>(argc, argv, opt, online_opts);
+        RingMachine<T, U, W>(argc, argv, opt, online_options);
     }
 };

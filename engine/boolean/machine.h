@@ -26,7 +26,7 @@ public:
     Memory<T> MS;
     Memory<Clear> MC;
 
-    ShuffleStore<typename T::Shuffler::shuffle_type> shuffle_store;
+    ShuffleStore<typename T::Shuffler::ShuffleType> shuffle_store;
 
     template<class U>
     void reset(const U& program);
@@ -43,7 +43,7 @@ public:
     vector<Program> progs;
 
     bool use_encryption;
-    bool more_comm_less_comp;
+    bool more_communication_less_comp;
 
     Machine();
     ~Machine();

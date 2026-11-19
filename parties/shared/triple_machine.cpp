@@ -33,8 +33,8 @@ void* run_ngenerator_thread(void* ptr)
 }
 
 TripleMachine::TripleMachine(int argc, const char** argv) :
-        nConnections(1), player(0), bonding(0),
-        network_opts(opt, argc, argv, 2, true)
+        n_connections(1), player(0), bonding(0),
+        network_options(opt, argc, argv, 2, true)
 {
     opt.add(
         "1", // Default.
@@ -121,11 +121,11 @@ TripleMachine::TripleMachine(int argc, const char** argv) :
     parse_options(argc, argv);
 
     opt.get("-l")->getInt(nloops);
-    generateBits = opt.get("-B")->isSet;
-    check = opt.get("-c")->isSet || generateBits;
+    generate_bits = opt.get("-B")->isSet;
+    check = opt.get("-c")->isSet || generate_bits;
     correlation_check = opt.get("-c")->isSet;
-    generateMACs = opt.get("-m")->isSet || check;
-    amplify = opt.get("-a")->isSet || generateMACs;
+    generate_macs = opt.get("-m")->isSet || check;
+    amplify = opt.get("-a")->isSet || generate_macs;
     if (opt.isSet("-P"))
     {
         string tmp;
@@ -142,53 +142,53 @@ TripleMachine::TripleMachine(int argc, const char** argv) :
 
     // doesn't work with Montgomery multiplication
     if (prime)
-        gfpvar1::init_field(prime, false);
+        Gfpvar1::initialize_field(prime, false);
     else
-        gfpvar1::init_default(128, false);
-    gf2n_long::init_field();
-    gf2n_short::init_field();
+        Gfpvar1::initialize_default(128, false);
+    Gf2nLong::initialize_field();
+    Gf2nShort::initialize_field();
 }
 
 template<class T, class U>
-GeneratorThread* TripleMachine::new_generator(OTTripleSetup& setup, int i,
+GeneratorThread* TripleMachine::new_generator(OtTripleSetup& setup, int i,
         U& mac_key)
 {
     if (i == 0)
     {
         mac_key = T::LivePrep::get_mac_key(*player);
-        T::MAC_Check::setup(*player);
+        T::MacCheck::setup(*player);
     }
 
     if (output and i == 0)
     {
-        prep_data_dir = get_prep_sub_dir<T>(PREP_DIR, nplayers);
-        T::clear::write_setup(prep_data_dir);
-        write_mac_key(prep_data_dir, my_num, nplayers, mac_key);
+        prep_data_directory = get_prep_sub_directory<T>(PREP_DIR, nplayers);
+        T::clear::write_setup(prep_data_directory);
+        write_mac_key(prep_data_directory, my_num, nplayers, mac_key);
     }
 
-    return new typename T::TripleGenerator(setup, N[i % nConnections], i,
-            nTriplesPerThread, nloops, *this);
+    return new typename T::TripleGenerator(setup, N[i % n_connections], i,
+            n_triples_per_thread, nloops, *this);
 }
 
 void TripleMachine::run()
 {
     cout << "my_num: " << my_num << endl;
-    network_opts.start_networking(N[0], my_num);
-    nConnections = 1;
+    network_options.start_networking(N[0], my_num);
+    n_connections = 1;
     if (bonding)
     {
-        if (network_opts.ip_filename.empty())
+        if (network_options.ip_filename.empty())
         {
             cerr << "Bonding only works with --ip-file-name" << endl;
             exit(1);
         }
-        N[1].init(my_num, network_opts.portnum_base + 1000,
-                network_opts.ip_filename + "2", nplayers);
-        nConnections = 2;
+        N[1].init(my_num, network_options.portnum_base + 1000,
+                network_options.ip_filename + "2", nplayers);
+        n_connections = 2;
     }
     // do the base OTs
     PlainPlayer P(N[0], "base");
-    OTTripleSetup setup(P, true);
+    OtTripleSetup setup(P, true);
     player = &P;
 
     vector<GeneratorThread*> generators(nthreads);
@@ -197,7 +197,7 @@ void TripleMachine::run()
     for (int i = 0; i < nthreads; i++)
     {
         if (prime)
-            generators[i] = new_generator<Share<gfpvar1>>(setup, i, mac_keyp);
+            generators[i] = new_generator<Share<Gfpvar1>>(setup, i, mac_keyp);
         else if (z2k)
         {
             if (z2k == 32 and z2s == 32)
@@ -218,7 +218,7 @@ void TripleMachine::run()
                 throw runtime_error("not compiled for k=" + to_string(z2k) + " and s=" + to_string(z2s));
         }
         else
-            generators[i] = new_generator<Share<gf2n>>(setup, i, mac_key2);
+            generators[i] = new_generator<Share<Gf2n>>(setup, i, mac_key2);
     }
     ntriples = generators[0]->nTriples * nthreads;
     cout <<"Setup generators\n";

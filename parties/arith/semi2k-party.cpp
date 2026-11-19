@@ -16,6 +16,6 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     DishonestMajorityRingMachine<Semi2kShare, SemiShare>(argc, argv, opt);
 }

@@ -35,7 +35,7 @@ class SubProcessor
   StackedVector<T> S;
 
   DataPositions bit_usage;
-  NamedStats stats;
+  NamedStatistics statistics;
 
   void resize(size_t size)       { C.resize(size); S.resize(size); }
 
@@ -46,20 +46,20 @@ class SubProcessor
 
   void maybe_check();
 
-  template<class sint, class sgf2n> friend class Processor;
+  template<class Sint, class Sgf2n> friend class Processor;
   template<class U> friend class SPDZ;
   template<class U> friend class ProtocolBase;
   template<class U> friend class Beaver;
 
-  typedef typename T::bit_type::part_type BT;
+  typedef typename T::BitType::part_type BT;
 
-  typedef typename T::Protocol::Shuffler::store_type ShuffleStore;
+  typedef typename T::Protocol::Shuffler::StoreType ShuffleStore;
   typedef ShuffleTuple<
-      typename T::Protocol::Shuffler::shuffle_type> shuffle_tuple_type;
+      typename T::Protocol::Shuffler::ShuffleType> ShuffleTupleType;
 
 public:
   ArithmeticProcessor* Proc;
-  typename T::MAC_Check& MC;
+  typename T::MacCheck& MC;
   Player& P;
   Preprocessing<T>& DataF;
 
@@ -71,12 +71,12 @@ public:
 
   typename T::Protocol::Shuffler shuffler;
 
-  Binary_File_IO<T> binary_file_io;
-  Binary_File_IO<typename T::clear> binary_file_io_clear;
+  BinaryFileIo<T> binary_file_io;
+  BinaryFileIo<typename T::clear> binary_file_io_clear;
 
-  SubProcessor(ArithmeticProcessor& Proc, typename T::MAC_Check& MC,
+  SubProcessor(ArithmeticProcessor& Proc, typename T::MacCheck& MC,
       Preprocessing<T>& DataF, Player& P);
-  SubProcessor(typename T::MAC_Check& MC, Preprocessing<T>& DataF, Player& P,
+  SubProcessor(typename T::MacCheck& MC, Preprocessing<T>& DataF, Player& P,
       ArithmeticProcessor* Proc = 0);
   ~SubProcessor();
 
@@ -92,9 +92,9 @@ public:
   void matmuls(const StackedVector<T>& source, const Instruction& instruction);
   void matmulsm(const MemoryPart<T>& source, const ArgVector& args);
 
-  void matmulsm_finalize_batch(ArgVector::const_iterator startMatmul, int startI, int startJ,
-                               ArgVector::const_iterator endMatmul,
-                               int endI, int endJ);
+  void matmulsm_finalize_batch(ArgVector::const_iterator start_matmul, int start_i, int start_j,
+                               ArgVector::const_iterator end_matmul,
+                               int end_i, int end_j);
 
   void conv2ds(const Instruction& instruction);
 
@@ -108,22 +108,22 @@ public:
   void send_personal(const ArgVector& args);
   void private_output(const ArgVector& args);
 
-  StackedVector<T>& get_S()
+  StackedVector<T>& get_s()
   {
     return S;
   }
 
-  StackedVector<typename T::clear>& get_C()
+  StackedVector<typename T::clear>& get_c()
   {
     return C;
   }
 
-  T& get_S_ref(size_t i)
+  T& get_s_ref(size_t i)
   {
     return S[i];
   }
 
-  typename T::clear& get_C_ref(size_t i)
+  typename T::clear& get_c_ref(size_t i)
   {
     return C[i];
   }
@@ -136,9 +136,9 @@ public:
 
   // Read and write secret numeric data to file (name hardcoded at present)
   template<class U>
-  void read_shares_from_file(long start_file_pos, int end_file_pos_register,
+  void read_shares_from_file(long start_file_position, int end_file_position_register,
       const ArgVector& data_registers, size_t vector_size, U& Proc);
-  void write_shares_to_file(long start_pos, const ArgVector& data_registers,
+  void write_shares_to_file(long start_position, const ArgVector& data_registers,
       size_t vector_size);
 };
 
@@ -191,98 +191,98 @@ public:
     return thread_num;
   }
 
-  long read_Ci(size_t i) const
+  long read_ci(size_t i) const
     { return Ci[i].get(); }
-  Integer& get_Ci_ref(size_t i)
+  Integer& get_ci_ref(size_t i)
     { return Ci[i]; }
-  void write_Ci(size_t i, const long& x)
+  void write_ci(size_t i, const long& x)
     { Ci[i]=x; }
-  StackedVector<Integer>& get_Ci()
+  StackedVector<Integer>& get_ci()
     { return Ci; }
 
   virtual ofstream& get_public_output()
   {
-    throw not_implemented();
+    throw NotImplemented();
   }
   virtual ofstream& get_binary_output()
   {
-    throw not_implemented();
+    throw NotImplemented();
   }
 
   void shuffle(const Instruction& instruction);
   void bitdecint(const Instruction& instruction);
 };
 
-template<class sint, class sgf2n>
+template<class Sint, class Sgf2n>
 class Processor : public ArithmeticProcessor
 {
-  typedef typename sint::clear cint;
+  typedef typename Sint::clear Cint;
 
   // Data structure used for reading/writing data to/from a socket (i.e. an external party to SPDZ)
-  octetStream socket_stream;
+  OctetStream socket_stream;
 
   // avoid re-computation of expensive division
-  vector<cint> inverses2m;
+  vector<Cint> inverses2m;
 
   public:
-  Data_Files<sint, sgf2n> DataF;
+  DataFiles<Sint, Sgf2n> DataF;
   Player& P;
-  typename sgf2n::MAC_Check& MC2;
-  typename sint::MAC_Check& MCp;
-  Machine<sint, sgf2n>& machine;
+  typename Sgf2n::MacCheck& MC2;
+  typename Sint::MacCheck& MCp;
+  Machine<Sint, Sgf2n>& machine;
 
-  GC::ShareThread<typename sint::bit_type> share_thread;
-  GC::Processor<typename sint::bit_type> Procb;
-  SubProcessor<sgf2n> Proc2;
-  SubProcessor<sint>  Procp;
+  GC::ShareThread<typename Sint::BitType> share_thread;
+  GC::Processor<typename Sint::BitType> procb;
+  SubProcessor<Sgf2n> Proc2;
+  SubProcessor<Sint>  Procp;
 
-  unsigned int PC, last_PC;
-  TempVars<sint, sgf2n> temp;
+  unsigned int PC, last_pc;
+  TempVars<Sint, Sgf2n> temp;
 
   ExternalClients& external_clients;
 
-  CommStats client_stats;
+  CommunicationStatistics client_statistics;
   Timer& client_timer;
 
   void reset(const Program& program,int arg); // Reset the state of the processor
   string get_filename(const char* basename, bool use_number);
 
   Processor(int thread_num,Player& P,
-          typename sgf2n::MAC_Check& MC2,typename sint::MAC_Check& MCp,
-          Machine<sint, sgf2n>& machine,
+          typename Sgf2n::MacCheck& MC2,typename Sint::MacCheck& MCp,
+          Machine<Sint, Sgf2n>& machine,
           const Program& program);
   ~Processor();
 
-    const typename sgf2n::clear& read_C2(size_t i) const
+    const typename Sgf2n::clear& read_c2(size_t i) const
       { return Proc2.C[i]; }
-    const sgf2n& read_S2(size_t i) const
+    const Sgf2n& read_s2(size_t i) const
       { return Proc2.S[i]; }
-    typename sgf2n::clear& get_C2_ref(size_t i)
+    typename Sgf2n::clear& get_c2_ref(size_t i)
       { return Proc2.C[i]; }
-    sgf2n& get_S2_ref(size_t i)
+    Sgf2n& get_s2_ref(size_t i)
       { return Proc2.S[i]; }
-    void write_C2(size_t i,const typename sgf2n::clear& x)
+    void write_c2(size_t i,const typename Sgf2n::clear& x)
       { Proc2.C[i]=x; }
-    void write_S2(size_t i,const sgf2n& x)
+    void write_s2(size_t i,const Sgf2n& x)
       { Proc2.S[i]=x; }
   
-    const typename sint::clear& read_Cp(size_t i) const
+    const typename Sint::clear& read_cp(size_t i) const
       { return Procp.C[i]; }
-    const sint & read_Sp(size_t i) const
+    const Sint & read_sp(size_t i) const
       { return Procp.S[i]; }
-    typename sint::clear& get_Cp_ref(size_t i)
+    typename Sint::clear& get_cp_ref(size_t i)
       { return Procp.C[i]; }
-    sint & get_Sp_ref(size_t i)
+    Sint & get_sp_ref(size_t i)
       { return Procp.S[i]; }
-    void write_Cp(size_t i,const typename sint::clear& x)
+    void write_cp(size_t i,const typename Sint::clear& x)
       { Procp.C[i]=x; }
-    void write_Sp(size_t i,const sint & x)
+    void write_sp(size_t i,const Sint & x)
       { Procp.S[i]=x; }
 
   void check();
 
-  void dabit(const Instruction& instruction);
-  void edabit(const Instruction& instruction, bool strict = false);
+  void Dabit(const Instruction& instruction);
+  void Edabit(const Instruction& instruction, bool strict = false);
 
   void convcbitvec(const Instruction& instruction);
   void convcintvec(const Instruction& instruction);
@@ -301,7 +301,7 @@ class Processor : public ArithmeticProcessor
   void read_socket_private(int client_id, const ArgVector& registers,
       int size, bool send_macs);
 
-  cint get_inverse2(unsigned m);
+  Cint get_inverse2(unsigned m);
 
   void fixinput(const Instruction& instruction);
 
@@ -313,7 +313,7 @@ class Processor : public ArithmeticProcessor
 
   void call_tape(int tape_number, int arg, const ArgVector& results);
 
-  TimerWithComm prep_time();
+  TimerWithCommunication prep_time();
 
   void jump(int n);
 

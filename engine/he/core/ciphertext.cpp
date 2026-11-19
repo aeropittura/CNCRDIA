@@ -5,12 +5,12 @@
 
 #include "numeric/modp.hpp"
 
-Ciphertext::Ciphertext(const FHE_PK& pk) : Ciphertext(pk.get_params())
+Ciphertext::Ciphertext(const FHE_PK& pk) : Ciphertext(pk.get_parameters())
 {
 }
 
 
-void Ciphertext::set(const Rq_Element& a0, const Rq_Element& a1,
+void Ciphertext::set(const RqElement& a0, const RqElement& a1,
         const FHE_PK& pk)
 {
   set(a0, a1, pk.a().get(0).get_element(0).get_limb(0));
@@ -39,8 +39,8 @@ void Ciphertext::Scale()
 
 void add(Ciphertext& ans,const Ciphertext& c0,const Ciphertext& c1)
 {
-  if (c0.params!=c1.params)  { throw params_mismatch(); }
-  if (ans.params!=c1.params) { throw params_mismatch(); }
+  if (c0.params!=c1.params)  { throw ParametersMismatch(); }
+  if (ans.params!=c1.params) { throw ParametersMismatch(); }
   ans.pk_id = check_pk_id(c0.pk_id, c1.pk_id);
   add(ans.cc0,c0.cc0,c1.cc0);
   add(ans.cc1,c0.cc1,c1.cc1);
@@ -49,8 +49,8 @@ void add(Ciphertext& ans,const Ciphertext& c0,const Ciphertext& c1)
 
 void sub(Ciphertext& ans,const Ciphertext& c0,const Ciphertext& c1)
 {
-  if (c0.params!=c1.params)  { throw params_mismatch(); }
-  if (ans.params!=c1.params) { throw params_mismatch(); }
+  if (c0.params!=c1.params)  { throw ParametersMismatch(); }
+  if (ans.params!=c1.params) { throw ParametersMismatch(); }
   ans.pk_id = check_pk_id(c0.pk_id, c1.pk_id);
   sub(ans.cc0,c0.cc0,c1.cc0);
   sub(ans.cc1,c0.cc1,c1.cc1);
@@ -62,8 +62,8 @@ void mul(Ciphertext& ans,const Ciphertext& c0,const Ciphertext& c1,
 {
   CODE_LOCATION_NO_SCOPE
 
-  if (c0.params!=c1.params)  { throw params_mismatch(); }
-  if (ans.params!=c1.params) { throw params_mismatch(); }
+  if (c0.params!=c1.params)  { throw ParametersMismatch(); }
+  if (ans.params!=c1.params) { throw ParametersMismatch(); }
 
   // Switch Modulus for c0 and c1 down to level 0
   Ciphertext cc0=c0,cc1=c1;
@@ -77,11 +77,11 @@ void mul(Ciphertext& ans,const Ciphertext& c0,const Ciphertext& c1,
 
   // Now do the switch key
   d2.raise_level();
-  d0.mul_by_p1();
+  d0.mult_by_p1();
   auto t =  pk.bs()* d2;
   add(d0,d0,t);
 
-  d1.mul_by_p1();
+  d1.mult_by_p1();
   mul(t,pk.as(),d2);
   add(d1,d1,t);
 
@@ -93,25 +93,25 @@ void mul(Ciphertext& ans,const Ciphertext& c0,const Ciphertext& c1,
 template<class T,class FD,class S>
 void mul(Ciphertext& ans,const Plaintext<T,FD,S>& a,const Ciphertext& c)
 {
-  a.to_poly();
+  a.to_polynomial();
 
   int lev=c.cc0.level();
-  Rq_Element ra((*ans.params).FFTD(),evaluation,evaluation);
+  RqElement ra((*ans.params).FFTD(),evaluation,evaluation);
   if (lev==0) { ra.lower_level(); }
   ra.from(a.get_iterator());
   ans.mul(c, ra);
 }
 
-void Ciphertext::mul(const Ciphertext& c, const Rq_Element& ra)
+void Ciphertext::mul(const Ciphertext& c, const RqElement& ra)
 {
-  if (params!=c.params) { throw params_mismatch(); }
+  if (params!=c.params) { throw ParametersMismatch(); }
   pk_id = c.pk_id;
 
   ::mul(cc0,ra,c.cc0);
   ::mul(cc1,ra,c.cc1);
 }
 
-void Ciphertext::add(octetStream& os, int)
+void Ciphertext::add(OctetStream& os, int)
 {
   Ciphertext tmp(*params);
   tmp.unpack(os);
@@ -120,14 +120,14 @@ void Ciphertext::add(octetStream& os, int)
 
 void Ciphertext::rerandomize(const FHE_PK& pk)
 {
-  Rq_Element tmp(*params);
-  SeededPRNG G;
-  vector<FFT_Data::S> r(params->FFTD()[0].phi_m());
-  bigint p = pk.p();
+  RqElement tmp(*params);
+  SeededPrng G;
+  vector<FftData::S> r(params->FFTD()[0].phi_m());
+  Bigint p = pk.p();
   assert(p != 0);
   for (auto& x : r)
     {
-      G.get(x, params->p0().numBits() - p.numBits() - 1);
+      G.get(x, params->p0().num_bits() - p.num_bits() - 1);
       x *= p;
     }
   tmp.from(r, 0);
@@ -139,6 +139,6 @@ void Ciphertext::rerandomize(const FHE_PK& pk)
 }
 
 
-template void mul(Ciphertext& ans,const Plaintext<gfp,FFT_Data,bigint>& a,const Ciphertext& c);
-template void mul(Ciphertext& ans, const Plaintext<gf2n_short, P2Data, int>& a,
+template void mul(Ciphertext& ans,const Plaintext<Gfp,FftData,Bigint>& a,const Ciphertext& c);
+template void mul(Ciphertext& ans, const Plaintext<Gf2nShort, P2Data, int>& a,
         const Ciphertext& c);

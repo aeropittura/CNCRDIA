@@ -48,7 +48,7 @@ void RepPrep<T>::buffer_triples()
         return this->buffer_personal_triples();
 
     assert(protocol != 0);
-    auto MC = ShareThread<T>::s().new_mc({});
+    auto MC = ShareThread<T>::s().new_opener({});
     ThreadQueues* queues = 0;
     if (BaseMachine::has_singleton() and BaseMachine::thread_num == 0)
         queues = &BaseMachine::s().queues;

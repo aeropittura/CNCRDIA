@@ -14,14 +14,14 @@ SpdzWiseRep3Shuffler<T>::SpdzWiseRep3Shuffler(SubProcessor<T>& proc) :
 }
 
 template<class T>
-void SpdzWiseRep3Shuffler<T>::generate(int n_shuffle, shuffle_type& shuffle)
+void SpdzWiseRep3Shuffler<T>::generate(int n_shuffle, ShuffleType& shuffle)
 {
     internal.generate(n_shuffle, shuffle);
 }
 
 template<class T>
 void SpdzWiseRep3Shuffler<T>::apply_multiple(StackedVector<T> &a,
-        vector<ShuffleTuple<shuffle_type>>& shuffles)
+        vector<ShuffleTuple<ShuffleType>>& shuffles)
 {
     CODE_LOCATION
     const size_t n_shuffles = shuffles.size();
@@ -29,7 +29,7 @@ void SpdzWiseRep3Shuffler<T>::apply_multiple(StackedVector<T> &a,
     StackedVector<typename T::part_type::Honest> temporary_memory(0);
     vector<
             ShuffleTuple<
-                    typename T::part_type::Honest::Protocol::Shuffler::shuffle_type>> mapped_shuffles;
+                    typename T::part_type::Honest::Protocol::Shuffler::ShuffleType>> mapped_shuffles;
 
     for (size_t current_shuffle = 0; current_shuffle < n_shuffles;
             current_shuffle++)
@@ -38,7 +38,7 @@ void SpdzWiseRep3Shuffler<T>::apply_multiple(StackedVector<T> &a,
         mapped_shuffles.push_back({2 * shuffle.size, temporary_memory.size(),
             temporary_memory.size(), 2 * shuffle.unit_size, shuffle.shuffle, shuffle.reverse});
 
-        stats[shuffle.size / shuffle.unit_size] += shuffle.unit_size;
+        statistics[shuffle.size / shuffle.unit_size] += shuffle.unit_size;
 
         for (size_t i = 0; i < shuffle.size; i++)
         {

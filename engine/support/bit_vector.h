@@ -17,7 +17,7 @@ using namespace std;
 #include "support/intrinsics.h"
 
 class PRNG;
-class octetStream;
+class OctetStream;
 
 template <int K>
 class Z2;
@@ -29,13 +29,13 @@ class BitVectorView
     friend class BitVector;
 
 protected:
-    octet* bytes;
+    Octet* bytes;
 
     size_t nbytes;
     size_t nbits;
 
 public:
-    BitVectorView(octet* bytes = 0, size_t size = 0) :
+    BitVectorView(Octet* bytes = 0, size_t size = 0) :
             bytes(bytes), nbytes(DIV_CEIL(size, 8)), nbits(size)
     {
     }
@@ -62,7 +62,7 @@ public:
         memmove(bytes, other.bytes, nbytes);
     }
 
-    octet get_byte(size_t i) const
+    Octet get_byte(size_t i) const
     {
 #ifdef CHECK_SIZE
         assert(size_t(i) < nbytes);
@@ -81,8 +81,8 @@ public:
 
     bool operator[](size_t i) const { return get_bit(i); }
 
-    int128 get_int128(size_t i) const { return _mm_loadu_si128((__m128i*)bytes + i); }
-    void set_int128(size_t i, int128 a) { *((__m128i*)bytes + i) = a.a; }
+    Int128 get_int128(size_t i) const { return _mm_loadu_si128((__m128i*)bytes + i); }
+    void set_int128(size_t i, Int128 a) { *((__m128i*)bytes + i) = a.a; }
 
     __m256i get_m256i(size_t i) const { return _mm256_loadu_si256((__m256i*)bytes + i); }
     void set_m256i(size_t i, __m256i a) { _mm256_storeu_si256((__m256i*)bytes + i, a); }
@@ -90,7 +90,7 @@ public:
     void add(const BitVectorView& A)
     {
         if (nbits != A.nbits)
-          { throw invalid_length(); }
+          { throw InvalidLength(); }
         size_t nwords = nbytes / 8;
         for (size_t i = 0; i < nwords; i++)
             ((word*)bytes)[i] ^= ((word*)A.bytes)[i];
@@ -131,7 +131,7 @@ public:
 
     // Pack and unpack in native format
     //   i.e. Dont care about conversion to human readable form
-    void pack(octetStream& o) const;
+    void pack(OctetStream& o) const;
 };
 
 class BitVector : public BitVectorView
@@ -198,7 +198,7 @@ class BitVector : public BitVectorView
         if (new_nbytes > 1000)
             fprintf(stderr, "resizing bit vector to use %zu bytes\n", new_nbytes);
 #endif
-        octet* tmp = new octet[new_nbytes];
+        Octet* tmp = new Octet[new_nbytes];
         memcpy(tmp, bytes, min(new_nbytes, nbytes));
         delete[] bytes;
         bytes = tmp;
@@ -209,22 +209,22 @@ class BitVector : public BitVectorView
 
     void resize_zero(size_t new_nbits);
 
-    octet* get_ptr() { return bytes; }
-    const octet* get_ptr() const { return bytes; }
-    const void* get_ptr_to_byte(size_t i, size_t block_size) const;
-    const void* get_ptr_to_bit(size_t i, size_t block_size) const;
+    Octet* get_ptr() { return bytes; }
+    const Octet* get_ptr() const { return bytes; }
+    const void* get_pointer_to_byte(size_t i, size_t block_size) const;
+    const void* get_pointer_to_bit(size_t i, size_t block_size) const;
 
     BitVector(size_t n=0)
     {
         nbits = n;
         nbytes = DIV_CEIL(nbits, 8);
         capacity = nbytes;
-        bytes = new octet[nbytes];
+        bytes = new Octet[nbytes];
         assign_zero();
     }
     BitVector(const BitVector& K) : BitVectorView()
     {
-        bytes = new octet[K.nbytes];
+        bytes = new Octet[K.nbytes];
         nbytes = K.nbytes;
         capacity = K.nbytes;
         nbits = K.nbits;
@@ -255,7 +255,7 @@ class BitVector : public BitVectorView
         return *this;
     }
 
-    BitVector& operator=(const octetStream other);
+    BitVector& operator=(const OctetStream other);
 
     void swap(BitVector& other)
     {
@@ -284,12 +284,12 @@ class BitVector : public BitVectorView
     bool operator[](size_t i) const { return get_bit(i); }
     Access operator[](size_t i) { return {*this, i}; }
 
-    void set_byte(size_t i, octet b) { bytes[i] = b; }
+    void set_byte(size_t i, Octet b) { bytes[i] = b; }
 
     void set_int32(size_t i, int32_t w)
     {
         size_t offset = i * sizeof(int32_t);
-        memcpy(bytes + offset, (octet*)&w, sizeof(int32_t));
+        memcpy(bytes + offset, (Octet*)&w, sizeof(int32_t));
     }
 
     // get the i-th 64-bit word
@@ -298,7 +298,7 @@ class BitVector : public BitVectorView
     void set_word(size_t i, word w)
     {
         size_t offset = i * sizeof(word);
-        memcpy(bytes + offset, (octet*)&w, sizeof(word));
+        memcpy(bytes + offset, (Octet*)&w, sizeof(word));
     }
 
     template <class T>
@@ -316,15 +316,15 @@ class BitVector : public BitVectorView
             throw overflow("BitVector", i, nbits);
         size_t j = i/8, k = i&7;
         if (a==1)
-          { bytes[j] |= (octet)(1UL<<k); }
+          { bytes[j] |= (Octet)(1UL<<k); }
         else
-  	     { bytes[j] &= (octet)~(1UL<<k); }
+  	     { bytes[j] &= (Octet)~(1UL<<k); }
     }
 
     void add(const BitVectorView& A, const BitVectorView& B)
     {
         if (A.nbits != B.nbits)
-          { throw invalid_length(); }
+          { throw InvalidLength(); }
         resize(A.nbits);
         for (size_t i=0; i < nbytes; i++)
   	    {
@@ -377,7 +377,7 @@ class BitVector : public BitVectorView
     void output(ostream& s,bool human) const;
     void input(istream& s,bool human);
 
-    void unpack(octetStream& o);
+    void unpack(OctetStream& o);
 
     string str(size_t end = SIZE_MAX) const
     {

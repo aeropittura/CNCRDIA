@@ -12,8 +12,8 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     CowGearOptions::singleton = CowGearOptions(opt, argc, argv);
-    DishonestMajorityFieldMachine<ChaiGearShare, ChaiGearShare, gf2n_short>(
+    DishonestMajorityFieldMachine<ChaiGearShare, ChaiGearShare, Gf2nShort>(
             argc, argv, opt);
 }

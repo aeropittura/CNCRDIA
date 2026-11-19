@@ -15,7 +15,7 @@ class PostSacriBin;
 class PostSacriSecret : public MalRepSecretBase<PostSacriSecret>
 {
     typedef PostSacriSecret This;
-    typedef MalRepSecretBase<This> super;
+    typedef MalRepSecretBase<This> Super;
 
 public:
     typedef PostSacriBin Protocol;
@@ -26,7 +26,7 @@ public:
 
     template<class T>
     PostSacriSecret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 };

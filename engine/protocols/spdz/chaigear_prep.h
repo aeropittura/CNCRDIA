@@ -14,17 +14,17 @@ template<class T>
 class ChaiGearPrep : public MaliciousRingPrep<T>
 {
     template<class U>
-    friend typename U::mac_key_type get_mac_key(Player& P, bool read_only);
+    friend typename U::MacKeyType get_mac_key(Player& P, bool read_only);
 
-    typedef typename T::mac_key_type mac_key_type;
+    typedef typename T::MacKeyType MacKeyType;
     typedef typename T::clear::FD FD;
     typedef SimpleGenerator<SummingEncCommit, FD> Generator;
 
-    static MultiplicativeMachineParams* machine;
+    static MultiplicativeMachineParameters* machine;
     static Lock lock;
 
     // setting this non-randomly is a security violation
-    static mac_key_type maybe_mac_key;
+    static MacKeyType maybe_mac_key;
 
     Generator* generator;
     SquareProducer<FD>* square_producer;
@@ -38,7 +38,7 @@ class ChaiGearPrep : public MaliciousRingPrep<T>
     void buffer_bits(false_type);
 
 public:
-    typedef T share_type;
+    typedef T ShareType;
 
     static const bool homomorphic = true;
 
@@ -46,7 +46,7 @@ public:
     static void key_setup(Player& P, bool read_only = false);
     static void teardown();
 
-    static mac_key_type get_mac_key(Player& P, bool read_only = false);
+    static MacKeyType get_mac_key(Player& P, bool read_only = false);
     static void adjust_mac_key(Player& P);
 
     static string get_full_secrets_filename(const Player& P);

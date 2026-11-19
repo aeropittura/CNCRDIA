@@ -9,24 +9,24 @@
 #include "net/server.h"
 #include "net/player.h"
 
-class OfflineParams
+class OfflineParameters
 {
 public:
     bool output;
     int nthreads;
 
-    OfflineParams() : output(false), nthreads(0) {}
+    OfflineParameters() : output(false), nthreads(0) {}
 };
 
-class OfflineMachineBase : virtual public OfflineParams
+class OfflineMachineBase : virtual public OfflineParameters
 {
 protected:
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
 
 public:
     Names N;
     int my_num, nplayers;
-    long long ntriples, nTriplesPerThread;
+    long long ntriples, n_triples_per_thread;
 
     OfflineMachineBase();
     ~OfflineMachineBase();

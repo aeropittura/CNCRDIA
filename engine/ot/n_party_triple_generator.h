@@ -47,29 +47,29 @@ public:
 };
 
 template<class T>
-class OTTripleGenerator : public GeneratorThread
+class OtTripleGenerator : public GeneratorThread
 {
-    typedef typename T::open_type open_type;
-    typedef typename T::mac_key_type mac_key_type;
-    typedef MascotMacKey<typename T::mac_key_type> complete_mac_key_type;
+    typedef typename T::OpenType OpenType;
+    typedef typename T::MacKeyType MacKeyType;
+    typedef MascotMacKey<typename T::MacKeyType> CompleteMacKeyType;
 
-    template<class> friend class OTTripleGenerator;
+    template<class> friend class OtTripleGenerator;
 
 protected:
-    static complete_mac_key_type mac_key;
+    static CompleteMacKeyType mac_key;
 
-    //OTTripleSetup* setup;
-    Player& globalPlayer;
-    Player* parentPlayer;
+    //OtTripleSetup* setup;
+    Player& global_player;
+    Player* parent_player;
 
     int thread_num;
     int nbase;
 
     struct timeval last_lap;
 
-    ofstream outputFile;
+    ofstream output_file;
 
-    SeededPRNG share_prg;
+    SeededPrng share_prg;
 
     void start_progress();
     void print_progress(int k);
@@ -84,69 +84,69 @@ public:
     vector<VirtualTwoPartyPlayer*> players;
     vector<typename T::Multiplier*> ot_multipliers;
     //vector<OTMachine*> machines;
-    BitVector baseReceiverInput; // same for every set of OTs
-    vector< vector< array<BitVector, 2> > > baseSenderInputs;
-    vector< vector<BitVector> > baseReceiverOutputs;
-    vector<BitVector> valueBits;
+    BitVector base_receiver_input; // same for every set of OTs
+    vector< vector< array<BitVector, 2> > > base_sender_inputs;
+    vector< vector<BitVector> > base_receiver_outputs;
+    vector<BitVector> value_bits;
     BitVector b_padded_bits;
 
     int my_num;
-    int nTriplesPerLoop;
+    int n_triples_per_loop;
     int nloops;
     int field_size;
-    int nAmplify;
-    int nPreampTriplesPerLoop;
+    int n_amplify;
+    int n_preamp_triples_per_loop;
     int repeat[3];
     int nparties;
 
-    MascotParams& machine;
+    MascotParameters& machine;
 
-    vector<PlainTriple<open_type, N_AMPLIFY>> preampTriples;
-    vector<array<open_type, 3>> plainTriples;
-    vector<dabit<T>> plainBits;
-    vector<array<open_type, 3>> mixedTriples;
+    vector<PlainTriple<OpenType, N_AMPLIFY>> preamp_triples;
+    vector<array<OpenType, 3>> plain_triples;
+    vector<Dabit<T>> plain_bits;
+    vector<array<OpenType, 3>> mixedTriples;
 
-    typename T::MAC_Check* MC;
+    typename T::MacCheck* MC;
 
-    static complete_mac_key_type& get_mac_key() { return mac_key; }
-    static mac_key_type get_mac_key(Player& P, bool = false);
+    static CompleteMacKeyType& get_mac_key() { return mac_key; }
+    static MacKeyType get_mac_key(Player& P, bool = false);
     static void reset_mac_key();
 
-    OTTripleGenerator(const OTTripleSetup& setup, const Names& names,
-            int thread_num, int nTriples, int nloops, MascotParams& machine,
-            Player* parentPlayer = 0);
-    ~OTTripleGenerator();
+    OtTripleGenerator(const OtTripleSetup& setup, const Names& names,
+            int thread_num, int nTriples, int nloops, MascotParameters& machine,
+            Player* parent_player = 0);
+    ~OtTripleGenerator();
 
     void set_batch_size(int nTriples, bool limit = true);
 
-    void generate() { throw not_implemented(); }
+    void generate() { throw NotImplemented(); }
 
-    void generatePlainTriples();
-    void plainTripleRound(int k = 0);
+    void generate_plain_triples();
+    void plain_triple_round(int k = 0);
 
-    void generatePlainBits();
-    void generateMixedTriples();
+    void generate_plain_bits();
+    void generate_mixed_triples();
 
     void run_multipliers(MultJob job);
 
-    Player& get_player() { return globalPlayer; }
+    Player& get_player() { return global_player; }
 };
 
 template<class T>
-class NPartyTripleGenerator : public OTTripleGenerator<T>
+class NPartyTripleGenerator : public OtTripleGenerator<T>
 {
-    typedef typename T::open_type open_type;
-    typedef typename T::mac_key_type mac_key_type;
+    typedef typename T::OpenType OpenType;
+    typedef typename T::MacKeyType MacKeyType;
 
-    virtual void generateTriples() { throw not_implemented(); }
-    virtual void generateBits() { throw not_implemented(); }
+    virtual void generateTriples() { throw NotImplemented(); }
+    virtual void generate_bits() { throw NotImplemented(); }
 
 public:
-    vector<InputTuple<typename T::input_type>> inputs;
+    vector<InputTuple<typename T::InputType>> inputs;
 
-    NPartyTripleGenerator(const OTTripleSetup& setup, const Names& names,
-            int thread_num, int nTriples, int nloops, MascotParams& machine,
-            Player* parentPlayer = 0);
+    NPartyTripleGenerator(const OtTripleSetup& setup, const Names& names,
+            int thread_num, int nTriples, int nloops, MascotParameters& machine,
+            Player* parent_player = 0);
     virtual ~NPartyTripleGenerator() {}
 
     void generate();
@@ -154,22 +154,22 @@ public:
 };
 
 template<class T>
-typename OTTripleGenerator<T>::complete_mac_key_type OTTripleGenerator<T>::mac_key;
+typename OtTripleGenerator<T>::CompleteMacKeyType OtTripleGenerator<T>::mac_key;
 
 template<class T>
 class SimpleMascotTripleGenerator : public NPartyTripleGenerator<T>
 {
-    typedef typename T::mac_key_type mac_key_type;
-    typedef typename T::MAC_Check MAC_Check;
+    typedef typename T::MacKeyType MacKeyType;
+    typedef typename T::MacCheck MacCheck;
 
-    virtual void sacrifice(typename T::MAC_Check&, PRNG&) { throw not_implemented(); }
+    virtual void sacrifice(typename T::MacCheck&, PRNG&) { throw NotImplemented(); }
 
 public:
-    vector< ShareTriple<T, 2> > uncheckedTriples;
+    vector< ShareTriple<T, 2> > unchecked_triples;
 
-    SimpleMascotTripleGenerator(const OTTripleSetup& setup, const Names& names,
-            int thread_num, int nTriples, int nloops, MascotParams& machine,
-            Player* parentPlayer = 0);
+    SimpleMascotTripleGenerator(const OtTripleSetup& setup, const Names& names,
+            int thread_num, int nTriples, int nloops, MascotParameters& machine,
+            Player* parent_player = 0);
     virtual ~SimpleMascotTripleGenerator() {}
 
     void generateTriples();
@@ -178,45 +178,45 @@ public:
 template<class T>
 class MascotTripleGenerator : public SimpleMascotTripleGenerator<T>
 {
-    typedef typename T::open_type open_type;
-    typedef typename T::mac_key_type mac_key_type;
-    typedef typename T::MAC_Check MAC_Check;
+    typedef typename T::OpenType OpenType;
+    typedef typename T::MacKeyType MacKeyType;
+    typedef typename T::MacCheck MacCheck;
 
-    void generateBits();
-    void generateBitsGf2n();
+    void generate_bits();
+    void generate_bits_gf2n();
     template <int X, int L>
-    void generateBitsFromTriples(MAC_Check& MC, ofstream& outputFile, gfp_<X, L>);
+    void generate_bits_from_triples(MacCheck& MC, ofstream& output_file, Gfp_<X, L>);
     template <class U>
-    void generateBitsFromTriples(MAC_Check& MC, ofstream& outputFile, U);
+    void generate_bits_from_triples(MacCheck& MC, ofstream& output_file, U);
 
-    void sacrifice(typename T::MAC_Check& MC, PRNG& G);
+    void sacrifice(typename T::MacCheck& MC, PRNG& G);
 
 public:
     vector<T> bits;
 
-    MascotTripleGenerator(const OTTripleSetup& setup, const Names& names,
-            int thread_num, int nTriples, int nloops, MascotParams& machine,
-            Player* parentPlayer = 0);
+    MascotTripleGenerator(const OtTripleSetup& setup, const Names& names,
+            int thread_num, int nTriples, int nloops, MascotParameters& machine,
+            Player* parent_player = 0);
 };
 
 template<class T>
 class Spdz2kTripleGenerator : public NPartyTripleGenerator<T>
 {
-    typedef typename T::open_type open_type;
-    typedef typename T::mac_key_type mac_key_type;
-    typedef typename T::sacri_type sacri_type;
+    typedef typename T::OpenType OpenType;
+    typedef typename T::MacKeyType MacKeyType;
+    typedef typename T::SacriType SacriType;
 
-    void generateBits() { throw not_implemented(); }
+    void generate_bits() { throw NotImplemented(); }
 
     template<class U>
-    void sacrificeZ2k(U& MC, PRNG& G);
+    void sacrifice_z2k(U& MC, PRNG& G);
 
 public:
-    vector< ShareTriple<Share<sacri_type>, 2> > uncheckedTriples;
+    vector< ShareTriple<Share<SacriType>, 2> > unchecked_triples;
 
-    Spdz2kTripleGenerator(const OTTripleSetup& setup, const Names& names,
-            int thread_num, int nTriples, int nloops, MascotParams& machine,
-            Player* parentPlayer = 0);
+    Spdz2kTripleGenerator(const OtTripleSetup& setup, const Names& names,
+            int thread_num, int nTriples, int nloops, MascotParameters& machine,
+            Player* parent_player = 0);
 
     void generateTriples();
 };

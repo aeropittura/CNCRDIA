@@ -4,20 +4,20 @@
 #include "numeric/modp.hpp"
 
 template <class FD>
-Verifier<FD>::Verifier(Proof& proof, const FD& FieldD) :
-    P(proof), FieldD(FieldD)
+Verifier<FD>::Verifier(Proof& proof, const FD& field_d) :
+    P(proof), field_d(field_d)
 {
 #ifdef LESS_ALLOC_MORE_MEM
   z.resize(proof.phim);
-  z.allocate_slots(bigint(1) << proof.B_plain_length);
+  z.allocate_slots(Bigint(1) << proof.b_plain_length);
   t.resize(3, proof.phim);
-  t.allocate_slots(bigint(1) << proof.B_rand_length);
+  t.allocate_slots(Bigint(1) << proof.b_random_length);
 #endif
 }
 
 
 template <class T, class FD, class S>
-bool Check_Decoding(const Plaintext<T,FD,S>& AE,bool Diag)
+bool check_decoding(const Plaintext<T,FD,S>& AE,bool Diag)
 {
 //  // Now check decoding z[i]
 //  if (!AE.to_type(0))
@@ -35,7 +35,7 @@ bool Check_Decoding(const Plaintext<T,FD,S>& AE,bool Diag)
 }
 
 template <>
-bool Check_Decoding(const vector<Proof::bound_type>& AE, bool Diag, const FFT_Data&)
+bool check_decoding(const vector<Proof::BoundType>& AE, bool Diag, const FftData&)
 {
   if (Diag)
     {
@@ -47,13 +47,13 @@ bool Check_Decoding(const vector<Proof::bound_type>& AE, bool Diag, const FFT_Da
 }
 
 template <>
-bool Check_Decoding(const vector<Proof::bound_type>& AE, bool Diag, const P2Data& p2d)
+bool check_decoding(const vector<Proof::BoundType>& AE, bool Diag, const P2Data& p2d)
 {
   if (Diag)
     {
       Plaintext_<P2Data> tmp(p2d);
       for (size_t i = 0; i < AE.size(); i++)
-        tmp.set_coeff(i, AE[i].get_limb(0) % 2);
+        tmp.set_coefficient(i, AE[i].get_limb(0) % 2);
       return tmp.is_diagonal();
     }
   return true;
@@ -62,9 +62,9 @@ bool Check_Decoding(const vector<Proof::bound_type>& AE, bool Diag, const P2Data
 
 
 template <class FD>
-void Verifier<FD>::Stage_2(
-                          AddableVector<Ciphertext>& c,octetStream& ciphertexts,
-                          octetStream& cleartexts,
+void Verifier<FD>::stage_2(
+                          AddableVector<Ciphertext>& c,OctetStream& ciphertexts,
+                          OctetStream& cleartexts,
                           const FHE_PK& pk)
 {
   unsigned int i, V;
@@ -74,8 +74,8 @@ void Verifier<FD>::Stage_2(
     throw length_error("number of received ciphertexts incorrect");
 
   // Now check the encryptions are correct
-  Ciphertext d1(pk.get_params()), d2(pk.get_params());
-  Random_Coins rc(pk.get_params());
+  Ciphertext d1(pk.get_parameters()), d2(pk.get_parameters());
+  RandomCoins rc(pk.get_parameters());
   ciphertexts.get(V);
   if (V != P.V)
     throw length_error("number of received commitments incorrect");
@@ -99,7 +99,7 @@ void Verifier<FD>::Stage_2(
 #endif
           throw runtime_error("ciphertexts don't match");
         }
-      if (!Check_Decoding(z,P.get_diagonal(),FieldD))
+      if (!check_decoding(z,P.get_diagonal(),field_d))
          {
 #ifdef VERBOSE
           cout << "\tCheck : " << i << endl;
@@ -114,13 +114,13 @@ void Verifier<FD>::Stage_2(
 /* This is the non-interactive version using the ROM
 */
 template <class FD>
-void Verifier<FD>::NIZKPoK(AddableVector<Ciphertext>& c,
-                          octetStream& ciphertexts, octetStream& cleartexts,
+void Verifier<FD>::nizk_pok(AddableVector<Ciphertext>& c,
+                          OctetStream& ciphertexts, OctetStream& cleartexts,
                           const FHE_PK& pk, int prover)
 {
   P.set_challenge(ciphertexts, prover, pk);
 
-  Stage_2(c,ciphertexts,cleartexts,pk);
+  stage_2(c,ciphertexts,cleartexts,pk);
 
   if (P.top_gear)
     {
@@ -130,5 +130,5 @@ void Verifier<FD>::NIZKPoK(AddableVector<Ciphertext>& c,
 }
 
 
-template class Verifier<FFT_Data>;
+template class Verifier<FftData>;
 template class Verifier<P2Data>;

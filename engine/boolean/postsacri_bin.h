@@ -27,7 +27,7 @@ class PostSacriBin : public ReplicatedBase,
     vector<FixedVec<T, 3>> d1;
     vector<array<T, 3>> d2;
 
-    array<T, 3> get_d1_triple(GlobalPRNG& G, int n_bits);
+    array<T, 3> get_d1_triple(GlobalPrng& G, int n_bits);
     array<T, 3> get_d2_triple(int n_bits);
     void get(Dtype type, T* res);
 
@@ -37,7 +37,7 @@ public:
     PostSacriBin(Player& P);
     ~PostSacriBin();
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1);
     void exchange();
     T finalize_mul(int n = -1);

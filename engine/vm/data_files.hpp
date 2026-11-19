@@ -24,8 +24,8 @@ Preprocessing<T>* Preprocessing<T>::get_new(
   if (machine.live_prep)
     return get_live_prep(proc, usage);
   else
-    return new Sub_Data_Files<T>(machine.get_N(),
-        machine.template prep_dir_prefix<T>(), usage, BaseMachine::thread_num);
+    return new SubDataFiles<T>(machine.get_N(),
+        machine.template prep_directory_prefix<T>(), usage, BaseMachine::thread_num);
 }
 
 template<class T>
@@ -38,7 +38,7 @@ Preprocessing<T>* Preprocessing<T>::get_new(
     return new typename T::LivePrep(usage);
   else
     return new GC::BitPrepFiles<T>(N,
-        get_prep_sub_dir<T>(PREP_DIR, N.num_players()), usage,
+        get_prep_sub_directory<T>(PREP_DIR, N.num_players()), usage,
         BaseMachine::thread_num);
 }
 
@@ -49,7 +49,7 @@ T Preprocessing<T>::get_random_from_inputs(int nplayers)
   for (int j = 0; j < nplayers; j++)
     {
       T tmp;
-      typename T::open_type _;
+      typename T::OpenType _;
       this->get_input_no_count(tmp, _, j);
       res += tmp;
     }
@@ -57,59 +57,59 @@ T Preprocessing<T>::get_random_from_inputs(int nplayers)
 }
 
 template<class T>
-Sub_Data_Files<T>::Sub_Data_Files(const Names& N, DataPositions& usage,
+SubDataFiles<T>::SubDataFiles(const Names& N, DataPositions& usage,
     int thread_num) :
-    Sub_Data_Files(N, get_prep_dir(N), usage,
+    SubDataFiles(N, get_prep_directory(N), usage,
         thread_num)
 {
 }
 
 
 template<class T>
-int Sub_Data_Files<T>::tuple_length(int dtype)
+int SubDataFiles<T>::tuple_length(int dtype)
 {
   return DataPositions::tuple_size[dtype] * T::size();
 }
 
 template<class T>
-string Sub_Data_Files<T>::get_filename(const Names& N, Dtype type,
+string SubDataFiles<T>::get_filename(const Names& N, Dtype type,
     int thread_num)
 {
-  return PrepBase::get_filename(get_prep_sub_dir<T>(N.num_players()),
+  return PrepBase::get_filename(get_prep_sub_directory<T>(N.num_players()),
       type, T::type_short(), N.my_num(), thread_num);
 }
 
 template<class T>
-string Sub_Data_Files<T>::get_input_filename(const Names& N, int input_player,
+string SubDataFiles<T>::get_input_filename(const Names& N, int input_player,
     int thread_num)
 {
   return PrepBase::get_input_filename(
-      get_prep_sub_dir<T>(N.num_players()), T::type_short(), input_player,
+      get_prep_sub_directory<T>(N.num_players()), T::type_short(), input_player,
       N.my_num(), thread_num);
 }
 
 template<class T>
-string Sub_Data_Files<T>::get_edabit_filename(const Names& N, int n_bits,
+string SubDataFiles<T>::get_edabit_filename(const Names& N, int n_bits,
     int thread_num)
 {
   return PrepBase::get_edabit_filename(
-      get_prep_sub_dir<T>(N.num_players()), n_bits, N.my_num(), thread_num);
+      get_prep_sub_directory<T>(N.num_players()), n_bits, N.my_num(), thread_num);
 }
 
 template<class T>
-string Sub_Data_Files<T>::get_prep_dir(const Names& N)
+string SubDataFiles<T>::get_prep_directory(const Names& N)
 {
-  return OnlineOptions::singleton.prep_dir_prefix<T>(N.num_players());
+  return OnlineOptions::singleton.prep_directory_prefix<T>(N.num_players());
 }
 
 template<class T>
-void Sub_Data_Files<T>::check_setup(const Names& N)
+void SubDataFiles<T>::check_setup(const Names& N)
 {
-  return check_setup(N.num_players(), get_prep_dir(N));
+  return check_setup(N.num_players(), get_prep_directory(N));
 }
 
 template<class T>
-void Sub_Data_Files<T>::check_setup(int num_players, const string& prep_dir)
+void SubDataFiles<T>::check_setup(int num_players, const string& prep_directory)
 {
   if (T::function_dependent)
     throw runtime_error("preprocessing from file not implemented "
@@ -117,27 +117,27 @@ void Sub_Data_Files<T>::check_setup(int num_players, const string& prep_dir)
 
   try
     {
-      T::clear::check_setup(prep_dir);
+      T::clear::check_setup(prep_directory);
     }
   catch (exception& e)
     {
-      throw prep_setup_error(e.what(), num_players,
-          T::template proto_fake_opts<typename T::clear>());
+      throw PrepSetupError(e.what(), num_players,
+          T::template protocol_fake_options<typename T::clear>());
     }
 }
 
 template<class T>
-Sub_Data_Files<T>::Sub_Data_Files(int my_num, int num_players,
-    const string& prep_data_dir, DataPositions& usage, int thread_num) :
+SubDataFiles<T>::SubDataFiles(int my_num, int num_players,
+    const string& prep_data_directory, DataPositions& usage, int thread_num) :
     Preprocessing<T>(usage),
-    my_num(my_num), num_players(num_players), prep_data_dir(prep_data_dir),
+    my_num(my_num), num_players(num_players), prep_data_directory(prep_data_directory),
     thread_num(thread_num), part(0)
 {
 #ifdef DEBUG_FILES
-  cerr << "Setting up Data_Files in: " << prep_data_dir << endl;
+  cerr << "Setting up Data_Files in: " << prep_data_directory << endl;
 #endif
 
-  check_setup(num_players, prep_data_dir);
+  check_setup(num_players, prep_data_directory);
 
   string type_short = T::type_short();
   string type_string = T::type_string();
@@ -147,21 +147,21 @@ Sub_Data_Files<T>::Sub_Data_Files(int my_num, int num_players,
       if (T::clear::allows(Dtype(dtype)))
         {
           buffers[dtype].setup(num_players,
-              PrepBase::get_filename(prep_data_dir, Dtype(dtype), type_short,
+              PrepBase::get_filename(prep_data_directory, Dtype(dtype), type_short,
                   my_num, thread_num), tuple_length(dtype), type_string,
               DataPositions::dtype_names[dtype]);
         }
     }
 
   dabit_buffer.setup(num_players,
-      PrepBase::get_filename(prep_data_dir, DATA_DABIT,
-          type_short, my_num, thread_num), dabit<T>::size(), type_string,
+      PrepBase::get_filename(prep_data_directory, DATA_DABIT,
+          type_short, my_num, thread_num), Dabit<T>::size(), type_string,
       DataPositions::dtype_names[DATA_DABIT]);
 
   input_buffers.resize(num_players);
   for (int i=0; i<num_players; i++)
     {
-      string filename = PrepBase::get_input_filename(prep_data_dir,
+      string filename = PrepBase::get_input_filename(prep_data_directory,
           type_short, i, my_num, thread_num);
       if (i == my_num)
         my_input_buffers.setup(num_players, filename,
@@ -176,45 +176,45 @@ Sub_Data_Files<T>::Sub_Data_Files(int my_num, int num_players,
 #endif
 }
 
-template<class sint, class sgf2n>
-Data_Files<sint, sgf2n>::Data_Files(Machine<sint, sgf2n>& machine, SubProcessor<sint>* procp,
-    SubProcessor<sgf2n>* proc2) :
+template<class Sint, class Sgf2n>
+DataFiles<Sint, Sgf2n>::DataFiles(Machine<Sint, Sgf2n>& machine, SubProcessor<Sint>* procp,
+    SubProcessor<Sgf2n>* proc2) :
     usage(machine.get_N().num_players()),
-    DataFp(*Preprocessing<sint>::get_new(machine, usage, procp)),
-    DataF2(*Preprocessing<sgf2n>::get_new(machine, usage, proc2)),
-    DataFb(
-        *Preprocessing<typename sint::bit_type>::get_new(machine.live_prep,
+    data_fp(*Preprocessing<Sint>::get_new(machine, usage, procp)),
+    data_f2(*Preprocessing<Sgf2n>::get_new(machine, usage, proc2)),
+    data_fb(
+        *Preprocessing<typename Sint::BitType>::get_new(machine.live_prep,
             machine.get_N(), usage))
 {
 }
 
-template<class sint, class sgf2n>
-Data_Files<sint, sgf2n>::Data_Files(const Names& N, int thread_num) :
+template<class Sint, class Sgf2n>
+DataFiles<Sint, Sgf2n>::DataFiles(const Names& N, int thread_num) :
     usage(N.num_players()),
-    DataFp(*new Sub_Data_Files<sint>(N, usage, thread_num)),
-    DataF2(*new Sub_Data_Files<sgf2n>(N, usage, thread_num)),
-    DataFb(*new Sub_Data_Files<typename sint::bit_type>(N, usage, thread_num))
+    data_fp(*new SubDataFiles<Sint>(N, usage, thread_num)),
+    data_f2(*new SubDataFiles<Sgf2n>(N, usage, thread_num)),
+    data_fb(*new SubDataFiles<typename Sint::BitType>(N, usage, thread_num))
 {
 }
 
 
-template<class sint, class sgf2n>
-Data_Files<sint, sgf2n>::~Data_Files()
+template<class Sint, class Sgf2n>
+DataFiles<Sint, Sgf2n>::~DataFiles()
 {
-  delete &DataFp;
-  delete &DataF2;
-  delete &DataFb;
+  delete &data_fp;
+  delete &data_f2;
+  delete &data_fb;
 }
 
 template<class T>
-Sub_Data_Files<T>::~Sub_Data_Files()
+SubDataFiles<T>::~SubDataFiles()
 {
   if (part != 0)
     delete part;
 }
 
 template<class T>
-long Sub_Data_Files<T>::additional_inputs(const DataPositions& usage)
+long SubDataFiles<T>::additional_inputs(const DataPositions& usage)
 {
   auto& domain_usage = usage.files[T::clear::field_type()];
   long add_to_inputs = domain_usage[DATA_RANDOM];
@@ -224,7 +224,7 @@ long Sub_Data_Files<T>::additional_inputs(const DataPositions& usage)
 }
 
 template<class T>
-void Sub_Data_Files<T>::seekg(DataPositions& pos)
+void SubDataFiles<T>::seekg(DataPositions& pos)
 {
   if (OnlineOptions::singleton.file_prep_per_thread)
     return;
@@ -265,38 +265,38 @@ void Sub_Data_Files<T>::seekg(DataPositions& pos)
         }
 
 
-      int block_size = edabitvec<T>::MAX_SIZE;
+      int block_size = Edabitvec<T>::MAX_SIZE;
       for (auto& x : edabit_buffers)
         {
           int n = pos.edabits[{true, x.first}] + pos.edabits[{false, x.first}];
           x.second.seekg(n / block_size);
-          edabit<T> eb;
+          Edabit<T> eb;
           for (int i = 0; i < n % block_size; i++)
             get_edabit_no_count(false, x.first, eb);
         }
     }
 }
 
-template<class sint, class sgf2n>
-void Data_Files<sint, sgf2n>::seekg(DataPositions& pos)
+template<class Sint, class Sgf2n>
+void DataFiles<Sint, Sgf2n>::seekg(DataPositions& pos)
 {
-  DataFp.seekg(pos);
-  DataF2.seekg(pos);
-  DataFb.seekg(pos);
+  data_fp.seekg(pos);
+  data_f2.seekg(pos);
+  data_fb.seekg(pos);
   usage = pos;
 }
 
-template<class sint, class sgf2n>
-void Data_Files<sint, sgf2n>::skip(const DataPositions& pos)
+template<class Sint, class Sgf2n>
+void DataFiles<Sint, Sgf2n>::skip(const DataPositions& pos)
 {
-  DataPositions new_pos = usage;
-  new_pos.increase(pos);
+  DataPositions new_position = usage;
+  new_position.increase(pos);
   skipped.increase(pos);
-  seekg(new_pos);
+  seekg(new_position);
 }
 
 template<class T>
-void Sub_Data_Files<T>::prune()
+void SubDataFiles<T>::prune()
 {
   for (auto& buffer : buffers)
     buffer.prune();
@@ -312,16 +312,16 @@ void Sub_Data_Files<T>::prune()
     x.second.prune();
 }
 
-template<class sint, class sgf2n>
-void Data_Files<sint, sgf2n>::prune()
+template<class Sint, class Sgf2n>
+void DataFiles<Sint, Sgf2n>::prune()
 {
-  DataFp.prune();
-  DataF2.prune();
-  DataFb.prune();
+  data_fp.prune();
+  data_f2.prune();
+  data_fb.prune();
 }
 
 template<class T>
-void Sub_Data_Files<T>::purge()
+void SubDataFiles<T>::purge()
 {
   for (auto& buffer : buffers)
     buffer.purge();
@@ -338,7 +338,7 @@ void Sub_Data_Files<T>::purge()
 }
 
 template<class T>
-void Sub_Data_Files<T>::setup_extended(const DataTag& tag, int tuple_size)
+void SubDataFiles<T>::setup_extended(const DataTag& tag, int tuple_size)
 {
   auto& buffer = extended[tag];
   int tuple_length = tuple_size * T::size();
@@ -346,7 +346,7 @@ void Sub_Data_Files<T>::setup_extended(const DataTag& tag, int tuple_size)
   if (!buffer.is_up())
     {
       stringstream ss;
-      ss << prep_data_dir << tag.get_string() << "-" << T::type_short() << "-P" << my_num;
+      ss << prep_data_directory << tag.get_string() << "-" << T::type_short() << "-P" << my_num;
       buffer.setup(num_players, ss.str(), tuple_length);
     }
 
@@ -354,7 +354,7 @@ void Sub_Data_Files<T>::setup_extended(const DataTag& tag, int tuple_size)
 }
 
 template<class T>
-void Sub_Data_Files<T>::get_no_count(StackedVector<T>& S, DataTag tag, const ArgVector& regs, int vector_size)
+void SubDataFiles<T>::get_no_count(StackedVector<T>& S, DataTag tag, const ArgVector& regs, int vector_size)
 {
   setup_extended(tag, regs.size());
   for (int j = 0; j < vector_size; j++)
@@ -363,31 +363,31 @@ void Sub_Data_Files<T>::get_no_count(StackedVector<T>& S, DataTag tag, const Arg
 }
 
 template<class T>
-void Sub_Data_Files<T>::get_dabit_no_count(T& a, typename T::bit_type& b)
+void SubDataFiles<T>::get_dabit_no_count(T& a, typename T::BitType& b)
 {
-  dabit<T> tmp;
+  Dabit<T> tmp;
   dabit_buffer.input(tmp);
   a = tmp.first;
   b = tmp.second;
 }
 
 template<class T>
-EdabitBuffer<T>& Sub_Data_Files<T>::get_edabit_buffer(int n_bits)
+EdabitBuffer<T>& SubDataFiles<T>::get_edabit_buffer(int n_bits)
 {
   if (edabit_buffers.find(n_bits) == edabit_buffers.end())
     {
-      string filename = PrepBase::get_edabit_filename(prep_data_dir,
+      string filename = PrepBase::get_edabit_filename(prep_data_directory,
           n_bits, my_num, thread_num);
       edabit_buffers[n_bits] = n_bits;
       edabit_buffers[n_bits].setup(filename,
-          T::size() * edabitvec<T>::MAX_SIZE
-              + n_bits * T::bit_type::part_type::size());
+          T::size() * Edabitvec<T>::MAX_SIZE
+              + n_bits * T::BitType::part_type::size());
     }
   return edabit_buffers[n_bits];
 }
 
 template<class T>
-edabitvec<T> Sub_Data_Files<T>::get_edabitvec(bool strict, int n_bits)
+Edabitvec<T> SubDataFiles<T>::get_edabitvec(bool strict, int n_bits)
 {
   if (my_edabits[n_bits].empty())
     return get_edabit_buffer(n_bits).read();
@@ -401,9 +401,9 @@ edabitvec<T> Sub_Data_Files<T>::get_edabitvec(bool strict, int n_bits)
 }
 
 template<class T>
-void Preprocessing<T>::fill(edabitvec<T>& res, bool strict, int n_bits)
+void Preprocessing<T>::fill(Edabitvec<T>& res, bool strict, int n_bits)
 {
-  edabit<T> eb;
+  Edabit<T> eb;
   while (res.size() < res.MAX_SIZE)
     {
       get_edabit_no_count(strict, n_bits, eb);
@@ -412,23 +412,23 @@ void Preprocessing<T>::fill(edabitvec<T>& res, bool strict, int n_bits)
 }
 
 template<class T>
-typename Sub_Data_Files<T>::part_type& Sub_Data_Files<T>::get_part()
+typename SubDataFiles<T>::part_type& SubDataFiles<T>::get_part()
 {
   if (part == 0)
     part = new part_type(my_num, num_players,
-        get_prep_sub_dir<typename T::part_type>(num_players), this->usage,
+        get_prep_sub_directory<typename T::part_type>(num_players), this->usage,
         thread_num);
   return *part;
 }
 
-template<class sint, class sgf2n>
-TimerWithComm Data_Files<sint, sgf2n>::total_time()
+template<class Sint, class Sgf2n>
+TimerWithCommunication DataFiles<Sint, Sgf2n>::total_time()
 {
-  return DataFp.total_time() + DataF2.total_time() + DataFb.total_time();
+  return data_fp.total_time() + data_f2.total_time() + data_fb.total_time();
 }
 
 template<class T>
-TimerWithComm Preprocessing<T>::total_time()
+TimerWithCommunication Preprocessing<T>::total_time()
 {
   auto res = prep_timer;
   try

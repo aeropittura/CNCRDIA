@@ -8,11 +8,11 @@
 #include "protocols/replicated/malicious_rep_po.h"
 
 template<class T>
-class ReplicatedPO : public MaliciousRepPO<T>
+class ReplicatedPo : public MaliciousRepPo<T>
 {
 public:
-    ReplicatedPO(Player& P) :
-            MaliciousRepPO<T>(P)
+    ReplicatedPo(Player& P) :
+            MaliciousRepPo<T>(P)
     {
     }
 

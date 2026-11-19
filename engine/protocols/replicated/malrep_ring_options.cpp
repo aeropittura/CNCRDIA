@@ -12,7 +12,7 @@ MalRepRingOptions::MalRepRingOptions()
     shuffle = false;
 }
 
-MalRepRingOptions::MalRepRingOptions(ez::ezOptionParser& opt, int argc,
+MalRepRingOptions::MalRepRingOptions(ez::EzOptionParser& opt, int argc,
         const char** argv) : MalRepRingOptions()
 {
     opt.add(
@@ -26,5 +26,5 @@ MalRepRingOptions::MalRepRingOptions(ez::ezOptionParser& opt, int argc,
     );
     opt.parse(argc, argv);
     shuffle = opt.isSet("-SH");
-    opt.resetArgs();
+    opt.reset_args();
 }

@@ -25,15 +25,15 @@ void PairwiseSetup<FD>::init(const Player& P, int sec, int plaintext_length,
     cout << "Finding parameters for security " << sec << " and field size ~2^"
             << plaintext_length << endl;
     PRNG G;
-    G.ReSeed();
+    G.re_seed();
 
-    octetStream o;
+    OctetStream o;
     if (P.my_num() == 0)
     {
         extra_slack =
-            generate_semi_setup(plaintext_length, sec, params, FieldD, true);
+            generate_semi_setup(plaintext_length, sec, params, field_d, true);
         params.pack(o);
-        FieldD.pack(o);
+        field_d.pack(o);
         o.store(extra_slack);
         P.send_all(o);
     }
@@ -41,31 +41,31 @@ void PairwiseSetup<FD>::init(const Player& P, int sec, int plaintext_length,
     {
         P.receive_player(0, o);
         params.unpack(o);
-        FieldD.unpack(o);
-        FieldD.init_field();
+        field_d.unpack(o);
+        field_d.initialize_field();
         o.get(extra_slack);
     }
 
-    alpha = FieldD;
+    alpha = field_d;
     alphai.randomize(G);
     alpha.assign_constant(alphai);
 }
 
 template <class FD>
-void PairwiseSetup<FD>::secure_init(Player& P, PairwiseMachine& machine,
+void PairwiseSetup<FD>::secure_initialize(Player& P, PairwiseMachine& machine,
         int plaintext_length, int sec, bool read_only)
 {
-    ::secure_init(*this, P, machine, plaintext_length, sec, params, read_only);
-    alpha = FieldD;
-    machine.sk = FHE_SK(params, FieldD.get_prime());
+    ::secure_initialize(*this, P, machine, plaintext_length, sec, params, read_only);
+    alpha = field_d;
+    machine.sk = FHE_SK(params, field_d.get_prime());
     for (auto& pk : machine.other_pks)
-        pk = FHE_PK(params, FieldD.get_prime());
+        pk = FHE_PK(params, field_d.get_prime());
 }
 
 template <class T, class U>
-void secure_init(T& setup, Player& P, U& machine,
+void secure_initialize(T& setup, Player& P, U& machine,
         int plaintext_length, int sec,
-        FHE_Params& params, bool read_only)
+        FheParameters& params, bool read_only)
 {
     assert(sec >= 0);
     machine.sec = sec;
@@ -74,7 +74,7 @@ void secure_init(T& setup, Player& P, U& machine,
             + to_string(plaintext_length) + "-" + to_string(sec) + "-"
             + to_string(params.secp()) + "-"
             + to_string(machine.comp_sec()) + "-"
-            + to_string(params.get_matrix_dim()) + "-"
+            + to_string(params.get_matrix_dimension()) + "-"
             + OnlineOptions::singleton.prime.get_str() + "-"
             + to_string(CowGearOptions::singleton.top_gear()) + "-P"
             + to_string(P.my_num()) + "-" + to_string(P.num_players());
@@ -83,7 +83,7 @@ void secure_init(T& setup, Player& P, U& machine,
 
     try
     {
-        octetStream os;
+        OctetStream os;
         os.input(filename);
         os.get(machine.extra_slack);
         setup.unpack(os);
@@ -97,7 +97,7 @@ void secure_init(T& setup, Player& P, U& machine,
     {
         setup.check(P, machine);
     }
-    catch (mismatch_among_parties& e)
+    catch (MismatchAmongParties& e)
     {
         if (reason.empty())
             reason = e.what();
@@ -117,7 +117,7 @@ void secure_init(T& setup, Player& P, U& machine,
         setup = base_setup;
         setup.generate(P, machine, plaintext_length, sec);
         setup.check(P, machine);
-        octetStream os;
+        OctetStream os;
         os.store(machine.extra_slack);
         setup.pack(os);
         ofstream file(filename);
@@ -126,12 +126,12 @@ void secure_init(T& setup, Player& P, U& machine,
 
     if (OnlineOptions::singleton.has_option("verbose_he"))
     {
-        cerr << "Ciphertext length: " << params.p0().numBits();
+        cerr << "Ciphertext length: " << params.p0().num_bits();
         for (size_t i = 1; i < params.FFTD().size(); i++)
-            cerr << "+" << params.FFTD()[i].get_prime().numBits();
-        cerr << " (" << DIV_CEIL(params.p0().numBits(), 64);
+            cerr << "+" << params.FFTD()[i].get_prime().num_bits();
+        cerr << " (" << DIV_CEIL(params.p0().num_bits(), 64);
         for (size_t i = 1; i < params.FFTD().size(); i++)
-            cerr << "+" << DIV_CEIL(params.FFTD()[i].get_prime().numBits(), 64);
+            cerr << "+" << DIV_CEIL(params.FFTD()[i].get_prime().num_bits(), 64);
         cerr << " limbs)";
         cerr << endl;
         cerr << "Number of slots: " << params.phi_m() << endl;
@@ -143,24 +143,24 @@ void PairwiseSetup<FD>::generate(Player&, MachineBase& machine,
         int plaintext_length, int sec)
 {
     machine.extra_slack = generate_semi_setup(plaintext_length, sec, params,
-            FieldD, true);
+            field_d, true);
 }
 
 template<class FD>
-void PairwiseSetup<FD>::pack(octetStream& os) const
+void PairwiseSetup<FD>::pack(OctetStream& os) const
 {
     params.pack(os);
-    FieldD.pack(os);
+    field_d.pack(os);
     alpha.pack(os);
     alphai.pack(os);
 }
 
 template<class FD>
-void PairwiseSetup<FD>::unpack(octetStream& os)
+void PairwiseSetup<FD>::unpack(OctetStream& os)
 {
     params.unpack(os);
-    FieldD.unpack(os);
-    FieldD.init_field();
+    field_d.unpack(os);
+    field_d.initialize_field();
     alpha.unpack(os);
     alphai.unpack(os);
 }
@@ -168,10 +168,10 @@ void PairwiseSetup<FD>::unpack(octetStream& os)
 template <class FD>
 void PairwiseSetup<FD>::check(Player& P, PairwiseMachine& machine)
 {
-    Bundle<octetStream> bundle(P);
+    Bundle<OctetStream> bundle(P);
     bundle.mine.store(machine.extra_slack);
     params.pack(bundle.mine);
-    FieldD.hash(bundle.mine);
+    field_d.hash(bundle.mine);
     bundle.compare(P);
 }
 
@@ -180,10 +180,10 @@ void PairwiseSetup<FD>::covert_key_generation(Player& P,
         PairwiseMachine& machine, int num_runs)
 {
     CODE_LOCATION
-    vector<SeededPRNG> G(num_runs);
+    vector<SeededPrng> G(num_runs);
     vector<AllCommitments> commits(num_runs, P);
-    vector<FHE_KeyPair> my_keys(num_runs, {params, FieldD.get_prime()});
-    Bundle<octetStream> pks(P);
+    vector<FheKeyPair> my_keys(num_runs, {params, field_d.get_prime()});
+    Bundle<OctetStream> pks(P);
 
     for (int i = 0; i < num_runs; i++)
     {
@@ -192,8 +192,8 @@ void PairwiseSetup<FD>::covert_key_generation(Player& P,
         commits[i].commit({SEED_SIZE, G[i].get_seed()});
     }
 
-    P.Broadcast_Receive(pks);
-    int challenge = GlobalPRNG(P).get_uint(num_runs);
+    P.broadcast_receive(pks);
+    int challenge = GlobalPrng(P).get_uint(num_runs);
     machine.sk = my_keys[challenge].sk;
     machine.pk = my_keys[challenge].pk;
 
@@ -212,11 +212,11 @@ void PairwiseSetup<FD>::covert_key_generation(Player& P,
                     machine.other_pks[j] = pk;
                 else
                 {
-                    FHE_KeyPair pair(params, FieldD.get_prime());
+                    FheKeyPair pair(params, field_d.get_prime());
                     PRNG prng(commits[i].messages[j]);
                     pair.generate(prng);
                     if (pair.pk != pk)
-                        throw bad_keygen("covert pairwise key generation");
+                        throw BadKeygen("covert pairwise key generation");
                 }
             }
     }
@@ -248,11 +248,11 @@ void PairwiseSetup<FD>::set_alphai(T alphai)
     alpha.assign_constant(alphai);
 }
 
-template class PairwiseSetup<FFT_Data>;
+template class PairwiseSetup<FftData>;
 template class PairwiseSetup<P2Data>;
 
-template void secure_init(PartSetup<FFT_Data>&, Player&, MachineBase&, int, int, FHE_Params& params, bool);
-template void secure_init(PartSetup<P2Data>&, Player&, MachineBase&, int, int, FHE_Params& params, bool);
+template void secure_initialize(PartSetup<FftData>&, Player&, MachineBase&, int, int, FheParameters& params, bool);
+template void secure_initialize(PartSetup<P2Data>&, Player&, MachineBase&, int, int, FheParameters& params, bool);
 
-template void secure_init(TemiSetup<FFT_Data>&, Player&, MachineBase&, int, int, FHE_Params& params, bool);
-template void secure_init(TemiSetup<P2Data>&, Player&, MachineBase&, int, int, FHE_Params& params, bool);
+template void secure_initialize(TemiSetup<FftData>&, Player&, MachineBase&, int, int, FheParameters& params, bool);
+template void secure_initialize(TemiSetup<P2Data>&, Player&, MachineBase&, int, int, FheParameters& params, bool);

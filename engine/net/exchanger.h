@@ -14,8 +14,8 @@ template<class T>
 class Exchanger
 {
     T send_socket, receive_socket;
-    const octetStream& send_stream;
-    octetStream& receive_stream;
+    const OctetStream& send_stream;
+    OctetStream& receive_stream;
 
     size_t sent, received;
     bool length_received;
@@ -23,17 +23,17 @@ class Exchanger
     size_t n_iter, n_send;
 
     size_t len;
-    octet* data;
+    Octet* data;
 
-    Timer recv_timer;
+    Timer receive_timer;
     Timer send_timer;
 
     bool debug;
     int delay;
 
 public:
-    Exchanger(T send_socket, const octetStream& send_stream, T receive_socket,
-            octetStream& receive_stream) :
+    Exchanger(T send_socket, const OctetStream& send_stream, T receive_socket,
+            OctetStream& receive_stream) :
             send_socket(send_socket), receive_socket(receive_socket), send_stream(
                     send_stream), receive_stream(receive_stream)
     {
@@ -58,7 +58,7 @@ public:
     ~Exchanger()
     {
 #ifdef TIME_ROUNDS
-  cout << "Exchange time: " << recv_timer.elapsed() << " seconds and " << n_iter <<
+  cout << "Exchange time: " << receive_timer.elapsed() << " seconds and " << n_iter <<
           " iterations to receive "
       << 1e-3 * new_len << " KB, " << send_timer.elapsed() << " seconds and " << n_send
       << " iterations to send " << 1e-3 * len << " KB" << endl;
@@ -104,7 +104,7 @@ public:
             if (to_receive > 0)
             {
 #ifdef TIME_ROUNDS
-                    TimeScope ts(recv_timer);
+                    TimeScope ts(receive_timer);
       #endif
 
                 if (debug)
@@ -132,11 +132,11 @@ public:
         else if (not length_received and receive_socket)
         {
 #ifdef TIME_ROUNDS
-                TimeScope ts(recv_timer);
+                TimeScope ts(receive_timer);
       #endif
             if (debug)
                 cerr << "receive length from " << receive_socket << endl;
-            octet blen[LENGTH_SIZE];
+            Octet blen[LENGTH_SIZE];
             size_t tmp = LENGTH_SIZE;
             if (sent < len or not block)
                 tmp = receive_all_or_nothing(receive_socket, blen, LENGTH_SIZE);

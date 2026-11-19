@@ -18,9 +18,9 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     ShamirOptions::singleton = {opt, argc, argv};
     OnlineOptions opts(opt, argc, argv);
-    gf2n_short::init_minimum(opts.security_parameter);
-    GC::ShareParty<GC::MaliciousCcdSecret<gf2n_short>>(argc, argv, opt);
+    Gf2nShort::initialize_minimum(opts.security_parameter);
+    GC::ShareParty<GC::MaliciousCcdSecret<Gf2nShort>>(argc, argv, opt);
 }

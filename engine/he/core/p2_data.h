@@ -11,15 +11,15 @@
 class P2Data
 {
   int slots;
-  // Data for the forward mapping  ((slots*gf2n:deg) by phi_m)
-  imatrix A;
+  // Data for the forward mapping  ((slots*Gf2n:deg) by phi_m)
+  Imatrix A;
   // Data for the backward mapping (phi_m by phi_m)
-  imatrix Ai;
+  Imatrix Ai;
 
   public:
-  typedef gf2n_short T;
+  typedef Gf2nShort T;
   typedef int S;
-  typedef fixint<0> poly_type;
+  typedef Fixint<0> poly_type;
 
   int num_slots() const { return slots; }
   int degree() const { return A.size() ? A.size() : 0; }
@@ -27,8 +27,8 @@ class P2Data
 
   void check_dimensions() const;
 
-  void forward(vector<poly_type>& ans,const vector<gf2n_short>& a) const;
-  void backward(vector<gf2n_short>& ans,const vector<poly_type>& a) const;
+  void forward(vector<poly_type>& ans,const vector<Gf2nShort>& a) const;
+  void backward(vector<Gf2nShort>& ans,const vector<poly_type>& a) const;
 
   int get_prime() const { return 2; }
   void write_setup(const string&) const {}
@@ -36,17 +36,17 @@ class P2Data
   bool operator!=(const P2Data& other) const;
 
   // no op because we require field to be initalized first
-  void init_field() const {}
+  void initialize_field() const {}
 
-  void hash(octetStream& o) const;
-  void pack(octetStream& o) const;
-  void unpack(octetStream& o);
+  void hash(OctetStream& o) const;
+  void pack(OctetStream& o) const;
+  void unpack(OctetStream& o);
 
-  void load(const Ring& Rg);
-  void store(const Ring& Rg) const;
+  void load(const Ring& rg);
+  void store(const Ring& rg) const;
 
-  void load_or_generate(const Ring& Rg);
+  void load_or_generate(const Ring& rg);
 
 
-  friend void init(P2Data& P2D,const Ring& Rg);
+  friend void init(P2Data& P2D,const Ring& rg);
 };

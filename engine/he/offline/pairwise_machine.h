@@ -12,7 +12,7 @@
 class PairwiseMachine : public virtual MachineBase
 {
 public:
-    PairwiseSetup<FFT_Data> setup_p;
+    PairwiseSetup<FftData> setup_p;
     PairwiseSetup<P2Data> setup_2;
     Player& P;
 
@@ -32,8 +32,8 @@ public:
         return setup<FD>();
     }
 
-    void pack(octetStream& os) const;
-    void unpack(octetStream& os);
+    void pack(OctetStream& os) const;
+    void unpack(OctetStream& os);
 
     void check(Player& P) const;
 

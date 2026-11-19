@@ -8,21 +8,21 @@
 #include "ot/ot_extension.h"
 #include "support/ez_option_parser.h"
 
-class OTMachine
+class OtMachine
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     OT_ROLE ot_role;
 
 public:
     int my_num, portnum_base, nthreads, nloops, nsubloops, nbase;
-    long nOTs;
+    long n_ots;
     bool passive;
     TwoPartyPlayer* P;
-    BitVector baseReceiverInput;
+    BitVector base_receiver_input;
     BaseOT* bot_;
     vector<Names*> N;
 
-    OTMachine(int argc, const char** argv);
-    ~OTMachine();
+    OtMachine(int argc, const char** argv);
+    ~OtMachine();
     void run();
 };

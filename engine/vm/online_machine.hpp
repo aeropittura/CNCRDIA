@@ -22,9 +22,9 @@
 using namespace std;
 
 template<class V>
-OnlineMachine::OnlineMachine(int argc, const char** argv, ez::ezOptionParser& opt,
-        OnlineOptions& online_opts, int nplayers, V) :
-        argc(argc), argv(argv), online_opts(online_opts),
+OnlineMachine::OnlineMachine(int argc, const char** argv, ez::EzOptionParser& opt,
+        OnlineOptions& online_options, int nplayers, V) :
+        argc(argc), argv(argv), online_options(online_options),
         use_encryption(false),
         opt(opt), nplayers(nplayers)
 {
@@ -79,22 +79,22 @@ OnlineMachine::OnlineMachine(int argc, const char** argv, ez::ezOptionParser& op
     );
 
     opt.parse(argc, argv);
-    opt.resetArgs();
+    opt.reset_args();
 }
 
 inline
 DishonestMajorityMachine::DishonestMajorityMachine(int argc,
-        const char** argv, ez::ezOptionParser& opt, OnlineOptions& online_opts,
+        const char** argv, ez::EzOptionParser& opt, OnlineOptions& online_options,
         int nplayers) :
-        DishonestMajorityMachine(argc, argv, opt, online_opts, gf2n())
+        DishonestMajorityMachine(argc, argv, opt, online_options, Gf2n())
 {
     assert(nplayers == 0);
 }
 
 template<class V>
 DishonestMajorityMachine::DishonestMajorityMachine(int argc, const char** argv,
-        ez::ezOptionParser& opt, OnlineOptions& online_opts, V, int nplayers) :
-        OnlineMachine(argc, argv, opt, online_opts, nplayers, V())
+        ez::EzOptionParser& opt, OnlineOptions& online_options, V, int nplayers) :
+        OnlineMachine(argc, argv, opt, online_options, nplayers, V())
 {
     opt.example = string() + argv[0] + " -p 0 -N 2 sample-prog\n" + argv[0]
             + " -h localhost -p 1 -N 2 sample-prog\n";
@@ -108,7 +108,7 @@ DishonestMajorityMachine::DishonestMajorityMachine(int argc, const char** argv,
           "-e", // Flag token.
           "--encrypted" // Flag token.
     );
-    online_opts.finalize(opt, argc, argv);
+    online_options.finalize(opt, argc, argv);
 
     use_encryption = opt.isSet("--encrypted");
 
@@ -118,41 +118,41 @@ DishonestMajorityMachine::DishonestMajorityMachine(int argc, const char** argv,
 inline
 void OnlineMachine::start_networking()
 {
-    string hostname, ipFileName;
+    string hostname, ip_file_name;
     int pnbase;
     int my_port;
 
     opt.get("--portnumbase")->getInt(pnbase);
     opt.get("--hostname")->getString(hostname);
-    opt.get("--ip-file-name")->getString(ipFileName);
+    opt.get("--ip-file-name")->getString(ip_file_name);
 
-    ez::OptionGroup* mp_opt = opt.get("--my-port");
-    if (mp_opt->isSet)
-      mp_opt->getInt(my_port);
+    ez::OptionGroup* mp_option = opt.get("--my-port");
+    if (mp_option->isSet)
+      mp_option->getInt(my_port);
     else
       my_port = Names::DEFAULT_PORT;
 
-    int mynum = online_opts.playerno;
-    int playerno = online_opts.playerno;
+    int mynum = online_options.playerno;
+    int playerno = online_options.playerno;
 
-    if (ipFileName.size() > 0) {
+    if (ip_file_name.size() > 0) {
       if (my_port != Names::DEFAULT_PORT)
         throw runtime_error("cannot set port number when using IP file");
       if (nplayers == 0 and opt.isSet("-N"))
         opt.get("-N")->getInt(nplayers);
-      playerNames.init(playerno, pnbase, ipFileName, nplayers);
+      player_names.init(playerno, pnbase, ip_file_name, nplayers);
     } else {
       if (not opt.get("-ext-server")->isSet)
       {
         if (nplayers == 0)
           opt.get("-N")->getInt(nplayers);
-        Server::start_networking(playerNames, mynum, nplayers,
+        Server::start_networking(player_names, mynum, nplayers,
             hostname, pnbase, my_port);
       }
       else
       {
         cerr << "Relying on external Server.x" << endl;
-        playerNames.init(playerno, pnbase, my_port, hostname.c_str());
+        player_names.init(playerno, pnbase, my_port, hostname.c_str());
       }
     }
 }
@@ -161,15 +161,15 @@ inline
 Player* OnlineMachine::new_player(const string& id_base)
 {
     if (use_encryption)
-        return new CryptoPlayer(playerNames, id_base);
+        return new CryptoPlayer(player_names, id_base);
     else
-        return new PlainPlayer(playerNames, id_base);
+        return new PlainPlayer(player_names, id_base);
 }
 
 template<class T, class U>
 int OnlineMachine::run()
 {
-    if (online_opts.has_option("throw_exceptions"))
+    if (online_options.has_option("throw_exceptions"))
         return run_with_error<T, U>();
     else
     {
@@ -192,10 +192,10 @@ int OnlineMachine::run_with_error()
     try
 #endif
     {
-        Machine<T, U>(playerNames, use_encryption, online_opts).run(
-                online_opts.progname);
+        Machine<T, U>(player_names, use_encryption, online_options).run(
+                online_options.progname);
 
-        if (online_opts.verbose)
+        if (online_options.verbose)
           {
             cerr << "Command line:";
             for (int i = 0; i < argc; i++)
@@ -206,8 +206,8 @@ int OnlineMachine::run_with_error()
 #ifndef INSECURE
     catch(...)
     {
-        if (not online_opts.live_prep)
-            thread_info<T, U>::purge_preprocessing(playerNames, 0);
+        if (not online_options.live_prep)
+            thread_info<T, U>::purge_preprocessing(player_names, 0);
         throw;
     }
 #endif

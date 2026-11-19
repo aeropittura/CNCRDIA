@@ -5,7 +5,7 @@
 
 #pragma once
 
-template<class share_type>
+template<class ShareType>
 string get_ot_secrets_filename(const Player& P);
 
 template<class T>
@@ -14,22 +14,22 @@ class MascotMacKey : public T
     MascotMacKey(const MascotMacKey&) = default;
 
 public:
-    OTTripleSetup ot;
+    OtTripleSetup ot;
 
     MascotMacKey() = default;
 
     MascotMacKey& operator=(MascotMacKey&&) = default;
 
-    template<class share_type>
+    template<class ShareType>
     void read_or_generate(Player& P);
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         T::pack(os);
         ot.pack(os);
     }
 
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
         T::unpack(os);
         ot.unpack(os);

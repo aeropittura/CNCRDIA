@@ -13,7 +13,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
-    DishonestMajorityFieldMachine<Share, Share, gf2n,
+    ez::EzOptionParser opt;
+    DishonestMajorityFieldMachine<Share, Share, Gf2n,
             OfflineMachine<DishonestMajorityMachine>>(argc, argv, opt);
 }

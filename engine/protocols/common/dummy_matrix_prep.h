@@ -8,7 +8,7 @@
 #include "vm/data_files.h"
 #include "protocols/common/share_matrix.h"
 
-class no_matrix_prep : public exception
+class NoMatrixPrep : public exception
 {
 };
 
@@ -19,6 +19,6 @@ public:
     DummyMatrixPrep(int, int, int, Preprocessing<T>&, DataPositions& usage) :
             Preprocessing<ShareMatrix<T>>(usage)
     {
-        throw no_matrix_prep();
+        throw NoMatrixPrep();
     }
 };

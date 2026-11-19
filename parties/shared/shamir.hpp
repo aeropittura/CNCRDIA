@@ -41,7 +41,7 @@ template<template<class U> class T>
 ShamirMachineSpec<T>::ShamirMachineSpec(int argc, const char** argv)
 {
     auto& opts = ShamirOptions::singleton;
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     opts = {opt, argc, argv};
     HonestMajorityFieldMachine<T>(argc, argv, opt, opts.nparties);
 }

@@ -26,12 +26,12 @@ void EvalRegister::inputbvec(T& processor, ProcessorBase& input_processor,
 }
 
 template <class T>
-void PRFRegister::load(vector<GC::ReadAccess<T> >& accesses,
+void PrfRegister::load(vector<GC::ReadAccess<T> >& accesses,
         const NoMemory& source)
 {
     (void)source;
     for (auto access : accesses)
-        for (auto& reg : access.dest.get_regs())
+        for (auto& reg : access.dest.get_registers())
         {
             ProgramParty::s().receive_keys(reg);
             ProgramParty::s().store_wire(reg);
@@ -79,22 +79,22 @@ void EvalRegister::store(GC::Memory<U>& mem,
 	check_for_doubles(accesses, "storing");
 	auto& party = ProgramPartySpec<U>::s();
 	vector<U> S, S2, S3, S4, S5, SS;
-	vector<gf2n_long> exts;
+	vector<Gf2nLong> exts;
 	int n_registers = 0;
 	for (auto access : accesses)
-		n_registers += access.source.get_regs().size();
+		n_registers += access.source.get_registers().size();
 	for (auto access : accesses)
 	{
 		U& dest = mem[access.address];
 		dest.assign_zero();
-		const vector<EvalRegister>& sources = access.source.get_regs();
+		const vector<EvalRegister>& sources = access.source.get_registers();
 		for (unsigned int i = 0; i < sources.size(); i++)
 		{
 			DualWire<U> spdz_wire;
 			party.get_spdz_wire(SPDZ_STORE, spdz_wire);
 			const EvalRegister& reg = sources[i];
 			U tmp;
-			gf2n_long ext = (int)reg.get_external();
+			Gf2nLong ext = (int)reg.get_external();
 			//cout << "ext:" << ext << "/" << (int)reg.get_external() << " " << endl;
 			tmp = spdz_wire.mask + U::constant(ext, (int)party.get_id() - 1, party.get_mac_key());
 			S.push_back(tmp);
@@ -124,7 +124,7 @@ void EvalRegister::store(GC::Memory<U>& mem,
 
 #ifdef DEBUG_SPDZ
 	party.MC->Check(*party.P);
-	vector<gf2n> v, v3, vv;
+	vector<Gf2n> v, v3, vv;
 	party.MC->POpen_Begin(vv, SS, *party.P);
 	party.MC->POpen_End(vv, SS, *party.P);
 	cout << "stored " << vv.back() << " from bits:";
@@ -180,7 +180,7 @@ void EvalRegister::load(vector<GC::ReadAccess<T> >& accesses,
 	{
 		const U& source = mem[access.address];
 		U mask;
-		vector<EvalRegister>& dests = access.dest.get_regs();
+		vector<EvalRegister>& dests = access.dest.get_registers();
 		for (unsigned int i = 0; i < dests.size(); i++)
 		{
 			spdz_wires.push_back({});
@@ -195,13 +195,13 @@ void EvalRegister::load(vector<GC::ReadAccess<T> >& accesses,
 
 #ifdef DEBUG_SPDZ
 	party.MC->Check(*party.P);
-	vector<gf2n> v;
+	vector<Gf2n> v;
 	party.MC->POpen_Begin(v, S, *party.P);
 	party.MC->POpen_End(v, S, *party.P);
 	for (size_t j = 0; j < accesses.size(); j++)
 	{
 		cout << "loaded " << v[j] << " / ";
-		vector<Register>& dests = accesses[j].dest.get_regs();
+		vector<Register>& dests = accesses[j].dest.get_registers();
 		for (unsigned int i = 0; i < dests.size(); i++)
 			cout << (int)dests[i].get_external();
 		cout << " from " << S[j] << endl;
@@ -209,14 +209,14 @@ void EvalRegister::load(vector<GC::ReadAccess<T> >& accesses,
 	party.MC->Check(*party.P);
 #endif
 
-	vector<gf2n_long> masked;
+	vector<Gf2nLong> masked;
 	party.MC->POpen_Begin(masked, shares, *party.P);
 	party.MC->POpen_End(masked, shares, *party.P);
-	vector<octetStream> keys(party.get_n_parties());
+	vector<OctetStream> keys(party.get_n_parties());
 
 	for (size_t j = 0; j < accesses.size(); j++)
 	{
-		vector<EvalRegister>& dests = accesses[j].dest.get_regs();
+		vector<EvalRegister>& dests = accesses[j].dest.get_registers();
 		for (unsigned int i = 0; i < dests.size(); i++)
 		{
 			bool ext = masked[j].get_bit(i);
@@ -232,7 +232,7 @@ void EvalRegister::load(vector<GC::ReadAccess<T> >& accesses,
 	int base = 0;
 	for (auto access : accesses)
 	{
-		vector<EvalRegister>& dests = access.dest.get_regs();
+		vector<EvalRegister>& dests = access.dest.get_registers();
 		for (unsigned int i = 0; i < dests.size(); i++)
 			for (int j = 0; j < party.get_n_parties(); j++)
 			{

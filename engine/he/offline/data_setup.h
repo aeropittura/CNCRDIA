@@ -21,8 +21,8 @@ class PartSetup
 public:
   typedef typename FD::T T;
 
-  FHE_Params params;
-  FD FieldD;
+  FheParameters params;
+  FD field_d;
   FHE_PK pk;
   FHE_SK sk;
   Ciphertext calpha;
@@ -51,15 +51,15 @@ public:
       bool distributed = true, bool check_security = true);
   void insecure_debug_keys(vector<PartSetup<FD> >& setups, int nplayers, bool simple_pk);
 
-  void pack(octetStream& os);
-  void unpack(octetStream& os);
+  void pack(OctetStream& os);
+  void unpack(OctetStream& os);
 
-  void init_field();
+  void initialize_field();
 
   void check() const;
   bool operator!=(const PartSetup<FD>& other);
 
-  void secure_init(Player& P, MachineBase& machine, int plaintext_length,
+  void secure_initialize(Player& P, MachineBase& machine, int plaintext_length,
       int sec, bool read_only = false);
   void generate(Player& P, MachineBase& machine, int plaintext_length,
       int sec);
@@ -79,7 +79,7 @@ public:
 class DataSetup
 {
 public:
-  PartSetup<FFT_Data> setup_p;
+  PartSetup<FftData> setup_p;
   PartSetup<P2Data> setup_2;
 
   DataSetup();
@@ -93,5 +93,5 @@ public:
   PartSetup<FD>& get_setup() { return part<FD>(); }
 };
 
-template<> inline PartSetup<FFT_Data>& DataSetup::part<FFT_Data>() { return setup_p; }
+template<> inline PartSetup<FftData>& DataSetup::part<FftData>() { return setup_p; }
 template<> inline PartSetup<P2Data>& DataSetup::part<P2Data>() { return setup_2; }

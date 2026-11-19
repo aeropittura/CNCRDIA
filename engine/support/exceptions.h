@@ -8,97 +8,97 @@ using namespace std;
 
 void exit_error(const string& message);
 
-class not_implemented: public exception
+class NotImplemented: public exception
     { virtual const char* what() const throw()
         { return "Case not implemented"; }
     };
-class division_by_zero: public exception
+class DivisionByZero: public exception
     { virtual const char* what() const throw()
         { return "Division by zero"; }
     };
-class invalid_plaintext: public exception
+class InvalidPlaintext: public exception
     { virtual const char* what() const throw()
         { return "Inconsistent plaintext space"; }
     };
-class rep_mismatch: public exception
+class RepMismatch: public exception
     { virtual const char* what() const throw()
         { return "Representation mismatch"; }
     };
-class pr_mismatch: public exception
+class PrMismatch: public exception
     { virtual const char* what() const throw()
         { return "Prime mismatch"; }
     };
-class params_mismatch: public exception
+class ParametersMismatch: public exception
     { virtual const char* what() const throw()
         { return "FHE params mismatch"; }
     };
-class field_mismatch: public exception
+class FieldMismatch: public exception
     { virtual const char* what() const throw()
         { return "Plaintext Field mismatch"; }
     };
-class level_mismatch: public exception
+class LevelMismatch: public exception
     { virtual const char* what() const throw()
         { return "Level mismatch"; }
     };
-class invalid_length: public runtime_error
+class InvalidLength: public runtime_error
     {
     public:
-      invalid_length(string msg = "") : runtime_error("Invalid length: " + msg) {}
+      InvalidLength(string msg = "") : runtime_error("Invalid length: " + msg) {}
     };
-class invalid_commitment: public runtime_error
+class InvalidCommitment: public runtime_error
     {
 public:
-    invalid_commitment(int player = -1, const char* message = 0);
+    InvalidCommitment(int player = -1, const char* message = 0);
     };
-class IO_Error: public exception
+class IoError: public exception
     {
       string ans;
       public:
-      IO_Error(const string& m);
-      ~IO_Error()throw() { }
+      IoError(const string& m);
+      ~IoError()throw() { }
       virtual const char* what() const throw()
         {
           return ans.c_str(); 
         }
     };
-class broadcast_invalid: public exception
+class BroadcastInvalid: public exception
     { virtual const char* what() const throw()
         { return "Inconsistent broadcast at some point"; }
     };
-class bad_keygen: public runtime_error
+class BadKeygen: public runtime_error
     {
       public:
-      bad_keygen(string m) : runtime_error("KeyGen has gone wrong: "+m) {}
+      BadKeygen(string m) : runtime_error("KeyGen has gone wrong: "+m) {}
     };
-class bad_enccommit:  public exception
+class BadEnccommit:  public exception
     { virtual const char* what() const throw()
         { return "Error in EncCommit"; }
     };
-class invalid_params:  public exception
+class InvalidParameters:  public exception
     { virtual const char* what() const throw()
         { return "Invalid Params"; }
     };
-class bad_value: public runtime_error
+class BadValue: public runtime_error
     {
       public:
-      bad_value(string msg = "Some value is wrong somewhere") : runtime_error(msg) {}
+      BadValue(string msg = "Some value is wrong somewhere") : runtime_error(msg) {}
     };
-class Offline_Check_Error: public runtime_error
+class OfflineCheckError: public runtime_error
     {
       public:
-      Offline_Check_Error(string m) :
+      OfflineCheckError(string m) :
           runtime_error("Offline-Check-Error : " + m) {}
     };
-class mac_fail:  public bad_value
+class MacFail:  public BadValue
     {
       public:
-      mac_fail(string msg = "MacCheck Failure") : bad_value(msg) {}
+      MacFail(string msg = "MacCheck Failure") : BadValue(msg) {}
     };
-class consistency_check_fail:  public exception
+class ConsistencyCheckFail:  public exception
     { virtual const char* what() const throw()
         { return "OT consistency check failed"; }
     };
-class invalid_program:  public exception
+class InvalidProgram:  public exception
     { virtual const char* what() const throw()
         { return "Invalid Program"; }
     };
@@ -113,10 +113,10 @@ class file_error:  public exception
           return ans.c_str();
         }
     };
-class end_of_file: public exception
+class EndOfFile: public exception
     { string filename, context, ans;
       public:
-      end_of_file(string pfilename="no filename", string pcontext="") : 
+      EndOfFile(string pfilename="no filename", string pcontext="") : 
         filename(pfilename), context(pcontext)
         {
           ans="End of file when reading ";
@@ -124,16 +124,16 @@ class end_of_file: public exception
           ans+=" ";
           ans+=context;
         }
-      ~end_of_file()throw() { }
+      ~EndOfFile()throw() { }
       virtual const char* what() const throw()
         {
           return ans.c_str();
         }
     };
-class file_missing:  public exception
+class FileMissing:  public exception
     { string filename, context, ans;
       public:
-      file_missing(string pfilename="no filename", string pcontext="") : 
+      FileMissing(string pfilename="no filename", string pcontext="") : 
         filename(pfilename), context(pcontext)
         {
           ans="File missing : ";
@@ -141,55 +141,55 @@ class file_missing:  public exception
           ans+=" ";
           ans+=context;
         }
-      ~file_missing()throw() { }
+      ~FileMissing()throw() { }
       virtual const char* what() const throw()
         {
           return ans.c_str();
         }
     };    
-class Processor_Error: public exception
+class ProcessorError: public exception
     { string msg;
       public:
-      Processor_Error(const string& m);
-      Processor_Error(const char* m);
-      ~Processor_Error()throw() { }
+      ProcessorError(const string& m);
+      ProcessorError(const char* m);
+      ~ProcessorError()throw() { }
       virtual const char* what() const throw()
         {
           return msg.c_str();
         }
     };
 
-class max_mod_sz_too_small : public exception
+class MaxModSizeTooSmall : public exception
     {
       string msg;
       public:
-      max_mod_sz_too_small(int len)
+      MaxModSizeTooSmall(int len)
         { stringstream out;
           out << "MAX_MOD_SZ too small for desired bit length of p, "
                   << "must be at least ceil(len(p)/len(word)), "
                   << "in this case: " << len;
           msg = out.str();
         }
-      ~max_mod_sz_too_small() throw() {}
+      ~MaxModSizeTooSmall() throw() {}
       virtual const char* what() const throw()
         {
           return msg.c_str();
         }
     };
-class crash_requested: public exception
+class CrashRequested: public exception
     { virtual const char* what() const throw()
         { return "Crash requested by program"; }
     };
-class memory_exception : public exception {};
-class how_would_that_work : public exception {};
-class not_enough_to_buffer : public runtime_error
+class MemoryException : public exception {};
+class HowWouldThatWork : public exception {};
+class NotEnoughToBuffer : public runtime_error
 {
 public:
-    not_enough_to_buffer(const string& type, const string& filename);
+    NotEnoughToBuffer(const string& type, const string& filename);
 };
-class needs_cleaning : public exception {};
+class NeedsCleaning : public exception {};
 
-class closed_connection : public exception
+class ClosedConnection : public exception
 {
     const char* what() const throw()
     {
@@ -202,16 +202,16 @@ class closed_connection : public exception
     }
 };
 
-class no_singleton : public runtime_error
+class NoSingleton : public runtime_error
 {
 public:
-    no_singleton(string msg = "no singleton") :
+    NoSingleton(string msg = "no singleton") :
             runtime_error(msg)
     {
     }
 };
 
-class ran_out : public exception
+class RanOut : public exception
 {
     const char* what() const throw()
     {
@@ -219,19 +219,19 @@ class ran_out : public exception
     }
 };
 
-class bigint;
+class Bigint;
 
-class wrong_gfp_size : public runtime_error
+class WrongGfpSize : public runtime_error
 {
 public:
-    wrong_gfp_size(const char* name, const bigint& p, const char* symbol,
+    WrongGfpSize(const char* name, const Bigint& p, const char* symbol,
             int n_limbs);
 };
 
-class mac_key_error: public runtime_error
+class MacKeyError: public runtime_error
 {
 public:
-    mac_key_error(string filename) :
+    MacKeyError(string filename) :
             runtime_error("error loading MAC key from " + filename)
     {
     }
@@ -243,16 +243,16 @@ public:
     overflow(const string& name, size_t i, size_t n);
 };
 
-class unknown_input_type : public runtime_error
+class UnknownInputType : public runtime_error
 {
 public:
-    unknown_input_type(int type);
+    UnknownInputType(int type);
 };
 
-class invalid_opcode : public runtime_error
+class InvalidOpcode : public runtime_error
 {
 public:
-    invalid_opcode(int opcode);
+    InvalidOpcode(int opcode);
 };
 
 class input_error : public exception
@@ -269,64 +269,64 @@ public:
     }
 };
 
-class signature_mismatch : public runtime_error
+class SignatureMismatch : public runtime_error
 {
 public:
-    signature_mismatch(const string& filename, bool has_mac = false);
+    SignatureMismatch(const string& filename, bool has_mac = false);
 };
 
-class insufficient_memory : public runtime_error
+class InsufficientMemory : public runtime_error
 {
 public:
-    insufficient_memory(size_t size, const string& type);
+    InsufficientMemory(size_t size, const string& type);
 };
 
-class gf2n_not_supported : public runtime_error
+class Gf2nNotSupported : public runtime_error
 {
 public:
-    gf2n_not_supported(int n, string options = "");
+    Gf2nNotSupported(int n, string options = "");
 };
 
-class setup_error : public runtime_error
+class SetupError : public runtime_error
 {
 public:
-    setup_error(const string& error);
+    SetupError(const string& error);
 };
 
-class prep_setup_error : public setup_error
+class PrepSetupError : public SetupError
 {
 public:
-    prep_setup_error(const string& error, int nplayers, const string& fake_opts);
+    PrepSetupError(const string& error, int nplayers, const string& fake_options);
 };
 
-class insufficient_shares : public runtime_error
+class InsufficientShares : public runtime_error
 {
 public:
-    insufficient_shares(int expected, int actual, exception& e);
+    InsufficientShares(int expected, int actual, exception& e);
 };
 
-class persistence_error : public runtime_error
+class PersistenceError : public runtime_error
 {
 public:
-    persistence_error(const string& error);
+    PersistenceError(const string& error);
 };
 
-class bytecode_error : public runtime_error
+class BytecodeError : public runtime_error
 {
 public:
-    bytecode_error(const string& error);
+    BytecodeError(const string& error);
 };
 
-typedef bytecode_error Invalid_Instruction;
+typedef BytecodeError InvalidInstruction;
 
-class no_dynamic_memory : public runtime_error
+class NoDynamicMemory : public runtime_error
 {
 public:
-    no_dynamic_memory();
+    NoDynamicMemory();
 };
 
-class field_too_small : public runtime_error
+class FieldTooSmall : public runtime_error
 {
 public:
-    field_too_small(int length, int security);
+    FieldTooSmall(int length, int security);
 };

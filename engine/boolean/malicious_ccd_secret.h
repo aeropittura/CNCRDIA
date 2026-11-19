@@ -17,23 +17,23 @@ template<class T>
 class MaliciousCcdSecret : public VectorSecret<MaliciousCcdShare<T>>
 {
     typedef MaliciousCcdSecret This;
-    typedef VectorSecret<MaliciousCcdShare<T>> super;
+    typedef VectorSecret<MaliciousCcdShare<T>> Super;
 
 public:
-    typedef TinyMC<This> MC;
-    typedef MC MAC_Check;
+    typedef TinyOpener<This> MC;
+    typedef MC MacCheck;
     typedef VectorProtocol<This> Protocol;
     typedef CcdPrep<This> LivePrep;
     typedef VectorInput<This> Input;
 
-    typedef typename This::part_type check_type;
+    typedef typename This::part_type CheckType;
 
     static string type_short()
     {
         return "CCD";
     }
 
-    static MC* new_mc(typename super::mac_key_type mac_key)
+    static MC* new_opener(typename Super::MacKeyType mac_key)
     {
         return new MC(mac_key);
     }
@@ -43,22 +43,22 @@ public:
     }
 
     MaliciousCcdSecret(const typename This::part_type& other) :
-            super(other)
+            Super(other)
     {
     }
 
-    MaliciousCcdSecret(const typename super::super& other) :
-            super(other)
+    MaliciousCcdSecret(const typename Super::Super& other) :
+            Super(other)
     {
     }
 
-    MaliciousCcdSecret(const typename This::part_type::super& other) :
-            super(other)
+    MaliciousCcdSecret(const typename This::part_type::Super& other) :
+            Super(other)
     {
     }
 
     MaliciousCcdSecret(const GC::Clear& other) :
-            super(other)
+            Super(other)
     {
     }
 };

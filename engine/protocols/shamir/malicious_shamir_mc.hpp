@@ -10,13 +10,13 @@
 #include "protocols/shamir/shamir_options.h"
 
 template<class T>
-MaliciousShamirMC<T>::MaliciousShamirMC()
+MaliciousShamirOpener<T>::MaliciousShamirOpener()
 {
     this->threshold = 2 * ShamirMachine::s().threshold;
 }
 
 template<class T>
-void MaliciousShamirMC<T>::init_open(const Player& P, int n)
+void MaliciousShamirOpener<T>::initialize_open(const Player& P, int n)
 {
     int threshold = ShamirMachine::s().threshold;
     if (reconstructions.empty())
@@ -24,15 +24,15 @@ void MaliciousShamirMC<T>::init_open(const Player& P, int n)
         reconstructions.resize(2 * threshold + 2);
         for (int i = threshold + 1; i <= 2 * threshold + 1; i++)
         {
-            reconstructions[i] = ShamirMC<T>::get_reconstruction(P, i);
+            reconstructions[i] = ShamirOpener<T>::get_reconstruction(P, i);
         }
     }
 
-    ShamirMC<T>::init_open(P, n);
+    ShamirOpener<T>::initialize_open(P, n);
 }
 
 template<class T>
-typename T::open_type MaliciousShamirMC<T>::finalize_raw()
+typename T::OpenType MaliciousShamirOpener<T>::finalize_raw()
 {
     int threshold = ShamirMachine::s().threshold;
     shares.resize(2 * threshold + 1);
@@ -42,21 +42,21 @@ typename T::open_type MaliciousShamirMC<T>::finalize_raw()
 }
 
 template<class T>
-typename T::open_type MaliciousShamirMC<T>::reconstruct(
-        const vector<open_type>& shares)
+typename T::OpenType MaliciousShamirOpener<T>::reconstruct(
+        const vector<OpenType>& shares)
 {
     int threshold = ShamirMachine::s().threshold;
     assert(shares.size() == reconstructions.size() - 1);
-    typename T::open_type value = 0;
+    typename T::OpenType value = 0;
     for (int j = 0; j < threshold + 1; j++)
         value += shares[j] * reconstructions[threshold + 1][j];
     for (size_t j = threshold + 2; j <= shares.size(); j++)
     {
-        typename T::open_type check = 0;
+        typename T::OpenType check = 0;
         for (size_t k = 0; k < j; k++)
             check += shares[k] * reconstructions[j][k];
         if (check != value)
-            throw mac_fail("inconsistent Shamir secret sharing");
+            throw MacFail("inconsistent Shamir secret sharing");
     }
     return value;
 }

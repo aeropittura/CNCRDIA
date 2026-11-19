@@ -16,7 +16,7 @@ using namespace std;
 
 class FlexBuffer
 {
-	friend class octetStream;
+	friend class OctetStream;
 
 protected:
     char* buf, *ptr;
@@ -28,16 +28,16 @@ public:
 	FlexBuffer(const FlexBuffer&);
 	~FlexBuffer() { del(); }
 	void operator=(FlexBuffer& msg);
-	void operator=(octetStream& os);
+	void operator=(OctetStream& os);
 	char* data() { return buf; }
 	const char* data() const { return buf; }
 	size_t size() const { return len; }
 	size_t capacity() const { return max_len; }
 };
 
-class ReceivedMsg : public virtual FlexBuffer
+class ReceivedMessage : public virtual FlexBuffer
 {
-	friend class ReceivedMsgStore;
+	friend class ReceivedMessageStore;
 
 public:
 	void operator=(FlexBuffer& msg) { FlexBuffer::operator=(msg); }
@@ -61,7 +61,7 @@ public:
 	char* end() { return buf + len; }
 	void skip(size_t n) { len += n; }
 	void resize(size_t new_len);
-	void resize_copy(size_t new_max_len);
+	void resize_copy(size_t new_max_length);
 	void clear() { len = 0; }
 	const char& operator[](size_t i) { return data()[i]; }
 	void push_back(char c) { serialize(c); }
@@ -76,24 +76,24 @@ public:
 	void send(int socket_num);
 };
 
-class LocalBuffer : public ReceivedMsg, public SendBuffer
+class LocalBuffer : public ReceivedMessage, public SendBuffer
 {
 };
 
-class ReceivedMsgStore
+class ReceivedMessageStore
 {
 	static const int N = 1;
-	ReceivedMsg mem[N];
+	ReceivedMessage mem[N];
 	int start, mem_size;
 	deque<string> files;
 	size_t total_size;
 	Timer push_timer, pop_timer;
 public:
-	ReceivedMsgStore() : start(0), mem_size(0), total_size(0) {}
-	~ReceivedMsgStore();
-	void push(ReceivedMsg& msg);
+	ReceivedMessageStore() : start(0), mem_size(0), total_size(0) {}
+	~ReceivedMessageStore();
+	void push(ReceivedMessage& msg);
 	void push_and_clear(LocalBuffer& msg) { push(msg); msg.clear(); }
-	bool pop(ReceivedMsg& msg);
+	bool pop(ReceivedMessage& msg);
 	bool empty() { return mem_size == 0 and files.empty(); }
 };
 
@@ -120,7 +120,7 @@ inline void FlexBuffer::operator=(FlexBuffer& msg)
     }
 }
 
-inline void FlexBuffer::operator=(octetStream& os)
+inline void FlexBuffer::operator=(OctetStream& os)
 {
 	del();
 	buf = (char*)os.get_data();
@@ -130,7 +130,7 @@ inline void FlexBuffer::operator=(octetStream& os)
 	os.reset();
 }
 
-inline void ReceivedMsg::resize(size_t new_len)
+inline void ReceivedMessage::resize(size_t new_len)
 {
 	if (new_len > max_len)
 	{
@@ -155,7 +155,7 @@ inline void FlexBuffer::del()
 	reset();
 }
 
-inline void ReceivedMsg::unserialize(void* output, size_t size)
+inline void ReceivedMessage::unserialize(void* output, size_t size)
 {
 	check_buffer(size);
 	avx_memcpy(output, ptr, size);
@@ -163,13 +163,13 @@ inline void ReceivedMsg::unserialize(void* output, size_t size)
 }
 
 template<class T>
-inline void ReceivedMsg::unserialize(T& output)
+inline void ReceivedMessage::unserialize(T& output)
 {
 	unserialize(&output, sizeof(T));
 }
 
 template<class T>
-inline void ReceivedMsg::nonavx_unserialize(T& output)
+inline void ReceivedMessage::nonavx_unserialize(T& output)
 {
 	check_buffer(sizeof(T));
 	memcpy(&output, ptr, sizeof(T));
@@ -182,10 +182,10 @@ inline void SendBuffer::resize(size_t new_size)
 		push_back(0);
 }
 
-inline void SendBuffer::resize_copy(size_t new_max_len)
+inline void SendBuffer::resize_copy(size_t new_max_length)
 {
 	char* old = buf;
-	max_len = new_max_len;
+	max_len = new_max_length;
 	buf = new char[max_len];
 	if (old)
 	{
@@ -227,7 +227,7 @@ inline void SendBuffer::serialize_no_allocate(const void* source, size_t size)
 	len += size;
 }
 
-inline void ReceivedMsg::check_buffer(size_t size)
+inline void ReceivedMessage::check_buffer(size_t size)
 {
 	(void)size;
 #ifndef NO_CHECK_BUFFER

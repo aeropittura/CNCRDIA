@@ -89,7 +89,7 @@ TrustedProgramParty::~TrustedProgramParty()
 	cout << "Random timer: " << random_timer.elapsed() << endl;
 }
 
-void BaseTrustedParty::NodeReady()
+void BaseTrustedParty::node_ready()
 {
 #ifdef DEBUG_STEPS
 	printf("\n\nNode ready \n\n");
@@ -102,12 +102,12 @@ void BaseTrustedParty::NodeReady()
 
 void BaseTrustedParty::prepare_randomness()
 {
-	msg_keys.resize(_N);
-	for (size_t i = 0; i < msg_keys.size(); i++)
+	message_keys.resize(_N);
+	for (size_t i = 0; i < message_keys.size(); i++)
 	{
-		msg_keys[i].clear();
-		fill_message_type(msg_keys[i], TYPE_KEYS);
-		msg_keys[i].resize(MSG_KEYS_HEADER_SZ);
+		message_keys[i].clear();
+		fill_message_type(message_keys[i], TYPE_KEYS);
+		message_keys[i].resize(MSG_KEYS_HEADER_SZ);
 	}
 
 	done_filling = _fill_keys();
@@ -115,22 +115,22 @@ void BaseTrustedParty::prepare_randomness()
 
 void BaseTrustedParty::send_randomness()
 {
-	for(party_id_t pid=1; pid<=_N; pid++)
+	for(PartyId pid=1; pid<=_N; pid++)
 	{
 //				printf("all keys\n");
 //				phex(all_keys, size_of_keys);
-		_node->Send(pid, msg_keys[pid - 1]);
+		_node->Send(pid, message_keys[pid - 1]);
 //		printf("msg keys\n");
-//		phex(msg_keys, msg_keys_size);
+//		phex(message_keys, msg_keys_size);
 		send_input_masks(pid);
 	}
 
 	send_output_masks();
 }
 
-void TrustedProgramParty::send_input_masks(party_id_t pid)
+void TrustedProgramParty::send_input_masks(PartyId pid)
 {
-	SendBuffer& buffer = msg_input_masks[pid-1];
+	SendBuffer& buffer = message_input_masks[pid-1];
 #ifdef DEBUG_ROUNDS
 	cout << "sending " << buffer.size() << " input masks to " << pid << endl;
 #endif
@@ -140,12 +140,12 @@ void TrustedProgramParty::send_input_masks(party_id_t pid)
 void TrustedProgramParty::send_output_masks()
 {
 #ifdef DEBUG_OUTPUT_MASKS
-	cout << "sending " << msg_output_masks.size() - 4 << " output masks" << endl;
+	cout << "sending " << message_output_masks.size() - 4 << " output masks" << endl;
 #endif
-	_node->Broadcast(msg_output_masks);
+	_node->Broadcast(message_output_masks);
 }
 
-void BaseTrustedParty::NewMessage(int from, ReceivedMsg& msg)
+void BaseTrustedParty::NewMessage(int from, ReceivedMessage& msg)
 {
 	char* message = msg.data();
 	int len = msg.size();
@@ -184,7 +184,7 @@ void BaseTrustedParty::NewMessage(int from, ReceivedMsg& msg)
 			if (done_filling)
 				_launch_online();
 			else
-				NodeReady();
+				node_ready();
 		}
 		break;
 	}
@@ -240,7 +240,7 @@ void BaseTrustedParty::Start()
 	_node->Start();
 }
 
-void TrustedProgramParty::NodeReady()
+void TrustedProgramParty::node_ready()
 {
 	for (int i = 0; i < get_n_parties(); i++)
 	{
@@ -248,7 +248,7 @@ void TrustedProgramParty::NodeReady()
 		buffer.serialize(deltas[i]);
 		_node->Send(i + 1, buffer);
 	}
-	this->BaseTrustedParty::NodeReady();
+	this->BaseTrustedParty::node_ready();
 }
 
 bool TrustedProgramParty::_fill_keys()
@@ -258,9 +258,9 @@ bool TrustedProgramParty::_fill_keys()
 		spdz_wires[i].clear();
 		spdz_wires[i].resize(get_n_parties());
 	}
-	msg_output_masks = get_buffer(TYPE_MASK_OUTPUT);
-	msg_input_masks.resize(get_n_parties());
-	for (auto& buffer : msg_input_masks)
+	message_output_masks = get_buffer(TYPE_MASK_OUTPUT);
+	message_input_masks.resize(get_n_parties());
+	for (auto& buffer : message_input_masks)
 	{
 		buffer.clear();
 		fill_message_type(buffer, TYPE_MASK_INPUTS);
@@ -273,7 +273,7 @@ void TrustedProgramParty::garble()
 	NoMemory dynamic_memory;
 	second_phase(program, processor, machine, dynamic_memory);
 
-	vector< Share<gf2n_long> > tmp;
+	vector< Share<Gf2nLong> > tmp;
 	make_share(tmp, 1, get_n_parties(), mac_key, prng);
 	for (int i = 0; i < get_n_parties(); i++)
 		tmp[i].get_mac().pack(spdz_wires[SPDZ_MAC][i]);
@@ -296,8 +296,8 @@ void TrustedProgramParty::garble()
 
 void TrustedProgramParty::store_spdz_wire(SpdzOp op, const Register& reg)
 {
-    make_share(mask_shares, gf2n_long(reg.get_mask()), get_n_parties(),
-            gf2n_long(get_mac_key()), prng);
+    make_share(mask_shares, Gf2nLong(reg.get_mask()), get_n_parties(),
+            Gf2nLong(get_mac_key()), prng);
 	for (int i = 0; i < get_n_parties(); i++)
 	{
 		SpdzWire wire;

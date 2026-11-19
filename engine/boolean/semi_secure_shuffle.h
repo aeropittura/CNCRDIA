@@ -26,7 +26,7 @@ class BitBuffer
 {
     friend class SemiSecureShuffle;
 
-    vector<pair<int128, size_t>> values;
+    vector<pair<Int128, size_t>> values;
 
 public:
     BitBuffer()
@@ -45,22 +45,22 @@ public:
     void add(size_t index, const F2Vec128& value);
 };
 
-class SemiSecurePerm
+class SemiSecurePermutation
 {
 public:
     mutable BitBuffer A, B, C;
     vector<unsigned> pi;
 
-    SemiSecurePerm()
+    SemiSecurePermutation()
     {
     }
 
-    SemiSecurePerm(const SemiSecurePerm& other)
+    SemiSecurePermutation(const SemiSecurePermutation& other)
     {
         *this = other;
     }
 
-    SemiSecurePerm& operator=(const SemiSecurePerm& other)
+    SemiSecurePermutation& operator=(const SemiSecurePermutation& other)
     {
         pi = other.pi;
         A = other.A;
@@ -119,19 +119,19 @@ public:
     }
 };
 template<class T>
-class ColMatrix : vector<T>
+class ColumnMatrix : vector<T>
 {
     template<class U> friend class Matrix;
     template<class U> friend class RowMatrix;
 
 public:
-    ColMatrix(size_t n = 0, size_t m = 0)
+    ColumnMatrix(size_t n = 0, size_t m = 0)
     {
         resize(n, m);
     }
 
     template<class U>
-    ColMatrix(const ColMatrix<U>& other)
+    ColumnMatrix(const ColumnMatrix<U>& other)
     {
         this->reserve(other.size());
         for (size_t i = 0; i < this->size(); i++)
@@ -171,10 +171,10 @@ public:
         {
             auto c = other.eight_from(i);
             for (int j = 0; j < 8; j++)
-                res.add_mul(c[j], *v++);
+                res.add_mult(c[j], *v++);
         }
         for (; i < this->size(); i++)
-            res.add_mul(other[i], *v++);
+            res.add_mult(other[i], *v++);
         return res;
     }
 
@@ -194,12 +194,12 @@ class RowMatrix : T
     size_t row_storage_size;
     size_t n;
 
-    class ColIterator
+    class ColumnIterator
     {
-        typename T::view_type part;
+        typename T::ViewType part;
 
     public:
-        ColIterator(const RowMatrix<T>& whole) : part(whole.col(0))
+        ColumnIterator(const RowMatrix<T>& whole) : part(whole.col(0))
         {
         }
 
@@ -208,7 +208,7 @@ class RowMatrix : T
             part.increment();
         }
 
-        const typename T::view_type& operator*() const
+        const typename T::ViewType& operator*() const
         {
             return part;
         }
@@ -230,7 +230,7 @@ public:
     {
         resize(other.at(0).size(), other.size());
         for (size_t i = 0; i < n_cols(); i++)
-            set_col(i, other[i]);
+            set_column(i, other[i]);
     }
 
     template<class U>
@@ -239,7 +239,7 @@ public:
         vector<T> rows;
         rows.reserve(other.size());
         for (auto& row : other)
-            rows.push_back(typename T::plain_type(row));
+            rows.push_back(typename T::PlainType(row));
         *this = rows;
         *this = transpose();
     }
@@ -274,13 +274,13 @@ public:
         return this->part(i * row_storage_size, n_rows());
     }
 
-    void set_col(size_t i, const typename T::view_type& col)
+    void set_column(size_t i, const typename T::ViewType& col)
     {
         assert(col.size() == n_rows());
         this->set_part(i * row_storage_size, col);
     }
 
-    ColIterator begin() const
+    ColumnIterator begin() const
     {
         return *this;
     }
@@ -289,7 +289,7 @@ public:
     T dot(const U& other) const
     {
         assert(other.size() == n_cols());
-        auto res = T::owner_type::zero(n_rows());
+        auto res = T::OwnerType::zero(n_rows());
         size_t i = 0;
         auto n_cols = this->n_cols();
         auto v = begin();
@@ -298,13 +298,13 @@ public:
             auto c = other.eight_from(i);
             for (int j = 0; j < 8; j++)
             {
-                res.add_mul(c[j], *v);
+                res.add_mult(c[j], *v);
                 v++;
             }
         }
         for (; i < n_cols; i++)
         {
-            res.add_mul(other[i], *v);
+            res.add_mult(other[i], *v);
             v++;
         }
         return res;
@@ -343,7 +343,7 @@ Matrix<T>::Matrix(const RowMatrix<U>& other)
     assert(other.n_cols() == tmp.col(0).size());
     for (size_t i = 0; i < tmp.n_cols(); i++)
     {
-        this->push_back(typename U::plain_type(tmp.col(i)));
+        this->push_back(typename U::PlainType(tmp.col(i)));
     }
     assert(this->size() == other.col(0).size());
     assert(this->at(0).size() == other.n_cols());
@@ -369,34 +369,34 @@ class SemiSecureTripleState;
 
 class SemiSecureShuffle
 {
-    typedef vector<Bit> bit_vector_type;
+    typedef vector<Bit> BitVectorType;
 
     SemiSecureShuffleState* state;
-    OTExtensionWithMatrix* rot_ext;
+    OtExtensionWithMatrix* rot_ext;
 
     F3Code A;
-    ColMatrix<F2Vec128> B;
+    ColumnMatrix<F2Vec128> B;
 
     F2Vec128 apply_prf(const BitVector& key, const F3VectorBitWiseView& x);
     vector<F2Vec128> apply_prf(const BitVector& key,
             const RowMatrix<F3VectorBitWise>& x);
 
 public:
-    typedef SemiSecurePerm shuffle_type;
-    typedef ShuffleStore<shuffle_type> store_type;
-    typedef const vector<shuffle_type*> shuffle_gen_type;
+    typedef SemiSecurePermutation ShuffleType;
+    typedef ShuffleStore<ShuffleType> StoreType;
+    typedef const vector<ShuffleType*> ShuffleGeneratorType;
 
     SemiSecureShuffle();
     ~SemiSecureShuffle();
 
-    void generate(size_t n, shuffle_gen_type& perms, bool full = false);
-    void full_generate(size_t n, shuffle_gen_type& perms);
-    void generate_from_ot(size_t n, shuffle_gen_type& perms, Player& P);
+    void generate(size_t n, ShuffleGeneratorType& perms, bool full = false);
+    void full_generate(size_t n, ShuffleGeneratorType& perms);
+    void generate_from_ot(size_t n, ShuffleGeneratorType& perms, Player& P);
 
-    void apply(StackedVector<SemiSecret>& S, shuffle_type& shuffle,
+    void apply(StackedVector<SemiSecret>& S, ShuffleType& shuffle,
             const BaseInstruction& instruction);
     void apply_role(StackedVector<SemiSecret>& S,
-            ShuffleTuple<shuffle_type>& shuffle, Player& P, int role);
+            ShuffleTuple<ShuffleType>& shuffle, Player& P, int role);
 };
 
 } /* namespace GC */

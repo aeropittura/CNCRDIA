@@ -94,14 +94,14 @@ BreakType Program::execute(Processor<T>& Proc, U& dynamic_memory,
         {
             return execute_with_errors(Proc, dynamic_memory, PC);
         }
-        catch (needs_cleaning& e)
+        catch (NeedsCleaning& e)
         {
             throw e;
         }
         catch (exception& e)
         {
-            auto inst = p[Proc.last_PC].get_name();
-            fprintf(stderr, "Fatal error at %d (%s): %s\n", Proc.last_PC,
+            auto inst = p[Proc.last_pc].get_name();
+            fprintf(stderr, "Fatal error at %d (%s): %s\n", Proc.last_pc,
                     inst.c_str(), e.what());
             exit(1);
         }
@@ -135,9 +135,9 @@ BreakType Program::execute_with_errors(Processor<T>& Proc, U& dynamic_memory,
             return DONE_BREAK;
         }
 #ifdef COUNT_INSTRUCTIONS
-        Proc.stats[p[Proc.PC].get_opcode()]++;
+        Proc.statistics[p[Proc.PC].get_opcode()]++;
 #endif
-        Proc.last_PC = Proc.PC;
+        Proc.last_pc = Proc.PC;
         auto& instruction = p[Proc.PC++];
         switch (instruction.get_opcode())
         {

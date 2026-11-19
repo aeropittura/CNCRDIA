@@ -15,7 +15,7 @@ template<class T>
 SemiPrep<T>::SemiPrep(SubProcessor<T>* proc, DataPositions& usage) :
         BufferPrep<T>(usage),
         BitPrep<T>(proc, usage),
-        OTPrep<T>(proc, usage),
+        OtPrep<T>(proc, usage),
         RingPrep<T>(proc, usage),
         SemiHonestRingPrep<T>(proc, usage)
 {
@@ -29,9 +29,9 @@ void SemiPrep<T>::buffer_triples()
     assert(this->triple_generator);
     this->triple_generator->set_batch_size(
             BaseMachine::batch_size<T>(DATA_TRIPLE, this->buffer_size));
-    this->triple_generator->generatePlainTriples();
+    this->triple_generator->generate_plain_triples();
     this->triple_generator->set_batch_size(OnlineOptions::singleton.batch_size);
-    for (auto& x : this->triple_generator->plainTriples)
+    for (auto& x : this->triple_generator->plain_triples)
     {
         this->triples.push_back({{x[0], x[1], x[2]}});
     }
@@ -55,8 +55,8 @@ void SemiPrep<T>::buffer_dabits(ThreadQueues* queues)
         this->triple_generator->set_batch_size(
                 BaseMachine::batch_size<T>(DATA_DABIT, this->buffer_size, 0,
                         T::length()), false);
-        this->triple_generator->generatePlainBits();
-        for (auto& x : this->triple_generator->plainBits)
+        this->triple_generator->generate_plain_bits();
+        for (auto& x : this->triple_generator->plain_bits)
             this->dabits.push_back({x.first, x.second});
         this->triple_generator->set_batch_size(OnlineOptions::singleton.batch_size);
         if (OnlineOptions::singleton.has_option("debug_plain"))
@@ -72,9 +72,9 @@ void SemiPrep<T>::get_one_no_count(Dtype dtype, T& a)
     if (bits_from_dabits())
     {
         if (dtype != DATA_BIT)
-            throw not_implemented();
+            throw NotImplemented();
 
-        typename T::bit_type b;
+        typename T::BitType b;
         this->get_dabit_no_count(a, b);
     }
     else

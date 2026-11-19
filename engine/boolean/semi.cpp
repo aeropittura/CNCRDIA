@@ -38,7 +38,7 @@ void Semi::prepare_mul(const SemiSecret& x, const SemiSecret& y, int n)
 {
     if (n == -1)
         n = SemiSecret::default_length;
-    super::prepare_mul(x.mask(n), y.mask(n), n);
+    Super::prepare_mul(x.mask(n), y.mask(n), n);
 }
 
 } /* namespace GC */

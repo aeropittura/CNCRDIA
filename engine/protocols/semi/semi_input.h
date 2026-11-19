@@ -8,19 +8,19 @@
 #include "protocols/replicated/replicated_input.h"
 #include "protocols/semi/hemi.h"
 
-template<class T> class SemiMC;
+template<class T> class SemiOpener;
 
 template<class T>
 class PairwiseKeyInput : public PrepLessInput<T>
 {
 protected:
-    vector<SeededPRNG> send_prngs;
-    vector<PRNG> recv_prngs;
+    vector<SeededPrng> send_prngs;
+    vector<PRNG> receive_prngs;
 
 public:
     PairwiseKeyInput(SubProcessor<T>* proc, PlayerBase& P);
 
-    void maybe_init(PlayerBase& P);
+    void maybe_initialize(PlayerBase& P);
 };
 
 /**
@@ -32,14 +32,14 @@ class SemiInput : public PairwiseKeyInput<T>
     PlayerBase& P;
 
 public:
-    SemiInput(SubProcessor<T>& proc, SemiMC<T>&) :
+    SemiInput(SubProcessor<T>& proc, SemiOpener<T>&) :
             SemiInput(&proc, proc.P)
     {
     }
 
     SemiInput(SubProcessor<T>* proc, PlayerBase& P);
 
-    SemiInput(typename T::MAC_Check& MC, Preprocessing<T>& prep, Player& P,
+    SemiInput(typename T::MacCheck& MC, Preprocessing<T>& prep, Player& P,
             typename T::Protocol* = 0) :
             SemiInput(0, P)
     {
@@ -50,5 +50,5 @@ public:
     void add_mine(const typename T::clear& input, int n_bits = -1);
     void add_other(int player, int n_bits = -1);
     void exchange();
-    void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
+    void finalize_other(int player, T& target, OctetStream& o, int n_bits = -1);
 };

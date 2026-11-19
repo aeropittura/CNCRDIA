@@ -7,7 +7,7 @@
 
 #include "protocols/replicated/rep3_share.h"
 
-template<class T> class Rep4MC;
+template<class T> class Rep4Opener;
 template<class T> class Rep4;
 template<class T> class Rep4RingPrep;
 template<class T> class Rep4Input;
@@ -21,14 +21,14 @@ template<class T>
 class Rep4Share : public RepShare<T, 3>
 {
     typedef Rep4Share This;
-    typedef RepShare<T, 3> super;
+    typedef RepShare<T, 3> Super;
 
 public:
     typedef T clear;
 
     typedef Rep4<This> Protocol;
-    typedef Rep4MC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef Rep4Opener<This> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef Rep4Input<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef Rep4RingPrep<This> LivePrep;
@@ -37,7 +37,7 @@ public:
 
     typedef This Honest;
 
-    typedef GC::Rep4Secret bit_type;
+    typedef GC::Rep4Secret BitType;
 
     static const bool malicious = true;
     static const bool variable_players = false;
@@ -48,7 +48,7 @@ public:
         return "R4" + string(1, T::type_char());
     }
 
-    static This constant(clear value, int my_num, typename super::mac_key_type = {})
+    static This constant(clear value, int my_num, typename Super::MacKeyType = {})
     {
         This res;
         if (my_num != 0)
@@ -61,7 +61,7 @@ public:
     }
 
     template<class U>
-    Rep4Share(const FixedVec<U, 3>& other) : super(other)
+    Rep4Share(const FixedVec<U, 3>& other) : Super(other)
     {
     }
 
@@ -71,7 +71,7 @@ public:
     }
     void assign(const char* buffer)
     {
-        super::assign(buffer);
+        Super::assign(buffer);
     }
 
 };

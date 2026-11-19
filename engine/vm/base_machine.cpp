@@ -18,7 +18,7 @@ using namespace std;
 
 BaseMachine* BaseMachine::singleton = 0;
 thread_local int BaseMachine::thread_num = -1;
-thread_local OnDemandOTTripleSetup BaseMachine::ot_setup;
+thread_local OnDemandOtTripleSetup BaseMachine::ot_setup;
 thread_local const Program* BaseMachine::program = 0;
 
 void print_usage(ostream& o, const char* name, size_t capacity)
@@ -115,7 +115,7 @@ int BaseMachine::matrix_requirement(int n_rows, int n_inner, int n_cols)
 
 bool BaseMachine::allow_mulm()
 {
-  return singleton and singleton->relevant_opts.find("no_mulm") != string::npos;
+  return singleton and singleton->relevant_options.find("no_mulm") != string::npos;
 }
 
 BaseMachine::BaseMachine() :
@@ -194,9 +194,9 @@ void BaseMachine::load_schedule(const string& progname, bool load_bytecode)
   inpf.get();
   getline(inpf, compiler);
   getline(inpf, domain);
-  getline(inpf, relevant_opts);
+  getline(inpf, relevant_options);
   getline(inpf, security);
-  getline(inpf, gf2n);
+  getline(inpf, Gf2n);
   getline(inpf, expected_communication);
   inpf.close();
 }
@@ -214,7 +214,7 @@ size_t BaseMachine::load_program(const string& threadname,
 {
   (void)threadname;
   (void)filename;
-  throw not_implemented();
+  throw NotImplemented();
 }
 
 void BaseMachine::time()
@@ -227,12 +227,12 @@ void BaseMachine::start(int n)
   cout << "Starting timer " << n << " at " << timer[n].elapsed()
     << " (" << timer[n] << ")"
     << " after " << timer[n].idle() << endl;
-  timer[n].start(total_stats());
+  timer[n].start(total_statistics());
 }
 
 void BaseMachine::stop(int n)
 {
-  timer[n].stop(total_stats());
+  timer[n].stop(total_statistics());
   cout << "Stopped timer " << n << " at " << timer[n].elapsed() << " ("
       << timer[n] << ")" << endl;
 }
@@ -251,9 +251,9 @@ void BaseMachine::print_timers()
       {
         cerr << "Time" << it->first << " = " << it->second.elapsed()
             << " seconds (" << it->second << ")" << endl;
-        if (not it->second.exe_stats().empty()
+        if (not it->second.exe_statistics().empty()
             and OnlineOptions::singleton.has_option("part_exe"))
-          it->second.exe_stats().print();
+          it->second.exe_statistics().print();
       }
 }
 
@@ -301,18 +301,18 @@ int BaseMachine::prime_length_from_schedule(string progname)
 
 int BaseMachine::gf2n_length_from_schedule(string progname)
 {
-  string domain = get_basics(progname).gf2n;
+  string domain = get_basics(progname).Gf2n;
   if (domain.substr(0, 4).compare("lg2:") == 0)
     return stoi(domain.substr(4));
   else
     return 0;
 }
 
-bigint BaseMachine::prime_from_schedule(string progname)
+Bigint BaseMachine::prime_from_schedule(string progname)
 {
   string domain = get_domain(progname);
   if (domain.substr(0, 2).compare("p:") == 0)
-    return bigint(domain.substr(2));
+    return Bigint(domain.substr(2));
   else
     return 0;
 }
@@ -334,23 +334,23 @@ ThreadQueues* BaseMachine::maybe_get_queues()
     return 0;
 }
 
-ThreadStats BaseMachine::total_stats()
+ThreadStatistics BaseMachine::total_statistics()
 {
-  return queues.total_stats();
+  return queues.total_statistics();
 }
 
-void BaseMachine::set_thread_stats(const ThreadStats& stats)
+void BaseMachine::set_thread_statistics(const ThreadStatistics& statistics)
 {
   auto queue = queues.at(BaseMachine::thread_num);
   assert(queue);
-  queue->set_stats(stats);
+  queue->set_statistics(statistics);
 }
 
-void BaseMachine::print_global_comm(Player& P, const NamedCommStats& stats)
+void BaseMachine::print_global_communication(Player& P, const NamedCommunicationStatistics& statistics)
 {
-  Bundle<octetStream> bundle(P);
-  bundle.mine.store(stats.sent);
-  P.Broadcast_Receive_no_stats(bundle);
+  Bundle<OctetStream> bundle(P);
+  bundle.mine.store(statistics.sent);
+  P.broadcast_receive_no_statistics(bundle);
   long long global = 0;
   for (auto& os : bundle)
     global += os.get_int(8);
@@ -358,9 +358,9 @@ void BaseMachine::print_global_comm(Player& P, const NamedCommStats& stats)
 
   double total_time;
   if (multithread)
-    total_time = max_comm.total_time();
+    total_time = max_communication.total_time();
   else
-    total_time = comm_stats.total_time();
+    total_time = communication_statistics.total_time();
   if (total_time > .95 * timer[0].elapsed())
     cerr
         << "Communication time accounts for more than 95 percent of total time ("
@@ -371,8 +371,8 @@ void BaseMachine::print_global_comm(Player& P, const NamedCommStats& stats)
         << endl;
 
   smatch what;
-  regex comm_regexp("online:([0-9]*) offline:([0-9]*) n_parties:([0-9]*)");
-  if (regex_search(expected_communication, what, comm_regexp))
+  regex communication_regexp("online:([0-9]*) offline:([0-9]*) n_parties:([0-9]*)");
+  if (regex_search(expected_communication, what, communication_regexp))
     {
       long long expected = stoll(what[1]) + stoll(what[2]);
       int n_parties = stoi(what[3]);
@@ -400,13 +400,13 @@ void BaseMachine::print_global_comm(Player& P, const NamedCommStats& stats)
     }
 }
 
-void BaseMachine::print_comm(Player& P, const NamedCommStats& comm_stats)
+void BaseMachine::print_communication(Player& P, const NamedCommunicationStatistics& communication_statistics)
 {
   size_t rounds = 0;
-  for (auto& x : comm_stats)
+  for (auto& x : communication_statistics)
     if (x.first.find("transmission") == string::npos)
       rounds += x.second.rounds;
-  cerr << "Data sent = " << comm_stats.sent / 1e6 << " MB in ~" << rounds
+  cerr << "Data sent = " << communication_statistics.sent / 1e6 << " MB in ~" << rounds
       << " rounds (party " << P.my_num() << " only";
   if (multithread)
     cerr << "; rounds counted double due to multi-threading";
@@ -414,11 +414,11 @@ void BaseMachine::print_comm(Player& P, const NamedCommStats& comm_stats)
     cerr << "; use '-v' for more details";
   cerr << ")" << endl;
 
-  print_global_comm(P, comm_stats);
+  print_global_communication(P, communication_statistics);
 }
 
-void BaseMachine::add_one_off(const NamedCommStats& comm)
+void BaseMachine::add_one_off(const NamedCommunicationStatistics& comm)
 {
   if (has_singleton())
-    s().one_off_comm += comm;
+    s().one_off_communication += comm;
 }

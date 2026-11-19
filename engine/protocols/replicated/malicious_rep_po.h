@@ -8,17 +8,17 @@
 #include "net/player.h"
 
 template<class T>
-class MaliciousRepPO
+class MaliciousRepPo
 {
 protected:
     Player& P;
-    octetStream to_send;
-    octetStream to_receive[2];
+    OctetStream to_send;
+    OctetStream to_receive[2];
     PointerVector<T> secrets;
 
 public:
-    MaliciousRepPO(Player& P);
-    virtual ~MaliciousRepPO() {}
+    MaliciousRepPo(Player& P);
+    virtual ~MaliciousRepPo() {}
 
     void prepare_sending(const T& secret, int player);
     virtual void send(int player);

@@ -49,10 +49,10 @@ protected:
     vector<T> bits;
     vector<vector<InputTuple<T>>> inputs;
 
-    vector<dabit<T>> dabits;
+    vector<Dabit<T>> dabits;
 
-    map<pair<bool, int>, vector<edabitvec<T>>> edabits;
-    map<pair<bool, int>, edabitvec<T>> my_edabits;
+    map<pair<bool, int>, vector<Edabitvec<T>>> edabits;
+    map<pair<bool, int>, Edabitvec<T>> my_edabits;
 
     int n_bit_rounds;
 
@@ -76,28 +76,28 @@ protected:
             ThreadQueues* queues = 0);
     virtual void buffer_edabits_with_queues(bool strict, int n_bits);
 
-    map<int, vector<dabit<T>>> personal_dabits;
-    void get_personal_dabit(int player, T& a, typename T::bit_type& b);
+    map<int, vector<Dabit<T>>> personal_dabits;
+    void get_personal_dabit(int player, T& a, typename T::BitType& b);
     virtual void buffer_personal_dabits(int)
     { throw runtime_error("no personal daBits"); }
 
-    void push_edabits(vector<edabitvec<T>>& edabits,
+    void push_edabits(vector<Edabitvec<T>>& edabits,
             const vector<T>& sums,
-            const vector<vector<typename T::bit_type::part_type>>& bits);
+            const vector<vector<typename T::BitType::part_type>>& bits);
 
 public:
-    typedef T share_type;
+    typedef T ShareType;
 
     static const bool homomorphic = false;
 
     /// Key-independent setup if necessary (cryptosystem parameters)
     static void basic_setup(Player& P) { (void) P; }
     /// Generate keys if necessary
-    static void setup(Player& P, typename T::mac_key_type alphai) { (void) P, (void) alphai; }
+    static void setup(Player& P, typename T::MacKeyType alphai) { (void) P, (void) alphai; }
     /// Free memory of global cryptosystem parameters
     static void teardown() {}
 
-    static void edabit_sacrifice_buckets(vector<edabit<T>>&, size_t, bool, int,
+    static void edabit_sacrifice_buckets(vector<Edabit<T>>&, size_t, bool, int,
             SubProcessor<T>&, int, int, const void* = 0)
     {
         throw runtime_error("sacrifice not available");
@@ -107,7 +107,7 @@ public:
     static bool bits_from_triples() { return false; }
     static bool dabits_from_bits() { return false; }
 
-    static typename T::mac_key_type get_mac_key(Player&, bool = false)
+    static typename T::MacKeyType get_mac_key(Player&, bool = false)
     { return {}; }
     static void adjust_mac_key(Player&) {}
 
@@ -124,14 +124,14 @@ public:
     void get_three_no_count(Dtype dtype, T& a, T& b, T& c);
     void get_two_no_count(Dtype dtype, T& a, T& b);
     void get_one_no_count(Dtype dtype, T& a);
-    void get_input_no_count(T& a, typename T::open_type& x, int i);
+    void get_input_no_count(T& a, typename T::OpenType& x, int i);
     void get_no_count(StackedVector<T>& S, DataTag tag, const ArgVector& regs,
             int vector_size);
 
-    virtual void get_dabit_no_count(T& a, typename T::bit_type& b);
+    virtual void get_dabit_no_count(T& a, typename T::BitType& b);
 
-    edabitvec<T> get_edabitvec(bool strict, int n_bits);
-    void get_edabit_no_count(bool strict, int n_bits, edabit<T>& eb);
+    Edabitvec<T> get_edabitvec(bool strict, int n_bits);
+    void get_edabit_no_count(bool strict, int n_bits, Edabit<T>& eb);
 
     /// Get fresh random value
     virtual T get_random();
@@ -146,8 +146,8 @@ public:
     void buffer_personal_triples(int, ThreadQueues*) {}
     void buffer_personal_triples(vector<array<T, 3>>&, int, int) {}
 
-    SubProcessor<T>* get_proc() { return proc; }
-    void set_proc(SubProcessor<T>* proc) { this->proc = proc; }
+    SubProcessor<T>* get_processor() { return proc; }
+    void set_processor(SubProcessor<T>* proc) { this->proc = proc; }
 
     void buffer_extra(Dtype type, int n_items);
 };
@@ -185,35 +185,35 @@ public:
 template<class T>
 class RingPrep : public virtual BitPrep<T>
 {
-    typedef typename T::bit_type::part_type BT;
+    typedef typename T::BitType::part_type BT;
 
-    SubProcessor<BT>& get_bit_part_proc();
+    SubProcessor<BT>& get_bit_part_processor();
 
 protected:
-    void buffer_dabits_without_check(vector<dabit<T>>& dabits,
+    void buffer_dabits_without_check(vector<Dabit<T>>& dabits,
             int buffer_size = -1, ThreadQueues* queues = 0);
     template<int>
     void buffer_edabits_without_check(int n_bits, vector<T>& sums,
-            vector<vector<typename T::bit_type::part_type>>& bits, int buffer_size,
+            vector<vector<typename T::BitType::part_type>>& bits, int buffer_size,
             ThreadQueues* queues = 0);
     template<int>
-    void buffer_edabits_without_check(int n_bits, vector<edabitvec<T>>& edabits,
+    void buffer_edabits_without_check(int n_bits, vector<Edabitvec<T>>& edabits,
             int buffer_size);
 
     void buffer_sedabits_from_edabits(int n_bits)
     {
         this->template buffer_sedabits_from_edabits<0>(n_bits,
                 T::clear::characteristic_two,
-                is_same<typename T::bit_type, GC::NoShare>());
+                is_same<typename T::BitType, GC::NoShare>());
     }
     template<int>
     void buffer_sedabits_from_edabits(int n_bits, false_type, false_type);
     template<int>
     void buffer_sedabits_from_edabits(int, bool, bool)
-    { throw not_implemented(); }
+    { throw NotImplemented(); }
 
     template<int>
-    void sanitize(vector<edabitvec<T>>& edabits, int n_bits);
+    void sanitize(vector<Edabitvec<T>>& edabits, int n_bits);
 
     template<int = 0>
     void buffer_personal_edabits_without_check_pre(int n_bits,
@@ -225,7 +225,7 @@ protected:
             typename BT::Input& bit_input, int input_player, int begin, int end);
 
 public:
-    SubProcessor<BT>* bit_part_proc;
+    SubProcessor<BT>* bit_part_processor;
 
     RingPrep(SubProcessor<T>* proc, DataPositions& usage);
     virtual ~RingPrep();
@@ -234,24 +234,24 @@ public:
 
     /// Generate strict edabits from loose ones
     template<int>
-    void sanitize(vector<edabit<T>>& edabits, int n_bits,
+    void sanitize(vector<Edabit<T>>& edabits, int n_bits,
             int player = -1, ThreadQueues* queues = 0);
     template<int>
-    void sanitize(vector<edabit<T>>& edabits, int n_bits, int player, int begin,
+    void sanitize(vector<Edabit<T>>& edabits, int n_bits, int player, int begin,
             int end);
 
     /// Generic daBit generation with semi-honest security
-    void buffer_dabits_without_check(vector<dabit<T>>& dabits,
+    void buffer_dabits_without_check(vector<Dabit<T>>& dabits,
             size_t begin, size_t end);
     template<int>
-    void buffer_dabits_without_check(vector<dabit<T>>& dabits,
+    void buffer_dabits_without_check(vector<Dabit<T>>& dabits,
             size_t begin, size_t end,
-            Preprocessing<typename T::bit_type::part_type>& bit_prep);
+            Preprocessing<typename T::BitType::part_type>& bit_prep);
 
     /// Generic edaBit generation with semi-honest security
     template<int>
     void buffer_edabits_without_check(int n_bits, vector<T>& sums,
-            vector<vector<typename T::bit_type::part_type>>& bits, int begin,
+            vector<vector<typename T::BitType::part_type>>& bits, int begin,
             int end);
 
     template<int>
@@ -296,7 +296,7 @@ public:
             BaseMachine::edabit_batch_size<T>(n_bits, this->buffer_size)); }
     template<int>
     void buffer_edabits(int, true_type)
-    { throw not_implemented(); }
+    { throw NotImplemented(); }
     virtual void buffer_sedabits(int n_bits, ThreadQueues*)
     { this->buffer_sedabits_from_edabits(n_bits); }
 };
@@ -333,7 +333,7 @@ public:
 template<class T>
 class MaliciousRingPrep : public virtual MaliciousDabitOnlyPrep<T>
 {
-    typedef typename T::bit_type::part_type BT;
+    typedef typename T::BitType::part_type BT;
 
     DabitSacrifice<T> dabit_sacrifice;
 
@@ -361,10 +361,10 @@ protected:
 
     template<int>
     void buffer_personal_dabits_without_check(int input_player,
-            vector<dabit<T>>& dabits, int buffer_size);
+            vector<Dabit<T>>& dabits, int buffer_size);
 
 public:
-    static void edabit_sacrifice_buckets(vector<edabit<T>>& to_check, size_t n_bits,
+    static void edabit_sacrifice_buckets(vector<Edabit<T>>& to_check, size_t n_bits,
             bool strict, int player, SubProcessor<T>& proc, int begin, int end,
             const void* supply = 0)
     {

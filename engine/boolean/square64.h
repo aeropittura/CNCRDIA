@@ -1,5 +1,5 @@
 /*
- * boolean/square64.h
+ * boolean/Square64.h
  *
  */
 
@@ -10,15 +10,15 @@
 #include "support/int.h"
 #include "support/intrinsics.h"
 
-union square64
+union Square64
 {
     __m256i quadrows[16];
     __m128i doublerows[32];
     int64_t rows[64];
     int32_t halfrows[128][2];
-    octet bytes[64][8];
+    Octet bytes[64][8];
 
-    square64()
+    Square64()
     {
         memset(bytes, 0, sizeof(bytes));
     }
@@ -28,7 +28,7 @@ union square64
 
     void transpose(int n_rows, int n_cols);
 
-    bool operator!=(const square64& other);
+    bool operator!=(const Square64& other);
 
     void print();
 };

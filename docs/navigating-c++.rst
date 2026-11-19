@@ -82,7 +82,7 @@ should output::
 
   2
 
-The first parameter to :cpp:class:`gfp_` is a counter that allows
+The first parameter to :cpp:class:`Gfp_` is a counter that allows
 several moduli to be used at once, for example::
 
   gfp_<0, 1>::init_field(13);
@@ -188,8 +188,8 @@ checking is a core function of the output protocol in SPDZ.
 These typedefs follow the general pattern that the *share type* is a
 template argument to the *protocol type*. This makes everything
 contained defined by the share type accessible to the protocol
-type. As an example of this, :cpp:class:`ReplicatedMC\<Rep3Share>` is
-a sub-class of :cpp:class:`MAC_Check_Base\<Rep3Share>`, which
+type. As an example of this, :cpp:class:`ReplicatedOpener\<Rep3Share>` is
+a sub-class of :cpp:class:`MacCheckBase\<Rep3Share>`, which
 implements the general interface for opening shares. On the functions
 there is defined as follows::
 
@@ -254,11 +254,11 @@ looks as follows::
 Indirectly, this calls an instance of :cpp:class:`Machine\<sint,
 sgf2n>` where :cpp:class:`sint` and :cpp:class:`sgf2n` denote the
 complete share type for integer and :math:`\mathrm{GF}(2^n)`,
-respectively. The defaults are :cpp:class:`Rep3Share\<gfp_\<0, 2>>` and
-:cpp:class:`Rep3Share\<gf2n_long>` in the example. To choose that,
+respectively. The defaults are :cpp:class:`Rep3Share\<Gfp_\<0, 2>>` and
+:cpp:class:`Rep3Share\<Gf2nLong>` in the example. To choose that,
 the constructor of :cpp:class:`FieldMachine` (in
 :download:`../engine/vm/field_machine.hpp`) contains code to the length
-for :cpp:class:`gfp_` (the second parameter, the first is always
+for :cpp:class:`Gfp_` (the second parameter, the first is always
 0). For protocols modulo a power of two other than SPDZ2k, this
 happens in the constructor of :cpp:class:`RingMachine` or
 :cpp:class:`HonestMajorityRingMachineWithSecurity` in

@@ -12,16 +12,16 @@ int main(int argc, const char** argv)
     int port_base = 9999;
     Names N(my_number, 3, "localhost", port_base);
 
-    typedef Rep3Share2<64> share_type;
-    Machine<share_type> machine(N);
+    typedef Rep3Share2<64> ShareType;
+    Machine<ShareType> machine(N);
 
     int n = 1000;
 
-    vector<share_type> inputs;
+    vector<ShareType> inputs;
     for (int i = 0; i < n; i++)
     {
         int j = (i % 2) ? (n - i) : i;
-        inputs.push_back(share_type::constant(j, my_number));
+        inputs.push_back(ShareType::constant(j, my_number));
     }
 
     vector<long> key_indices = {1};
@@ -31,8 +31,8 @@ int main(int argc, const char** argv)
 
     machine.run_function("sort", res, args);
 
-    Opener<share_type> MC(machine.get_player(), machine.get_sint_mac_key());
-    MC.init_open();
+    Opener<ShareType> MC(machine.get_player(), machine.get_sint_mac_key());
+    MC.initialize_open();
     for (auto& x : inputs)
         MC.prepare_open(x);
     MC.exchange();

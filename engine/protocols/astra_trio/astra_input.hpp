@@ -8,7 +8,7 @@
 #include "protocols/astra_trio/astra_input.h"
 
 template<class T>
-AstraInput<T>::AstraInput(SubProcessor<T>& proc, MAC_Check_Base<T>&) :
+AstraInput<T>::AstraInput(SubProcessor<T>& proc, MacCheckBase<T>&) :
         InputBase<T>(&proc), protocol(proc.protocol)
 {
 }
@@ -20,14 +20,14 @@ AstraInput<T>::AstraInput(SubProcessor<T>* proc, Player&) :
 }
 
 template<class T>
-AstraInput<T>::AstraInput(MAC_Check_Base<T>&, Preprocessing<T>&,
+AstraInput<T>::AstraInput(MacCheckBase<T>&, Preprocessing<T>&,
         Player&, AstraOnlineBase<T>* protocol) :
         protocol(*protocol)
 {
 }
 
 template<class T>
-AstraPrepInput<T>::AstraPrepInput(SubProcessor<T>& proc, MAC_Check_Base<T>&) :
+AstraPrepInput<T>::AstraPrepInput(SubProcessor<T>& proc, MacCheckBase<T>&) :
         InputBase<T>(&proc), protocol(proc.protocol)
 {
     n_inputs.resize(3);
@@ -40,7 +40,7 @@ AstraPrepInput<T>::AstraPrepInput(SubProcessor<T>* proc, Player&) :
 }
 
 template<class T>
-AstraPrepInput<T>::AstraPrepInput(MAC_Check_Base<T>&, Preprocessing<T>&,
+AstraPrepInput<T>::AstraPrepInput(MacCheckBase<T>&, Preprocessing<T>&,
         Player&, AstraPrepProtocol<T>* protocol) :
         protocol(*protocol)
 {
@@ -75,7 +75,7 @@ void AstraPrepInput<T>::reset(int player)
 }
 
 template<class T>
-void AstraPrepInput<T>::add_mine(const typename T::open_type&,
+void AstraPrepInput<T>::add_mine(const typename T::OpenType&,
         int)
 {
     add_other(this->P->my_num() - 1);
@@ -89,7 +89,7 @@ void AstraPrepInput<T>::add_other(int player, int)
 }
 
 template<class T>
-void AstraInput<T>::add_mine(const typename T::open_type& input,
+void AstraInput<T>::add_mine(const typename T::OpenType& input,
         int)
 {
     inputs.push_back(input);
@@ -139,13 +139,13 @@ void AstraPrepInput<T>::exchange()
         T res;
         int my_astra_num = P.my_num() - 1;
         int n = n_inputs.at(my_astra_num);
-        prep_os.reserve(n * open_type::size());
+        prep_os.reserve(n * OpenType::size());
         results[0].reserve(n);
         for (int j = 0; j < n; j++)
         {
             auto gamma =
                     protocol.prng_protocol.shared_prngs[other].template get<
-                            typename T::open_type>();
+                            typename T::OpenType>();
             prep_os.store_no_resize(gamma);
             res.neg_lambda(-1) = gamma;
             results[0].push_back(res);
@@ -164,30 +164,30 @@ void AstraInput<T>::exchange()
     CODE_LOCATION
     if (OnlineOptions::singleton.has_option("verbose_astra"))
         fprintf(stderr, "astra input exchange %zu\n",
-                this->inputs.size() * T::open_type::size());
+                this->inputs.size() * T::OpenType::size());
 
-    octetStream prep_os;
+    OctetStream prep_os;
     protocol.read(prep_os);
     my_results.reserve(inputs.size());
-    send_os.reserve(inputs.size() * T::open_type::size());
+    send_os.reserve(inputs.size() * T::OpenType::size());
 
-    if (prep_os.left() < inputs.size() * open_type::size())
+    if (prep_os.left() < inputs.size() * OpenType::size())
         throw runtime_error("insufficient data in input");
 
     for (auto& input : inputs)
     {
-        auto gamma = prep_os.get_no_check<typename T::open_type>();
+        auto gamma = prep_os.get_no_check<typename T::OpenType>();
         send_os.store_no_resize(input - gamma);
         T res;
         res.neg_lambda(-1) = gamma;
         my_results.push_back(res);
     }
 
-    assert(send_os.left() == my_results.size() * T::open_type::size());
+    assert(send_os.left() == my_results.size() * T::OpenType::size());
 
     protocol.P.pass_around(send_os, recv_os, 1);
 
-    if (recv_os.left() < results.size() * T::open_type::size())
+    if (recv_os.left() < results.size() * T::OpenType::size())
         throw runtime_error("insufficient data in Astra input");
 
     assert(not prep_os.left());
@@ -218,7 +218,7 @@ template<class T>
 T AstraInput<T>::finalize_offset(int offset)
 {
     T res;
-    octetStream* o;
+    OctetStream* o;
     if (offset == 0)
     {
         res = my_results.next();
@@ -229,6 +229,6 @@ T AstraInput<T>::finalize_offset(int offset)
         res = results.next();
         o = &recv_os;
     }
-    res.m(-1) = o->get_no_check<typename T::open_type>();
+    res.m(-1) = o->get_no_check<typename T::OpenType>();
     return res;
 }

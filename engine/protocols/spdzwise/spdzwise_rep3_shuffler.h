@@ -17,14 +17,14 @@ class SpdzWiseRep3Shuffler : public SecureShuffleBase<T>
     Rep3Shuffler<typename T::part_type::Honest> internal;
 
 public:
-    typedef typename Rep3Shuffler<T>::store_type store_type;
-    typedef typename Rep3Shuffler<T>::shuffle_type shuffle_type;
+    typedef typename Rep3Shuffler<T>::StoreType StoreType;
+    typedef typename Rep3Shuffler<T>::ShuffleType ShuffleType;
 
-    map<long, long> stats;
+    map<long, long> statistics;
 
     SpdzWiseRep3Shuffler(SubProcessor<T>& proc);
 
-    void generate(int n_shuffle, shuffle_type& shuffle);
+    void generate(int n_shuffle, ShuffleType& shuffle);
 
-    void apply_multiple(StackedVector<T>& a, vector<ShuffleTuple<shuffle_type>>& shuffles);
+    void apply_multiple(StackedVector<T>& a, vector<ShuffleTuple<ShuffleType>>& shuffles);
 };

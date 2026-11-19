@@ -7,5 +7,5 @@
 
 int main()
 {
-    cout << gf2n::default_degree() << endl;
+    cout << Gf2n::default_degree() << endl;
 }

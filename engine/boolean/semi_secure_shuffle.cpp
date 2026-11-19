@@ -84,10 +84,10 @@ SemiSecureShuffle::~SemiSecureShuffle()
         delete rot_ext;
 }
 
-void SemiSecureShuffle::generate(size_t n, const vector<shuffle_type*>& perms,
+void SemiSecureShuffle::generate(size_t n, const vector<ShuffleType*>& perms,
         bool full)
 {
-    SeededPRNG G;
+    SeededPrng G;
     for (auto perm : perms)
         G.random_permutation(n, perm->pi);
 
@@ -96,7 +96,7 @@ void SemiSecureShuffle::generate(size_t n, const vector<shuffle_type*>& perms,
 }
 
 void SemiSecureShuffle::full_generate(size_t n,
-        const vector<shuffle_type*>& perms)
+        const vector<ShuffleType*>& perms)
 {
     CODE_LOCATION
     auto& party = ShareThread<SemiSecret>::s();
@@ -117,13 +117,13 @@ void SemiSecureShuffle::full_generate(size_t n,
     typedef ShareThread<GC::SemiSecret> thread_type;
     bool time = thread_type::has_singleton();
     if (time)
-        thread_type::s().DataF.prep_timer.start(P.total_comm());
+        thread_type::s().DataF.prep_timer.start(P.total_communication());
 
-    SemiSecureShuffleState::job_type job(n, perms);
+    SemiSecureShuffleState::JobType job(n, perms);
     state->generate(&job);
 
     if (time)
-        thread_type::s().DataF.prep_timer.stop(P.total_comm());
+        thread_type::s().DataF.prep_timer.stop(P.total_communication());
 #else
     throw runtime_error("tungsten not compiled");
 #endif
@@ -133,10 +133,10 @@ F2Vec128 SemiSecureShuffle::apply_prf(const BitVector& key,
         const F3VectorBitWiseView& x)
 {
     bool debug_output = false;
-    auto A_input = x.schur(key);
+    auto a_input = x.schur(key);
     if (debug_output)
-        cout << "cleartext A input " << A_input << endl;
-    auto prod = A.apply(A_input);
+        cout << "cleartext A input " << a_input << endl;
+    auto prod = A.apply(a_input);
     if (debug_output)
         cout << "cleartext mid " << F3Vector(prod) << endl;
     F2Vector vec(prod);
@@ -152,16 +152,16 @@ vector<F2Vec128> SemiSecureShuffle::apply_prf(const BitVector& key,
     auto tmp = x;
     for (size_t i = 0; i < tmp.n_cols(); i++)
         tmp.col(i).ischur(key);
-    auto A_output = A.apply(tmp.transpose()).transpose();
-    assert(A_output.n_cols() == x.n_cols());
+    auto a_output = A.apply(tmp.transpose()).transpose();
+    assert(a_output.n_cols() == x.n_cols());
     vector<F2Vec128> res;
     res.reserve(x.n_cols());
-    for (size_t i = 0; i < A_output.n_cols(); i++)
-        res.push_back(B.dot(A_output.col(i).get_bits(0)));
+    for (size_t i = 0; i < a_output.n_cols(); i++)
+        res.push_back(B.dot(a_output.col(i).get_bits(0)));
     return res;
 }
 
-void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Player& P)
+void SemiSecureShuffle::generate_from_ot(size_t n, ShuffleGeneratorType& perms, Player& P)
 {
     CODE_LOCATION
 
@@ -174,23 +174,23 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
 
     int key_size = 128 * 4;
     int mid_size = 256;
-    vector<PRNG> G_receiver;
-    vector<array<PRNG, 2>> G_sender;
+    vector<PRNG> g_receiver;
+    vector<array<PRNG, 2>> g_sender;
     if (not rot_ext)
-        rot_ext = new OTExtensionWithMatrix(P, true);
+        rot_ext = new OtExtensionWithMatrix(P, true);
     auto& ot_ext = *rot_ext;
     BitVector k(key_size);
-    SeededPRNG G;
-    GlobalPRNG shared_prng(P);
+    SeededPrng G;
+    GlobalPrng shared_prng(P);
     k.randomize(G);
     ot_ext.extend(key_size, k);
     for (int i = 0; i < key_size; i++)
     {
-        G_sender.push_back({});
-        G_receiver.push_back({});
+        g_sender.push_back({});
+        g_receiver.push_back({});
         for (int k = 0; k < 2; k++)
-            G_sender.back()[k].SetSeedFrom(int128(ot_ext.senderOutputMatrices.at(k).at(i)));
-        G_receiver.back().SetSeedFrom(int128(ot_ext.receiverOutputMatrix.at(i)));
+            g_sender.back()[k].set_seed_from(Int128(ot_ext.sender_output_matrices.at(k).at(i)));
+        g_receiver.back().set_seed_from(Int128(ot_ext.receiver_output_matrix.at(i)));
     }
 
     if (A.empty())
@@ -205,14 +205,14 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
     }
 
     F3VectorBitWise w0, w1;
-    octetStream fs;
+    OctetStream fs;
 
     vector<F3Vector> h0s;
     vector<F3VectorBitWise> all_prf_inputs;
 
     size_t budget = 1 << 20;
-    if (OnlineOptions::singleton.has_param("shuffle_budget"))
-        budget = OnlineOptions::singleton.get_param("shuffle_budget");
+    if (OnlineOptions::singleton.has_parameter("shuffle_budget"))
+        budget = OnlineOptions::singleton.get_parameter("shuffle_budget");
 
     bool progress = OnlineOptions::singleton.has_option("shuffle_progress");
 
@@ -230,7 +230,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
         for (size_t i = 0; i < n; i++)
         {
             tmp.randomize(shared_prng);
-            prf_inputs.set_col(i, tmp);
+            prf_inputs.set_column(i, tmp);
 
             if (debug)
                 all_prf_inputs.push_back(prf_inputs.col(i));
@@ -249,7 +249,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
             RowMatrix<F3VectorBitWise> input_part(key_size, part_size);
 
             for (size_t j = 0; j < part_size; j++)
-                input_part.set_col(j, prf_inputs.col(i + j));
+                input_part.set_column(j, prf_inputs.col(i + j));
 
             auto prf_output = apply_prf(k, input_part);
 
@@ -265,8 +265,8 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
                 F3VectorBitWise tmp(part_size);
                 for (int j = 0; j < key_size; j++)
                 {
-                    tmp.randomize(G_sender[j][k]);
-                    x.set_col(j, tmp);
+                    tmp.randomize(g_sender[j][k]);
+                    x.set_column(j, tmp);
                 }
             }
 
@@ -300,7 +300,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
 
     P.exchange_relative(1, fs);
 
-    SemiMC<SemiShare<F3Vector>> MC;
+    SemiOpener<SemiShare<F3Vector>> MC;
 
     for (auto& shuffle : perms)
     {
@@ -321,8 +321,8 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
             tmp.resize(part_size);
             for (int j = 0; j < key_size; j++)
             {
-                tmp.randomize(G_receiver[j]);
-                t_matrix.set_col(j, tmp);
+                tmp.randomize(g_receiver[j]);
+                t_matrix.set_column(j, tmp);
             }
 
             tt = t_matrix.transpose();
@@ -349,7 +349,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
                 if (debug and false)
                 {
                     array<F3Vector, 2> w = {vec, h0s.at(i + j)};
-                    SemiMC<SemiShare<F3Vector>> MC;
+                    SemiOpener<SemiShare<F3Vector>> MC;
                     array<F3Vector, 2> opened;
                     for (int k = 0; k < 2; k++)
                         opened[k] = MC.open(w[k ^ P.my_num()], P);
@@ -382,7 +382,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
     if (debug and false)
     {
         array<F3Vector, 2> w = {w0, w1};
-        SemiMC<SemiShare<F3Vector>> MC;
+        SemiOpener<SemiShare<F3Vector>> MC;
         array<F3Vector, 2> opened;
         for (int k = 0; k < 2; k++)
             opened[k] = MC.open(w[k ^ P.my_num()], P);
@@ -404,7 +404,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
     auto offset = w0.size();
     assert(offset);
 
-    octetStream ds, ts;
+    OctetStream ds, ts;
     array<BitVector, 2> vs;
     for (auto& v : vs)
         v.resize(w0.size());
@@ -426,7 +426,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
         if (progress)
             fprintf(stderr, "conversion %zu+%zu\n", i, part_size);
 
-        BitVector m_recv(part_size);
+        BitVector m_receive(part_size);
         array<BitVector, 3> m({part_size, part_size, part_size});
         vector<array<Bit, 3>> m_send;
 
@@ -434,7 +434,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
         {
             auto choices = w1.part(i, part_size).get_bits(k).part(0, part_size);
             auto part_bits = ot_ext.bit_extension(choices, true);
-            m_recv ^= part_bits.second;
+            m_receive ^= part_bits.second;
 
             for (int j = 0; j < 3; j++)
             {
@@ -467,22 +467,22 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
         if (debug)
         {
             auto& c = w1;
-            octetStream os;
+            OctetStream os;
             c.pack(os);
-            os.store(m_recv);
+            os.store(m_receive);
             os.store(m_send);
             os.flush_bits();
             P.exchange_relative(1, os);
             auto other_c = c;
-            auto other_m_recv = m_recv;
+            auto other_m_receive = m_receive;
             auto other_m_send = m_send;
             other_c.unpack(os);
-            os.get(other_m_recv);
+            os.get(other_m_receive);
             os.get(other_m_send);
             for (size_t i = 0; i < w0.size(); i++)
             {
-                assert(other_m_send[i][c[i].get()] == bool(m_recv[i]));
-                assert(m_send[i][other_c[i].get()] == bool(other_m_recv[i]));
+                assert(other_m_send[i][c[i].get()] == bool(m_receive[i]));
+                assert(m_send[i][other_c[i].get()] == bool(other_m_receive[i]));
             }
         }
 
@@ -506,14 +506,14 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
 
         vs[1].set_part(i,
                 F2Vector(F3VectorBitWise(w1.part(i, part_size)).select(tt))
-                        + F2Vector(m_recv));
+                        + F2Vector(m_receive));
     }
 
     ot_ext.resize(0);
 
     if (debug_output)
     {
-        SemiMC<SemiShare<Bit>> MC2;
+        SemiOpener<SemiShare<Bit>> MC2;
         cout << "shared B input ";
         for (size_t i = 0; i < w0.size(); i++)
             cout << MC2.open(vs[P.my_num()].get_bit(i), P);
@@ -522,10 +522,10 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
 
     if (debug and false)
     {
-        SemiMC<SemiShare<Bit>> MC;
+        SemiOpener<SemiShare<Bit>> MC;
         for (size_t i = 0; i < n; i++)
         {
-            auto B_input = A.apply(all_prf_inputs.at(i).schur(k));
+            auto b_input = A.apply(all_prf_inputs.at(i).schur(k));
             for (int j = 0; j < mid_size; j++)
             {
                 int index = i * mid_size + j;
@@ -533,7 +533,7 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
                 for (int k = 0; k < 2; k++)
                     opened[k] = MC.open(vs[k ^ P.my_num()].get_bit(index), P);
                 auto& to_test = opened[P.my_num()];
-                assert(to_test == B_input[j].get() % 2);
+                assert(to_test == b_input[j].get() % 2);
             }
         }
     }
@@ -550,8 +550,8 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
 
     if (debug)
     {
-        SemiMC<SemiShare<Bit>> MC;
-        octetStream os;
+        SemiOpener<SemiShare<Bit>> MC;
+        OctetStream os;
         os.store(perms[0]->pi);
         P.exchange_relative(1, os);
         vector<unsigned> other_pi;
@@ -559,15 +559,15 @@ void SemiSecureShuffle::generate_from_ot(size_t n, shuffle_gen_type& perms, Play
 
         for (size_t i = 0; i < n; i++)
         {
-            array<int128, 2> w = {perms[0]->B.values[i].first, perms[0]->C.values[i].first};
+            array<Int128, 2> w = {perms[0]->B.values[i].first, perms[0]->C.values[i].first};
             cout << "B=" << w[0] << " C=" << w[1] << endl;
 
-            octetStream os;
+            OctetStream os;
             os.store(w);
 
             P.exchange_relative(1, os);
 
-            array<int128, 2> out;
+            array<Int128, 2> out;
             os.get(out);
             cout << "got " << out[0] << " " << out[1] << endl;
             cout << "comb options ";
@@ -608,27 +608,27 @@ SemiSecureStateBase<T>::SemiSecureStateBase(Player& P) :
     auto ot_setup = BaseMachine::fresh_ot_setup(*ShareThread<SemiSecret>::s().P);
     BitVector bits;
     bits.resize(secJoin::AltModPrf::KeySize);
-    SeededPRNG G;
+    SeededPrng G;
     bits.randomize(G);
     base_bits = {bits.get_ptr(), bits.size()};
 
     VirtualTwoPartyPlayer player(P, 1 - P.my_num());
     auto base = ot_setup.get_base(0);
-    OTExtensionWithMatrix ext(base, &player, false);
+    OtExtensionWithMatrix ext(base, &player, false);
     ext.extend(bits.size(), bits);
 
     for (int i = 0; i < 2; i++)
     {
-        auto& x = ext.senderOutputMatrices;
+        auto& x = ext.sender_output_matrices;
         for (unsigned j = 0; j < bits.size(); j++)
         {
-            G_sender[i ^ P.my_num()].push_back({});
+            g_sender[i ^ P.my_num()].push_back({});
             for (int k = 0; k < 2; k++)
-                G_sender[i ^ P.my_num()].back().at(k).SetSeedFrom(
-                        int128(x.at(k).at(j)));
-            G_receiver[i ^ P.my_num()].push_back({});
-            G_receiver[i ^ P.my_num()].back().SetSeedFrom(
-                    int128(ext.receiverOutputMatrix.at(j)));
+                g_sender[i ^ P.my_num()].back().at(k).set_seed_from(
+                        Int128(x.at(k).at(j)));
+            g_receiver[i ^ P.my_num()].push_back({});
+            g_receiver[i ^ P.my_num()].back().set_seed_from(
+                    Int128(ext.receiver_output_matrix.at(j)));
         }
     }
 
@@ -658,8 +658,8 @@ void SemiSecureStateBase<T>::run()
     const void* job;
     while (job_queue.pop(job))
     {
-        ((T*) this)->generate_role(*(typename T::job_type*) job, 1);
-        res_queue.push(job);
+        ((T*) this)->generate_role(*(typename T::JobType*) job, 1);
+        result_queue.push(job);
     }
 }
 
@@ -681,7 +681,7 @@ vector<osuCrypto::block> SemiSecureStateBase<T>::base_receiver_ots(int role,
     vector<osuCrypto::block> outputs;
     for (unsigned i = 0; i < size; i++)
     {
-        auto& x = G_receiver.at(role).at(i);
+        auto& x = g_receiver.at(role).at(i);
         outputs.push_back(x.get_doubleword());
     }
     return outputs;
@@ -702,7 +702,7 @@ vector<array<osuCrypto::block, 2>> SemiSecureStateBase<T>::base_sender_ots(
     vector<array<osuCrypto::block, 2>> inputs;
     for (unsigned i = 0; i < size; i++)
     {
-        auto& x = G_sender.at(role).at(i);
+        auto& x = g_sender.at(role).at(i);
         inputs.push_back({});
         for (int i = 0; i < 2; i++)
             inputs.back()[i] = x[i].get_doubleword();
@@ -714,8 +714,8 @@ template<class T>
 void SemiSecureStateBase<T>::generate(const void* job)
 {
     job_queue.push(job);
-    ((T*) this)->generate_role(*(typename T::job_type*) job, 0);
-    assert(res_queue.pop() == job);
+    ((T*) this)->generate_role(*(typename T::JobType*) job, 0);
+    assert(result_queue.pop() == job);
 }
 
 class PermEnsemble
@@ -731,7 +731,7 @@ public:
     optional<secJoin::AltModPrf::KeyType> key;
 };
 
-void SemiSecureShuffleState::generate_role(job_type& job,
+void SemiSecureShuffleState::generate_role(JobType& job,
         int role)
 {
     auto n = job.first;
@@ -858,7 +858,7 @@ void SemiSecureShuffleState::generate_role(job_type& job,
 }
 
 
-void SemiSecureTripleState::generate_role(job_type& job, int role)
+void SemiSecureTripleState::generate_role(JobType& job, int role)
 {
     auto batch_size = job.first;
     auto& triples = job.second;
@@ -902,7 +902,7 @@ void SemiSecureTripleState::generate_role(job_type& job, int role)
 
         while (c + 1 < o.mAdd.end())
         {
-            int128 aa(*a), bb(*b), cc(*c), dd(*(c + 1));
+            Int128 aa(*a), bb(*b), cc(*c), dd(*(c + 1));
             cc ^= dd ^ (aa & bb);
             triples[role].push_back(
             { aa.get_lower(), bb.get_lower(), cc.get_lower() });
@@ -919,7 +919,7 @@ void SemiSecureTripleState::generate_role(job_type& job, int role)
 #endif
 
 void SemiSecureShuffle::apply(StackedVector<SemiSecret>& S,
-        shuffle_type& shuffle, const BaseInstruction& instruction)
+        ShuffleType& shuffle, const BaseInstruction& instruction)
 {
     CODE_LOCATION
     auto& party = ShareThread<SemiSecret>::s();
@@ -929,7 +929,7 @@ void SemiSecureShuffle::apply(StackedVector<SemiSecret>& S,
     assert(args.size() % 2 == 1);
     assert(args[2] < 2);
 
-    ShuffleTuple<shuffle_type> shuffle_tuple(args[0], 0, 0, (args.size() - 3) / 2, shuffle,
+    ShuffleTuple<ShuffleType> shuffle_tuple(args[0], 0, 0, (args.size() - 3) / 2, shuffle,
             args[2]);
     size_t dl = SemiSecret::default_length;
     assert(shuffle_tuple.unit_size <= dl);
@@ -965,9 +965,9 @@ void SemiSecureShuffle::apply(StackedVector<SemiSecret>& S,
 }
 
 void SemiSecureShuffle::apply_role(StackedVector<SemiSecret>& S,
-        ShuffleTuple<shuffle_type>& shuffle, Player& P, int role)
+        ShuffleTuple<ShuffleType>& shuffle, Player& P, int role)
 {
-    octetStream os;
+    OctetStream os;
     size_t n = shuffle.shuffle_size();
     int n_bits = shuffle.unit_size;
 
@@ -1016,13 +1016,13 @@ void SemiSecureShuffle::apply_role(StackedVector<SemiSecret>& S,
 
         for (size_t i = 0; i < shuffle.shuffle_size(); i++)
         {
-            auto perm_i = pi[i];
+            auto permutation_i = pi[i];
             auto& res = S[shuffle.dest + i];
 
             if (shuffle.reverse)
-                res = deltas[perm_i] + C.get(perm_i, n_bits) + tmp[perm_i];
+                res = deltas[permutation_i] + C.get(permutation_i, n_bits) + tmp[permutation_i];
             else
-                res = deltas[perm_i] + C.get(i, n_bits) + tmp[perm_i];
+                res = deltas[permutation_i] + C.get(i, n_bits) + tmp[permutation_i];
         }
 
         assert(not os.left());

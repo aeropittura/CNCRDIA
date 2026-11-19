@@ -44,7 +44,7 @@ T TrioPrepShare<T>::local_mul_P2(const This&) const
 
 template<class T>
 template<int Pi>
-typename Trio<T>::pre_tuple Trio<T>::pre_mul(const T& x, const T& y)
+typename Trio<T>::PreTuple Trio<T>::pre_mult(const T& x, const T& y)
 {
     typename T::clear tmp;
 #define X(I) if (Pi == I) tmp = x.local_mul_P##I(y);
@@ -55,7 +55,7 @@ typename Trio<T>::pre_tuple Trio<T>::pre_mul(const T& x, const T& y)
 
 template<class T>
 template<int Pi>
-typename Trio<T>::pre_tuple Trio<T>::pre_dot(const open_type& input)
+typename Trio<T>::PreTuple Trio<T>::pre_dot(const OpenType& input)
 {
     auto tmp = pre_common(input);
     auto& V = tmp.second;
@@ -68,11 +68,11 @@ typename Trio<T>::pre_tuple Trio<T>::pre_dot(const open_type& input)
 }
 
 template<class T>
-typename Trio<T>::pre_tuple Trio<T>::pre_common(const open_type& input)
+typename Trio<T>::PreTuple Trio<T>::pre_common(const OpenType& input)
 {
-    auto tmp = input + prep.get_no_check<open_type>();
+    auto tmp = input + prep.get_no_check<OpenType>();
     T z;
-    z.neg_lambda(this->astra_num) = prep.get_no_check<open_type>();
+    z.neg_lambda(this->astra_num) = prep.get_no_check<OpenType>();
     return {z, tmp};
 }
 
@@ -91,11 +91,11 @@ void Trio<T>::exchange()
     int my_num = this->astra_num;
 
     this->read(prep);
-    if (prep.left() < open_type::size() * this->n_mults())
+    if (prep.left() < OpenType::size() * this->n_mults())
         throw runtime_error("not enough preprocessing");
 
     os[0].clear();
-    os[0].reserve(open_type::size() * this->n_mults());
+    os[0].reserve(OpenType::size() * this->n_mults());
 
     results.clear();
     results.reserve(this->n_mults());
@@ -104,7 +104,7 @@ void Trio<T>::exchange()
     if (my_num == Pi) \
     { \
         for (auto& x : this->input_pairs) \
-            results.push_back(pre_mul<Pi>(x[0], x[1])); \
+            results.push_back(pre_mult<Pi>(x[0], x[1])); \
         for (auto& x : inputs) \
             results.push_back(pre_dot<Pi>(x)); \
     }
@@ -112,18 +112,18 @@ void Trio<T>::exchange()
 
     P.pass_around(os[0], os[1], 1);
 
-    if (os[1].left() < open_type::size() * this->n_mults())
+    if (os[1].left() < OpenType::size() * this->n_mults())
         throw runtime_error("insufficient data in Trio");
 
     if (my_num == 1)
     {
         for (auto& x : results)
-            x.first.m(my_num) = os[1].template get_no_check<open_type>() - x.second;
+            x.first.m(my_num) = os[1].template get_no_check<OpenType>() - x.second;
     }
     else
     {
         for (auto& x : results)
-            x.first.m(my_num) = x.second - os[1].template get_no_check<open_type>();
+            x.first.m(my_num) = x.second - os[1].template get_no_check<OpenType>();
     }
 
     results.reset();
@@ -136,8 +136,8 @@ T Trio<T>::finalize_mul(int)
 }
 
 template<class T>
-void TrioPrepProtocol<T>::pre_P0(typename T::open_type& r01,
-        const typename T::open_type& input)
+void TrioPrepProtocol<T>::pre_p0(typename T::OpenType& r01,
+        const typename T::OpenType& input)
 {
     r01.randomize(this->prng_protocol.shared_prngs[0]);
     this->os.store_no_resize(input + r01);
@@ -151,31 +151,31 @@ void TrioPrepProtocol<T>::exchange()
     auto& inputs = this->inputs;
     auto& results = this->results;
     int my_num = P.my_num();
-    octetStream& os = this->os;
+    OctetStream& os = this->os;
     os.reset_write_head();
     assert(results.size() == 0);
     auto& shared_prngs = this->prng_protocol.shared_prngs;
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
 
     this->prepare_exchange();
 
     results.reserve(this->n_mults);
-    os.reserve(open_type::size() * 2 * this->n_mults);
+    os.reserve(OpenType::size() * 2 * this->n_mults);
 
     T z;
-    open_type r01;
+    OpenType r01;
 
     if (my_num == 0)
     {
         for (auto& x : inputs)
         {
-            pre_P0(r01, x);
+            pre_p0(r01, x);
             this->prng_protocol.randomize(z);
             results.push_back(z);
         }
         for (auto& x : this->input_pairs)
         {
-            pre_P0(r01, x[0].local_mul_P0(x[1]));
+            pre_p0(r01, x[0].local_mul_P0(x[1]));
             this->prng_protocol.randomize(z);
             results.push_back(z);
         }
@@ -197,13 +197,13 @@ void TrioPrepProtocol<T>::exchange()
     {
         assert(my_num == 2);
         P.receive_player(0, os);
-        octetStream prep_os;
-        prep_os.reserve(this->n_mults * 2 * open_type::size());
-        if (os.left() < this->n_mults * open_type::size())
+        OctetStream prep_os;
+        prep_os.reserve(this->n_mults * 2 * OpenType::size());
+        if (os.left() < this->n_mults * OpenType::size())
             throw runtime_error("insufficient data in multiplication");
         for (size_t i = 0; i < this->n_mults; i++)
         {
-            prep_os.store_no_resize(os.get_no_check<open_type>());
+            prep_os.store_no_resize(os.get_no_check<OpenType>());
             z.neg_lambda(my_num).randomize(shared_prngs[0]);
             prep_os.store_no_resize(z.neg_lambda(my_num));
             results.push_back(z);
@@ -230,7 +230,7 @@ template<class T>
 T TrioPrepProtocol<T>::get_random()
 {
     auto res = from_rep3(
-            this->prng_protocol.template get_random<typename T::open_type>());
+            this->prng_protocol.template get_random<typename T::OpenType>());
     this->store(res);
     return res;
 }
@@ -239,7 +239,7 @@ template<class T>
 void TrioPrepProtocol<T>::randoms_inst(StackedVector<T>& S,
         const Instruction& instruction)
 {
-    octetStream os;
+    OctetStream os;
 
     for (int j = 0; j < instruction.get_size(); j++)
     {
@@ -256,7 +256,7 @@ void TrioPrepProtocol<T>::randoms_inst(StackedVector<T>& S,
 
 template<class T>
 template<class U, int MY_NUM>
-void AstraPrepShare<T>::pre_reduced_mul(U& a, U&, U& c,
+void AstraPrepShare<T>::pre_reduced_mult(U& a, U&, U& c,
         AstraPrepProtocol<U>& protocol, const T& aa, const T&)
 {
     auto& shared_prngs = protocol.prng_protocol.shared_prngs;
@@ -293,24 +293,24 @@ void AstraPrepShare<T>::pre_reduced_mul(U& a, U&, U& c,
 }
 
 template<class T>
-void AstraPrepProtocol<T>::init_reduced_mul(size_t n_mul)
+void AstraPrepProtocol<T>::initialize_reduced_mult(size_t n_mult)
 {
     auto& P = this->P;
 
     os_prep.reset_write_head();
     os.reset_write_head();
-    os.reserve<typename T::clear>(n_mul);
-    os_prep.reserve<typename T::clear>(2 * n_mul);
+    os.reserve<typename T::clear>(n_mult);
+    os_prep.reserve<typename T::clear>(2 * n_mult);
 
     if (P.my_num() == 2)
     {
         P.receive_player(0, os);
-        os.require<typename T::clear>(n_mul);
+        os.require<typename T::clear>(n_mult);
     }
 }
 
 template<class T>
-void AstraPrepProtocol<T>::exchange_reduced_mul(size_t)
+void AstraPrepProtocol<T>::exchange_reduced_mult(size_t)
 {
     auto& P = this->P;
 
@@ -325,19 +325,19 @@ void AstraPrepProtocol<T>::exchange_reduced_mul(size_t)
 
 template<class T>
 void AstraPrepProtocol<T>::unsplit1(StackedVector<T>& dest,
-        StackedVector<typename T::bit_type>& source,
+        StackedVector<typename T::BitType>& source,
         const Instruction& instruction)
 {
     CODE_LOCATION
     int n_bits = instruction.get_size();
     assert(instruction.get_start().size() == 1);
     auto& P = this->P;
-    init_reduced_mul(n_bits);
+    initialize_reduced_mult(n_bits);
 
     if (P.my_num() == 0)
     {
         auto range = BlockRange(source, instruction.get_r(0), n_bits);
-        auto dest_it = dest.iterator_for_size(instruction.get_start()[0],
+        auto destination_it = dest.iterator_for_size(instruction.get_start()[0],
                 n_bits);
 
         for (auto& x : range)
@@ -345,8 +345,8 @@ void AstraPrepProtocol<T>::unsplit1(StackedVector<T>& dest,
             for (auto bit : BitLeftRange(x.sum(), x, range))
             {
                 T a, b, c;
-                T::template pre_reduced_mul<T, 0>(a, b, c, *this, bit, {});
-                *dest_it++ = a - 2 * c;
+                T::template pre_reduced_mult<T, 0>(a, b, c, *this, bit, {});
+                *destination_it++ = a - 2 * c;
             }
         }
     }
@@ -355,7 +355,7 @@ void AstraPrepProtocol<T>::unsplit1(StackedVector<T>& dest,
         for (auto& x : Range(dest, instruction.get_start()[0], n_bits))
         {
             T a, b, c;
-            T::template pre_reduced_mul<T, 1>(a, b, c, *this, {}, {});
+            T::template pre_reduced_mult<T, 1>(a, b, c, *this, {}, {});
             x[1] = a[1] - c[1] * 2;
         }
     }
@@ -364,17 +364,17 @@ void AstraPrepProtocol<T>::unsplit1(StackedVector<T>& dest,
         for (auto& x : Range(dest, instruction.get_start()[0], n_bits))
         {
             T a, b, c;
-            T::template pre_reduced_mul<T, 2>(a, b, c, *this, {}, {});
+            T::template pre_reduced_mult<T, 2>(a, b, c, *this, {}, {});
             x[1] = a[1] - c[1] * 2;
         }
     }
 
-    exchange_reduced_mul(n_bits);
+    exchange_reduced_mult(n_bits);
 }
 
 template<class T>
 template<class U, int MY_NUM>
-void TrioShare<T>::pre_reduced_mul(U& a, U& b, U& c,
+void TrioShare<T>::pre_reduced_mult(U& a, U& b, U& c,
         Trio<U>& protocol, const T&, const T& bb)
 {
     auto& os = protocol.os;
@@ -384,7 +384,7 @@ void TrioShare<T>::pre_reduced_mul(U& a, U& b, U& c,
     switch(MY_NUM)
     {
     case 0:
-        throw not_implemented();
+        throw NotImplemented();
     case 1:
     {
         prep.get_no_check(a[1]);
@@ -412,7 +412,7 @@ void TrioShare<T>::pre_reduced_mul(U& a, U& b, U& c,
 
 template<class T>
 template<class U, int MY_NUM>
-pair<U, T> TrioShare<T>::post_reduced_mul(typename U::Protocol& protocol)
+pair<U, T> TrioShare<T>::post_reduced_mult(typename U::Protocol& protocol)
 {
     auto& results = protocol.results;
     auto& os = protocol.os;
@@ -420,7 +420,7 @@ pair<U, T> TrioShare<T>::post_reduced_mul(typename U::Protocol& protocol)
     switch(MY_NUM)
     {
     case 0:
-        throw not_implemented();
+        throw NotImplemented();
     case 1:
     {
         auto res = results.next();
@@ -435,24 +435,24 @@ pair<U, T> TrioShare<T>::post_reduced_mul(typename U::Protocol& protocol)
 }
 
 template<class T>
-void Trio<T>::init_reduced_mul(size_t n_mul)
+void Trio<T>::initialize_reduced_mult(size_t n_mult)
 {
     this->read(prep);
-    prep.require<clear>(2 * n_mul);
+    prep.require<clear>(2 * n_mult);
 
     os[0].reset_write_head();
-    os[0].template reserve<clear>(n_mul);
+    os[0].template reserve<clear>(n_mult);
     results.clear();
-    results.reserve(n_mul);
+    results.reserve(n_mult);
 }
 
 template<class T>
-void Trio<T>::exchange_reduced_mul(size_t n_mul)
+void Trio<T>::exchange_reduced_mult(size_t n_mult)
 {
     this->P.pass_around(os[0], os[1], 1);
-    os[1].template require<clear>(n_mul);
+    os[1].template require<clear>(n_mult);
     results.reset();
-    assert(results.left() == n_mul);
+    assert(results.left() == n_mult);
 }
 
 template<class T>
@@ -466,14 +466,14 @@ TrioShare<T> TrioShare<T>::post_input0(typename U::Protocol& protocol)
 
 template<class T>
 void Trio<T>::unsplit1(StackedVector<T>& dest,
-        StackedVector<typename T::bit_type>& source,
+        StackedVector<typename T::BitType>& source,
         const Instruction& instruction)
 {
     CODE_LOCATION
     size_t n_bits = instruction.get_size();
     assert(instruction.get_start().size() == 1);
 
-    init_reduced_mul(n_bits);
+    initialize_reduced_mult(n_bits);
     auto range = BlockRange(source, instruction.get_r(0), n_bits);
 
     if (this->my_astra_num() == 1)
@@ -483,7 +483,7 @@ void Trio<T>::unsplit1(StackedVector<T>& dest,
             for (typename T::clear bit : BitLeftRange(x.sum(), x, range))
             {
                 T a, b, c;
-                T::template pre_reduced_mul<T, 1>(a, b, c, *this, {}, bit);
+                T::template pre_reduced_mult<T, 1>(a, b, c, *this, {}, bit);
                 results.back().first = a + b - 2 * c;
             }
         }
@@ -495,19 +495,19 @@ void Trio<T>::unsplit1(StackedVector<T>& dest,
             for (typename T::clear bit : BitLeftRange(x.sum(), x, range))
             {
                 T a, b, c;
-                T::template pre_reduced_mul<T, 2>(a, b, c, *this, {}, bit);
+                T::template pre_reduced_mult<T, 2>(a, b, c, *this, {}, bit);
                 results.back().first = a + b - 2 * c;
             }
         }
     }
 
-    exchange_reduced_mul(n_bits);
+    exchange_reduced_mult(n_bits);
 
     if (this->my_astra_num() == 1)
     {
         for (auto& x : Range(dest, instruction.get_start()[0], n_bits))
         {
-            auto res = T::template post_reduced_mul<T, 1>(*this);
+            auto res = T::template post_reduced_mult<T, 1>(*this);
             auto& mc = res.second;
             x = res.first;
             x[0] -= mc * 2;
@@ -517,7 +517,7 @@ void Trio<T>::unsplit1(StackedVector<T>& dest,
     {
         for (auto& x : Range(dest, instruction.get_start()[0], n_bits))
         {
-            auto res = T::template post_reduced_mul<T, 2>(*this);
+            auto res = T::template post_reduced_mult<T, 2>(*this);
             auto& mc = res.second;
             x = res.first;
             x[0] -= mc * 2;

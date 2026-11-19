@@ -29,13 +29,13 @@ class ShareInterface
 {
 public:
     typedef GC::NoShare part_type;
-    typedef GC::NoShare bit_type;
+    typedef GC::NoShare BitType;
 
-    typedef GC::NoValue mac_key_type;
-    typedef GC::NoShare mac_type;
-    typedef GC::NoShare mac_share_type;
+    typedef GC::NoValue MacKeyType;
+    typedef GC::NoShare MacType;
+    typedef GC::NoShare MacShareType;
 
-    typedef void DefaultMC;
+    typedef void DefaultOpener;
 
     static const bool needs_ot = false;
     static const bool expensive = false;
@@ -93,5 +93,5 @@ public:
     static int threshold(int) { throw runtime_error("undefined threshold"); }
 
     template<class T>
-    static string proto_fake_opts() { return T::fake_opts(); }
+    static string protocol_fake_options() { return T::fake_options(); }
 };

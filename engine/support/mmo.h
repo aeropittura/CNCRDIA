@@ -17,45 +17,45 @@ class MMO
     static const int N_KEYS = 8;
 #endif
 
-    octet IV[N_KEYS][176]  __attribute__((aligned (16)));
+    Octet IV[N_KEYS][176]  __attribute__((aligned (16)));
 
     template<int N>
     static void encrypt_and_xor(__m128i* output, const __m128i* input,
-            const octet* key);
+            const Octet* key);
     template<int N>
     static void encrypt_and_xor(void* output, const void* input,
-            const octet* key);
+            const Octet* key);
     template<int N>
     static void encrypt_and_xor(void* output, const void* input,
-            const octet* key, const int* indices);
+            const Octet* key, const int* indices);
 
 public:
-    MMO() { zeroIV(); }
-    void zeroIV();
-    void setIV(int i, octet key[AES_BLK_SIZE]);
+    MMO() { zero_iv(); }
+    void zero_iv();
+    void set_iv(int i, Octet key[AES_BLK_SIZE]);
     template <class T>
-    void hashOneBlock(void* output, const void* input) { hashBlocks<T, 1>((T*)output, input); }
+    void hash_one_block(void* output, const void* input) { hashBlocks<T, 1>((T*)output, input); }
     template <int N, int N_BYTES>
     void hashBlocks(void* output, const void* input, size_t alloc_size);
     template <class T, int N>
     void hashBlocks(void* output, const void* input);
     template <class T>
-    void hashEightBlocks(T* output, const void* input);
+    void hash_eight_blocks(T* output, const void* input);
     template <class T, int N_BYTES>
-    void hashEightBlocks(T* output, const void* input);
+    void hash_eight_blocks(T* output, const void* input);
     template <int X, int L>
-    void hashEightBlocks(gfp_<X, L>* output, const void* input);
+    void hash_eight_blocks(Gfp_<X, L>* output, const void* input);
     template <int X, int L>
-    void hashEightBlocks(gfpvar_<X, L>* output, const void* input);
+    void hash_eight_blocks(Gfpvar_<X, L>* output, const void* input);
     template <class T>
-    void outputOneBlock(octet* output);
+    void output_one_block(Octet* output);
     Key hash(const Key& input);
     template <int N>
     void hash(Key* output, const Key* input);
 };
 
 template<int N>
-inline void MMO::encrypt_and_xor(__m128i* out, const __m128i* in, const octet* key)
+inline void MMO::encrypt_and_xor(__m128i* out, const __m128i* in, const Octet* key)
 {
     ecb_aes_128_encrypt<N>(out, in, key);
     for (int i = 0; i < N; i++)
@@ -63,7 +63,7 @@ inline void MMO::encrypt_and_xor(__m128i* out, const __m128i* in, const octet* k
 }
 
 template<int N>
-inline void MMO::encrypt_and_xor(void* output, const void* input, const octet* key)
+inline void MMO::encrypt_and_xor(void* output, const void* input, const Octet* key)
 {
     __m128i in[N], out[N];
     avx_memcpy(in, input, sizeof(in));

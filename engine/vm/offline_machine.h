@@ -14,7 +14,7 @@ template<class W>
 class OfflineMachine : public W, BaseMachine
 {
     DataPositions usage;
-    Names& playerNames;
+    Names& player_names;
     Player& P;
 
     template<class T>
@@ -25,7 +25,7 @@ class OfflineMachine : public W, BaseMachine
 public:
     template<class V>
     OfflineMachine(int argc, const char** argv,
-            ez::ezOptionParser& opt, OnlineOptions& online_opts, V,
+            ez::EzOptionParser& opt, OnlineOptions& online_options, V,
             int nplayers = 0);
     ~OfflineMachine();
 

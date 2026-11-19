@@ -65,7 +65,7 @@ void Register::set_eval_keys(Key* keys, int n_parties, int except)
     set_eval_keys();
 }
 
-void Register::set_external_key(party_id_t i, const Key& key)
+void Register::set_external_key(PartyId i, const Key& key)
 {
     check_external();
     garbled_entry[i-1] = key;
@@ -73,7 +73,7 @@ void Register::set_external_key(party_id_t i, const Key& key)
     //keys[1-external][i-1] = 0;
 }
 
-void Register::reset_non_external_key(party_id_t i)
+void Register::reset_non_external_key(PartyId i)
 {
     check_external();
     keys[1-external][i-1] = 0;
@@ -176,7 +176,7 @@ void EvalRegister::andrs(GC::Processor<GC::Secret<EvalRegister> >& processor,
 		for (size_t i = 0; i < args[j]; i += dl)
 		{
 			GC::Secret<EvalRegister>& dest = processor.S[args[j + 1] + i / dl];
-			dest.resize_regs(min(args[j] - i, dl));
+			dest.resize_registers(min(args[j] - i, dl));
 		}
 		processor.complexity += args[j];
 		for (size_t i = 0; i < args[j]; i++)
@@ -189,7 +189,7 @@ void EvalRegister::andrs(GC::Processor<GC::Secret<EvalRegister> >& processor,
 		if (i_gate >= max_gates_per_thread or and_job.end >= args.size())
 		{
 			party.eval_threads[i_thread].request(and_job);
-			gate_id_t gate_id = party.next_gate(i_gate);
+			GateId gate_id = party.next_gate(i_gate);
 			i_gate = 0;
 			// advance to next thread but only if not on least thread
 			if(and_job.end < args.size())
@@ -219,7 +219,7 @@ void EvalRegister::op(const ProgramRegister& left, const ProgramRegister& right,
 }
 
 void Register::eval(const Register& left, const Register& right, GarbledGate& gate,
-        party_id_t my_id, char* prf_output, int w_o, int w_l, int w_r)
+        PartyId my_id, char* prf_output, int w_o, int w_l, int w_r)
 {
     (void)w_o;
     (void)w_l;
@@ -251,12 +251,12 @@ void Register::eval(const Register& left, const Register& right, GarbledGate& ga
 #endif
 
     Key k;
-    for(party_id_t i=1; i<=n_parties; i++) {
+    for(PartyId i=1; i<=n_parties; i++) {
 #ifdef DEBUG
                                 std::cout << "using key: " << left.external_key(i) << endl;
 #endif
-        PRF_chunk(left.external_key(i), gate.input(ext_l, 1), prf_output, PAD_TO_8(n_parties));
-        for(party_id_t j=1; j<=n_parties; j++) {
+        prf_chunk(left.external_key(i), gate.input(ext_l, 1), prf_output, PAD_TO_8(n_parties));
+        for(PartyId j=1; j<=n_parties; j++) {
             k = *(Key*)(prf_output+16*(j-1));
 #ifdef DEBUG
                         printf("Fk^%d_{%u,%d}(%d,%u,%d) = ",i, w_l, sig_l,ext_l,g,j);
@@ -268,8 +268,8 @@ void Register::eval(const Register& left, const Register& right, GarbledGate& ga
 #ifdef DEBUG
                                     std::cout << "using key: " << right.external_key(i) << endl;
 #endif
-        PRF_chunk(right.external_key(i), gate.input(ext_r, 1) , prf_output, PAD_TO_8(n_parties));
-        for(party_id_t j=1; j<=n_parties; j++) {
+        prf_chunk(right.external_key(i), gate.input(ext_r, 1) , prf_output, PAD_TO_8(n_parties));
+        for(PartyId j=1; j<=n_parties; j++) {
             k = *(Key*)(prf_output+16*(j-1));
 #ifdef DEBUG
             printf("Fk^%d_{%u,%d}(%d,%u,%d) = ",i, w_r, sig_r,ext_r,g,j);
@@ -279,7 +279,7 @@ void Register::eval(const Register& left, const Register& right, GarbledGate& ga
         }
     }
 
-//  for(party_id_t i=1; i<=n_parties; i++) {
+//  for(PartyId i=1; i<=n_parties; i++) {
 //      std::cout << garbled_entry[i-1] << "  ";
 //  }
 //  std::cout << std::endl;
@@ -306,7 +306,7 @@ void GarbleRegister::op(const Register& left, const Register& right, Function fu
 
 void Register::garble(const Register& left, const Register& right,
         Function func, Gate* gate, int g,
-        vector<ReceivedMsg>& prf_outputs, SendBuffer& buffer)
+        vector<ReceivedMessage>& prf_outputs, SendBuffer& buffer)
 {
     (void)func;
     (void)gate;
@@ -314,66 +314,66 @@ void Register::garble(const Register& left, const Register& right,
     size_t n_parties = CommonParty::singleton->get_n_parties();
     GarbledGate garbled_gate(n_parties);
     garbled_gate.reset();
-    KeyVector& gg_A = garbled_gate[0];
-    KeyVector& gg_B = garbled_gate[1];
-    KeyVector& gg_C = garbled_gate[2];
-    KeyVector& gg_D = garbled_gate[3];
+    KeyVector& gg_a = garbled_gate[0];
+    KeyVector& gg_b = garbled_gate[1];
+    KeyVector& gg_c = garbled_gate[2];
+    KeyVector& gg_d = garbled_gate[3];
 
-    for(party_id_t i=1; i<=n_parties; i++) {
+    for(PartyId i=1; i<=n_parties; i++) {
 #ifdef DEBUG
         std::cout << "adding prfs of party " << i << std::endl ;
 #endif
         Key left_i_j, right_i_j;
-        for (party_id_t j=1; j<=n_parties; j++) {
-            PRFTuple party_prfs;
+        for (PartyId j=1; j<=n_parties; j++) {
+            PrfTuple party_prfs;
             prf_outputs[i - 1].unserialize(party_prfs);
             //A
 #ifdef DEBUG
             left_i_j = *(Key*)party_prfs.outputs[0][0][0];
             right_i_j = *(Key*)party_prfs.outputs[1][0][0];
             std::cout << "A" << std::endl;
-                        cout << gg_A[j-1] << std::endl;
+                        cout << gg_a[j-1] << std::endl;
                         cout << left_i_j << std::endl;
                         cout << right_i_j << std::endl;
 #endif
-            gg_A[j-1] += party_prfs.for_garbling(0);
-//                          cout << gg_A[j-1] << std::endl<< std::endl;
+            gg_a[j-1] += party_prfs.for_garbling(0);
+//                          cout << gg_a[j-1] << std::endl<< std::endl;
 
             //B
 #ifdef DEBUG
             left_i_j = *(Key*)party_prfs.outputs[0][0][1];
             right_i_j = *(Key*)party_prfs.outputs[1][1][0];
             std::cout << "B" << std::endl;
-                        cout << gg_B[j-1] << std::endl;
+                        cout << gg_b[j-1] << std::endl;
                         cout << left_i_j << std::endl;
                         cout << right_i_j << std::endl;
 #endif
-            gg_B[j-1] += party_prfs.for_garbling(1);
-//                          cout << gg_B[j-1] << std::endl<< std::endl;
+            gg_b[j-1] += party_prfs.for_garbling(1);
+//                          cout << gg_b[j-1] << std::endl<< std::endl;
 
             //C
 #ifdef DEBUG
             left_i_j = *(Key*)party_prfs.outputs[0][1][0];
             right_i_j = *(Key*)party_prfs.outputs[1][0][1];
             std::cout << "C" << std::endl;
-                        cout << gg_C[j-1] << std::endl;
+                        cout << gg_c[j-1] << std::endl;
                         cout << left_i_j << std::endl;
                         cout << right_i_j << std::endl;
 #endif
-            gg_C[j-1] += party_prfs.for_garbling(2);
-//                          cout << gg_C[j-1] << std::endl<< std::endl;
+            gg_c[j-1] += party_prfs.for_garbling(2);
+//                          cout << gg_c[j-1] << std::endl<< std::endl;
 
             //D
 #ifdef DEBUG
             left_i_j = *(Key*)party_prfs.outputs[0][1][1];
             right_i_j = *(Key*)party_prfs.outputs[1][1][1];
             std::cout << "D" << std::endl;
-                        cout << gg_D[j-1] << std::endl;
+                        cout << gg_d[j-1] << std::endl;
                         cout << left_i_j << std::endl;
                         cout << right_i_j << std::endl;
 #endif
-            gg_D[j-1] += party_prfs.for_garbling(3);
-//                          cout << gg_D[j-1] << std::endl<< std::endl;
+            gg_d[j-1] += party_prfs.for_garbling(3);
+//                          cout << gg_d[j-1] << std::endl<< std::endl;
         }
     }
 
@@ -410,17 +410,17 @@ void Register::garble(const Register& left, const Register& right,
     KeyVector& keyxc = outwire[xc];
     KeyVector& keyxd = outwire[xd];
 
-    for(party_id_t i=1; i<=n_parties; i++) {
+    for(PartyId i=1; i<=n_parties; i++) {
 #ifdef DEBUG
         std::cout << "adding to A = " << keyxa[i-1] << std::endl;
         std::cout << "adding to B = " << keyxb[i-1] << std::endl;
         std::cout << "adding to C = " << keyxc[i-1] << std::endl;
         std::cout << "adding to D = " << keyxd[i-1] << std::endl;
 #endif
-        gg_A[i-1] += keyxa[i-1];
-        gg_B[i-1] += keyxb[i-1];
-        gg_C[i-1] += keyxc[i-1];
-        gg_D[i-1] += keyxd[i-1];
+        gg_a[i-1] += keyxa[i-1];
+        gg_b[i-1] += keyxb[i-1];
+        gg_c[i-1] += keyxc[i-1];
+        gg_d[i-1] += keyxd[i-1];
     }
     garbled_gate.serialize_no_allocate(buffer);
 #ifdef DEBUG
@@ -428,13 +428,13 @@ void Register::garble(const Register& left, const Register& right,
 #endif
 }
 
-void PRFRegister::output()
+void PrfRegister::output()
 {
 	ProgramParty& party = *ProgramParty::singleton;
 	party.store_wire(*this);
 }
 
-void PRFRegister::op(const PRFRegister& left, const PRFRegister& right, Function func)
+void PrfRegister::op(const PrfRegister& left, const PrfRegister& right, Function func)
 {
 	(void)func;
 #ifdef DEBUG
@@ -445,7 +445,7 @@ void PRFRegister::op(const PRFRegister& left, const PRFRegister& right, Function
 	ProgramParty& party = *ProgramParty::singleton;
 	party.receive_keys(*this);
 	GarbledGate gate(party.get_n_parties());
-	PRFOutputs prf_output(party.get_n_parties());
+	PrfOutputs prf_output(party.get_n_parties());
 	gate.compute_prfs_outputs(in_wires, party._id, prf_output, party.new_gate());
 	party.process_prf_output(prf_output, this, &left, &right);
 #ifdef DEBUG_FREE_XOR
@@ -460,7 +460,7 @@ void PRFRegister::op(const PRFRegister& left, const PRFRegister& right, Function
 #endif
 }
 
-void PRFRegister::input(party_id_t from, char value)
+void PrfRegister::input(PartyId from, char value)
 {
 	(void)from;
 	(void)value;
@@ -473,7 +473,7 @@ void PRFRegister::input(party_id_t from, char value)
 #endif
 }
 
-void PRFRegister::public_input(bool value)
+void PrfRegister::public_input(bool value)
 {
 	ProgramParty& party = ProgramParty::s();
 	int i = party.get_id() - 1;
@@ -482,7 +482,7 @@ void PRFRegister::public_input(bool value)
 	set_mask(0);
 }
 
-void PRFRegister::random()
+void PrfRegister::random()
 {
 	ProgramParty& party = ProgramParty::s();
 	ProgramParty::s().receive_keys(*this);
@@ -497,7 +497,7 @@ void PRFRegister::random()
 
 class InputAccess
 {
-	party_id_t from;
+	PartyId from;
 	size_t n_bits;
 	GC::Secret<EvalRegister>& dest;
 	GC::Processor<GC::Secret<EvalRegister> >& processor;
@@ -515,10 +515,10 @@ public:
 			throw runtime_error("invalid input parameters");
 	}
 
-	void prepare_masks(octetStream& os)
+	void prepare_masks(OctetStream& os)
 	{
-		dest.resize_regs(n_bits);
-		for (auto& reg : dest.get_regs())
+		dest.resize_registers(n_bits);
+		for (auto& reg : dest.get_registers())
 			party.load_wire(reg);
 		if (from == party.get_id())
 		{
@@ -531,10 +531,10 @@ public:
 		}
 	}
 
-	void received_masks(vector<octetStream>& oss)
+	void received_masks(vector<OctetStream>& oss)
 	{
 		size_t id = party.get_id() - 1;
-		for (auto& reg : dest.get_regs())
+		for (auto& reg : dest.get_registers())
 		{
 			if (party.get_id() != from)
 			{
@@ -546,11 +546,11 @@ public:
 		}
 	}
 
-	void received_labels(vector<octetStream>& oss)
+	void received_labels(vector<OctetStream>& oss)
 	{
-		for (auto& reg : dest.get_regs())
+		for (auto& reg : dest.get_registers())
 		{
-			for (party_id_t id = 1; id < (size_t)party.get_n_parties() + 1; id++)
+			for (PartyId id = 1; id < (size_t)party.get_n_parties() + 1; id++)
 			{
 				Key key;
 				if (id != party.get_id())
@@ -568,8 +568,8 @@ void EvalRegister::inputb(GC::Processor<GC::Secret<EvalRegister> >& processor,
 		const ArgVector& args)
 {
 	auto& party = ProgramParty::s();
-	vector<octetStream> oss(party.get_n_parties());
-	octetStream& my_os = oss[party.get_id() - 1];
+	vector<OctetStream> oss(party.get_n_parties());
+	OctetStream& my_os = oss[party.get_id() - 1];
 	vector<InputAccess> accesses;
 	InputArgList a(args);
 	processor.complexity += a.n_input_bits();
@@ -595,7 +595,7 @@ void EvalRegister::sync(vector<Integer>& values, Player*)
 	party.processor.untaint();
 }
 
-void EvalRegister::input_helper(char value, octetStream& os)
+void EvalRegister::input_helper(char value, OctetStream& os)
 {
 	set_mask(ProgramParty::s().input_masks.pop_front());
 	set_external(get_mask() ^ value);
@@ -709,13 +709,13 @@ void RandomRegister::op(const Register& left, const Register& right,
 	party.store_wire(*this);
 }
 
-void RandomRegister::input(party_id_t from, char value)
+void RandomRegister::input(PartyId from, char value)
 {
 	(void)value;
 	randomize();
 	auto& party = TrustedProgramParty::s();
 	party.store_wire(*this);
-	party.msg_input_masks[from - 1].push_back(get_mask());
+	party.message_input_masks[from - 1].push_back(get_mask());
 #ifdef DEBUG
 	cout << "(Random) input from " << from << ":" << endl;
 	keys.print(get_id());
@@ -735,7 +735,7 @@ void RandomRegister::public_input(bool value)
 	party.store_wire(*this);
 }
 
-void GarbleRegister::input(party_id_t from, char value)
+void GarbleRegister::input(PartyId from, char value)
 {
     (void)from;
     (void)value;
@@ -767,7 +767,7 @@ void GarbleRegister::random()
 
 void RandomRegister::output()
 {
-	TrustedProgramParty::s().msg_output_masks.push_back(get_mask());
+	TrustedProgramParty::s().message_output_masks.push_back(get_mask());
 }
 
 void EvalRegister::output()
@@ -794,7 +794,7 @@ void GarbleRegister::XOR(const Register& left, const Register& right)
 	mask = left.get_mask() ^ right.get_mask();
 }
 
-void PRFRegister::XOR(const Register& left, const Register& right)
+void PrfRegister::XOR(const Register& left, const Register& right)
 {
 	int i = ProgramParty::s()._id - 1;
 	Key delta = ProgramParty::s().get_delta();
@@ -840,7 +840,7 @@ void RandomRegister::store(NoMemory& mem,
 	(void)mem;
 	for (auto access : accesses)
 	{
-		for (auto& reg : access.source.get_regs())
+		for (auto& reg : access.source.get_registers())
 			TrustedProgramParty::s().store_spdz_wire(SPDZ_STORE, reg);
 	}
 }
@@ -851,7 +851,7 @@ void RandomRegister::load(vector<GC::ReadAccess< GC::Secret<RandomRegister> > >&
 {
 	(void)source;
 	for (auto access : accesses)
-		for (auto& reg : access.dest.get_regs())
+		for (auto& reg : access.dest.get_registers())
 		{
 			((RandomRegister*)&reg)->randomize();
 			TrustedProgramParty::s().store_spdz_wire(SPDZ_LOAD, reg);
@@ -865,7 +865,7 @@ void GarbleRegister::load(vector<GC::ReadAccess< GC::Secret<GarbleRegister> > >&
 {
 	(void)source;
 	for (auto access : accesses)
-		for (auto& reg : access.dest.get_regs())
+		for (auto& reg : access.dest.get_registers())
 			TrustedProgramParty::s().load_wire(reg);
 }
 
@@ -931,7 +931,7 @@ void KeyTuple<I>::randomize()
 {
 	for (int i = 0; i < I; i++)
 	{
-		CommonParty::s().prng.get_octets((octet*)keys[i].data(), part_size());
+		CommonParty::s().prng.get_octets((Octet*)keys[i].data(), part_size());
 #ifdef DEBUG
 		for (unsigned j = 0; j < keys[i].size(); j++)
 		{
@@ -946,7 +946,7 @@ template<int I>
 void KeyTuple<I>::print(int wire_id) const
 {
 	for(int b=0; b<I; b++) {
-		for (party_id_t i=1; i<=keys[b].size(); i++) {
+		for (PartyId i=1; i<=keys[b].size(); i++) {
 			printf("k^%d_{%u,%d}: ",i,wire_id,b);
 			std::cout << keys[b][i-1] << std::endl;
 		}
@@ -954,7 +954,7 @@ void KeyTuple<I>::print(int wire_id) const
 }
 
 template<int I>
-void KeyTuple<I>::print(int wire_id, party_id_t pid)
+void KeyTuple<I>::print(int wire_id, PartyId pid)
 {
 	for(int b=0; b<I; b++) {
 		printf("k^%d_{%u,%d}: ",pid,wire_id,b);

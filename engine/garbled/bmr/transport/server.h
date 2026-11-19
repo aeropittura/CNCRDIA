@@ -14,9 +14,9 @@
 
 class ServerUpdatable {
 public:
-	virtual void ClientsConnected()=0;
-	virtual void NewMsg(ReceivedMsg& msg, struct sockaddr_in* from)=0;
-	virtual void NodeAborted(struct sockaddr_in* from) =0;
+	virtual void clients_connected()=0;
+	virtual void NewMsg(ReceivedMessage& msg, struct sockaddr_in* from)=0;
+	virtual void node_aborted(struct sockaddr_in* from) =0;
 };
 
 namespace BIU
@@ -27,7 +27,7 @@ public:
 	Server(int port, int expected_clients, ServerUpdatable* updatable, unsigned int max_message_size);
 	~Server();
 
-	sockaddr_in* get_client_addr(int id) { return &_clients_addr[id]; }
+	sockaddr_in* get_client_address(int id) { return &_clients_address[id]; }
 
 	boost::thread* starter;
 	std::vector<boost::thread*> listeners;
@@ -37,17 +37,17 @@ public:
 private:
 	int _expected_clients;
 	int *_clients;
-	struct sockaddr_in* _clients_addr;
+	struct sockaddr_in* _clients_address;
 	int _port;
 	int _servfd;
 	struct sockaddr_in _servaddr;
 
 	ServerUpdatable* _updatable;
-	unsigned int _max_msg_sz;
+	unsigned int _max_message_size;
 
 	void _start_server();
 	void _listen_to_client(int id);
-	bool _handle_recv_len(int id, size_t actual_len, size_t expected_len);
+	bool _handle_receive_length(int id, size_t actual_length, size_t expected_length);
 };
 
 }

@@ -15,15 +15,15 @@
 using namespace std;
 
 template<class T> class Input;
-template<class T> class SemiMC;
-template<class T> class DirectSemiMC;
+template<class T> class SemiOpener;
+template<class T> class DirectSemiOpener;
 template<class T> class Semi;
 template<class T> class Hemi;
 template<class T> class SemiPrep;
 template<class T> class SemiInput;
 template<class T> class PrivateOutput;
 template<class T> class SemiMultiplier;
-template<class T> class OTTripleGenerator;
+template<class T> class OtTripleGenerator;
 template<class T> class DummyMatrixPrep;
 
 template<class T>
@@ -42,10 +42,10 @@ template<class T>
 class BasicSemiShare : public T
 {
 public:
-    typedef T open_type;
+    typedef T OpenType;
     typedef T clear;
 
-    typedef GC::NoValue mac_key_type;
+    typedef GC::NoValue MacKeyType;
 
     template<class U>
     BasicSemiShare(const U& other) : T(other)
@@ -56,16 +56,16 @@ public:
 template<class T>
 class SemiShare : public T, public ShareInterface
 {
-    typedef T super;
+    typedef T Super;
     typedef SemiShare This;
 
 public:
-    typedef T open_type;
+    typedef T OpenType;
     typedef T clear;
-    typedef SemiShare share_type;
+    typedef SemiShare ShareType;
 
-    typedef SemiMC<SemiShare> MAC_Check;
-    typedef DirectSemiMC<SemiShare> Direct_MC;
+    typedef SemiOpener<SemiShare> MacCheck;
+    typedef DirectSemiOpener<SemiShare> DirectOpener;
     typedef SemiInput<SemiShare> Input;
     typedef ::PrivateOutput<SemiShare> PrivateOutput;
     typedef Semi<SemiShare> BasicProtocol;
@@ -74,14 +74,14 @@ public:
     typedef MaybeHemi<This> Protocol;
     typedef DummyMatrixPrep<This> MatrixPrep;
 
-    typedef SemiShare<typename T::next> prep_type;
+    typedef SemiShare<typename T::next> PrepType;
     typedef SemiMultiplier<SemiShare> Multiplier;
-    typedef OTTripleGenerator<prep_type> TripleGenerator;
-    typedef T sacri_type;
+    typedef OtTripleGenerator<PrepType> TripleGenerator;
+    typedef T SacriType;
     typedef typename T::Square Rectangle;
 
 #ifndef NO_MIXED_CIRCUITS
-    typedef GC::SemiSecret bit_type;
+    typedef GC::SemiSecret BitType;
 #endif
 
     const static bool needs_ot = true;
@@ -100,8 +100,8 @@ public:
         return nplayers - 1;
     }
 
-    static SemiShare constant(const open_type& other, int my_num,
-            mac_key_type = {}, int = -1)
+    static SemiShare constant(const OpenType& other, int my_num,
+            MacKeyType = {}, int = -1)
     {
         if (my_num == 0)
             return other;
@@ -119,27 +119,27 @@ public:
 
     void assign(const void* buffer)
     {
-        super::assign(buffer);
+        Super::assign(buffer);
     }
 
-    void pack(octetStream& os, bool full = true) const
+    void pack(OctetStream& os, bool full = true) const
     {
         (void)full;
-        super::pack(os);
+        Super::pack(os);
     }
-    void unpack(octetStream& os, bool full = true)
+    void unpack(OctetStream& os, bool full = true)
     {
         (void)full;
-        super::unpack(os);
+        Super::unpack(os);
     }
 
-    void pack(octetStream& os, int n_bits) const
+    void pack(OctetStream& os, int n_bits) const
     {
-        super::pack(os, n_bits);
+        Super::pack(os, n_bits);
     }
-    void unpack(octetStream& os, int n_bits)
+    void unpack(OctetStream& os, int n_bits)
     {
-        super::unpack(os, n_bits);
+        Super::unpack(os, n_bits);
     }
 
     template<class U>
@@ -161,8 +161,8 @@ public:
     {
         for (int i = 0; i < inst.get_size(); i++)
         {
-            auto& dest = proc.get_S_ref(inst.get_r(0) + i);
-            auto& source = proc.get_S_ref(inst.get_r(1) + i);
+            auto& dest = proc.get_s_ref(inst.get_r(0) + i);
+            auto& source = proc.get_s_ref(inst.get_r(1) + i);
             dest = source >> inst.get_n();
         }
     }

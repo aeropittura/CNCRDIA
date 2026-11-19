@@ -1,27 +1,27 @@
 /*
- * vm/thread_stats.cpp
+ * vm/thread_statistics.cpp
  *
  */
 
 #include "vm/thread_stats.h"
 
-ThreadStats::ThreadStats(const NamedCommStats& comm_stats,
-        const ExecutionStats& exe_stats) :
-        comm_stats(comm_stats), exe_stats(exe_stats)
+ThreadStatistics::ThreadStatistics(const NamedCommunicationStatistics& communication_statistics,
+        const ExecutionStats& exe_statistics) :
+        communication_statistics(communication_statistics), exe_statistics(exe_statistics)
 {
 }
 
-ThreadStats& ThreadStats::operator +=(const ThreadStats& other)
+ThreadStatistics& ThreadStatistics::operator +=(const ThreadStatistics& other)
 {
-    comm_stats += other.comm_stats;
-    exe_stats += other.exe_stats;
+    communication_statistics += other.communication_statistics;
+    exe_statistics += other.exe_statistics;
     return *this;
 }
 
-ThreadStats ThreadStats::operator -(const ThreadStats& other) const
+ThreadStatistics ThreadStatistics::operator -(const ThreadStatistics& other) const
 {
-    ThreadStats res;
-    res.comm_stats = comm_stats - other.comm_stats;
-    res.exe_stats = exe_stats - other.exe_stats;
+    ThreadStatistics res;
+    res.communication_statistics = communication_statistics - other.communication_statistics;
+    res.exe_statistics = exe_statistics - other.exe_statistics;
     return res;
 }

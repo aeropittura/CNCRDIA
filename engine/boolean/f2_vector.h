@@ -13,7 +13,7 @@ class F2VectorPlain;
 class F2Vector : public BitVector
 {
 public:
-    typedef F2VectorPlain plain_type;
+    typedef F2VectorPlain PlainType;
 
     F2Vector() = default;
 
@@ -37,7 +37,7 @@ public:
         return *this;
     }
 
-    void add_mul(Bit b, const F2Vector& other)
+    void add_mult(Bit b, const F2Vector& other)
     {
         assert(size() == other.size());
         if (b.get())
@@ -87,7 +87,7 @@ public:
 
 class F2Vec128
 {
-    int128 a;
+    Int128 a;
     size_t size_;
 
 public:
@@ -96,7 +96,7 @@ public:
         resize(size);
     }
 
-    int128 get() const
+    Int128 get() const
     {
         return a;
     }
@@ -112,7 +112,7 @@ public:
         size_ = size;
     }
 
-    void add_mul(Bit b, const F2Vec128& other)
+    void add_mult(Bit b, const F2Vec128& other)
     {
         if (b.get())
             a ^= other.a;

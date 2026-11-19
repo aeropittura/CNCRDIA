@@ -14,17 +14,17 @@ using namespace std;
 // Forward declaration as apparently this is needed for friends in templates
 template<class T> class Share;
 
-template<class T> class MAC_Check_;
-template<class T> class Direct_MAC_Check;
+template<class T> class MacCheck_;
+template<class T> class DirectMacCheck;
 template<class T> class MascotMultiplier;
 template<class T> class MascotFieldPrep;
 template<class T> class MascotTripleGenerator;
 template<class T> class MascotPrep;
 template<class T> class MascotTriplePrep;
 
-union square128;
+union Square128;
 
-class gf2n_mac_key;
+class Gf2nMacKey;
 
 namespace GC
 {
@@ -43,15 +43,15 @@ class Share_ : public ShareInterface
    public:
 
    typedef GC::NoShare part_type;
-   typedef V mac_key_type;
-   typedef V mac_type;
-   typedef T share_type;
-   typedef V mac_share_type;
-   typedef typename T::open_type open_type;
+   typedef V MacKeyType;
+   typedef V MacType;
+   typedef T ShareType;
+   typedef V MacShareType;
+   typedef typename T::OpenType OpenType;
    typedef typename T::clear clear;
 
 #ifndef NO_MIXED_CIRCUITS
-   typedef GC::TinierSecret<gf2n_mac_key> bit_type;
+   typedef GC::TinierSecret<Gf2nMacKey> BitType;
 #endif
 
    const static bool needs_ot = T::needs_ot;
@@ -71,15 +71,15 @@ class Share_ : public ShareInterface
    static int threshold(int nplayers)
      { return T::threshold(nplayers); }
 
-   static void specification(octetStream& os);
+   static void specification(OctetStream& os);
 
-   static mac_key_type get_mac_key();
-   static void set_mac_key(const mac_key_type& mac_key);
+   static MacKeyType get_mac_key();
+   static void set_mac_key(const MacKeyType& mac_key);
 
    static void set_secrets_filename(string filename)
      { Share_::secrets_filename = filename; }
 
-   static Share_ constant(const open_type& aa, int my_num, const typename V::Scalar& alphai)
+   static Share_ constant(const OpenType& aa, int my_num, const typename V::Scalar& alphai)
      { Share_ res; res.assign(aa, my_num, alphai); return res; }
 
    template<class U, class W>
@@ -89,7 +89,7 @@ class Share_ : public ShareInterface
      { a.assign(buffer); mac.assign(buffer + T::size()); }
    void assign_zero()
      { *this = {}; }
-   void assign(const open_type& aa, int my_num, const typename V::Scalar& alphai);
+   void assign(const OpenType& aa, int my_num, const typename V::Scalar& alphai);
 
    Share_()                   {}
    template<class U, class W>
@@ -146,8 +146,8 @@ class Share_ : public ShareInterface
 
    friend ostream& operator<<(ostream& s, const Share_<T, V>& x) { x.output(s, true); return s; }
 
-   void pack(octetStream& os, bool full = true) const;
-   void unpack(octetStream& os, bool full = true);
+   void pack(OctetStream& os, bool full = true) const;
+   void unpack(OctetStream& os, bool full = true);
 };
 
 // SPDZ(2k) only
@@ -157,25 +157,25 @@ class Share : public Share_<SemiShare<T>, SemiShare<T>>
     typedef Share This;
 
 public:
-    typedef Share_<SemiShare<T>, SemiShare<T>> super;
+    typedef Share_<SemiShare<T>, SemiShare<T>> Super;
 
-    typedef T mac_key_type;
-    typedef T mac_type;
+    typedef T MacKeyType;
+    typedef T MacType;
 
-    typedef Share<typename T::next> prep_type;
-    typedef Share prep_check_type;
-    typedef Share bit_prep_type;
-    typedef Share input_check_type;
-    typedef Share input_type;
+    typedef Share<typename T::next> PrepType;
+    typedef Share PrepCheckType;
+    typedef Share BitPrepType;
+    typedef Share InputCheckType;
+    typedef Share InputType;
     typedef MascotMultiplier<Share> Multiplier;
-    typedef MascotTripleGenerator<prep_type> TripleGenerator;
-    typedef T sacri_type;
+    typedef MascotTripleGenerator<PrepType> TripleGenerator;
+    typedef T SacriType;
     typedef typename T::Square Rectangle;
     typedef Rectangle Square;
     typedef This part_type;
 
-    typedef MAC_Check_<Share> MAC_Check;
-    typedef Direct_MAC_Check<Share> Direct_MC;
+    typedef MacCheck_<Share> MacCheck;
+    typedef DirectMacCheck<Share> DirectOpener;
     typedef ::Input<Share> Input;
     typedef ::PrivateOutput<Share> PrivateOutput;
     typedef Beaver<This> BasicProtocol;
@@ -195,31 +195,31 @@ public:
 
     Share() {}
     template<class U>
-    Share(const U& other) : super(other) {}
+    Share(const U& other) : Super(other) {}
     Share(const SemiShare<T>& share, const SemiShare<T>& mac) :
-            super(share, mac) {}
+            Super(share, mac) {}
 };
 
 template<class T>
 class ArithmeticOnlyMascotShare : public Share<T>
 {
     typedef ArithmeticOnlyMascotShare This;
-    typedef Share<T> super;
+    typedef Share<T> Super;
 
 public:
-    typedef GC::NoShare bit_type;
+    typedef GC::NoShare BitType;
 
-    typedef MAC_Check_<This> MAC_Check;
+    typedef MacCheck_<This> MacCheck;
     typedef ::Input<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef SPDZ<This> Protocol;
 
     ArithmeticOnlyMascotShare() {}
     template<class U>
-    ArithmeticOnlyMascotShare(const U& other) : super(other) {}
+    ArithmeticOnlyMascotShare(const U& other) : Super(other) {}
     ArithmeticOnlyMascotShare(const SemiShare<T>& share,
             const SemiShare<T>& mac) :
-            super(share, mac) {}
+            Super(share, mac) {}
 };
 
 template <class T, class V, class U>
@@ -248,7 +248,7 @@ inline void Share_<T, V>::mul(const Share_<T, V>& S, const U& aa)
 }
 
 template<class T, class V>
-inline void Share_<T, V>::assign(const open_type& aa, int my_num,
+inline void Share_<T, V>::assign(const OpenType& aa, int my_num,
     const typename V::Scalar& alphai)
 {
   a = T::constant(aa, my_num);

@@ -14,11 +14,11 @@ template<class T>
 class TemiShare : public HemiShare<T>
 {
     typedef TemiShare This;
-    typedef HemiShare<T> super;
+    typedef HemiShare<T> Super;
 
 public:
-    typedef SemiMC<This> MAC_Check;
-    typedef DirectSemiMC<This> Direct_MC;
+    typedef SemiOpener<This> MacCheck;
+    typedef DirectSemiOpener<This> DirectOpener;
     typedef SemiInput<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef typename conditional<T::prime_field, Hemi<This>, Beaver<This>>::type Protocol;
@@ -28,7 +28,7 @@ public:
     typedef Semi<This> BasicProtocol;
 
     static const bool needs_ot = false;
-    static const bool local_mul = false;
+    static const bool local_mult = false;
 
     static string alt()
     {
@@ -40,7 +40,7 @@ public:
     }
     template<class U>
     TemiShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 

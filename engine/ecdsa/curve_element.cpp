@@ -11,8 +11,8 @@ unsigned char CurveElement::zero[crypto_core_ristretto255_BYTES];
 
 void CurveElement::init()
 {
-    Scalar::init_field(
-            (bigint(1) << 252) + bigint("27742317777372353535851937790883648493"),
+    Scalar::initialize_field(
+            (Bigint(1) << 252) + Bigint("27742317777372353535851937790883648493"),
             false);
     if(sodium_init() == -1)
         throw runtime_error("cannot initalize sodium");
@@ -23,7 +23,7 @@ void CurveElement::init()
 
 void CurveElement::convert(unsigned char* res, const Scalar& other)
 {
-    bigint tmp;
+    Bigint tmp;
     tmp = other;
     assert(tmp.__get_mp()->_mp_size * sizeof(mp_limb_t) <= crypto_core_ristretto255_SCALARBYTES);
     memset(res, 0, crypto_core_ristretto255_SCALARBYTES);
@@ -114,12 +114,12 @@ bool CurveElement::operator !=(const CurveElement& other) const
     return not (*this == other);
 }
 
-void CurveElement::pack(octetStream& os) const
+void CurveElement::pack(OctetStream& os) const
 {
     os.append(a, sizeof(a));
 }
 
-void CurveElement::unpack(octetStream& os)
+void CurveElement::unpack(OctetStream& os)
 {
     os.consume(a, sizeof(a));
     check();
@@ -131,9 +131,9 @@ ostream& operator <<(ostream& s, const CurveElement& x)
     return s;
 }
 
-octetStream CurveElement::hash(size_t n_bytes) const
+OctetStream CurveElement::hash(size_t n_bytes) const
 {
-    octetStream os;
+    OctetStream os;
     pack(os);
     auto res = os.hash();
     assert(n_bytes >= res.get_length());

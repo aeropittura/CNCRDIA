@@ -24,7 +24,7 @@ void SohoPrep<T>::basic_setup(Player& P)
     setup = new PartSetup<FD>;
     MachineBase machine;
     setup->params.set_sec(OnlineOptions::singleton.security_parameter);
-    secure_init(*setup, P, machine, typename T::clear(), 0);
+    secure_initialize(*setup, P, machine, typename T::clear(), 0);
     read_or_generate_secrets(*setup, P, machine, 1, true_type(), T());
     T::clear::template init<typename FD::T>();
 }
@@ -47,17 +47,17 @@ void SohoPrep<T>::buffer_triples()
     {
         PlainPlayer P(proc->P.N, "Soho" + T::type_string());
         basic_setup(P);
-        BaseMachine::add_one_off(P.total_comm());
+        BaseMachine::add_one_off(P.total_communication());
     }
     lock.unlock();
 
-    Plaintext_<FD> ai(setup->FieldD), bi(setup->FieldD);
-    SeededPRNG G;
+    Plaintext_<FD> ai(setup->field_d), bi(setup->field_d);
+    SeededPrng G;
     ai.randomize(G);
     bi.randomize(G);
     Ciphertext Ca = setup->pk.encrypt(ai);
     Ciphertext Cb = setup->pk.encrypt(bi);
-    octetStream os;
+    OctetStream os;
     Ca.pack(os);
     Cb.pack(os);
 
@@ -69,7 +69,7 @@ void SohoPrep<T>::buffer_triples()
     }
 
     Ciphertext Cc = Ca.mul(setup->pk, Cb);
-    Plaintext_<FD> ci(setup->FieldD);
+    Plaintext_<FD> ci(setup->field_d);
     SimpleDistDecrypt<FD> dd(proc->P, *setup);
     EncCommitBase_<FD> EC;
     dd.reshare(ci, Cc, EC);
@@ -90,15 +90,15 @@ void SohoPrep<T>::buffer_squares()
     {
         PlainPlayer P(proc->P.N, "Soho" + T::type_string());
         basic_setup(P);
-        BaseMachine::add_one_off(P.total_comm());
+        BaseMachine::add_one_off(P.total_communication());
     }
     lock.unlock();
 
-    Plaintext_<FD> ai(setup->FieldD);
-    SeededPRNG G;
+    Plaintext_<FD> ai(setup->field_d);
+    SeededPrng G;
     ai.randomize(G);
     Ciphertext Ca = setup->pk.encrypt(ai);
-    octetStream os;
+    OctetStream os;
     Ca.pack(os);
 
     for (int i = 1; i < proc->P.num_players(); i++)
@@ -108,7 +108,7 @@ void SohoPrep<T>::buffer_squares()
     }
 
     Ciphertext Cc = Ca.mul(setup->pk, Ca);
-    Plaintext_<FD> ci(setup->FieldD);
+    Plaintext_<FD> ci(setup->field_d);
     SimpleDistDecrypt<FD> dd(proc->P, *setup);
     EncCommitBase_<FD> EC;
     dd.reshare(ci, Cc, EC);
@@ -124,7 +124,7 @@ void SohoPrep<T>::buffer_bits()
 }
 
 template<>
-void SohoPrep<SohoShare<gf2n_short>>::buffer_bits()
+void SohoPrep<SohoShare<Gf2nShort>>::buffer_bits()
 {
     buffer_bits_without_check();
 }

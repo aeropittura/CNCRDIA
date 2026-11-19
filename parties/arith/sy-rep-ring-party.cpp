@@ -37,7 +37,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     HonestMajorityRingMachineWithSecurity<SpdzWiseRingShare, SpdzWiseRepFieldShare>(
             argc, argv, opt);
 }

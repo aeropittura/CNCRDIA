@@ -17,8 +17,8 @@ template<class T>
 class Sender : CommunicationThread
 {
     T socket;
-    WaitQueue<const octetStream*> in;
-    WaitQueue<const octetStream*> out;
+    WaitQueue<const OctetStream*> in;
+    WaitQueue<const OctetStream*> out;
     pthread_t thread;
 
     static void* run_thread(void* sender);
@@ -42,6 +42,6 @@ public:
         return socket;
     }
 
-    void request(const octetStream& os);
-    void wait(const octetStream& os);
+    void request(const OctetStream& os);
+    void wait(const OctetStream& os);
 };

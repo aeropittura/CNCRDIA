@@ -6,21 +6,21 @@
 #pragma once
 
 template<class T>
-class MaliciousShamirPO
+class MaliciousShamirPo
 {
 protected:
     Player& P;
 
-    octetStream to_send;
-    vector<octetStream> to_receive;
+    OctetStream to_send;
+    vector<OctetStream> to_receive;
 
-    vector<typename T::open_type> shares;
-    typename T::Direct_MC MC;
+    vector<typename T::OpenType> shares;
+    typename T::DirectOpener MC;
 
     int n_relevant_players();
 
 public:
-    MaliciousShamirPO(Player& P);
+    MaliciousShamirPo(Player& P);
 
     void prepare_sending(const T& secret, int player);
     void send(int player);

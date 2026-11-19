@@ -9,31 +9,31 @@
  */
 
 template<class T>
-bool Binary_File_IO<T>::is_gf2n(true_type)
+bool BinaryFileIo<T>::is_gf2n(true_type)
 {
   return T::characteristic_two;
 }
 
 template<class T>
-bool Binary_File_IO<T>::is_gf2n(false_type)
+bool BinaryFileIo<T>::is_gf2n(false_type)
 {
   return T::clear::characteristic_two;
 }
 
 template<class T>
-bool Binary_File_IO<T>::real_shares(const Player&, true_type)
+bool BinaryFileIo<T>::real_shares(const Player&, true_type)
 {
   return true;
 }
 
 template<class T>
-bool Binary_File_IO<T>::real_shares(const Player& P, false_type)
+bool BinaryFileIo<T>::real_shares(const Player& P, false_type)
 {
   return T::real_shares(P);
 }
 
 template<class T>
-inline string Binary_File_IO<T>::filename(int my_number)
+inline string BinaryFileIo<T>::filename(int my_number)
 {
   string dir = "Persistence";
   mkdir_p(dir.c_str());
@@ -46,15 +46,15 @@ inline string Binary_File_IO<T>::filename(int my_number)
 }
 
 template<class T>
-void Binary_File_IO<T>::reset(int my_number)
+void BinaryFileIo<T>::reset(int my_number)
 {
-  string filename = Binary_File_IO<T>::filename(my_number);
+  string filename = BinaryFileIo<T>::filename(my_number);
   ifstream pers(filename);
   try
   {
       check_file_signature<T>(pers, filename);
   }
-  catch (signature_mismatch&)
+  catch (SignatureMismatch&)
   {
       ofstream pers(filename, ios::binary);
       file_signature<T>().output(pers);
@@ -62,21 +62,21 @@ void Binary_File_IO<T>::reset(int my_number)
 }
 
 template<class T>
-void Binary_File_IO<T>::write_to_file(const string filename,
-    const vector<T>& buffer, long start_pos)
+void BinaryFileIo<T>::write_to_file(const string filename,
+    const vector<T>& buffer, long start_position)
 {
   ofstream outf;
 
   outf.open(filename, ios::out | ios::binary | ios::ate | ios::in);
   if (outf.fail()) { throw file_error(filename); }
 
-  if (start_pos != -1)
+  if (start_position != -1)
     {
-      long write_pos = file_signature<T>().get_total_length() + start_pos * T::size();
+      long write_position = file_signature<T>().get_total_length() + start_position * T::size();
       // fill with zeros if needed
-      for (long i = outf.tellp(); i < write_pos; i++)
+      for (long i = outf.tellp(); i < write_position; i++)
         outf.put(0);
-      outf.seekp(write_pos);
+      outf.seekp(write_position);
     }
 
   for (unsigned int i = 0; i < buffer.size(); i++)
@@ -91,12 +91,12 @@ void Binary_File_IO<T>::write_to_file(const string filename,
 }
 
 template<class T>
-void Binary_File_IO<T>::read_from_file(const string filename, vector<T>& buffer,
+void BinaryFileIo<T>::read_from_file(const string filename, vector<T>& buffer,
     const long start_posn, long& end_posn)
 {
   ifstream inf;
   inf.open(filename, ios::in | ios::binary);
-  if (inf.fail()) { throw file_missing(filename, "Binary_File_IO.read_from_file expects this file to exist."); }
+  if (inf.fail()) { throw FileMissing(filename, "Binary_File_IO.read_from_file expects this file to exist."); }
 
   try
   {
@@ -104,7 +104,7 @@ void Binary_File_IO<T>::read_from_file(const string filename, vector<T>& buffer,
   }
   catch (exception& e)
   {
-    throw persistence_error(e.what());
+    throw PersistenceError(e.what());
   }
 
   auto data_start = inf.tellg();
@@ -124,13 +124,13 @@ void Binary_File_IO<T>::read_from_file(const string filename, vector<T>& buffer,
         ss << "Got to EOF when reading from disk (expecting " << size_in_bytes
             << " bytes from " << (long(data_start) + start_posn * T::size())
             << ").";
-        throw persistence_error(ss.str());
+        throw PersistenceError(ss.str());
       }
       if (inf.fail())
       {
         stringstream ss;
         ss << "IO problem when reading from disk";
-        throw persistence_error(ss.str());
+        throw PersistenceError(ss.str());
       }
   }
   while (n_read < size_in_bytes);

@@ -6,77 +6,77 @@
 #include "support/timer_with_comm.h"
 #include "vm/online_options.h"
 
-TimerWithComm::TimerWithComm(const Timer& other) :
+TimerWithCommunication::TimerWithCommunication(const Timer& other) :
         Timer(other), cpu_timer(CLOCK_PROCESS_CPUTIME_ID)
 {
 }
 
-TimerWithComm::TimerWithComm(double time) :
-        TimerWithComm(Timer(time))
+TimerWithCommunication::TimerWithCommunication(double time) :
+        TimerWithCommunication(Timer(time))
 {
 }
 
-void TimerWithComm::start(const ThreadStats& stats)
+void TimerWithCommunication::start(const ThreadStatistics& statistics)
 {
     Timer::start();
-    last_stats = stats;
+    last_statistics = statistics;
     cpu_timer.start();
 }
 
-void TimerWithComm::stop(const ThreadStats& stats)
+void TimerWithCommunication::stop(const ThreadStatistics& statistics)
 {
     Timer::stop();
-    total_stats += stats - last_stats;
+    total_statistics += statistics - last_statistics;
     cpu_timer.stop();
 }
 
-size_t TimerWithComm::bytes_sent() const
+size_t TimerWithCommunication::bytes_sent() const
 {
-    return total_stats.comm_stats.sent;
+    return total_statistics.communication_statistics.sent;
 }
 
-double TimerWithComm::mb_sent() const
+double TimerWithCommunication::mb_sent() const
 {
-    return total_stats.comm_stats.sent * 1e-6;
+    return total_statistics.communication_statistics.sent * 1e-6;
 }
 
-size_t TimerWithComm::rounds() const
+size_t TimerWithCommunication::rounds() const
 {
     size_t res = 0;
-    for (auto& x : total_stats.comm_stats)
+    for (auto& x : total_statistics.communication_statistics)
         res += x.second.rounds;
     return res;
 }
 
-TimerWithComm TimerWithComm::operator +(const TimerWithComm& other)
+TimerWithCommunication TimerWithCommunication::operator +(const TimerWithCommunication& other)
 {
-    TimerWithComm res = *this;
+    TimerWithCommunication res = *this;
     res += other;
     return res;
 }
 
-TimerWithComm TimerWithComm::operator -(const TimerWithComm& other)
+TimerWithCommunication TimerWithCommunication::operator -(const TimerWithCommunication& other)
 {
-    TimerWithComm res = *this;
+    TimerWithCommunication res = *this;
     res.Timer::operator-=(other);
-    res.total_stats = total_stats - other.total_stats;
+    res.total_statistics = total_statistics - other.total_statistics;
     return res;
 }
 
-TimerWithComm& TimerWithComm::operator +=(const TimerWithComm& other)
+TimerWithCommunication& TimerWithCommunication::operator +=(const TimerWithCommunication& other)
 {
     Timer::operator+=(other);
-    total_stats += other.total_stats;
+    total_statistics += other.total_statistics;
     return *this;
 }
 
-TimerWithComm& TimerWithComm::operator -=(const TimerWithComm& other)
+TimerWithCommunication& TimerWithCommunication::operator -=(const TimerWithCommunication& other)
 {
     *this = *this - other;
     return *this;
 }
 
-string TimerWithComm::full()
+string TimerWithCommunication::full()
 {
     stringstream tmp;
     tmp << elapsed() << " seconds";
@@ -85,18 +85,18 @@ string TimerWithComm::full()
     return tmp.str();
 }
 
-const ExecutionStats& TimerWithComm::exe_stats() const
+const ExecutionStats& TimerWithCommunication::exe_statistics() const
 {
-    return total_stats.exe_stats;
+    return total_statistics.exe_statistics;
 }
 
-ostream& operator<<(ostream& os, const TimerWithComm& stats)
+ostream& operator<<(ostream& os, const TimerWithCommunication& statistics)
 {
-    os << stats.mb_sent() << " MB, " << stats.rounds() << " rounds, "
-            << stats.cpu_timer.elapsed() << " CPU seconds, "
-            << stats.total_stats.comm_stats.total_time()
+    os << statistics.mb_sent() << " MB, " << statistics.rounds() << " rounds, "
+            << statistics.cpu_timer.elapsed() << " CPU seconds, "
+            << statistics.total_statistics.communication_statistics.total_time()
             << " communication seconds";
     if (OnlineOptions::singleton.has_option("ratio"))
-        os << ", ratio " << (stats.cpu_timer.elapsed() / stats.elapsed());
+        os << ", ratio " << (statistics.cpu_timer.elapsed() / statistics.elapsed());
     return os;
 }

@@ -122,14 +122,14 @@ public:
         return array<T, L>::at(i);
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         os.store(used_size);
         for (auto& x : *this)
             x.pack(os);
     }
 
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
         os.get(used_size);
         for (auto& x : *this)

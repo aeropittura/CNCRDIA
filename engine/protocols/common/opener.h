@@ -10,14 +10,14 @@
 template<class T>
 class Opener
 {
-    typedef typename conditional<is_same<typename T::DefaultMC, void>::value,
-            typename T::MAC_Check, typename T::DefaultMC>::type inner_type;
+    typedef typename conditional<is_same<typename T::DefaultOpener, void>::value,
+            typename T::MacCheck, typename T::DefaultOpener>::type InnerType;
 
-    inner_type inner;
+    InnerType inner;
     Player& P;
 
 public:
-    Opener(Player& P, typename T::mac_key_type mac_key) :
+    Opener(Player& P, typename T::MacKeyType mac_key) :
             inner(mac_key), P(P)
     {
     }
@@ -32,9 +32,9 @@ public:
         inner.Check(P);
     }
 
-    void init_open(int n = 0)
+    void initialize_open(int n = 0)
     {
-        inner.init_open(P, n);
+        inner.initialize_open(P, n);
     }
 
     void prepare_open(const T& secret)

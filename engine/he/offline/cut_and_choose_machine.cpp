@@ -35,7 +35,7 @@ CutAndChooseMachine::CutAndChooseMachine(int argc, const char** argv)
         if (use_gf2n)
             generators.push_back(new_generator<P2Data>(i));
         else
-            generators.push_back(new_generator<FFT_Data>(i));
+            generators.push_back(new_generator<FftData>(i));
     }
 }
 
@@ -47,6 +47,6 @@ GeneratorBase* CutAndChooseMachine::new_generator(int i)
     if (covert)
         generator->EC.init(generator->P, setup.part<FD>().pk, sec, Full);
     else
-        generator->EC.init(generator->P, setup.part<FD>().pk, Full, setup.part<FD>().FieldD, i);
+        generator->EC.init(generator->P, setup.part<FD>().pk, Full, setup.part<FD>().field_d, i);
     return generator;
 }

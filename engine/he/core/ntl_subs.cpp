@@ -36,10 +36,10 @@ void generate_setup(int n, int lgp, int lg2, int sec, bool skip_2,
 
   // do the full setup for SHE data
   Parameters(n, lgp, sec, slack, round_up).generate_setup(setup.setup_p.params,
-      setup.setup_p.FieldD);
+      setup.setup_p.field_d);
   if (!skip_2)
     Parameters(n, lg2, sec, slack, round_up).generate_setup(
-        setup.setup_2.params, setup.setup_2.FieldD);
+        setup.setup_2.params, setup.setup_2.field_d);
 }
 
 
@@ -50,26 +50,26 @@ bool same_word_length(int l1, int l2)
 
 template <>
 int generate_semi_setup(int plaintext_length, int sec,
-    FHE_Params& params, FFT_Data& FTD, bool round_up, int n)
+    FheParameters& params, FftData& FTD, bool round_up, int n)
 {
   CODE_LOCATION_NO_SCOPE
   int m = 1024;
   int lgp = plaintext_length;
-  bigint p;
+  Bigint p;
   generate_prime(p, lgp, m);
   int lgp0, lgp1;
-  FHE_Params tmp_params;
+  FheParameters temp_parameters;
   while (true)
     {
-      tmp_params = params;
-      SemiHomomorphicNoiseBounds nb(p, phi_N(m), n, sec,
-          numBits(NonInteractiveProof::slack(sec, phi_N(m))), true, tmp_params);
-      bigint p1 = 2 * p * m, p0 = p;
+      temp_parameters = params;
+      SemiHomomorphicNoiseBounds nb(p, phi_n(m), n, sec,
+          num_bits(NonInteractiveProof::slack(sec, phi_n(m))), true, temp_parameters);
+      Bigint p1 = 2 * p * m, p0 = p;
       while (nb.min_p0(params.n_mults() > 0, p1) > p0)
         {
           p0 *= 2;
         }
-      if (phi_N(m) < nb.min_phi_m(2 + numBits(p0 * (params.n_mults() > 0 ? p1 : 1)),
+      if (phi_n(m) < nb.min_phi_m(2 + num_bits(p0 * (params.n_mults() > 0 ? p1 : 1)),
           params.get_R()))
         {
           m *= 2;
@@ -77,48 +77,48 @@ int generate_semi_setup(int plaintext_length, int sec,
         }
       else
         {
-          lgp0 = numBits(p0) + 1;
-          lgp1 = numBits(p1) + 1;
+          lgp0 = num_bits(p0) + 1;
+          lgp1 = num_bits(p1) + 1;
           break;
         }
     }
 
-  params = tmp_params;
+  params = temp_parameters;
   int extra_slack = common_semi_setup(params, m, p, lgp0, lgp1, round_up);
 
   FTD.init(params.get_ring(), p);
-  gfp::init_field(p);
+  Gfp::initialize_field(p);
   return extra_slack;
 }
 
 template <>
 int generate_semi_setup(int plaintext_length, int sec,
-    FHE_Params& params, P2Data& P2D, bool round_up, int n)
+    FheParameters& params, P2Data& P2D, bool round_up, int n)
 {
   CODE_LOCATION_NO_SCOPE
 
   if (params.n_mults() > 0)
     throw runtime_error("only implemented for 0-level BGV");
-  gf2n_short::init_field(plaintext_length);
+  Gf2nShort::initialize_field(plaintext_length);
   int m;
   char_2_dimension(m, plaintext_length);
-  SemiHomomorphicNoiseBounds nb(2, phi_N(m), n, sec,
-      numBits(NonInteractiveProof::slack(sec, phi_N(m))), true, params);
-  int lgp0 = numBits(nb.min_p0(false, 0));
+  SemiHomomorphicNoiseBounds nb(2, phi_n(m), n, sec,
+      num_bits(NonInteractiveProof::slack(sec, phi_n(m))), true, params);
+  int lgp0 = num_bits(nb.min_p0(false, 0));
   int extra_slack = common_semi_setup(params, m, 2, lgp0, -1, round_up);
   assert(nb.min_phi_m(lgp0, false) * 2 <= m);
   load_or_generate(P2D, params.get_ring());
   return extra_slack;
 }
 
-int common_semi_setup(FHE_Params& params, int m, bigint p, int& lgp0, int lgp1, bool round_up)
+int common_semi_setup(FheParameters& params, int m, Bigint p, int& lgp0, int lgp1, bool round_up)
 {
   if (OnlineOptions::singleton.has_option("verbose_he_setup"))
     {
       cout << "Need ciphertext modulus of length " << lgp0;
       if (params.n_mults() > 0)
         cout << "+" << lgp1;
-      cout << " and " << phi_N(m) << " slots" << endl;
+      cout << " and " << phi_n(m) << " slots" << endl;
     }
 
   int extra_slack = 0;
@@ -127,7 +127,7 @@ int common_semi_setup(FHE_Params& params, int m, bigint p, int& lgp0, int lgp1, 
       int i;
       for (i = 0; i <= 20; i++)
         {
-          if (SemiHomomorphicNoiseBounds::min_phi_m(lgp0 + i, params) > phi_N(m))
+          if (SemiHomomorphicNoiseBounds::min_phi_m(lgp0 + i, params) > phi_n(m))
             break;
           if (not same_word_length(lgp0, lgp0 + i))
             break;
@@ -142,7 +142,7 @@ int common_semi_setup(FHE_Params& params, int m, bigint p, int& lgp0, int lgp1, 
 
   Ring R;
   ::init(R, m);
-  bigint p0, p1 = 1;
+  Bigint p0, p1 = 1;
   if (params.n_mults() > 0)
   {
     generate_moduli(p0, p1, m, p, lgp0, lgp1);
@@ -157,7 +157,7 @@ int common_semi_setup(FHE_Params& params, int m, bigint p, int& lgp0, int lgp1, 
 }
 
 int finalize_lengths(int& lg2p0, int& lg2p1, int n, int m, int* lg2pi,
-    bool round_up, FHE_Params& params)
+    bool round_up, FheParameters& params)
 {
   (void) lg2pi, (void) n;
 
@@ -178,7 +178,7 @@ int finalize_lengths(int& lg2p0, int& lg2p1, int n, int m, int* lg2pi,
       int i = 0;
       for (i = 0; i < 10; i++)
         {
-          if (phi_N(m) < NoiseBounds::min_phi_m(lg2p0 + lg2p1 + 2 * i, params))
+          if (phi_n(m) < NoiseBounds::min_phi_m(lg2p0 + lg2p1 + 2 * i, params))
             break;
           if (not same_word_length(lg2p0 + i, lg2p0))
             break;
@@ -208,8 +208,8 @@ int finalize_lengths(int& lg2p0, int& lg2p1, int n, int m, int* lg2pi,
 /*
  * Subroutine for creating the FHE parameters
  */
-int Parameters::SPDZ_Data_Setup_Char_p_Sub(int idx, int& m, bigint& p,
-    FHE_Params& params)
+int Parameters::spdz_data_setup_char_p_sub(int idx, int& m, Bigint& p,
+    FheParameters& params)
 {
   int n = n_parties;
   int lg2pi[5][2][9]
@@ -237,13 +237,13 @@ int Parameters::SPDZ_Data_Setup_Char_p_Sub(int idx, int& m, bigint& p,
   while (sec != -1)
     {
       double phi_m_bound =
-              NoiseBounds(p, phi_N(m), n, sec, slack, params).optimize(lg2p0, lg2p1);
+              NoiseBounds(p, phi_n(m), n, sec, slack, params).optimize(lg2p0, lg2p1);
 
 #ifdef VERBOSE
       cout << "Trying primes of length " << lg2p0 << " and " << lg2p1 << endl;
 #endif
 
-      if (phi_N(m) < phi_m_bound)
+      if (phi_n(m) < phi_m_bound)
         {
           int old_m = m;
           (void) old_m;
@@ -253,7 +253,7 @@ int Parameters::SPDZ_Data_Setup_Char_p_Sub(int idx, int& m, bigint& p,
           cout << "m = " << old_m << " too small, increasing it to " << m << endl;
 #endif
 
-          generate_prime(p, numBits(p), m);
+          generate_prime(p, num_bits(p), m);
         }
       else
         break;
@@ -266,65 +266,65 @@ int Parameters::SPDZ_Data_Setup_Char_p_Sub(int idx, int& m, bigint& p,
   return extra_slack;
 }
 
-void generate_moduli(bigint& pr0, bigint& pr1, const int m, const bigint p,
+void generate_moduli(Bigint& pr0, Bigint& pr1, const int m, const Bigint p,
         const int lg2p0, const int lg2p1)
 {
   generate_modulus(pr0, m, p, lg2p0, "0");
   generate_modulus(pr1, m, p, lg2p1, "1", pr0);
 }
 
-void generate_modulus(bigint& pr, const int m, const bigint p, const int lg2pr,
-    const string& i, const bigint& pr0)
+void generate_modulus(Bigint& pr, const int m, const Bigint p, const int lg2pr,
+    const string& i, const Bigint& pr0)
 {
   (void) i;
 
-  if (lg2pr==0) { throw invalid_params(); }
+  if (lg2pr==0) { throw InvalidParameters(); }
 
-  bigint step=m;
-  bigint twop=1<<(numBits(m)+1);
-  bigint gc=gcd(step,twop);
+  Bigint step=m;
+  Bigint twop=1<<(num_bits(m)+1);
+  Bigint gc=gcd(step,twop);
   step=step*twop/gc;
 
   step *= p;
-  pr = (bigint(1) << lg2pr) / step * step + 1;
+  pr = (Bigint(1) << lg2pr) / step * step + 1;
 
-  while (pr == pr0 || !probPrime(pr))
+  while (pr == pr0 || !prob_prime(pr))
     {
       pr -= step;
-      assert(numBits(pr) == lg2pr);
+      assert(num_bits(pr) == lg2pr);
     }
 
 #ifdef VERBOSE
-  cout << "\t pr" << i << " = " << pr << "  :   " << numBits(pr) <<  endl;
+  cout << "\t pr" << i << " = " << pr << "  :   " << num_bits(pr) <<  endl;
   cout << "Minimal MAX_MOD_SZ = " << int(ceil(1. * lg2pr / 64)) << endl;
 #endif
 
   assert(pr % m == 1);
   assert(pr % p == 1);
-  assert(numBits(pr) == lg2pr);
+  assert(num_bits(pr) == lg2pr);
 }
 
 /*
  * Create the char p FHE parameters
  */
 template <>
-void Parameters::SPDZ_Data_Setup(FHE_Params& params, FFT_Data& FTD)
+void Parameters::spdz_data_setup(FheParameters& params, FftData& FTD)
 {
   CODE_LOCATION_NO_SCOPE
 
-  bigint p;
+  Bigint p;
   int idx, m;
-  SPDZ_Data_Setup_Primes(p, plaintext_length, idx, m);
-  SPDZ_Data_Setup_Char_p_Sub(idx, m, p, params);
+  spdz_data_setup_primes(p, plaintext_length, idx, m);
+  spdz_data_setup_char_p_sub(idx, m, p, params);
 
-  Zp_Data Zp(p);
-  gfp::init_field(p);
-  FTD.init(R,Zp);
+  ZpData zp(p);
+  Gfp::initialize_field(p);
+  FTD.init(R,zp);
 }
 
 #ifdef USE_NTL
 /* Compute Phi(N) */
-int phi_N(int N)
+int phi_n(int N)
 {
   int phiN=1,p,e;
   PrimeSeq s;
@@ -378,7 +378,7 @@ ZZX Cyclotomic(int N)
 }
 #else
 // simplified version powers of two
-int phi_N(int N)
+int phi_n(int N)
 {
   if (((N - 1) & N) != 0)
     throw runtime_error(
@@ -391,26 +391,26 @@ int phi_N(int N)
 #endif
 
 
-void init(Ring& Rg, int m, bool generate_poly)
+void init(Ring& rg, int m, bool generate_polynomial)
 {
-  Rg.mm=m;
-  Rg.phim=phi_N(Rg.mm);
+  rg.mm=m;
+  rg.phim=phi_n(rg.mm);
 
-  Rg.pi.resize(Rg.phim);    Rg.pi_inv.resize(Rg.mm);
-  for (int i=0; i<Rg.mm; i++) { Rg.pi_inv[i]=-1; }
+  rg.pi.resize(rg.phim);    rg.pi_inverse.resize(rg.mm);
+  for (int i=0; i<rg.mm; i++) { rg.pi_inverse[i]=-1; }
 
-  if (((m - 1) & m) == 0 and not generate_poly)
+  if (((m - 1) & m) == 0 and not generate_polynomial)
     {
       // m is power of two
       // no need to generate poly
       int k = 0;
-      for (int i = 1; i < Rg.mm; i++)
+      for (int i = 1; i < rg.mm; i++)
         {
           // easy GCD
           if (i % 2 == 1)
             {
-              Rg.pi[k] = i;
-              Rg.pi_inv[i] = k;
+              rg.pi[k] = i;
+              rg.pi_inverse[i] = k;
               k++;
             }
         }
@@ -419,18 +419,18 @@ void init(Ring& Rg, int m, bool generate_poly)
     {
 #ifdef USE_NTL
       int k=0;
-      for (int i=1; i<Rg.mm; i++)
-        { if (gcd(i,Rg.mm)==1)
-          { Rg.pi[k]=i;
-          Rg.pi_inv[i]=k;
+      for (int i=1; i<rg.mm; i++)
+        { if (gcd(i,rg.mm)==1)
+          { rg.pi[k]=i;
+          rg.pi_inverse[i]=k;
           k++;
           }
         }
 
-      ZZX P=Cyclotomic(Rg.mm);
-      Rg.poly.resize(Rg.phim+1);
-      for (int i=0; i<Rg.phim+1; i++)
-        { Rg.poly[i]=to_int(coeff(P,i)); }
+      ZZX P=Cyclotomic(rg.mm);
+      rg.poly.resize(rg.phim+1);
+      for (int i=0; i<rg.phim+1; i++)
+        { rg.poly[i]=to_int(coeff(P,i)); }
 #else
       throw runtime_error(
           "compile with NTL support (USE_NTL=1 in CONFIG.mine)");
@@ -468,27 +468,27 @@ GF2X Subs_PowX_Mod(const GF2X& a,int pow,int m,const GF2X& c)
 
 
 
-GF2X get_F(const Ring& Rg)
+GF2X get_F(const Ring& rg)
 {
   GF2X F;
-  for (int i=0; i<=Rg.phi_m(); i++)
-    { if (((Rg.Phi()[i])%2)!=0)
+  for (int i=0; i<=rg.phi_m(); i++)
+    { if (((rg.Phi()[i])%2)!=0)
         { SetCoeff(F,i,1); }
     }
   //cout << "F = " << F << endl;
   return F;
 }
 
-void init(P2Data& P2D,const Ring& Rg)
+void init(P2Data& P2D,const Ring& rg)
 {
   GF2X G,F;
-  SetCoeff(G,gf2n_short::degree(),1);
+  SetCoeff(G,Gf2nShort::degree(),1);
   SetCoeff(G,0,1);
-  for (int i=0; i<gf2n_short::get_nterms(); i++)
-    { SetCoeff(G,gf2n_short::get_t(i),1); }
+  for (int i=0; i<Gf2nShort::get_nterms(); i++)
+    { SetCoeff(G,Gf2nShort::get_t(i),1); }
   //cout << "G = " << G << endl;
 
-  F = get_F(Rg);
+  F = get_F(rg);
 
   // seed randomness to achieve same result for all players
   // randomness is used in SFCanZass and FindRoot
@@ -500,23 +500,23 @@ void init(P2Data& P2D,const Ring& Rg)
   // Check all is compatible
   int d=deg(facts[0]);
   if (d%deg(G)!=0)
-    { throw invalid_params(); }
+    { throw InvalidParameters(); }
 
   // Compute the quotient group
   QGroup QGrp;
-  int Gord=-1,e=Rg.phi_m()/d; // e = # of plaintext slots, phi(m)/degree
+  int Gord=-1,e=rg.phi_m()/d; // e = # of plaintext slots, phi(m)/degree
 
-  if ((e*gf2n_short::degree())!=Rg.phi_m())
+  if ((e*Gf2nShort::degree())!=rg.phi_m())
     { cout << "Plaintext type requires Gord*gf2n_short::degree ==  phi_m" << endl;
-      cout << e << " * " << gf2n_short::degree() << " != " << Rg.phi_m() << endl;
-      throw invalid_params();
+      cout << e << " * " << Gf2nShort::degree() << " != " << rg.phi_m() << endl;
+      throw InvalidParameters();
     }
 
   bool verbose = OnlineOptions::singleton.has_option("verbose_he_setup");
 
   int max_tries = 10;
   for (int seed = 0;; seed++)
-    { QGrp.assign(Rg.m(),seed);       // QGrp encodes the the quotient group Z_m^*/<2>
+    { QGrp.assign(rg.m(),seed);       // QGrp encodes the the quotient group Z_m^*/<2>
       Gord = QGrp.order();
       if (Gord == e)
         {
@@ -527,7 +527,7 @@ void init(P2Data& P2D,const Ring& Rg)
           if (seed == max_tries)
             {
               cerr << "abort after " << max_tries << " tries" << endl;
-              throw invalid_params();
+              throw InvalidParameters();
             }
           else if (verbose)
             cout << "Group order wrong, need to repeat the Haf-Mc algorithm"
@@ -561,16 +561,16 @@ void init(P2Data& P2D,const Ring& Rg)
         cout << i << " " << flush;
       if (i!=0)
         { int hpow=QGrp.nth_element(i);
-          Rts[i]=Subs_PowX_Mod(Rts[0],hpow,Rg.m(),F);
+          Rts[i]=Subs_PowX_Mod(Rts[0],hpow,rg.m(),F);
           bool flag=false;
           for (int j=0; j<facts.length(); j++)
             { if (used[j]==0)
-                { g=Subs_PowX_Mod(facts[0],hpow,Rg.m(),facts[j]);
+                { g=Subs_PowX_Mod(facts[0],hpow,rg.m(),facts[j]);
                   if (IsZero(g))
                     { g=Subs_Mod(G,Rts[i],facts[j]);
                       if (!IsZero(g))
                         { cout << "Something wrong - G" << endl;
-                          throw invalid_params();
+                          throw InvalidParameters();
                         }
                       Fi[i]=facts[j];
                       used[j]=1;
@@ -581,7 +581,7 @@ void init(P2Data& P2D,const Ring& Rg)
             }
           if (flag==false)
            { cout << "Something gone wrong" << endl;
-             throw invalid_params();
+             throw InvalidParameters();
            }
           Rts[i]=Rts[i]%Fi[i];
         }
@@ -598,13 +598,13 @@ void init(P2Data& P2D,const Ring& Rg)
   //   This is a deg(F) x (deg(G)*Gord)  matrix which maps elements
   //   vectors in the SIMD representation into plaintext vectors
   
-  imatrix A;
-  A.resize(Rg.phi_m(), imatrix::value_type(Gord*gf2n_short::degree()));
+  Imatrix A;
+  A.resize(rg.phi_m(), Imatrix::value_type(Gord*Gf2nShort::degree()));
   P2D.A.resize(A[0].size());
   for (auto& x : P2D.A)
     x.resize(A.size());
   for (int slot=0; slot<Gord; slot++)
-    { for (int co=0; co<gf2n_short::degree(); co++)
+    { for (int co=0; co<Gf2nShort::degree(); co++)
         { // Work out how x^co in given slot maps to plaintext vector
           GF2X av;
           SetCoeff(av,co,1);
@@ -613,9 +613,9 @@ void init(P2Data& P2D,const Ring& Rg)
           // Now need to map using CRT to the plaintext vector
           av=MulMod(av,u[slot],F);
           //cout << slot << " " << co << " : " << av << endl;
-          for (int k=0; k<Rg.phi_m(); k++)
+          for (int k=0; k<rg.phi_m(); k++)
 	    {
-              int i = slot*gf2n_short::degree()+co;
+              int i = slot*Gf2nShort::degree()+co;
               if (IsOne(coeff(av,k)))
                 { A[k][i]=1; }
               else
@@ -628,7 +628,7 @@ void init(P2Data& P2D,const Ring& Rg)
 
   // Find pseudo inverse modulo 2
   pinv(P2D.Ai, A);
-  P2D.Ai.resize(Gord*gf2n_short::degree());
+  P2D.Ai.resize(Gord*Gf2nShort::degree());
 
   //cout << "Inverse Matrix : " << endl; print(P2D.Ai);
 
@@ -687,7 +687,7 @@ void char_2_dimension(int& m, int& lg2)
 }
 
 template <>
-void Parameters::SPDZ_Data_Setup(FHE_Params& params, P2Data& P2D)
+void Parameters::spdz_data_setup(FheParameters& params, P2Data& P2D)
 {
   CODE_LOCATION_NO_SCOPE
 
@@ -702,7 +702,7 @@ void Parameters::SPDZ_Data_Setup(FHE_Params& params, P2Data& P2D)
   bool verbose = OnlineOptions::singleton.has_option("verbose_he_setup");
   if (verbose)
     cout << "Setting up parameters\n";
-  if ((n<2 || n>10) and sec == -1) { throw invalid_params(); }
+  if ((n<2 || n>10) and sec == -1) { throw InvalidParameters(); }
 
   int m,lg2p0,lg2p1,ex;
 
@@ -715,7 +715,7 @@ void Parameters::SPDZ_Data_Setup(FHE_Params& params, P2Data& P2D)
   }
   else
   {
-    NoiseBounds(2, phi_N(m), n, sec, slack, params).optimize(lg2p0, lg2p1);
+    NoiseBounds(2, phi_n(m), n, sec, slack, params).optimize(lg2p0, lg2p1);
     finalize_lengths(lg2p0, lg2p1, n, m, lg2pi[0], round_up, params);
   }
 
@@ -726,35 +726,35 @@ void Parameters::SPDZ_Data_Setup(FHE_Params& params, P2Data& P2D)
     cout << "m = " << m << endl;
   init(R,m);
 
-  if (lg2p0==0 || lg2p1==0) { throw invalid_params(); }
+  if (lg2p0==0 || lg2p1==0) { throw InvalidParameters(); }
 
   // We want pr0=pr1=1 mod (m*twop) where twop is the smallest 
   // power of two bigger than 2*m. This means we have m'th roots of
   // unity and twop'th roots of unity. This means FFT's are easier
   // to implement
-  int lg2m=numBits(m);
-  bigint step=m<<(lg2m+1);
+  int lg2m=num_bits(m);
+  Bigint step=m<<(lg2m+1);
   
   ex=lg2p0-2*lg2m;
   pr0=1; pr0=(pr0<<ex)*step+1;
-  while (!probPrime(pr0)) { pr0=pr0+step; }
+  while (!prob_prime(pr0)) { pr0=pr0+step; }
   if (verbose)
-    cout << "\t pr0 = " << pr0 << "  :   " << numBits(pr0) << endl;
+    cout << "\t pr0 = " << pr0 << "  :   " << num_bits(pr0) << endl;
 
   ex=lg2p1-2*lg2m;
   pr1=1; pr1=(pr1<<ex)*step+1;
-  while (!probPrime(pr1) || pr1==pr0) { pr1=pr1+step; }
+  while (!prob_prime(pr1) || pr1==pr0) { pr1=pr1+step; }
 
   if (verbose)
     {
-      cout << "\t pr1 = " << pr1 << "  :   " << numBits(pr1) <<  endl;
+      cout << "\t pr1 = " << pr1 << "  :   " << num_bits(pr1) <<  endl;
 
       cout << "\t\tFollowing should be both 1" << endl;
       cout << "\t\tpr1 mod m = " << pr1%m << endl;
       cout << "\t\tpr1 mod 2^lg2m = " << pr1%(1<<lg2m) << endl;
     }
 
-  gf2n_short::init_field(lg2);
+  Gf2nShort::initialize_field(lg2);
   load_or_generate(P2D, R);
 }
 

@@ -24,7 +24,7 @@ HemiOptions HemiOptions::singleton;
 OnlineOptions::OnlineOptions() : playerno(-1)
 {
     interactive = false;
-    lgp = gfp0::MAX_N_BITS;
+    lgp = Gfp0::MAX_N_BITS;
     lg2 = 0;
     live_prep = true;
     batch_size = 1000;
@@ -34,8 +34,8 @@ OnlineOptions::OnlineOptions() : playerno(-1)
     bucket_size = 4;
     security_parameter = DEFAULT_SECURITY;
     use_security_parameter = false;
-    cmd_private_input_file = "Player-Data/Input";
-    cmd_private_output_file = "";
+    command_private_input_file = "Player-Data/Input";
+    command_private_output_file = "";
     file_prep_per_thread = false;
     trunc_error = DEFAULT_SECURITY;
     opening_sum = 0;
@@ -55,7 +55,7 @@ OnlineOptions::OnlineOptions() : playerno(-1)
 #endif
 }
 
-OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
+OnlineOptions::OnlineOptions(ez::EzOptionParser& opt, int argc,
         const char** argv, bool security) :
         OnlineOptions()
 {
@@ -73,7 +73,7 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
           "--interactive" // Flag token.
     );
     opt.add(
-          cmd_private_input_file.c_str(), // Default.
+          command_private_input_file.c_str(), // Default.
           0, // Required?
           1, // Number of args expected.
           0, // Delimiter if expecting multiple args.
@@ -84,7 +84,7 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
           "--input-file" // Flag token.
     );
     opt.add(
-          cmd_private_output_file.c_str(), // Default.
+          command_private_output_file.c_str(), // Default.
           0, // Required?
           1, // Number of args expected.
           0, // Delimiter if expecting multiple args.
@@ -158,8 +158,8 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
 
     interactive = opt.isSet("-I");
 
-    opt.get("-IF")->getString(cmd_private_input_file);
-    opt.get("-OF")->getString(cmd_private_output_file);
+    opt.get("-IF")->getString(command_private_input_file);
+    opt.get("-OF")->getString(command_private_output_file);
 
     opt.get("--bucket-size")->getInt(bucket_size);
 
@@ -168,7 +168,7 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
 #endif
 
     vector<vector<string>> multi_options;
-    opt.get("--options")->getMultiStrings(multi_options);
+    opt.get("--options")->get_multi_strings(multi_options);
     for (auto& x : multi_options)
         options.insert(options.end(), x.begin(), x.end());
 
@@ -190,13 +190,13 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
     else
         security_parameter = 1000;
 
-    opt.resetArgs();
+    opt.reset_args();
 
     if (argc > 0)
         executable = boost::filesystem::path(argv[0]).filename().string();
 }
 
-OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
+OnlineOptions::OnlineOptions(ez::EzOptionParser& opt, int argc,
         const char** argv, int default_batch_size, bool default_live_prep,
         bool variable_prime_length, bool security) :
         OnlineOptions(opt, argc, argv, security)
@@ -306,7 +306,7 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
         string p;
         opt.get("--prime")->getString(p);
         if (not p.empty())
-            prime = bigint(p);
+            prime = Bigint(p);
     }
     if (default_live_prep)
         live_prep = not opt.get("-F")->isSet;
@@ -323,20 +323,20 @@ OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
 
     direct = opt.isSet("--direct");
 
-    opt.resetArgs();
+    opt.reset_args();
 }
 
-void OnlineOptions::finalize(ez::ezOptionParser& opt, int argc,
+void OnlineOptions::finalize(ez::EzOptionParser& opt, int argc,
         const char** argv, bool networking)
 {
-    opt.resetArgs();
+    opt.reset_args();
     opt.parse(argc, argv);
 
-    vector<string*> allArgs(opt.firstArgs);
-    allArgs.insert(allArgs.end(), opt.unknownArgs.begin(), opt.unknownArgs.end());
-    allArgs.insert(allArgs.end(), opt.lastArgs.begin(), opt.lastArgs.end());
+    vector<string*> all_args(opt.first_args);
+    all_args.insert(all_args.end(), opt.unknown_args.begin(), opt.unknown_args.end());
+    all_args.insert(all_args.end(), opt.last_args.begin(), opt.last_args.end());
     string usage;
-    vector<string> badOptions;
+    vector<string> bad_options;
     unsigned int i;
 
     if (networking)
@@ -346,14 +346,14 @@ void OnlineOptions::finalize(ez::ezOptionParser& opt, int argc,
 
     size_t name_index = 1 + networking - opt.isSet("-p");
 
-    if (allArgs.size() < name_index + 1)
+    if (all_args.size() < name_index + 1)
     {
         opt.getUsage(usage);
         cout << usage;
         cerr << "ERROR: incorrect number of arguments to " << argv[0] << endl;
         cerr << "Arguments given were:\n";
-        for (unsigned int j = 1; j < allArgs.size(); j++)
-            cout << "'" << *allArgs[j] << "'" << endl;
+        for (unsigned int j = 1; j < all_args.size(); j++)
+            cout << "'" << *all_args[j] << "'" << endl;
         exit(1);
     }
     else
@@ -361,41 +361,41 @@ void OnlineOptions::finalize(ez::ezOptionParser& opt, int argc,
         if (opt.isSet("-p"))
             opt.get("-p")->getInt(playerno);
         else
-            sscanf((*allArgs[1]).c_str(), "%d", &playerno);
-        progname = *allArgs.at(name_index);
+            sscanf((*all_args[1]).c_str(), "%d", &playerno);
+        progname = *all_args.at(name_index);
     }
 
-    if (!opt.gotRequired(badOptions))
+    if (!opt.got_required(bad_options))
     {
         opt.getUsage(usage);
         cout << usage;
-        for (i = 0; i < badOptions.size(); ++i)
-            cerr << "ERROR: Missing required option " << badOptions[i] << "."
+        for (i = 0; i < bad_options.size(); ++i)
+            cerr << "ERROR: Missing required option " << bad_options[i] << "."
                     << endl;
         exit(1);
     }
 
-    if (!opt.gotExpected(badOptions))
+    if (!opt.got_expected(bad_options))
     {
         opt.getUsage(usage);
         cout << usage;
-        for (i = 0; i < badOptions.size(); ++i)
+        for (i = 0; i < bad_options.size(); ++i)
             cerr << "ERROR: Got unexpected number of arguments for option "
-                    << badOptions[i] << "." << endl;
+                    << bad_options[i] << "." << endl;
         exit(1);
     }
 
-    for (size_t i = name_index + 1; i < allArgs.size(); i++)
+    for (size_t i = name_index + 1; i < all_args.size(); i++)
     {
         try
         {
-            args.push_back(stol(*allArgs[i]));
+            args.push_back(stol(*all_args[i]));
         }
         catch (exception& e)
         {
             opt.getUsage(usage);
             cerr << usage;
-            cerr << "Additional argument has to be integer: " << *allArgs[i]
+            cerr << "Additional argument has to be integer: " << *all_args[i]
                     << endl;
             exit(1);
         }
@@ -417,11 +417,11 @@ void OnlineOptions::finalize(ez::ezOptionParser& opt, int argc,
     }
 }
 
-void OnlineOptions::finalize_with_error(ez::ezOptionParser& opt)
+void OnlineOptions::finalize_with_error(ez::EzOptionParser& opt)
 {
     if (opt.get("-lgp"))
     {
-        bigint schedule_prime = BaseMachine::prime_from_schedule(progname);
+        Bigint schedule_prime = BaseMachine::prime_from_schedule(progname);
         if (prime != 0 and prime != schedule_prime and schedule_prime != 0)
         {
             cerr << "Different prime for compilation and computation." << endl;
@@ -498,7 +498,7 @@ void OnlineOptions::finalize_with_error(ez::ezOptionParser& opt)
     }
 }
 
-void OnlineOptions::set_trunc_error(ez::ezOptionParser& opt)
+void OnlineOptions::set_trunc_error(ez::EzOptionParser& opt)
 {
     if (opt.get("-E"))
     {
@@ -513,7 +513,7 @@ int OnlineOptions::prime_length()
     if (prime == 0)
         return lgp;
     else
-        return prime.numBits();
+        return prime.num_bits();
 }
 
 int OnlineOptions::prime_limbs()
@@ -521,7 +521,7 @@ int OnlineOptions::prime_limbs()
     return DIV_CEIL(prime_length(), 64);
 }
 
-bool OnlineOptions::has_param(const string& param)
+bool OnlineOptions::has_parameter(const string& param)
 {
     for (auto& x : options)
         if (x.find(param + "=") == 0)
@@ -529,7 +529,7 @@ bool OnlineOptions::has_param(const string& param)
     return false;
 }
 
-int OnlineOptions::get_param(const string& param)
+int OnlineOptions::get_parameter(const string& param)
 {
     basic_regex re(param + "=([0-9]+)");
     smatch match;
@@ -542,8 +542,8 @@ int OnlineOptions::get_param(const string& param)
 int OnlineOptions::comp_sec()
 {
     int res = COMP_SEC;
-    if (has_param("comp_sec"))
-        res = get_param("comp_sec");
+    if (has_parameter("comp_sec"))
+        res = get_parameter("comp_sec");
     if (res < 128 and not have_warned_about_comp_sec)
     {
         cerr << "WARNING: computational security parameter " << res

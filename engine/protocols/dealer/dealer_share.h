@@ -13,8 +13,8 @@
 
 template<class T> class DealerPrep;
 template<class T> class DealerInput;
-template<class T> class DealerMC;
-template<class T> class DirectDealerMC;
+template<class T> class DealerOpener;
+template<class T> class DirectDealerOpener;
 template<class T> class DealerMatrixPrep;
 template<class T> class Hemi;
 
@@ -29,13 +29,13 @@ template<class T>
 class DealerShare : public SemiShare<T>
 {
     typedef DealerShare This;
-    typedef SemiShare<T> super;
+    typedef SemiShare<T> Super;
 
 public:
-    typedef GC::DealerSecret bit_type;
+    typedef GC::DealerSecret BitType;
 
-    typedef DealerMC<This> MAC_Check;
-    typedef DirectDealerMC<This> Direct_MC;
+    typedef DealerOpener<This> MacCheck;
+    typedef DirectDealerOpener<This> DirectOpener;
     typedef Hemi<This> Protocol;
     typedef DealerInput<This> Input;
     typedef DealerPrep<This> LivePrep;
@@ -59,7 +59,7 @@ public:
     }
 
     static This constant(const T& other, int my_num,
-            const typename super::mac_key_type& = {}, int = -1)
+            const typename Super::MacKeyType& = {}, int = -1)
     {
         if (my_num == 1)
             return other;
@@ -72,7 +72,7 @@ public:
     }
 
     template<class U>
-    DealerShare(const U& other) : super(other)
+    DealerShare(const U& other) : Super(other)
     {
     }
 };

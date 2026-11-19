@@ -8,7 +8,7 @@
 #include "vm/online_options.h"
 
 template<class T, class V>
-OnlineOptions::OnlineOptions(ez::ezOptionParser& opt, int argc,
+OnlineOptions::OnlineOptions(ez::EzOptionParser& opt, int argc,
         const char** argv, T, bool default_live_prep, V) :
         OnlineOptions(opt, argc, argv, OnlineOptions(T()).batch_size,
                 default_live_prep, T::clear::prime_field,

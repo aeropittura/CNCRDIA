@@ -22,15 +22,15 @@ CommonParty::CommonParty() :
 	if (singleton != 0)
 		throw runtime_error("there can only be one");
 	singleton = this;
-	prng.ReSeed();
+	prng.re_seed();
 #ifdef DEBUG_PRNG
-	octet seed[SEED_SIZE];
+	Octet seed[SEED_SIZE];
 	memset(seed, 0, sizeof(seed));
 	prng.SetSeed(seed);
 #endif
 	cpu_timer.start();
 	timer.start();
-	gf2n_long::init_field(128);
+	Gf2nLong::initialize_field(128);
 	mac_key.randomize(prng);
 }
 
@@ -97,7 +97,7 @@ void CommonParty::reset()
 	garbled_tbl_size = 0;
 }
 
-gate_id_t CommonParty::new_gate()
+GateId CommonParty::new_gate()
 {
     gate_counter++;
     garbled_tbl_size++;
@@ -107,7 +107,7 @@ gate_id_t CommonParty::new_gate()
 void CommonParty::next_gate(GarbledGate& gate)
 {
     gate_counter2++;
-    gate.init_inputs(gate_counter2, _N);
+    gate.initialize_inputs(gate_counter2, _N);
 }
 
 SendBuffer& CommonFakeParty::get_buffer(MSG_TYPE type)

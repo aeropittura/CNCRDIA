@@ -24,7 +24,7 @@ int main(int argc, char** argv)
         protocol = argv[3];
 
     if (protocol == "Tinier")
-        run<GC::TinierSecret<gf2n_mac_key>>(argc, argv);
+        run<GC::TinierSecret<Gf2nMacKey>>(argc, argv);
     else if (protocol == "Rep3")
         run<GC::SemiHonestRepSecret>(argc, argv);
     else if (protocol == "Rep4")
@@ -44,9 +44,9 @@ int main(int argc, char** argv)
         ShamirOptions::s().nparties = nparties;
 
         if (protocol == "CCD")
-            run<GC::CcdSecret<gf2n_<octet>>>(argc, argv);
+            run<GC::CcdSecret<Gf2n_<Octet>>>(argc, argv);
         else if (protocol == "MalCCD")
-            run<GC::MaliciousCcdSecret<gf2n_short>>(argc, argv);
+            run<GC::MaliciousCcdSecret<Gf2nShort>>(argc, argv);
         else
             run<GC::AtlasSecret>(argc, argv);
     }
@@ -94,11 +94,11 @@ void run(int argc, char** argv)
         b[i] = input.finalize(1, n_bits);
     }
 
-    protocol.init_mul();
+    protocol.initialize_mult();
     for (int i = 0; i < n; i++)
         protocol.prepare_mul(a[i], b[i], n_bits);
     protocol.exchange();
-    output.init_open(P, n);
+    output.initialize_open(P, n);
     for (int i = 0; i < n; i++)
     {
         auto c = protocol.finalize_mul(n_bits);

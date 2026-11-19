@@ -20,9 +20,9 @@ template <class FD>
 PairwiseGenerator<FD>::PairwiseGenerator(int thread_num,
         PairwiseMachine& machine, Player* player) :
     GeneratorBase(thread_num, machine.N, player),
-    producer(machine.setup<FD>().FieldD, P.my_num(),
-            thread_num, machine.output, machine.get_prep_dir<FD>(P)),
-    EC(P, machine.other_pks, machine.setup<FD>().FieldD, timers, machine, *this),
+    producer(machine.setup<FD>().field_d, P.my_num(),
+            thread_num, machine.output, machine.get_prep_directory<FD>(P)),
+    EC(P, machine.other_pks, machine.setup<FD>().field_d, timers, machine, *this),
     MC(machine.setup<FD>().alphai),
     n_ciphertexts(EC.proof.U),
     C(n_ciphertexts, machine.setup<FD>().params), volatile_memory(0),
@@ -30,14 +30,14 @@ PairwiseGenerator<FD>::PairwiseGenerator(int thread_num,
 {
     for (int i = 1; i < P.num_players(); i++)
         multipliers.push_back(new Multiplier<FD>(i, *this));
-    const FD& FieldD = machine.setup<FD>().FieldD;
-    a.resize(n_ciphertexts, FieldD);
-    b.resize(n_ciphertexts, FieldD);
-    c.resize(n_ciphertexts, FieldD);
-    a.allocate_slots(FieldD.get_prime());
-    b.allocate_slots(FieldD.get_prime());
+    const FD& field_d = machine.setup<FD>().field_d;
+    a.resize(n_ciphertexts, field_d);
+    b.resize(n_ciphertexts, field_d);
+    c.resize(n_ciphertexts, field_d);
+    a.allocate_slots(field_d.get_prime());
+    b.allocate_slots(field_d.get_prime());
     // extra limb for addition
-    c.allocate_slots((bigint)FieldD.get_prime() << 64);
+    c.allocate_slots((Bigint)field_d.get_prime() << 64);
     b_mod_q.resize(n_ciphertexts,
     { machine.setup<FD>().params, evaluation, evaluation });
 }
@@ -68,11 +68,11 @@ void PairwiseGenerator<FD>::run_with_errors()
 {
     CODE_LOCATION
     PRNG G;
-    G.ReSeed();
+    G.re_seed();
     total = 0;
     producer.triples.clear();
 
-    while (total < machine.nTriplesPerThread)
+    while (total < machine.n_triples_per_thread)
     {
         timers["Randomization"].start();
         a.randomize(G);
@@ -92,7 +92,7 @@ void PairwiseGenerator<FD>::run_with_errors()
         timers["Proof exchange"].stop();
         volatile_memory = max(prover_memory, verifier_memory);
 
-        Rq_Element values({machine.setup<FD>().params, evaluation, evaluation});
+        RqElement values({machine.setup<FD>().params, evaluation, evaluation});
         for (int k = 0; k < n_ciphertexts; k++)
         {
             producer.ai = a[k];
@@ -141,7 +141,7 @@ void PairwiseGenerator<FD>::generate_inputs(int player)
     bool mine = player == P.my_num();
     if (mine)
     {
-        SeededPRNG G;
+        SeededPrng G;
         b[0].randomize(G);
         b_mod_q.at(0).from(b.at(0).get_iterator());
         producer.macs[0].mul(machine.setup<FD>().alpha, b[0]);
@@ -155,7 +155,7 @@ void PairwiseGenerator<FD>::generate_inputs(int player)
 
     inputs.clear();
     Share<T> check_value;
-    GlobalPRNG G(P);
+    GlobalPrng G(P);
     SemiInput<SemiShare<T>> input(0, P);
     input.reset_all(P);
     for (size_t i = 0; i < b[0].num_slots(); i++)
@@ -192,7 +192,7 @@ size_t PairwiseGenerator<FD>::report_size(ReportType type)
 template <class FD>
 size_t PairwiseGenerator<FD>::report_sent()
 {
-    return P.total_comm().sent;
+    return P.total_communication().sent;
 }
 
 template <class FD>
@@ -210,5 +210,5 @@ void PairwiseGenerator<FD>::report_size(ReportType type, MemoryUsage& res)
     res += EC.memory_usage;
 }
 
-template class PairwiseGenerator<FFT_Data>;
+template class PairwiseGenerator<FftData>;
 template class PairwiseGenerator<P2Data>;

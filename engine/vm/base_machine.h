@@ -22,26 +22,26 @@ void print_usage(ostream& o, const char* name, size_t capacity);
 class BaseMachine
 {
     friend class Program;
-    template<class sint, class sgf2n> friend class thread_info;
+    template<class Sint, class Sgf2n> friend class thread_info;
 
 protected:
     static BaseMachine* singleton;
 
-    static thread_local OnDemandOTTripleSetup ot_setup;
+    static thread_local OnDemandOtTripleSetup ot_setup;
 
     static thread_local const Program* program;
 
-    std::map<int,TimerWithComm> timer;
+    std::map<int,TimerWithCommunication> timer;
 
     string compiler;
     string domain;
-    string relevant_opts;
+    string relevant_options;
     string security;
-    string gf2n;
+    string Gf2n;
     string expected_communication;
 
-    NamedCommStats one_off_comm;
-    NamedCommStats comm_stats, max_comm;
+    NamedCommunicationStatistics one_off_communication;
+    NamedCommunicationStatistics communication_statistics, max_communication;
 
     virtual size_t load_program(const string& threadname,
             const string& filename);
@@ -76,7 +76,7 @@ public:
     static int ring_size_from_schedule(string progname);
     static int prime_length_from_schedule(string progname);
     static int gf2n_length_from_schedule(string progname);
-    static bigint prime_from_schedule(string progname);
+    static Bigint prime_from_schedule(string progname);
     static int security_from_schedule(string progname);
 
     template<class T>
@@ -94,7 +94,7 @@ public:
 
     static bool allow_mulm();
 
-    static void add_one_off(const NamedCommStats& comm);
+    static void add_one_off(const NamedCommunicationStatistics& comm);
 
     static ThreadQueues* maybe_get_queues();
 
@@ -113,20 +113,20 @@ public:
     virtual void reqbl(int) {}
     virtual void active(int) {}
 
-    static OTTripleSetup fresh_ot_setup(Player& P);
+    static OtTripleSetup fresh_ot_setup(Player& P);
 
-    ThreadStats total_stats();
-    void set_thread_stats(const ThreadStats& stats);
+    ThreadStatistics total_statistics();
+    void set_thread_statistics(const ThreadStatistics& statistics);
 
-    void print_global_comm(Player& P, const NamedCommStats& stats);
-    void print_comm(Player& P, const NamedCommStats& stats);
+    void print_global_communication(Player& P, const NamedCommunicationStatistics& statistics);
+    void print_communication(Player& P, const NamedCommunicationStatistics& statistics);
 
-    virtual const Names& get_N() { throw not_implemented(); }
+    virtual const Names& get_N() { throw NotImplemented(); }
 
-    virtual void gap_warning(int) { throw not_implemented(); }
+    virtual void gap_warning(int) { throw NotImplemented(); }
 };
 
-inline OTTripleSetup BaseMachine::fresh_ot_setup(Player& P)
+inline OtTripleSetup BaseMachine::fresh_ot_setup(Player& P)
 {
     return ot_setup.get_fresh(P);
 }
@@ -139,16 +139,16 @@ int BaseMachine::batch_size(Dtype type, int buffer_size, int fallback,
         fprintf(stderr, "batch_size buffer_size=%d fallback=%d\n", buffer_size,
                 fallback);
 
-    int n_opts;
+    int n_options;
     int n = 0;
     int res = 0;
 
     if (buffer_size > 0)
-        n_opts = buffer_size;
+        n_options = buffer_size;
     else if (fallback > 0)
-        n_opts = fallback;
+        n_options = fallback;
     else
-        n_opts = OnlineOptions::singleton.batch_size
+        n_options = OnlineOptions::singleton.batch_size
                 * max(factor, T::default_length);
 
     if (buffer_size <= 0 and has_program())
@@ -172,13 +172,13 @@ int BaseMachine::batch_size(Dtype type, int buffer_size, int fallback,
     if (n > 0 and not (buffer_size > 0))
     {
         bool used_frac = false;
-        if (n > n_opts)
+        if (n > n_options)
         {
             // finding the right fraction
             for (int i = 1; i <= 10; i++)
             {
                 int frac = DIV_CEIL(n, i);
-                if (frac <= n_opts)
+                if (frac <= n_options)
                 {
                     res = frac;
                     used_frac = true;
@@ -190,15 +190,15 @@ int BaseMachine::batch_size(Dtype type, int buffer_size, int fallback,
             }
         }
         if (not used_frac)
-            res = min(n, n_opts);
+            res = min(n, n_options);
     }
     else
-        res = n_opts;
+        res = n_options;
 
     if (OnlineOptions::singleton.has_option("debug_batch_size"))
     {
         cerr << DataPositions::dtype_names[type] << " " << T::type_string()
-                << " res=" << res << " n=" << n << " n_opts=" << n_opts
+                << " res=" << res << " n=" << n << " n_opts=" << n_options
                 << " buffer_size=" << buffer_size << " bits/dabits="
                 << T::LivePrep::bits_from_dabits() << "/"
                 << T::LivePrep::dabits_from_bits() << " has_program="
@@ -233,14 +233,14 @@ int BaseMachine::input_batch_size(int player, int buffer_size)
 template<class T>
 int BaseMachine::edabit_batch_size(int n_bits, int buffer_size)
 {
-    int n_opts;
+    int n_options;
     int n = 0;
     int res;
 
     if (buffer_size > 0)
-        n_opts = buffer_size;
+        n_options = buffer_size;
     else
-        n_opts = OnlineOptions::singleton.batch_size;
+        n_options = OnlineOptions::singleton.batch_size;
 
     if (has_program())
     {
@@ -248,14 +248,14 @@ int BaseMachine::edabit_batch_size(int n_bits, int buffer_size)
     }
 
     if (n > 0 and not (buffer_size > 0))
-        res = min(n, n_opts);
+        res = min(n, n_options);
     else
-        res = n_opts;
+        res = n_options;
 
 #ifdef DEBUG_BATCH_SIZE
     cerr << "edaBits " << T::type_string() << " (" << n_bits
             << ") res=" << res << " n="
-            << n << " n_opts=" << n_opts << " buffer_size=" << buffer_size << endl;
+            << n << " n_opts=" << n_options << " buffer_size=" << buffer_size << endl;
 #endif
 
     assert(res > 0);

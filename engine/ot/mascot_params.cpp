@@ -5,20 +5,20 @@
 
 #include "ot/mascot_params.h"
 
-MascotParams::MascotParams()
+MascotParameters::MascotParameters()
 {
-    generateMACs = true;
+    generate_macs = true;
     amplify = true;
     check = true;
     correlation_check = true;
-    generateBits = false;
+    generate_bits = false;
     use_extension = true;
     fewer_rounds = false;
     fiat_shamir = false;
     timerclear(&start);
 }
 
-void MascotParams::set_passive()
+void MascotParameters::set_passive()
 {
-    generateMACs = amplify = check = correlation_check = false;
+    generate_macs = amplify = check = correlation_check = false;
 }

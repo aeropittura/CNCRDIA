@@ -16,7 +16,7 @@ using namespace std;
  */
 
 template<class T>
-class Binary_File_IO
+class BinaryFileIo
 {
   static bool is_gf2n(true_type);
   static bool is_gf2n(false_type);
@@ -34,7 +34,7 @@ class Binary_File_IO
    * Throws file_error.   
    */
   void write_to_file(const string filename, const vector<T>& buffer,
-      long start_pos);
+      long start_position);
   void write(const StackedVector<T>& source, const StackedVector<Integer>& Ci,
        const Player& P, const BaseInstruction& inst);
 

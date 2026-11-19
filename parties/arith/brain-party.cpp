@@ -15,7 +15,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     HonestMajorityRingMachineWithSecurity<BrainShare, MaliciousRep3Share>(argc,
             argv, opt);
 }

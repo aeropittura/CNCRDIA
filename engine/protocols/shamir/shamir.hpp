@@ -12,7 +12,7 @@
 #include "support/benchmarking.h"
 
 template<class T>
-typename T::open_type::Scalar Shamir<T>::get_rec_factor(int i, int n)
+typename T::OpenType::Scalar Shamir<T>::get_rec_factor(int i, int n)
 {
     vector<int> points(n);
     for (int j = 0; j < n; j++)
@@ -21,7 +21,7 @@ typename T::open_type::Scalar Shamir<T>::get_rec_factor(int i, int n)
 }
 
 template<class T>
-typename T::open_type::Scalar Shamir<T>::get_rec_factor(int i,
+typename T::OpenType::Scalar Shamir<T>::get_rec_factor(int i,
         const vector<int>& points, int target)
 {
     assert(find(points.begin(), points.end(), i) != points.end());
@@ -41,7 +41,7 @@ typename T::open_type::Scalar Shamir<T>::get_rec_factor(int i,
 }
 
 template<class T>
-vector<typename T::open_type::Scalar> Shamir<T>::get_rec_factors(
+vector<typename T::OpenType::Scalar> Shamir<T>::get_rec_factors(
         const vector<int>& points, int target)
 {
     vector<U> res;
@@ -60,8 +60,8 @@ Shamir<T>::Shamir(Player& P, int t) :
         threshold = t;
     else
         threshold = ShamirMachine::s().threshold;
-    n_mul_players = min(P.num_players(), 2 * threshold + 1);
-    assert(n_mul_players <= P.num_players());
+    n_mult_players = min(P.num_players(), 2 * threshold + 1);
+    assert(n_mult_players <= P.num_players());
     resharing = new ShamirInput<T>(0, P);
     reset();
 }
@@ -93,23 +93,23 @@ void Shamir<T>::reset()
     for (int i = 0; i < P.num_players(); i++)
         resharing->reset(i);
 
-    for (int i = 0; i < n_mul_players; i++)
+    for (int i = 0; i < n_mult_players; i++)
         resharing->add_sender(i);
 }
 
 template<class T>
-void Shamir<T>::init_mul()
+void Shamir<T>::initialize_mult()
 {
     reset();
-    if (rec_factor == 0 and P.my_num() < n_mul_players)
-        rec_factor = get_rec_factor(P.my_num(), n_mul_players);
+    if (rec_factor == 0 and P.my_num() < n_mult_players)
+        rec_factor = get_rec_factor(P.my_num(), n_mult_players);
 }
 
 template<class T>
 void Shamir<T>::prepare_mul(const T& x, const T& y, int n)
 {
     (void) n;
-    if (P.my_num() < n_mul_players)
+    if (P.my_num() < n_mult_players)
         resharing->add_mine(x * y * rec_factor);
 }
 
@@ -137,7 +137,7 @@ template<class T>
 T Shamir<T>::finalize_mul(int n)
 {
     (void) n;
-    return finalize(n_mul_players);
+    return finalize(n_mult_players);
 }
 
 template<class T>
@@ -150,9 +150,9 @@ T Shamir<T>::finalize(int n_relevant_players)
 }
 
 template<class T>
-void Shamir<T>::init_dotprod()
+void Shamir<T>::initialize_dotprod()
 {
-    init_mul();
+    initialize_mult();
     dotprod_share = 0;
 }
 
@@ -165,7 +165,7 @@ void Shamir<T>::prepare_dotprod(const T& x, const T& y)
 template<class T>
 void Shamir<T>::next_dotprod()
 {
-    if (P.my_num() < n_mul_players)
+    if (P.my_num() < n_mult_players)
         resharing->add_mine(dotprod_share);
     dotprod_share = 0;
 }
@@ -183,7 +183,7 @@ void Shamir<T>::buffer_random()
 }
 
 template<class T>
-vector<vector<typename T::open_type>>& Shamir<T>::get_hyper(int t)
+vector<vector<typename T::OpenType>>& Shamir<T>::get_hyper(int t)
 {
     auto& hyper = hypers[t];
     if (int(hyper.size()) != P.num_players() - t)
@@ -201,14 +201,14 @@ string Shamir<T>::hyper_filename(int t, int n)
 }
 
 template<class T>
-void Shamir<T>::get_hyper(vector<vector<typename T::open_type> >& hyper,
+void Shamir<T>::get_hyper(vector<vector<typename T::OpenType> >& hyper,
         int t, int n)
 {
     assert(hyper.empty());
 
     try
     {
-        octetStream os;
+        OctetStream os;
         string filename = hyper_filename(t, n);
         ifstream in(filename);
 #ifdef VERBOSE_HYPER

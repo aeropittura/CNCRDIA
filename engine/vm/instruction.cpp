@@ -16,9 +16,9 @@
 #include <iomanip>
 #include <ranges>
 
-template<class cgf2n>
-void Instruction::execute_clear_gf2n(StackedVector<cgf2n>& registers,
-        MemoryPart<cgf2n>& memory, ArithmeticProcessor& Proc) const
+template<class Cgf2n>
+void Instruction::execute_clear_gf2n(StackedVector<Cgf2n>& registers,
+        MemoryPart<Cgf2n>& memory, ArithmeticProcessor& Proc) const
 {
     auto& C2 = registers;
     auto& M2C = memory;
@@ -31,12 +31,12 @@ void Instruction::execute_clear_gf2n(StackedVector<cgf2n>& registers,
     }
 }
 
-template<class cgf2n>
-void Instruction::gbitdec(StackedVector<cgf2n>& registers) const
+template<class Cgf2n>
+void Instruction::gbitdec(StackedVector<Cgf2n>& registers) const
 {
     for (int j = 0; j < size; j++)
     {
-        typename cgf2n::internal_type a = registers.at(r[0] + j).get();
+        typename Cgf2n::InternalType a = registers.at(r[0] + j).get();
         for (unsigned int i = 0; i < start.size(); i++)
         {
             registers.at(start[i] + j) = a & 1;
@@ -45,12 +45,12 @@ void Instruction::gbitdec(StackedVector<cgf2n>& registers) const
     }
 }
 
-template<class cgf2n>
-void Instruction::gbitcom(StackedVector<cgf2n>& registers) const
+template<class Cgf2n>
+void Instruction::gbitcom(StackedVector<Cgf2n>& registers) const
 {
     for (int j = 0; j < size; j++)
     {
-        typename cgf2n::internal_type a = 0;
+        typename Cgf2n::InternalType a = 0;
         for (unsigned int i = 0; i < start.size(); i++)
         {
             a ^= registers.at(start[i] + j).get() << (i * n);
@@ -59,10 +59,10 @@ void Instruction::gbitcom(StackedVector<cgf2n>& registers) const
     }
 }
 
-void Instruction::execute_regint(ArithmeticProcessor& Proc, MemoryPart<Integer>& Mi) const
+void Instruction::execute_regint(ArithmeticProcessor& Proc, MemoryPart<Integer>& mi) const
 {
-    (void) Mi;
-    auto& Ci = Proc.get_Ci();
+    (void) mi;
+    auto& Ci = Proc.get_ci();
     switch (opcode)
     {
 #define X(NAME, PRE, CODE) \
@@ -98,11 +98,11 @@ void Instruction::incint(StackedVector<Integer>& Ci) const
 void Instruction::shuffle(ArithmeticProcessor& Proc) const
 {
     for (int i = 0; i < size; i++)
-        Proc.write_Ci(r[0] + i, Proc.read_Ci(r[1] + i));
+        Proc.write_ci(r[0] + i, Proc.read_ci(r[1] + i));
     for (int i = 0; i < size; i++)
     {
         int j = Proc.shared_prng.get_uint(size - i);
-        swap(Proc.get_Ci_ref(r[0] + i), Proc.get_Ci_ref(r[0] + i + j));
+        swap(Proc.get_ci_ref(r[0] + i), Proc.get_ci_ref(r[0] + i + j));
     }
 }
 
@@ -110,10 +110,10 @@ void Instruction::bitdecint(ArithmeticProcessor& Proc) const
 {
     for (int j = 0; j < size; j++)
     {
-        long a = Proc.read_Ci(r[0] + j);
+        long a = Proc.read_ci(r[0] + j);
         for (unsigned int i = 0; i < start.size(); i++)
         {
-            Proc.get_Ci_ref(start[i] + j) = (a >> i) & 1;
+            Proc.get_ci_ref(start[i] + j) = (a >> i) & 1;
         }
     }
 }
@@ -145,7 +145,7 @@ void Instruction::groupsumint(StackedVector<Integer>& Ci) const
         res[j] = sum;
 }
 
-void Instruction::qs_perm(StackedVector<Integer>& Ci) const
+void Instruction::qs_permutation(StackedVector<Integer>& Ci) const
 {
     vector<span<Integer>> spans;
     for (int i = 0; i < 4; i++)
@@ -240,7 +240,7 @@ ostream& operator<<(ostream& s, const Instruction& instr)
     return s;
 }
 
-template void Instruction::execute_clear_gf2n(StackedVector<gf2n_short>& registers,
-        MemoryPart<gf2n_short>& memory, ArithmeticProcessor& Proc) const;
-template void Instruction::execute_clear_gf2n(StackedVector<gf2n_long>& registers,
-        MemoryPart<gf2n_long>& memory, ArithmeticProcessor& Proc) const;
+template void Instruction::execute_clear_gf2n(StackedVector<Gf2nShort>& registers,
+        MemoryPart<Gf2nShort>& memory, ArithmeticProcessor& Proc) const;
+template void Instruction::execute_clear_gf2n(StackedVector<Gf2nLong>& registers,
+        MemoryPart<Gf2nLong>& memory, ArithmeticProcessor& Proc) const;

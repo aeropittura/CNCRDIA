@@ -19,23 +19,23 @@ PRNG::PRNG() :
 {
 #if defined(__AES__) || !defined(__x86_64__)
   #ifdef USE_AES
-    useC=(Check_CPU_support_AES()==0);
+    use_c=(check_cpu_support_aes()==0);
   #endif
 #endif
 }
 
-PRNG::PRNG(octetStream& seed) : PRNG()
+PRNG::PRNG(OctetStream& seed) : PRNG()
 {
   SetSeed(seed.consume(SEED_SIZE));
 }
 
 PRNG::PRNG(const string& seed) : PRNG()
 {
-  octetStream os(seed);
+  OctetStream os(seed);
   SetSeed(os.consume(SEED_SIZE));
 }
 
-void PRNG::ReSeed()
+void PRNG::re_seed()
 {
   if (OnlineOptions::singleton.has_option("zero_seed"))
     {
@@ -44,26 +44,26 @@ void PRNG::ReSeed()
     }
   else
       randombytes_buf(seed, SEED_SIZE);
-  InitSeed();
+  initialize_seed();
 }
 
-void PRNG::SeedGlobally(const PlayerBase& P, const vector<bool>& parties)
+void PRNG::seed_globally(const PlayerBase& P, const vector<bool>& parties)
 {
-  octet seed[SEED_SIZE];
-  Create_Random_Seed(seed, P, SEED_SIZE, parties);
+  Octet seed[SEED_SIZE];
+  create_random_seed(seed, P, SEED_SIZE, parties);
   SetSeed(seed);
 }
 
-void PRNG::SeedGlobally(const Player& P, bool secure)
+void PRNG::seed_globally(const Player& P, bool secure)
 {
   if (secure)
-    SeedGlobally(static_cast<const PlayerBase&>(P));
+    seed_globally(static_cast<const PlayerBase&>(P));
   else
     {
-      octetStream os;
+      OctetStream os;
       if (P.my_num() == 0)
         {
-          ReSeed();
+          re_seed();
           os.append(seed, SEED_SIZE);
           P.send_all(os);
         }
@@ -71,25 +71,25 @@ void PRNG::SeedGlobally(const Player& P, bool secure)
         {
           P.receive_player(0, os);
           os.consume(seed, SEED_SIZE);
-          InitSeed();
+          initialize_seed();
         }
     }
 }
 
-void PRNG::SetSeed(const octet* inp)
+void PRNG::SetSeed(const Octet* inp)
 {
-  memcpy(seed,inp,SEED_SIZE*sizeof(octet));
-  InitSeed();
+  memcpy(seed,inp,SEED_SIZE*sizeof(Octet));
+  initialize_seed();
 }
 
 void PRNG::SetSeed(PRNG& G)
 {
-  octet tmp[SEED_SIZE];
+  Octet tmp[SEED_SIZE];
   G.get_octets(tmp, sizeof(tmp));
   SetSeed(tmp);
 }
 
-void PRNG::InitSeed()
+void PRNG::initialize_seed()
 {
   if (not (OnlineOptions::singleton.has_option("allow_zero_seed") or
       OnlineOptions::singleton.has_option("zero_seed")))
@@ -103,15 +103,15 @@ void PRNG::InitSeed()
 
   initialized = true;
   #ifdef USE_AES
-     if (useC)
-        { aes_schedule(KeyScheduleC,seed); }
+     if (use_c)
+        { aes_schedule(key_schedule_c,seed); }
      else
         { aes_schedule(KeySchedule,seed); }
-     memset(state,0,RAND_SIZE*sizeof(octet));
+     memset(state,0,RAND_SIZE*sizeof(Octet));
      for (int i = 0; i < PIPELINES * N_CACHE; i++)
          state[i*AES_BLK_SIZE] = i;
   #else
-     memcpy(state,seed,SEED_SIZE*sizeof(octet));
+     memcpy(state,seed,SEED_SIZE*sizeof(Octet));
   #endif
   cnt = RAND_SIZE;
   //cout << "SetSeed : "; print_state(); cout << endl;
@@ -155,10 +155,10 @@ void PRNG::hash()
     memcpy(seed, tmp + RAND_SIZE, SEED_SIZE);
   #else
     for (int i = start; i < N_CACHE; i++)
-      if (useC)
+      if (use_c)
         software_ecb_aes_128_encrypt<PIPELINES>(
             (__m128i*) (random + i * CALL_SIZE),
-            (__m128i*) (state + i * CALL_SIZE), KeyScheduleC);
+            (__m128i*) (state + i * CALL_SIZE), key_schedule_c);
       else
         ecb_aes_128_encrypt<PIPELINES>(
             (__m128i*) (random + i * CALL_SIZE),
@@ -215,7 +215,7 @@ unsigned int PRNG::get_uint(int upper)
 	return reduced;
 }
 
-void PRNG::get_octetStream(octetStream& ans,int len)
+void PRNG::get_octet_stream(OctetStream& ans,int len)
 {
   ans.resize(len);
   for (int i=0; i<len; i++)
@@ -225,15 +225,15 @@ void PRNG::get_octetStream(octetStream& ans,int len)
 }
 
 
-void PRNG::randomBnd(mp_limb_t* res, const mp_limb_t* B, size_t n_bytes, mp_limb_t mask)
+void PRNG::random_bnd(mp_limb_t* res, const mp_limb_t* B, size_t n_bytes, mp_limb_t mask)
 {
   switch (n_bytes)
   {
   case 16:
-    randomBnd<16>(res, B, mask);
+    random_bnd<16>(res, B, mask);
     return;
   case 32:
-    randomBnd<32>(res, B, mask);
+    random_bnd<32>(res, B, mask);
     return;
   default:
     {
@@ -241,7 +241,7 @@ void PRNG::randomBnd(mp_limb_t* res, const mp_limb_t* B, size_t n_bytes, mp_limb
       size_t n_limbs = (n_bytes + sizeof(mp_limb_t) - 1) / sizeof(mp_limb_t);
       do
       {
-        get_octets((octet*) res, n_bytes);
+        get_octets((Octet*) res, n_bytes);
         res[n_limbs - 1] &= mask;
       }
       while (mpn_cmp(res, B, n_limbs) >= 0);
@@ -250,12 +250,12 @@ void PRNG::randomBnd(mp_limb_t* res, const mp_limb_t* B, size_t n_bytes, mp_limb
 }
 
 template<>
-void PRNG::randomBnd(bigint& x, const bigint& B, bool positive)
+void PRNG::random_bnd(Bigint& x, const Bigint& B, bool positive)
 {
   int i = 0;
   do
     {
-      get(x, numBits(B), true);
+      get(x, num_bits(B), true);
       if (i++ > 1000)
         {
           cout << x << " - " << B << " = " << x - B << endl;
@@ -270,16 +270,16 @@ void PRNG::randomBnd(bigint& x, const bigint& B, bool positive)
     }
 }
 
-void PRNG::get(bigint& res, int n_bits, bool positive)
+void PRNG::get(Bigint& res, int n_bits, bool positive)
 {
   assert(n_bits > 0);
   int n_bytes = (n_bits + 7) / 8;
   int n_words = DIV_CEIL(n_bytes, sizeof(word));
   auto words = new word[n_words];
-  octet* bytes = (octet*) words;
+  Octet* bytes = (Octet*) words;
   words[n_words - 1] = 0;
   get_octets(bytes, n_bytes);
-  octet mask = -1;
+  Octet mask = -1;
   if (n_bits % 8 > 0)
     mask = (1 << (n_bits % 8)) - 1;
   bytes[n_bytes - 1] &= mask;
@@ -289,7 +289,7 @@ void PRNG::get(bigint& res, int n_bits, bool positive)
   delete[] words;
 }
 
-void PRNG::get_octets_call(octet* ans, int len)
+void PRNG::get_octets_call(Octet* ans, int len)
 {
   get_octets(ans, len);
 }

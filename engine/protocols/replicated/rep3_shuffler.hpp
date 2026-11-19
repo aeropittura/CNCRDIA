@@ -12,7 +12,7 @@ Rep3Shuffler<T>::Rep3Shuffler(SubProcessor<T> &proc) : proc(proc) {
 }
 
 template<class T>
-void Rep3Shuffler<T>::generate(int n_shuffle, shuffle_type& shuffle)
+void Rep3Shuffler<T>::generate(int n_shuffle, ShuffleType& shuffle)
 {
     for (int i = 0; i < 2; i++) {
         auto &perm = shuffle[i];
@@ -23,7 +23,7 @@ void Rep3Shuffler<T>::generate(int n_shuffle, shuffle_type& shuffle)
 
 template<class T>
 void Rep3Shuffler<T>::apply_multiple(StackedVector<T> &a,
-        vector<ShuffleTuple<shuffle_type>> &shuffles, bool multithread)
+        vector<ShuffleTuple<ShuffleType>> &shuffles, bool multithread)
 {
     CODE_LOCATION
 
@@ -47,7 +47,7 @@ void Rep3Shuffler<T>::apply_multiple(StackedVector<T> &a,
         if (shuffle.shuffle[0].empty())
             throw runtime_error("shuffle has been deleted");
 
-        stats[shuffle.size / shuffle.unit_size] += shuffle.unit_size;
+        statistics[shuffle.size / shuffle.unit_size] += shuffle.unit_size;
     }
 
     assert(not shuffles.empty());
@@ -77,7 +77,7 @@ void Rep3Shuffler<T>::apply_multiple(StackedVector<T> &a,
 
 template<class T>
 void Rep3Shuffler<T>::shuffle_job(StackedVector<T>& a,
-        const vector<ShuffleTuple<shuffle_type> >& shuffles, long begin, long end,
+        const vector<ShuffleTuple<ShuffleType> >& shuffles, long begin, long end,
         Player& P, ThreadQueues* queues)
 {
     const auto n_shuffles = shuffles.size();

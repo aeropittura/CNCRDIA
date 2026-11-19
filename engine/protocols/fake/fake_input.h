@@ -18,7 +18,7 @@ public:
     {
     }
 
-    FakeInput(SubProcessor<T>&, typename T::MAC_Check&)
+    FakeInput(SubProcessor<T>&, typename T::MacCheck&)
     {
     }
 
@@ -27,7 +27,7 @@ public:
         results.clear();
     }
 
-    void add_mine(const typename T::open_type& x, int = -1)
+    void add_mine(const typename T::OpenType& x, int = -1)
     {
         results.push_back(x);
     }
@@ -45,7 +45,7 @@ public:
         return results.next();
     }
 
-    void finalize_other(int, T&, octetStream&, int = -1)
+    void finalize_other(int, T&, OctetStream&, int = -1)
     {
         throw runtime_error("input from other parties not implemented");
     }

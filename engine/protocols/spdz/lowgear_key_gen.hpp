@@ -15,19 +15,19 @@
 #include "protocols/spdz/mascot_prep.hpp"
 
 template<int L>
-LowGearKeyGen<L>::LowGearKeyGen(Player& P, PairwiseMachine& machine,
-        FHE_Params& params) :
-        KeyGenProtocol<1, L>(P, params), P(P), machine(machine)
+LowGearKeyGenerator<L>::LowGearKeyGenerator(Player& P, PairwiseMachine& machine,
+        FheParameters& params) :
+        KeyGeneratorProtocol<1, L>(P, params), P(P), machine(machine)
 {
 }
 
 template<int X, int L>
-KeyGenProtocol<X, L>::KeyGenProtocol(Player& P, const FHE_Params& params,
+KeyGeneratorProtocol<X, L>::KeyGeneratorProtocol(Player& P, const FheParameters& params,
         int level) :
         P(P), params(params), fftd(params.FFTD().at(level)), usage(P)
 {
-    open_type::init_field(params.FFTD().at(level).get_prD().pr, false);
-    typename share_type::mac_key_type alphai;
+    OpenType::initialize_field(params.FFTD().at(level).get_pr_d().pr, false);
+    typename ShareType::MacKeyType alphai;
 
     auto& batch_size = OnlineOptions::singleton.batch_size;
     backup_batch_size = batch_size;
@@ -35,24 +35,24 @@ KeyGenProtocol<X, L>::KeyGenProtocol(Player& P, const FHE_Params& params,
 
     if (OnlineOptions::singleton.live_prep)
     {
-        prep = new MascotDabitOnlyPrep<share_type>(0, usage);
-        alphai = MascotDabitOnlyPrep<share_type>::get_mac_key(P);
+        prep = new MascotDabitOnlyPrep<ShareType>(0, usage);
+        alphai = MascotDabitOnlyPrep<ShareType>::get_mac_key(P);
     }
     else
     {
-        prep = new Sub_Data_Files<share_type>(P.N,
-                get_prep_sub_dir<share_type>(P.num_players()), usage);
-        read_mac_key(get_prep_sub_dir<share_type>(P.num_players()), P.N, alphai);
+        prep = new SubDataFiles<ShareType>(P.N,
+                get_prep_sub_directory<ShareType>(P.num_players()), usage);
+        read_mac_key(get_prep_sub_directory<ShareType>(P.num_players()), P.N, alphai);
     }
 
-    MC = new MAC_Check_<share_type>(alphai);
-    proc = new SubProcessor<share_type>(*MC, *prep, P);
+    MC = new MacCheck_<ShareType>(alphai);
+    proc = new SubProcessor<ShareType>(*MC, *prep, P);
 
     MC->setup(P);
 }
 
 template<int X, int L>
-KeyGenProtocol<X, L>::~KeyGenProtocol()
+KeyGeneratorProtocol<X, L>::~KeyGeneratorProtocol()
 {
     MC->Check(P);
 
@@ -64,19 +64,19 @@ KeyGenProtocol<X, L>::~KeyGenProtocol()
     delete MC;
 
     MC->teardown();
-    MascotDabitOnlyPrep<share_type>::teardown();
+    MascotDabitOnlyPrep<ShareType>::teardown();
 
     OnlineOptions::singleton.batch_size = backup_batch_size;
-    open_type::reset();
+    OpenType::reset();
 }
 
 template<int X, int L>
-void KeyGenProtocol<X, L>::input(vector<vector_type>& shares, const Rq_Element& secret)
+void KeyGeneratorProtocol<X, L>::input(vector<VectorType>& shares, const RqElement& secret)
 {
     assert(secret.level() == 0);
     auto s = secret.get(0);
     s.change_rep(evaluation);
-    auto& FFTD = s.get_FFTD();
+    auto& FFTD = s.get_fftd();
     auto& inputter = this->proc->input;
     inputter.reset_all(P);
     for (int i = 0; i < FFTD.num_slots(); i++)
@@ -94,7 +94,7 @@ void KeyGenProtocol<X, L>::input(vector<vector_type>& shares, const Rq_Element& 
  */
 template<int X, int L>
 template<class T>
-void KeyGenProtocol<X, L>::binomial(vector_type& shares, T& prep)
+void KeyGeneratorProtocol<X, L>::binomial(VectorType& shares, T& prep)
 {
     shares.resize(params.phi_m());
     RunningTimer timer, total;
@@ -111,7 +111,7 @@ void KeyGenProtocol<X, L>::binomial(vector_type& shares, T& prep)
 
         auto& share = shares[i];
         share = {};
-        for (int i = 0; i < params.get_DG().get_NewHopeB(); i++)
+        for (int i = 0; i < params.get_dg().get_new_hope_b(); i++)
         {
             share += prep.get_bit();
             share -= prep.get_bit();
@@ -122,7 +122,7 @@ void KeyGenProtocol<X, L>::binomial(vector_type& shares, T& prep)
 
 template<int X, int L>
 template<class T>
-void KeyGenProtocol<X, L>::secret_key(vector_type& shares, T& prep)
+void KeyGeneratorProtocol<X, L>::secret_key(VectorType& shares, T& prep)
 {
     cerr << "Generate secret key by ";
     cerr << "binomial" << endl;
@@ -130,13 +130,13 @@ void KeyGenProtocol<X, L>::secret_key(vector_type& shares, T& prep)
 }
 
 template<int X, int L>
-typename KeyGenProtocol<X, L>::vector_type KeyGenProtocol<X, L>::schur_product(
-        const vector_type& x, const vector_type& y)
+typename KeyGeneratorProtocol<X, L>::VectorType KeyGeneratorProtocol<X, L>::schur_product(
+        const VectorType& x, const VectorType& y)
 {
-    vector_type res;
+    VectorType res;
     assert(x.size() == y.size());
     auto& protocol = proc->protocol;
-    protocol.init_mul();
+    protocol.initialize_mult();
     for (size_t i = 0; i < x.size(); i++)
         protocol.prepare_mul(x[i], y[i]);
     protocol.exchange();
@@ -146,10 +146,10 @@ typename KeyGenProtocol<X, L>::vector_type KeyGenProtocol<X, L>::schur_product(
 }
 
 template<int X, int L>
-void KeyGenProtocol<X, L>::output_to(int player, vector<open_type>& opened,
-        vector<share_type>& shares)
+void KeyGeneratorProtocol<X, L>::output_to(int player, vector<OpenType>& opened,
+        vector<ShareType>& shares)
 {
-    PrivateOutput<share_type> po(*proc);
+    PrivateOutput<ShareType> po(*proc);
     for (auto& share : shares)
         po.prepare_sending(share, player);
     po.exchange();
@@ -159,32 +159,32 @@ void KeyGenProtocol<X, L>::output_to(int player, vector<open_type>& opened,
 }
 
 template<int L>
-void LowGearKeyGen<L>::generate_keys(FHE_Params& params)
+void LowGearKeyGenerator<L>::generate_keys(FheParameters& params)
 {
     RunningTimer timer;
     auto& pk = machine.pk;
 
-    GlobalPRNG global_prng(P);
-    auto& FFTD = pk.get_params().FFTD()[0];
+    GlobalPrng global_prng(P);
+    auto& FFTD = pk.get_parameters().FFTD()[0];
 
     for (int i = 0; i < P.num_players(); i++)
     {
-        vector_type sk;
+        VectorType sk;
         this->secret_key(sk, *this);
-        vector<open_type> open_sk;
+        vector<OpenType> open_sk;
         this->output_to(i, open_sk, sk);
         if (P.my_num() == i)
-            machine.sk.assign(Ring_Element(FFTD, evaluation, open_sk));
-        vector_type e0;
+            machine.sk.assign(RingElement(FFTD, evaluation, open_sk));
+        VectorType e0;
         this->binomial(e0, *this);
-        AddableVector<open_type> a0(pk.get_params().phi_m());
+        AddableVector<OpenType> a0(pk.get_parameters().phi_m());
         a0.randomize(global_prng);
-        vector<open_type> b0;
+        vector<OpenType> b0;
         assert(machine.sk.p() != 0);
         this->MC->POpen(b0, sk * a0 + e0 * machine.sk.p(), P);
         machine.other_pks[i] = FHE_PK(params, machine.sk.p());
-        machine.other_pks[i].assign(Ring_Element(FFTD, evaluation, a0),
-                Ring_Element(FFTD, evaluation, b0));
+        machine.other_pks[i].assign(RingElement(FFTD, evaluation, a0),
+                RingElement(FFTD, evaluation, b0));
     }
 
     this->MC->Check(P);
@@ -194,11 +194,11 @@ void LowGearKeyGen<L>::generate_keys(FHE_Params& params)
 
 template<int L>
 template<class FD>
-void LowGearKeyGen<L>::run(PairwiseSetup<FD>& setup)
+void LowGearKeyGenerator<L>::run(PairwiseSetup<FD>& setup)
 {
     CODE_LOCATION
     generate_keys(setup.params);
-    machine.sk.check(machine.pk, setup.FieldD);
+    machine.sk.check(machine.pk, setup.field_d);
 
     RunningTimer timer;
 
@@ -207,28 +207,28 @@ void LowGearKeyGen<L>::run(PairwiseSetup<FD>& setup)
     bool fresh = setup.alphai == 0;
 
     if (fresh)
-        mac_key = SeededPRNG().get<typename FD::T>();
+        mac_key = SeededPrng().get<typename FD::T>();
     else
         mac_key = setup.alphai;
 
     PairwiseGenerator<FD> generator(0, machine, &P);
     map<string, Timer> timers;
-    MultiEncCommit<FD> EC(P, machine.other_pks, setup.FieldD,
+    MultiEncCommit<FD> EC(P, machine.other_pks, setup.field_d,
             timers, machine, generator, true);
     assert(EC.proof.get_diagonal());
-    vector<Plaintext_<FD>> m(EC.proof.U, setup.FieldD);
+    vector<Plaintext_<FD>> m(EC.proof.U, setup.field_d);
     for (auto& mm : m)
         mm.assign_constant(mac_key);
 
     AddableVector<Ciphertext> C;
-    octetStream ciphertexts, cleartexts;
+    OctetStream ciphertexts, cleartexts;
     EC.get_proof().set_session_id(P);
     EC.generate_proof(C, m, ciphertexts, cleartexts);
 
     AddableVector<Ciphertext> others_ciphertexts;
-    others_ciphertexts.resize(EC.proof.U, machine.pk.get_params());
-    Verifier<FD> verifier(EC.proof, setup.FieldD);
-    verifier.NIZKPoK(others_ciphertexts, ciphertexts,
+    others_ciphertexts.resize(EC.proof.U, machine.pk.get_parameters());
+    Verifier<FD> verifier(EC.proof, setup.field_d);
+    verifier.nizk_pok(others_ciphertexts, ciphertexts,
             cleartexts, machine.pk, P.my_num());
 
     machine.enc_alphas.clear();
@@ -250,7 +250,7 @@ void LowGearKeyGen<L>::run(PairwiseSetup<FD>& setup)
         cerr << "Checking proof of player " << i << endl;
 #endif
         timers["Verifying"].start();
-        verifier.NIZKPoK(others_ciphertexts, ciphertexts,
+        verifier.nizk_pok(others_ciphertexts, ciphertexts,
                 cleartexts, machine.other_pks[player], player);
         timers["Verifying"].stop();
         machine.enc_alphas.at(player) = others_ciphertexts.at(0);
@@ -259,8 +259,8 @@ void LowGearKeyGen<L>::run(PairwiseSetup<FD>& setup)
     setup.set_alphai(mac_key);
     machine.enc_alphas.at(P.my_num()) = C.at(0);
 
-    auto test = machine.sk.decrypt(C[0], setup.FieldD);
-    for (int i = 0; i < setup.FieldD.num_slots(); i++)
+    auto test = machine.sk.decrypt(C[0], setup.field_d);
+    for (int i = 0; i < setup.field_d.num_slots(); i++)
         assert(test.element(i) == mac_key);
 
     cerr << "MAC key generation took " << timer.elapsed() << " seconds" << endl;

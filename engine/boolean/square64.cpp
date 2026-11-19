@@ -1,5 +1,5 @@
 /*
- * boolean/square64.cpp
+ * boolean/Square64.cpp
  *
  */
 
@@ -12,20 +12,20 @@
 #include <assert.h>
 using namespace std;
 
-union matrix32x8
+union Matrix32x8
 {
     __m256i whole;
-    octet rows[32];
+    Octet rows[32];
 
-    matrix32x8(const __m256i& x = _mm256_setzero_si256()) : whole(x) {}
+    Matrix32x8(const __m256i& x = _mm256_setzero_si256()) : whole(x) {}
 
-    matrix32x8(square64& input, int x, int y)
+    Matrix32x8(Square64& input, int x, int y)
     {
         for (int l = 0; l < 32; l++)
             rows[l] = input.bytes[32*x+l][y];
     }
 
-    void transpose(square64& output, int x, int y)
+    void transpose(Square64& output, int x, int y)
     {
 #if defined(__AVX2__) || !defined(__x86_64__)
         if (cpu_has_avx2())
@@ -94,7 +94,7 @@ void zip(int chunk_size, __m256i& lows, __m256i& highs,
     }
 }
 
-void square64::transpose(int n_rows, int n_cols)
+void Square64::transpose(int n_rows, int n_cols)
 {
 #ifdef DEBUG_TRANS
     cout << "transpose" << endl;
@@ -105,7 +105,7 @@ void square64::transpose(int n_rows, int n_cols)
     assert(n_cols <= 64);
 
 #ifndef __AVX2__
-    square128 tmp2;
+    Square128 tmp2;
     tmp2.set_zero();
     for (int i = 0; i < n_rows; i++)
         tmp2.rows[i] = _mm_cvtsi64_si128(rows[i]);
@@ -116,7 +116,7 @@ void square64::transpose(int n_rows, int n_cols)
     return;
 #endif
 
-    square64 tmp = *this;
+    Square64 tmp = *this;
     *this = {};
 
     for (int k = 0; k < DIV_CEIL(n_rows, 32); k++)
@@ -211,7 +211,7 @@ void square64::transpose(int n_rows, int n_cols)
         int perm[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
         for (int i = 0; i < DIV_CEIL(n_cols, 8); i++)
         {
-            matrix32x8(x[perm[i]]).transpose(*this, i, k);
+            Matrix32x8(x[perm[i]]).transpose(*this, i, k);
         }
     }
 #ifdef DEBUG_TRANS
@@ -220,7 +220,7 @@ void square64::transpose(int n_rows, int n_cols)
 #endif
 }
 
-bool square64::operator !=(const square64& other)
+bool Square64::operator !=(const Square64& other)
 {
     for (int i = 0; i < 64; i++)
         if (rows[i] != other.rows[i])
@@ -229,7 +229,7 @@ bool square64::operator !=(const square64& other)
 }
 
 
-void square64::print()
+void Square64::print()
 {
     for (int i = 0; i < 64; i++)
     {

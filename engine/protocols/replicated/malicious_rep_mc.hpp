@@ -15,27 +15,27 @@
 #include <stdlib.h>
 
 template<class T>
-void MaliciousRepMC<T>::POpen_Begin(vector<typename T::open_type>& values,
+void MaliciousRepOpener<T>::POpen_Begin(vector<typename T::OpenType>& values,
         const vector<T>& S, const Player& P)
 {
-    super::POpen_Begin(values, S, P);
+    Super::POpen_Begin(values, S, P);
 }
 
 template<class T>
-HashMaliciousRepMC<T>::HashMaliciousRepMC()
+HashMaliciousRepOpener<T>::HashMaliciousRepOpener()
 {
     reset();
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::reset()
+void HashMaliciousRepOpener<T>::reset()
 {
     hash.reset();
     needs_checking = false;
 }
 
 template<class T>
-HashMaliciousRepMC<T>::~HashMaliciousRepMC()
+HashMaliciousRepOpener<T>::~HashMaliciousRepOpener()
 {
     if (needs_checking)
     {
@@ -45,7 +45,7 @@ HashMaliciousRepMC<T>::~HashMaliciousRepMC()
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::POpen(vector<typename T::open_type>& values,
+void HashMaliciousRepOpener<T>::POpen(vector<typename T::OpenType>& values,
         const vector<T>& S, const Player& P)
 {
     prepare(S, P);
@@ -54,11 +54,11 @@ void HashMaliciousRepMC<T>::POpen(vector<typename T::open_type>& values,
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::prepare(const vector<T>& secrets, const Player& P)
+void HashMaliciousRepOpener<T>::prepare(const vector<T>& secrets, const Player& P)
 {
     to_send.resize(3);
     auto& value_buffer = to_send.at(P.get_player(-1));
-    auto buffer_size = secrets.size() * T::open_type::size();
+    auto buffer_size = secrets.size() * T::OpenType::size();
     value_buffer.reset_reserve(buffer_size);
     hash_buffer.reset_reserve(buffer_size);
     for (auto& x : secrets)
@@ -70,7 +70,7 @@ void HashMaliciousRepMC<T>::prepare(const vector<T>& secrets, const Player& P)
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::finalize(vector<typename T::open_type>& values,
+void HashMaliciousRepOpener<T>::finalize(vector<typename T::OpenType>& values,
         const vector<T>& secrets, const Player& P)
 {
     auto& received_values = to_receive.at(P.get_player(1));
@@ -79,15 +79,15 @@ void HashMaliciousRepMC<T>::finalize(vector<typename T::open_type>& values,
     {
         values.push_back(
                 x.sum() + received_values.template
-                get<typename T::open_type>());
+                get<typename T::OpenType>());
     }
     received_values.hash(hash_buffer);
     if (hash_buffer != to_receive.at(P.get_player(-1)))
-        throw mac_fail("check hash mismatch");
+        throw MacFail("check hash mismatch");
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::POpen_Begin(vector<typename T::open_type>&,
+void HashMaliciousRepOpener<T>::POpen_Begin(vector<typename T::OpenType>&,
         const vector<T>& S, const Player& P)
 {
     prepare(S, P);
@@ -95,7 +95,7 @@ void HashMaliciousRepMC<T>::POpen_Begin(vector<typename T::open_type>&,
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::POpen_End(vector<typename T::open_type>& values,
+void HashMaliciousRepOpener<T>::POpen_End(vector<typename T::OpenType>& values,
         const vector<T>& S, const Player& P)
 {
     P.receive_all(to_receive);
@@ -103,26 +103,26 @@ void HashMaliciousRepMC<T>::POpen_End(vector<typename T::open_type>& values,
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::exchange(const Player& P)
+void HashMaliciousRepOpener<T>::exchange(const Player& P)
 {
     POpen(this->values, this->secrets, P);
 }
 
 template<class T>
-typename T::open_type HashMaliciousRepMC<T>::finalize_raw()
+typename T::OpenType HashMaliciousRepOpener<T>::finalize_raw()
 {
-    return MAC_Check_Base<T>::finalize_raw();
+    return MacCheckBase<T>::finalize_raw();
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::update()
+void HashMaliciousRepOpener<T>::update()
 {
     hash.update(os);
     needs_checking = true;
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::CheckFor(const typename T::open_type& value,
+void HashMaliciousRepOpener<T>::check_for(const typename T::OpenType& value,
         const vector<T>& check_shares, const Player& P)
 {
     os.reset_reserve(check_shares.size() * T::size());
@@ -148,23 +148,23 @@ void HashMaliciousRepMC<T>::CheckFor(const typename T::open_type& value,
 }
 
 template<class T>
-void HashMaliciousRepMC<T>::Check(const Player& P)
+void HashMaliciousRepOpener<T>::Check(const Player& P)
 {
     if (needs_checking)
     {
         CODE_LOCATION
-        vector<octetStream> os(P.num_players());
+        vector<OctetStream> os(P.num_players());
         hash.final(os[P.my_num()]);
         reset();
-        P.Broadcast_Receive(os);
+        P.broadcast_receive(os);
         for (int i = 0; i < P.num_players(); i++)
             if (os[i] != os[P.my_num()])
-                throw mac_fail("check hash mismatch");
+                throw MacFail("check hash mismatch");
     }
 }
 
 template<class T>
-void CommMaliciousRepMC<T>::POpen(vector<typename T::clear>& values,
+void CommunicationMaliciousRepOpener<T>::POpen(vector<typename T::clear>& values,
         const vector<T>& S, const Player& P)
 {
     POpen_Begin(values, S, P);
@@ -172,7 +172,7 @@ void CommMaliciousRepMC<T>::POpen(vector<typename T::clear>& values,
 }
 
 template<class T>
-void CommMaliciousRepMC<T>::POpen_Begin(vector<typename T::clear>& values,
+void CommunicationMaliciousRepOpener<T>::POpen_Begin(vector<typename T::clear>& values,
         const vector<T>& S, const Player& P)
 {
     assert(T::vector_length == 2);
@@ -188,19 +188,19 @@ void CommMaliciousRepMC<T>::POpen_Begin(vector<typename T::clear>& values,
 }
 
 template<class T>
-void CommMaliciousRepMC<T>::POpen_End(vector<typename T::clear>& values,
+void CommunicationMaliciousRepOpener<T>::POpen_End(vector<typename T::clear>& values,
         const vector<T>& S, const Player& P)
 {
     (void) P;
     if (os[0] != os[1])
-        throw mac_fail();
+        throw MacFail();
     values.clear();
     for (auto& x : S)
         values.push_back(os[0].template get<BitVec>() + x.sum());
 }
 
 template<class T>
-void CommMaliciousRepMC<T>::Check(const Player& P)
+void CommunicationMaliciousRepOpener<T>::Check(const Player& P)
 {
     (void)P;
 }

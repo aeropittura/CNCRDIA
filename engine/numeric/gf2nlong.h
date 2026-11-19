@@ -20,61 +20,61 @@ using namespace std;
 
 bool is_ge(__m128i a, __m128i b);
 
-class int128
+class Int128
 {
 public:
     __m128i a;
 
-    int128() : a(_mm_setzero_si128()) { }
-    int128(const __m128i& a) : a(a) { }
-    int128(const word& a) : a(_mm_cvtsi64_si128(a)) { }
-    int128(const word& upper, const word& lower) : a(_mm_set_epi64x(upper, lower)) { }
+    Int128() : a(_mm_setzero_si128()) { }
+    Int128(const __m128i& a) : a(a) { }
+    Int128(const word& a) : a(_mm_cvtsi64_si128(a)) { }
+    Int128(const word& upper, const word& lower) : a(_mm_set_epi64x(upper, lower)) { }
 
     word get_lower() const                      { return (word)_mm_cvtsi128_si64(a); }
     word get_upper() const     { return _mm_cvtsi128_si64(_mm_unpackhi_epi64(a, a)); }
     word get_half(bool upper) const { return upper ? get_upper() : get_lower(); }
 
 #ifdef __SSE4_1__
-    bool operator==(const int128& other) const  { return _mm_test_all_zeros(a ^ other.a, a ^ other.a); }
+    bool operator==(const Int128& other) const  { return _mm_test_all_zeros(a ^ other.a, a ^ other.a); }
 #else
-    bool operator==(const int128& other) const  { return get_lower() == other.get_lower() and get_upper() == other.get_upper(); }
+    bool operator==(const Int128& other) const  { return get_lower() == other.get_lower() and get_upper() == other.get_upper(); }
 #endif
-    bool operator!=(const int128& other) const  { return !(*this == other); }
+    bool operator!=(const Int128& other) const  { return !(*this == other); }
 
-    bool operator>=(const int128& other) const  { return is_ge(a, other.a); }
+    bool operator>=(const Int128& other) const  { return is_ge(a, other.a); }
 
-    int128 operator<<(const int& other) const;
-    int128 operator>>(const int& other) const;
+    Int128 operator<<(const int& other) const;
+    Int128 operator>>(const int& other) const;
 
-    int128 operator^(const int128& other) const { return a ^ other.a; }
-    int128 operator|(const int128& other) const { return a | other.a; }
-    int128 operator&(const int128& other) const { return a & other.a; }
+    Int128 operator^(const Int128& other) const { return a ^ other.a; }
+    Int128 operator|(const Int128& other) const { return a | other.a; }
+    Int128 operator&(const Int128& other) const { return a & other.a; }
 
-    int128 operator~() const                    { return ~a; }
+    Int128 operator~() const                    { return ~a; }
 
-    int128& operator<<=(const int& other)       { return *this = *this << other; }
-    int128& operator>>=(const int& other)       { return *this = *this >> other; }
+    Int128& operator<<=(const int& other)       { return *this = *this << other; }
+    Int128& operator>>=(const int& other)       { return *this = *this >> other; }
 
-    int128& operator^=(const int128& other)     { a ^= other.a; return *this; }
-    int128& operator|=(const int128& other)     { a |= other.a; return *this; }
-    int128& operator&=(const int128& other)     { a &= other.a; return *this; }
+    Int128& operator^=(const Int128& other)     { a ^= other.a; return *this; }
+    Int128& operator|=(const Int128& other)     { a |= other.a; return *this; }
+    Int128& operator&=(const Int128& other)     { a &= other.a; return *this; }
 
-    friend ostream& operator<<(ostream& s, const int128& a);
-    friend istream& operator>>(istream& s, int128& a);
+    friend ostream& operator<<(ostream& s, const Int128& a);
+    friend istream& operator>>(istream& s, Int128& a);
 
     bool get_bit(int i) const;
 
     void randomize(PRNG& G)                     { *this = G.get_doubleword(); }
 
-    void to(int128& other)                      { other = *this; }
+    void to(Int128& other)                      { other = *this; }
     void to(word& other)                        { other = get_lower(); }
 
-    void pack(octetStream& os) const;
-    void unpack(octetStream& os);
+    void pack(OctetStream& os) const;
+    void unpack(OctetStream& os);
 };
 
 template<class T>
-class bit_plus
+class BitPlus
 {
     static const int N_BITS = 8 * sizeof(T);
 
@@ -82,32 +82,32 @@ class bit_plus
     bool msb;
 
 public:
-    bit_plus() : msb(false) { }
-    bit_plus(T lower, bool msb) : lower(lower), msb(msb) { }
+    BitPlus() : msb(false) { }
+    BitPlus(T lower, bool msb) : lower(lower), msb(msb) { }
     template<class U>
-    bit_plus(U a) : lower(a), msb(false) { }
+    BitPlus(U a) : lower(a), msb(false) { }
     T get_lower() { return lower; }
-    bool operator==(const bit_plus& other)
+    bool operator==(const BitPlus& other)
         { return (lower == other.lower) && (msb == other.msb); }
-    bool operator!=(const bit_plus& other)
+    bool operator!=(const BitPlus& other)
         { return !(*this == other); }
-    bool operator>=(const bit_plus& other)
+    bool operator>=(const BitPlus& other)
         { return msb == other.msb ? lower >= other.lower : msb > other.msb; }
-    bit_plus operator<<(int other)
-        { return bit_plus(lower << other, ((lower >> (N_BITS-other)) & 1) != 0); }
-    bit_plus& operator>>=(int other)
+    BitPlus operator<<(int other)
+        { return BitPlus(lower << other, ((lower >> (N_BITS-other)) & 1) != 0); }
+    BitPlus& operator>>=(int other)
         { lower >>= other; lower |= (T(msb) << (N_BITS-other)); msb = !other; return *this; }
-    bit_plus operator^(const bit_plus& other)
-        { return bit_plus(lower ^ other.lower, msb ^ other.msb); }
-    bit_plus& operator^=(const bit_plus& other)
+    BitPlus operator^(const BitPlus& other)
+        { return BitPlus(lower ^ other.lower, msb ^ other.msb); }
+    BitPlus& operator^=(const BitPlus& other)
         { lower ^= other.lower; msb ^= other.msb; return *this; }
-    bit_plus operator&(const word& other)
-        { return bit_plus(lower & other, false); }
-    friend ostream& operator<<(ostream& s, const bit_plus& a)
+    BitPlus operator&(const word& other)
+        { return BitPlus(lower & other, false); }
+    friend ostream& operator<<(ostream& s, const BitPlus& a)
         { s << a.msb << a.lower; return s; }
 };
 
-typedef bit_plus<int128> int129;
+typedef BitPlus<Int128> Int129;
 
 
 template<class T> class Input;
@@ -131,52 +131,52 @@ class NoValue;
   Arithmetic in Gf_{2^n} with n<=128
 */
 
-class gf2n_long : public gf2n_<int128>
+class Gf2nLong : public Gf2n_<Int128>
 {
-  typedef gf2n_<int128> super;
+  typedef Gf2n_<Int128> Super;
 
   public:
 
-  typedef gf2n_long value_type;
-  typedef gf2n_long next;
-  typedef ::Square<gf2n_long> Square;
+  typedef Gf2nLong value_type;
+  typedef Gf2nLong next;
+  typedef ::Square<Gf2nLong> Square;
 
-  typedef gf2n_long Scalar;
+  typedef Gf2nLong Scalar;
 
   static int default_degree() { return 128; }
 
   static string type_string() { return "gf2n_long"; }
   word get_word() const { return this->a.get_lower(); }
 
-  static gf2n_long cut(int128 x) { return x; }
+  static Gf2nLong cut(Int128 x) { return x; }
 
-  gf2n_long()              { assign_zero(); }
-  gf2n_long(const super& g) : super(g) {}
-  gf2n_long(const int128& g) : super(g) {}
-  gf2n_long(int g) : gf2n_long(int128(unsigned(g))) {}
-  gf2n_long(long g) : gf2n_long(int128(g)) {}
-  gf2n_long(word g) : gf2n_long(int128(g)) {}
+  Gf2nLong()              { assign_zero(); }
+  Gf2nLong(const Super& g) : Super(g) {}
+  Gf2nLong(const Int128& g) : Super(g) {}
+  Gf2nLong(int g) : Gf2nLong(Int128(unsigned(g))) {}
+  Gf2nLong(long g) : Gf2nLong(Int128(g)) {}
+  Gf2nLong(word g) : Gf2nLong(Int128(g)) {}
   template<class T>
-  gf2n_long(IntBase<T> g) : super(g.get()) {}
+  Gf2nLong(IntBase<T> g) : Super(g.get()) {}
   template<class T>
-  gf2n_long(const gf2n_<T>& a) : super(int128(a.get())) {}
+  Gf2nLong(const Gf2n_<T>& a) : Super(Int128(a.get())) {}
 };
 
 #if defined(__aarch64__) && defined(__clang__)
-inline __m128i my_slli(int128 x, int i)
+inline __m128i my_slli(Int128 x, int i)
 {
   if (i < 64)
-    return int128(x.get_upper() << i, x.get_lower() << i).a;
+    return Int128(x.get_upper() << i, x.get_lower() << i).a;
   else
-    return int128().a;
+    return Int128().a;
 }
 
-inline __m128i my_srli(int128 x, int i)
+inline __m128i my_srli(Int128 x, int i)
 {
   if (i < 64)
-    return int128(x.get_upper() >> i, x.get_lower() >> i).a;
+    return Int128(x.get_upper() >> i, x.get_lower() >> i).a;
   else
-    return int128().a;
+    return Int128().a;
 }
 
 #undef _mm_slli_epi64
@@ -185,9 +185,9 @@ inline __m128i my_srli(int128 x, int i)
 #define _mm_srli_epi64 my_srli
 #endif
 
-inline int128 int128::operator<<(const int& other) const
+inline Int128 Int128::operator<<(const int& other) const
 {
-  int128 res(_mm_slli_epi64(a, other));
+  Int128 res(_mm_slli_epi64(a, other));
   __m128i mask;
   if (other < 64)
     mask = _mm_srli_epi64(a, 64 - other);
@@ -197,9 +197,9 @@ inline int128 int128::operator<<(const int& other) const
   return res;
 }
 
-inline int128 int128::operator>>(const int& other) const
+inline Int128 Int128::operator>>(const int& other) const
 {
-  int128 res(_mm_srli_epi64(a, other));
+  Int128 res(_mm_srli_epi64(a, other));
   __m128i mask;
   if (other < 64)
     mask = _mm_slli_epi64(a, 64 - other);
@@ -214,9 +214,9 @@ void mul(word x, word y, word& lo, word& hi);
 inline __m128i software_clmul(__m128i a, __m128i b, int choice)
 {
     word lo, hi;
-    mul(int128(a).get_half(choice & 1),
-            int128(b).get_half((choice & 0x10) >> 4), lo, hi);
-    return int128(hi, lo).a;
+    mul(Int128(a).get_half(choice & 1),
+            Int128(b).get_half((choice & 0x10) >> 4), lo, hi);
+    return Int128(hi, lo).a;
 }
 
 template<int choice>
@@ -251,12 +251,12 @@ inline void mul128(__m128i a, __m128i b, __m128i *res1, __m128i *res2)
     *res2 = tmp6;
 }
 
-inline void mul(int128 a, int128 b, int128& lo, int128& hi)
+inline void mul(Int128 a, Int128 b, Int128& lo, Int128& hi)
 {
     mul128(a.a, b.a, &lo.a, &hi.a);
 }
 
-inline bool int128::get_bit(int i) const
+inline bool Int128::get_bit(int i) const
 {
     if (i < 64)
         return (get_lower() >> i) & 1;

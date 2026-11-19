@@ -9,28 +9,28 @@
 #include "support/code_locations.h"
 
 template<class T>
-void Create_Random(T& ans,const Player& P)
+void create_random(T& ans,const Player& P)
 {
   CODE_LOCATION
   PRNG G;
-  G.ReSeed();
+  G.re_seed();
   vector<T> e(P.num_players());
-  vector<octetStream> Comm_e(P.num_players());
-  vector<octetStream> Open_e(P.num_players());
+  vector<OctetStream> communication_e(P.num_players());
+  vector<OctetStream> open_e(P.num_players());
 
   e[P.my_num()].randomize(G);
-  octetStream ee;
+  OctetStream ee;
   e[P.my_num()].pack(ee);
-  Commit(Comm_e[P.my_num()],Open_e[P.my_num()],ee,P.my_num());
-  P.Broadcast_Receive(Comm_e);
+  Commit(communication_e[P.my_num()],open_e[P.my_num()],ee,P.my_num());
+  P.broadcast_receive(communication_e);
 
-  P.Broadcast_Receive(Open_e);
+  P.broadcast_receive(open_e);
 
   ans.assign_zero();
   for (int i = 0; i < P.num_players(); i++)
     { if (i != P.my_num())
-        { if (!Open(ee,Comm_e[i],Open_e[i],i))
-             { throw invalid_commitment(); }
+        { if (!Open(ee,communication_e[i],open_e[i],i))
+             { throw InvalidCommitment(); }
           e[i].unpack(ee);
           }
       ans += e[i];

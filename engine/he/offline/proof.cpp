@@ -11,7 +11,7 @@
 
 double Proof::dist = 0;
 
-bigint Proof::slack(int slack, int sec, int phim)
+Bigint Proof::slack(int slack, int sec, int phim)
 {
   switch (slack)
   {
@@ -26,30 +26,30 @@ bigint Proof::slack(int slack, int sec, int phim)
       return 0;
     case ACTIVE_SPDZ2_SLACK:
       cout << "Computing slack for active SPDZ2 proof" << endl;
-      return EncCommit_<FFT_Data>::active_slack(phim);
+      return EncCommit_<FftData>::active_slack(phim);
     default:
       if (slack < 0)
         throw runtime_error("slack type unknown");
-      return bigint(1) << slack;
+      return Bigint(1) << slack;
   }
 }
 
 void Proof::set_session_id(const PlayerBase& P)
 {
   session_id.reset_write_head();
-  Create_Random_Seed(session_id.append(SEED_SIZE), P, SEED_SIZE);
+  create_random_seed(session_id.append(SEED_SIZE), P, SEED_SIZE);
   if (OnlineOptions::singleton.has_option("debug_challenge"))
       cerr << "new session id: " << session_id << endl;
 }
 
-void Proof::set_challenge(const octetStream& ciphertexts, int prover,
+void Proof::set_challenge(const OctetStream& ciphertexts, int prover,
     const FHE_PK& pk)
 {
   Hash hasher;
   assert(not session_id.empty());
   hasher.update(session_id);
   hasher.update(&prover, sizeof(prover));
-  octetStream os;
+  OctetStream os;
   pk.pack(os);
   hasher.update(os);
   hasher.update(ciphertexts);
@@ -58,7 +58,7 @@ void Proof::set_challenge(const octetStream& ciphertexts, int prover,
       cerr << "use session id: " << session_id << endl;
       cerr << "prover " << prover << endl;
   }
-  octetStream hash = hasher.final();
+  OctetStream hash = hasher.final();
   PRNG G;
   assert(hash.get_length() >= SEED_SIZE);
   G.SetSeed(hash.get_data());
@@ -88,7 +88,7 @@ void Proof::set_challenge(PRNG& G)
 
 void Proof::generate_challenge(const Player& P)
 {
-  GlobalPRNG G(P);
+  GlobalPrng G(P);
   set_challenge(G);
 }
 
@@ -115,9 +115,9 @@ bool Proof::check_bounds(T& z, X& t, int i) const
   unsigned int j,k;
 
   // Check Bound 1 and Bound 2
-  AbsoluteBoundChecker<bound_type> plain_checker(plain_check * n_proofs);
-  AbsoluteBoundChecker<typename Int_Random_Coins::rand_type> rand_checker(
-      rand_check * n_proofs);
+  AbsoluteBoundChecker<BoundType> plain_checker(plain_check * n_proofs);
+  AbsoluteBoundChecker<typename IntRandomCoins::rand_type> random_checker(
+      random_check * n_proofs);
   for (j=0; j<phim; j++)
     {
       auto& te = z[j];
@@ -137,11 +137,11 @@ bool Proof::check_bounds(T& z, X& t, int i) const
       for (j=0; j<coeffs.size(); j++)
         {
           auto& te = coeffs.at(j);
-          if (rand_checker.outside(te, dist))
+          if (random_checker.outside(te, dist))
             {
 #ifdef VERBOSE
               cout << "Fail on Check 2 " << k << " : " << i << " " << j << endl;
-              cout << te << "  " << rand_check << endl;
+              cout << te << "  " << random_check << endl;
               cout << rho << " " << sec << " " << n_proofs << endl;
 #endif
               return false;
@@ -151,19 +151,19 @@ bool Proof::check_bounds(T& z, X& t, int i) const
   return true;
 }
 
-Proof::Preimages::Preimages(int size, const FHE_PK& pk, const bigint& p, int n_players) :
-    r(size, pk.get_params())
+Proof::Preimages::Preimages(int size, const FHE_PK& pk, const Bigint& p, int n_players) :
+    r(size, pk.get_parameters())
 {
-  m.resize(size, pk.get_params().phi_m());
+  m.resize(size, pk.get_parameters().phi_m());
   // extra limb for addition
-  bigint limit = p << (64 + n_players);
+  Bigint limit = p << (64 + n_players);
   m.allocate_slots(limit);
   r.allocate_slots(n_players);
-  m_tmp = m[0][0];
-  r_tmp = r[0][0];
+  m_temp = m[0][0];
+  r_temp = r[0][0];
 }
 
-void Proof::Preimages::add(octetStream& os)
+void Proof::Preimages::add(OctetStream& os)
 {
   check_sizes();
   unsigned int size;
@@ -172,12 +172,12 @@ void Proof::Preimages::add(octetStream& os)
     throw length_error("unexpected size received");
   for (size_t i = 0; i < m.size(); i++)
     {
-      m[i].add(os, m_tmp);
-      r[i].add(os, r_tmp);
+      m[i].add(os, m_temp);
+      r[i].add(os, r_temp);
     }
 }
 
-void Proof::Preimages::pack(octetStream& os)
+void Proof::Preimages::pack(OctetStream& os)
 {
   check_sizes();
   os.store((unsigned int)m.size());
@@ -188,7 +188,7 @@ void Proof::Preimages::pack(octetStream& os)
     }
 }
 
-void Proof::Preimages::unpack(octetStream& os)
+void Proof::Preimages::unpack(OctetStream& os)
 {
   unsigned int size;
   os.get(size);

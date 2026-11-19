@@ -13,19 +13,19 @@ class Prover
   AddableVector< Plaintext_<FD> > y;
 
 #ifdef LESS_ALLOC_MORE_MEM
-  AddableVector<typename Proof::bound_type> z;
-  AddableMatrix<Int_Random_Coins::value_type::value_type> t;
+  AddableVector<typename Proof::BoundType> z;
+  AddableMatrix<IntRandomCoins::value_type::value_type> t;
 #endif
 
 public:
   size_t volatile_memory;
 
-  Prover(Proof& proof, const FD& FieldD);
+  Prover(Proof& proof, const FD& field_d);
 
-  void Stage_1(const Proof& P, octetStream& ciphertexts, const AddableVector<Ciphertext>& c,
+  void stage_1(const Proof& P, OctetStream& ciphertexts, const AddableVector<Ciphertext>& c,
       const FHE_PK& pk);
 
-  bool Stage_2(Proof& P, octetStream& cleartexts,
+  bool stage_2(Proof& P, OctetStream& cleartexts,
                const vector<U>& x,
                const Proof::Randomness& r,
                const FHE_PK& pk);
@@ -34,7 +34,7 @@ public:
       - If Diag is true then the plaintexts x are assumed to be
         diagonal elements, i.e. x=(x_1,x_1,...,x_1)
   */
-  size_t NIZKPoK(Proof& P, octetStream& ciphertexts, octetStream& cleartexts,
+  size_t nizk_pok(Proof& P, OctetStream& ciphertexts, OctetStream& cleartexts,
 	       const FHE_PK& pk,
                const AddableVector<Ciphertext>& c,
                const vector<U>& x,

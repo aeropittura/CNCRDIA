@@ -10,15 +10,15 @@
 #include "ot/mascot_mac_key.h"
 
 template<class T>
-class OTPrep : public virtual BitPrep<T>
+class OtPrep : public virtual BitPrep<T>
 {
 public:
     typename T::TripleGenerator* triple_generator;
 
-    MascotParams params;
+    MascotParameters params;
 
-    OTPrep(SubProcessor<T>* proc, DataPositions& usage);
-    ~OTPrep();
+    OtPrep(SubProcessor<T>* proc, DataPositions& usage);
+    ~OtPrep();
 
     void set_protocol(typename T::Protocol& protocol);
 };
@@ -27,17 +27,17 @@ public:
  * MASCOT input tuple generation
  */
 template<class T>
-class MascotInputPrep : public OTPrep<T>
+class MascotInputPrep : public OtPrep<T>
 {
     void buffer_inputs(int player);
 
 public:
-    static typename T::mac_key_type get_mac_key(Player& P, bool = false);
+    static typename T::MacKeyType get_mac_key(Player& P, bool = false);
     static void teardown();
 
     MascotInputPrep(SubProcessor<T> *proc, DataPositions &usage) :
             BufferPrep<T>(usage), BitPrep<T>(proc, usage),
-            OTPrep<T>(proc, usage)
+            OtPrep<T>(proc, usage)
     {
     }
 };
@@ -133,7 +133,7 @@ public:
 };
 
 template<class T>
-typename T::mac_key_type MascotInputPrep<T>::get_mac_key(Player& P, bool)
+typename T::MacKeyType MascotInputPrep<T>::get_mac_key(Player& P, bool)
 {
     auto mac_key = T::TripleGenerator::get_mac_key(P);
     T::set_mac_key(mac_key);

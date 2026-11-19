@@ -17,53 +17,53 @@
  * Sending and receiving is done in separate threads to allow
  * for bidirectional communication.
  */
-class CryptoPlayer : public MultiPlayer<ssl_socket*>
+class CryptoPlayer : public MultiPlayer<SslSocket*>
 {
-    ssl_ctx ctx;
-    ssl_service io_service;
+    SslContext ctx;
+    SslService io_service;
 
-    vector<ssl_socket*> other_sockets;
+    vector<SslSocket*> other_sockets;
 
-    vector<Sender<ssl_socket*>*> senders;
-    vector<Receiver<ssl_socket*>*> receivers;
+    vector<Sender<SslSocket*>*> senders;
+    vector<Receiver<SslSocket*>*> receivers;
 
     void connect(int other, vector<int>* plaintext_sockets);
 
 public:
     /**
      * Start a new set of encrypted connections.
-     * @param Nms network setup
+     * @param nms network setup
      * @param id unique identifier
      */
-    CryptoPlayer(const Names& Nms, const string& id);
+    CryptoPlayer(const Names& nms, const string& id);
     // legacy interface
-    CryptoPlayer(const Names& Nms, int id_base = 0);
+    CryptoPlayer(const Names& nms, int id_base = 0);
     ~CryptoPlayer();
 
     bool is_encrypted() { return true; }
 
-    void send_to_no_stats(int other, const octetStream& o) const;
-    void receive_player_no_stats(int other, octetStream& o) const;
+    void send_to_no_statistics(int other, const OctetStream& o) const;
+    void receive_player_no_statistics(int other, OctetStream& o) const;
 
-    size_t send_no_stats(int player, const PlayerBuffer& buffer,
+    size_t send_no_statistics(int player, const PlayerBuffer& buffer,
             bool block) const;
-    size_t recv_no_stats(int player, const PlayerBuffer& buffer,
+    size_t receive_no_statistics(int player, const PlayerBuffer& buffer,
             bool block) const;
 
-    void exchange_no_stats(int other, const octetStream& to_send,
-        octetStream& to_receive) const;
+    void exchange_no_statistics(int other, const OctetStream& to_send,
+        OctetStream& to_receive) const;
 
-    void pass_around_no_stats(const octetStream& to_send, octetStream& to_receive,
+    void pass_around_no_statistics(const OctetStream& to_send, OctetStream& to_receive,
         int offset) const;
 
-    void send_receive_all_no_stats(const vector<vector<bool>>& channels,
-            const vector<octetStream>& to_send,
-            vector<octetStream>& to_receive) const;
+    void send_receive_all_no_statistics(const vector<vector<bool>>& channels,
+            const vector<OctetStream>& to_send,
+            vector<OctetStream>& to_receive) const;
 
-    void partial_broadcast_no_stats(const vector<bool>& my_senders,
-            const vector<bool>& my_receivers, vector<octetStream>& os) const;
+    void partial_broadcast_no_statistics(const vector<bool>& my_senders,
+            const vector<bool>& my_receivers, vector<OctetStream>& os) const;
 
-    void Broadcast_Receive_no_stats(vector<octetStream>& os) const;
+    void broadcast_receive_no_statistics(vector<OctetStream>& os) const;
 
     Player* fresh_fork(string suffix);
 };

@@ -19,7 +19,7 @@ public:
     AddableVector(size_t n, const T& x = T()) : vector<T>(n, x) {}
     template <class U, class FD, class S>
     AddableVector(const Plaintext<U,FD,S>& other) :
-            AddableVector(other.get_poly()) {}
+            AddableVector(other.get_polynomial()) {}
 
     template <class U>
     AddableVector(const vector<U>& other)
@@ -27,12 +27,12 @@ public:
         this->assign(other.begin(), other.end());
     }
 
-    AddableVector(const Rq_Element& other) :
-            AddableVector(other.to_vec_bigint())
+    AddableVector(const RqElement& other) :
+            AddableVector(other.to_vector_bigint())
     {
     }
 
-    void allocate_slots(const bigint& init)
+    void allocate_slots(const Bigint& init)
     {
         for (auto& x: *this)
             x.allocate_slots(init);
@@ -83,12 +83,12 @@ public:
             (*this)[i].mul(x[i], y[i]);
     }
 
-    AddableVector mul_by_X_i(int i, const FHE_PK& pk) const;
+    AddableVector mult_by_x_i(int i, const FHE_PK& pk) const;
 
-    void generateUniform(PRNG& G, int n_bits)
+    void generate_uniform(PRNG& G, int n_bits)
     {
         for (unsigned int i = 0; i < this->size(); i++)
-            (*this)[i].generateUniform(G, n_bits);
+            (*this)[i].generate_uniform(G, n_bits);
     }
 
     void randomize(PRNG& G)
@@ -97,7 +97,7 @@ public:
             x.randomize(G);
     }
 
-    void randomize(PRNG& G, int n_bits, PT_Type type = Evaluation)
+    void randomize(PRNG& G, int n_bits, PtType type = Evaluation)
     {
         for (auto& x : *this)
             x.randomize(G, n_bits, false, false, type);
@@ -121,14 +121,14 @@ public:
             generator.get(x);
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         os.store((unsigned int)this->size());
         for (unsigned int i = 0; i < this->size(); i++)
             (*this)[i].pack(os);
     }
 
-    size_t unpack_size(octetStream& os)
+    size_t unpack_size(OctetStream& os)
     {
         unsigned int size;
         os.get(size);
@@ -136,7 +136,7 @@ public:
         return size;
     }
 
-    void unpack(octetStream& os, const T& init = T())
+    void unpack(OctetStream& os, const T& init = T())
     {
         size_t new_size = unpack_size(os);
         this->clear();
@@ -147,7 +147,7 @@ public:
         }
     }
 
-    void add(octetStream& os, T& tmp)
+    void add(OctetStream& os, T& tmp)
     {
         size_t new_size = unpack_size(os);
         T init = tmp;
@@ -198,16 +198,16 @@ public:
             (*this)[i].resize(m);
     }
 
-    AddableMatrix mul_by_X_i(int i, const FHE_PK& pk) const;
+    AddableMatrix mult_by_x_i(int i, const FHE_PK& pk) const;
 };
 
 template<class T>
-AddableMatrix<T> AddableMatrix<T>::mul_by_X_i(int i,
+AddableMatrix<T> AddableMatrix<T>::mult_by_x_i(int i,
         const FHE_PK& pk) const
 {
     AddableMatrix<T> res;
     res.resize(this->size());
     for (size_t j = 0; j < this->size(); j++)
-        res[j] = (*this)[j].mul_by_X_i(i, pk);
+        res[j] = (*this)[j].mult_by_x_i(i, pk);
     return res;
 }

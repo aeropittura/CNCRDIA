@@ -39,21 +39,21 @@ public:
 };
 
 template <class T>
-void Triple_Checking(const Player& P, MAC_Check<T>& MC, int nm,
+void triple_checking(const Player& P, MacCheck<T>& MC, int nm,
         int output_thread, TripleSacriFactory<Share<T> >& factory,
         bool write_output = true, bool clear = true, string dir = PREP_DIR);
 template <class T>
-void Inverse_Checking(const Player& P, MAC_Check<T>& MC, int nr,
+void inverse_checking(const Player& P, MacCheck<T>& MC, int nr,
         int output_thread, TripleSacriFactory<Share<T> >& triple_factory,
         TupleSacriFactory<Share<T> >& inverse_factor,
         bool write_output = true, bool clear = true, string dir = PREP_DIR);
 template <class T>
-void Square_Checking(const Player& P, MAC_Check<T>& MC, int ns,
+void square_checking(const Player& P, MacCheck<T>& MC, int ns,
         int output_thread, TupleSacriFactory<Share<T> >& factory,
         bool write_output = true, bool clear = true, string dir = PREP_DIR);
-void Bit_Checking(const Player& P, MAC_Check<gfp>& MC, int nb,
-        int output_thread, TupleSacriFactory<Share<gfp> >& square_factory,
-        SingleSacriFactory<Share<gfp> >& bit_factory, bool write_output = true,
+void bit_checking(const Player& P, MacCheck<Gfp>& MC, int nb,
+        int output_thread, TupleSacriFactory<Share<Gfp> >& square_factory,
+        SingleSacriFactory<Share<Gfp> >& bit_factory, bool write_output = true,
         bool clear = true, string dir = PREP_DIR);
 
 template <class T>

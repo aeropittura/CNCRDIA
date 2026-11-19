@@ -1,5 +1,5 @@
 /*
- * vm/thread_stats.h
+ * vm/thread_statistics.h
  *
  */
 
@@ -8,18 +8,18 @@
 #include "net/player.h"
 #include "support/execution_stats.h"
 
-class ThreadStats
+class ThreadStatistics
 {
 public:
-    NamedCommStats comm_stats;
-    ExecutionStats exe_stats;
+    NamedCommunicationStatistics communication_statistics;
+    ExecutionStats exe_statistics;
 
-    ThreadStats() = default;
+    ThreadStatistics() = default;
 
-    ThreadStats(const NamedCommStats& comm_stats,
-            const ExecutionStats& exe_stats = {});
+    ThreadStatistics(const NamedCommunicationStatistics& communication_statistics,
+            const ExecutionStats& exe_statistics = {});
 
-    ThreadStats& operator+=(const ThreadStats& other);
+    ThreadStatistics& operator+=(const ThreadStatistics& other);
 
-    ThreadStats operator-(const ThreadStats& other) const;
+    ThreadStatistics operator-(const ThreadStatistics& other) const;
 };

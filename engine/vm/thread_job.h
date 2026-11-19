@@ -178,13 +178,13 @@ public:
 class FftJob : public ThreadJob
 {
 public:
-    FftJob(vector<modp>& ioput, vector<modp>& alpha2, int m, const Zp_Data& PrD)
+    FftJob(vector<modp>& ioput, vector<modp>& alpha2, int m, const ZpData& pr_d)
     {
         type = FFT_JOB;
         output = &ioput;
         input = &alpha2;
         length = m;
-        supply = &PrD;
+        supply = &pr_d;
     }
 };
 
@@ -195,7 +195,7 @@ class ShuffleJob : public ThreadJob
 public:
     template<class T>
     ShuffleJob(typename T::Protocol::Shuffler* shuffler, StackedVector<T>& a,
-            vector<ShuffleTuple<typename T::Protocol::Shuffler::shuffle_type>>& shuffles)
+            vector<ShuffleTuple<typename T::Protocol::Shuffler::ShuffleType>>& shuffles)
     {
         type = SHUFFLE_JOB;
         output = shuffler;

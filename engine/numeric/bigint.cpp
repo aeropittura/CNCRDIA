@@ -10,19 +10,19 @@
 
 #include "numeric/bigint.hpp"
 
-thread_local bigint bigint::tmp = 0;
-thread_local bigint bigint::tmp2 = 0;
-thread_local gmp_random bigint::random;
+thread_local Bigint Bigint::tmp = 0;
+thread_local Bigint Bigint::tmp2 = 0;
+thread_local GmpRandom Bigint::random;
 
 
-bigint powerMod(const bigint& x,const bigint& e,const bigint& p)
+Bigint power_mod(const Bigint& x,const Bigint& e,const Bigint& p)
 {
-  bigint ans;
+  Bigint ans;
   if (e>=0)
     { mpz_powm(ans.get_mpz_t(),x.get_mpz_t(),e.get_mpz_t(),p.get_mpz_t()); }
   else
-    { bigint xi,ei=-e;
-      invMod(xi,x,p);
+    { Bigint xi,ei=-e;
+      inverse_mod(xi,x,p);
       mpz_powm(ans.get_mpz_t(),xi.get_mpz_t(),ei.get_mpz_t(),p.get_mpz_t()); 
     }
       
@@ -30,12 +30,12 @@ bigint powerMod(const bigint& x,const bigint& e,const bigint& p)
 }
 
 
-int powerMod(int x,int e,int p)
+int power_mod(int x,int e,int p)
 {
   if (e==1) { return x; }
   if (e==0) { return 1; }
   if (e<0)
-     { throw not_implemented(); }
+     { throw NotImplemented(); }
    int t=x,ans=1;
    while (e!=0)
      { if ((e&1)==1) { ans=(ans*t)%p; }
@@ -45,7 +45,7 @@ int powerMod(int x,int e,int p)
   return ans;
 }
 
-size_t bigint::report_size(ReportType type) const
+size_t Bigint::report_size(ReportType type) const
 {
   size_t res = 0;
   if (type != MINIMAL)
@@ -60,7 +60,7 @@ size_t bigint::report_size(ReportType type) const
 }
 
 template <>
-int limb_size<bigint>()
+int limb_size<Bigint>()
 {
   return 64;
 }
@@ -72,27 +72,27 @@ int limb_size<int>()
   return 0;
 }
 
-bigint::bigint(const Integer& x)
+Bigint::Bigint(const Integer& x)
 {
   *this = x;
 }
 
-bigint::bigint(const GC::Clear& x)
+Bigint::Bigint(const GC::Clear& x)
 {
   *this = x;
 }
 
-bigint& bigint::operator =(const Integer& x)
+Bigint& Bigint::operator =(const Integer& x)
 {
   return *this = SignedZ2<64>(x);
 }
 
-bigint& bigint::operator =(const GC::Clear& x)
+Bigint& Bigint::operator =(const GC::Clear& x)
 {
   return *this = SignedZ2<64>(x);
 }
 
-bigint& bigint::operator=(const int128& x)
+Bigint& Bigint::operator=(const Int128& x)
 {
   *this = x.get_upper();
   *this <<= 64;
@@ -100,22 +100,22 @@ bigint& bigint::operator=(const int128& x)
   return *this;
 }
 
-bigint::bigint(const mp_limb_t* data, size_t n_limbs)
+Bigint::Bigint(const mp_limb_t* data, size_t n_limbs)
 {
   mpz_import(get_mpz_t(), n_limbs, -1, 8, -1, 0, data);
 }
 
-void bigint::pack(octetStream& os, int length) const
+void Bigint::pack(OctetStream& os, int length) const
 {
   os.store(*this, length);
 }
 
-void bigint::unpack(octetStream& os, int length)
+void Bigint::unpack(OctetStream& os, int length)
 {
   os.get(*this, length);
 }
 
-string to_string(const bigint& x)
+string to_string(const Bigint& x)
 {
   stringstream ss;
   ss << x;
@@ -123,7 +123,7 @@ string to_string(const bigint& x)
 }
 
 #ifdef REALLOC_POLICE
-void bigint::lottery()
+void Bigint::lottery()
 {
   if (rand() % 1000 == 0)
     if (rand() % 1000 == 0)

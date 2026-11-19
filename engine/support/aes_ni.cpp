@@ -19,7 +19,7 @@ inline __m128i AES_128_ASSIST (__m128i temp1, __m128i temp2)
 } 
 
 
-void aes_128_schedule( octet* key, const octet* userkey )
+void aes_128_schedule( Octet* key, const Octet* userkey )
 {
 #if defined(__AES__) || !defined(__x86_64__)
   if (cpu_has_aes())
@@ -82,7 +82,7 @@ inline void KEY_192_ASSIST(__m128i* temp1, __m128i * temp2, __m128i * temp3)
 }
 
 
-void aes_192_schedule( octet* key, const octet* userkey )
+void aes_192_schedule( Octet* key, const Octet* userkey )
 { __m128i temp1, temp2, temp3;
   __m128i *Key_Schedule = (__m128i*)key;
   temp1 = _mm_loadu_si128((__m128i*)userkey);
@@ -148,7 +148,7 @@ inline void KEY_256_ASSIST_2(__m128i* temp1, __m128i * temp3)
   *temp3 = _mm_xor_si128 (*temp3, temp2);
 }
 
-void aes_256_schedule( octet* key, const octet* userkey )
+void aes_256_schedule( Octet* key, const Octet* userkey )
 { __m128i temp1, temp2, temp3;
   __m128i *Key_Schedule = (__m128i*)key;
   temp1 = _mm_loadu_si128((__m128i*)userkey);
@@ -192,14 +192,14 @@ void aes_256_schedule( octet* key, const octet* userkey )
 
 
 
-void aes_128_encrypt(octet* out, const octet* in, const octet* key)
+void aes_128_encrypt(Octet* out, const Octet* in, const Octet* key)
 { __m128i tmp;
   tmp = _mm_loadu_si128 (&((__m128i*)in)[0]);
   tmp = aes_128_encrypt(tmp,key);
   _mm_storeu_si128 (&((__m128i*)out)[0],tmp);
 }
 
-void aes_192_encrypt(octet* out, const octet* in, const octet* key)
+void aes_192_encrypt(Octet* out, const Octet* in, const Octet* key)
 { __m128i tmp; 
   tmp = _mm_loadu_si128 (&((__m128i*)in)[0]); 
   tmp = _mm_xor_si128 (tmp,((__m128i*)key)[0]); 
@@ -210,7 +210,7 @@ void aes_192_encrypt(octet* out, const octet* in, const octet* key)
   _mm_storeu_si128 (&((__m128i*)out)[0],tmp); 
 }
 
-void aes_256_encrypt(octet* out, const octet* in, const octet* key)
+void aes_256_encrypt(Octet* out, const Octet* in, const Octet* key)
 { __m128i tmp; 
   tmp = _mm_loadu_si128 (&((__m128i*)in)[0]); 
   tmp = _mm_xor_si128 (tmp,((__m128i*)key)[0]); 

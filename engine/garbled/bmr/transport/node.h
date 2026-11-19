@@ -23,12 +23,12 @@ class ClientUpdatable;
 
 class NodeUpdatable {
 public:
-	virtual void NodeReady()=0;
-	virtual void NewMessage(int from, ReceivedMsg& msg) =0;
-	virtual void NodeAborted(struct sockaddr_in* from) =0;
+	virtual void node_ready()=0;
+	virtual void NewMessage(int from, ReceivedMessage& msg) =0;
+	virtual void node_aborted(struct sockaddr_in* from) =0;
 };
 
-typedef void (*msg_id_cb_t)(int from, char* msg, unsigned int len);
+typedef void (*MessageIdCb)(int from, char* msg, unsigned int len);
 #define START_INTERVAL (3000000) // 5 secs
 #define ID_HDR ("IDHD") // the chances to this to happen randomly is 2^(-64)
 const char ALL_IDENTIFIED[] =  "ALID";
@@ -42,18 +42,18 @@ public:
 	virtual ~Node();
 	void Send(int to, SendBuffer& msg);
 	void Broadcast(SendBuffer& msg);
-	void Broadcast2(SendBuffer& msg);
+	void broadcast2(SendBuffer& msg);
 	inline int NumParties(){return _numparties;}
 	void Start();
 	void Stop();
 //	void Close();
 
 	//derived from ServerUpdateable
-	void NewMsg(ReceivedMsg& msg, struct sockaddr_in* from);
-	void ClientsConnected();
-	void NodeAborted(struct sockaddr_in* from);
+	void NewMsg(ReceivedMessage& msg, struct sockaddr_in* from);
+	void clients_connected();
+	void node_aborted(struct sockaddr_in* from);
 	//derived from ClientUpdatable
-	void ConnectedToServers();
+	void connected_to_servers();
 
 	void print_waiting();
 

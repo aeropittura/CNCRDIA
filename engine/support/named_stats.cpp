@@ -8,14 +8,14 @@
 #include <iomanip>
 #include <iostream>
 
-NamedStats& NamedStats::operator+=(const NamedStats& other)
+NamedStatistics& NamedStatistics::operator+=(const NamedStatistics& other)
 {
     for (auto x : other)
         (*this)[x.first] += x.second;
     return *this;
 }
 
-void NamedStats::print()
+void NamedStatistics::print()
 {
     long sum = 0;
     for (auto x : *this)

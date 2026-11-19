@@ -31,7 +31,7 @@ void set_up_client_socket(int& mysocket,const char* hostname,int Portnum)
    hints.ai_flags = AI_CANONNAME;
 
    char my_name[512];
-   memset(my_name,0,512*sizeof(octet));
+   memset(my_name,0,512*sizeof(Octet));
    gethostname((char*)my_name,512);
 
    int erp;
@@ -199,7 +199,7 @@ void close_client_socket(int socket)
     }
 }
 
-void send(int socket, octet* msg, size_t len)
+void send(int socket, Octet* msg, size_t len)
 {
   size_t i = 0;
   long wait = 1;
@@ -228,7 +228,7 @@ void send(int socket, octet* msg, size_t len)
           max_wait * 1e-6);
 }
 
-void receive(int socket, octet* msg, size_t len)
+void receive(int socket, Octet* msg, size_t len)
 {
   size_t i = 0;
   int fail = 0;
@@ -267,7 +267,7 @@ void receive(int socket, octet* msg, size_t len)
             }
         }
       else
-        throw closed_connection();
+        throw ClosedConnection();
     }
 
   if (max_wait and OnlineOptions::singleton.has_option("recv_count"))

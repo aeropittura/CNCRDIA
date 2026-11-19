@@ -10,7 +10,7 @@
 
 int main(int argc, const char** argv)
 {
-	ez::ezOptionParser opt;
+	ez::EzOptionParser opt;
 	ShamirOptions::singleton = {opt, argc, argv};
-	RealProgramParty<MaliciousShamirShare<gf2n_long>>(argc, argv);
+	RealProgramParty<MaliciousShamirShare<Gf2nLong>>(argc, argv);
 }

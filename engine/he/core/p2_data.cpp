@@ -7,11 +7,11 @@
 #include <fstream>
 
 
-void P2Data::forward(vector<poly_type>& ans,const vector<gf2n_short>& a) const
+void P2Data::forward(vector<poly_type>& ans,const vector<Gf2nShort>& a) const
 {
   CODE_LOCATION_NO_SCOPE
 
-  int n=gf2n_short::degree();
+  int n=Gf2nShort::degree();
   
   BitVector bv(A.size());
   ans.resize(A.size());
@@ -30,11 +30,11 @@ void P2Data::forward(vector<poly_type>& ans,const vector<gf2n_short>& a) const
 }
 
 
-void P2Data::backward(vector<gf2n_short>& ans,const vector<poly_type>& a) const
+void P2Data::backward(vector<Gf2nShort>& ans,const vector<poly_type>& a) const
 {
   CODE_LOCATION_NO_SCOPE
 
-  int n=gf2n_short::degree();
+  int n=Gf2nShort::degree();
   BitVector bv(a.size());
   for (size_t i = 0; i < a.size(); i++)
     bv.set_bit(i, a[i].get_limb(0));
@@ -55,7 +55,7 @@ void P2Data::backward(vector<gf2n_short>& ans,const vector<poly_type>& a) const
 
 void P2Data::check_dimensions() const
 {
-//  cout << "degree: " << gf2n_short::degree() << endl;
+//  cout << "degree: " << Gf2nShort::degree() << endl;
 //  cout << "slots: " << slots << endl;
 //  cout << "A: " << A.size() << "x" << A[0].size() << endl;
 //  cout << "Ai: " << Ai.size() << "x" << Ai[0].size() << endl;
@@ -65,11 +65,11 @@ void P2Data::check_dimensions() const
     throw runtime_error("forward mapping not square");
   if (Ai.size() != Ai.at(0).size())
     throw runtime_error("backward mapping not square");
-  if ((int)A.at(0).size() != slots * gf2n_short::degree())
+  if ((int)A.at(0).size() != slots * Gf2nShort::degree())
         throw runtime_error(
                 "mapping dimension incorrect: " + to_string(A.at(0).size())
                         + " != " + to_string(slots) + " * "
-                        + to_string(gf2n_short::degree()));
+                        + to_string(Gf2nShort::degree()));
 }
 
 
@@ -78,29 +78,29 @@ bool P2Data::operator!=(const P2Data& other) const
   return slots != other.slots or A != other.A or Ai != other.Ai;
 }
 
-void P2Data::hash(octetStream& o) const
+void P2Data::hash(OctetStream& o) const
 {
-  o.store(gf2n_short::degree());
+  o.store(Gf2nShort::degree());
   o.store(slots);
   A.hash(o);
   Ai.hash(o);
 }
 
-void P2Data::pack(octetStream& o) const
+void P2Data::pack(OctetStream& o) const
 {
   check_dimensions();
-  o.store(gf2n_short::degree());
+  o.store(Gf2nShort::degree());
   o.store(slots);
   A.pack(o);
   Ai.pack(o);
   o.store_int(0xdeadbeef1, 8);
 }
 
-void P2Data::unpack(octetStream& o)
+void P2Data::unpack(OctetStream& o)
 {
   int degree;
   o.get(degree);
-  gf2n_short::init_field(degree);
+  Gf2nShort::initialize_field(degree);
   o.get(slots);
   A.unpack(o);
   Ai.unpack(o);
@@ -109,29 +109,29 @@ void P2Data::unpack(octetStream& o)
   check_dimensions();
 }
 
-string get_filename(const Ring& Rg)
+string get_filename(const Ring& rg)
 {
-  return (string) PREP_DIR + "P2D-" + to_string(gf2n_short::degree()) + "x"
-      + to_string(Rg.phi_m() / gf2n_short::degree());
+  return (string) PREP_DIR + "P2D-" + to_string(Gf2nShort::degree()) + "x"
+      + to_string(rg.phi_m() / Gf2nShort::degree());
 }
 
-void P2Data::load(const Ring& Rg)
+void P2Data::load(const Ring& rg)
 {
-  string filename = get_filename(Rg);
+  string filename = get_filename(rg);
   if (OnlineOptions::singleton.verbose)
     cerr << "Loading from " << filename << endl;
-  octetStream os;
+  OctetStream os;
   os.input(filename);
   unpack(os);
 }
 
-void P2Data::store(const Ring& Rg) const
+void P2Data::store(const Ring& rg) const
 {
-  string filename = get_filename(Rg);
+  string filename = get_filename(rg);
   if (OnlineOptions::singleton.verbose)
     cerr << "Storing in " << filename << endl;
   ofstream s(filename);
-  octetStream os;
+  OctetStream os;
   pack(os);
   os.output(s);
 }

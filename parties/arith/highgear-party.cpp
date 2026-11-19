@@ -10,7 +10,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     CowGearOptions::singleton = CowGearOptions(opt, argc, argv, false);
-    DishonestMajorityFieldMachine<HighGearShare, HighGearShare, gf2n_short>(argc, argv, opt);
+    DishonestMajorityFieldMachine<HighGearShare, HighGearShare, Gf2nShort>(argc, argv, opt);
 }

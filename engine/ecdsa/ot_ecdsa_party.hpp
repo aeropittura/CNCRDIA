@@ -31,7 +31,7 @@
 template<template<class U> class T>
 void run(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     EcdsaOptions opts(opt, argc, argv);
     opt.add(
             "", // Default.
@@ -90,57 +90,57 @@ void run(int argc, const char** argv)
 
     Names N(opt, argc, argv, 2);
     int n_tuples = 1000;
-    if (not opt.lastArgs.empty())
-        n_tuples = atoi(opt.lastArgs[0]->c_str());
+    if (not opt.last_args.empty())
+        n_tuples = atoi(opt.last_args[0]->c_str());
     PlainPlayer P(N, "ecdsa");
     P256Element::init();
-    P256Element::Scalar::next::init_field(P256Element::Scalar::pr(), false);
+    P256Element::Scalar::next::initialize_field(P256Element::Scalar::pr(), false);
 
-    typedef T<P256Element::Scalar> pShare;
+    typedef T<P256Element::Scalar> PShare;
     DataPositions usage;
 
-    auto keyp = pShare::LivePrep::get_mac_key(P);
+    auto keyp = PShare::LivePrep::get_mac_key(P);
 
-    pShare::MAC_Check::setup(P);
-    T<P256Element>::MAC_Check::setup(P);
+    PShare::MacCheck::setup(P);
+    T<P256Element>::MacCheck::setup(P);
 
     OnlineOptions::singleton.batch_size = 1;
-    typename pShare::Direct_MC MCp(keyp);
+    typename PShare::DirectOpener MCp(keyp);
     ArithmeticProcessor _({}, 0);
-    typename pShare::TriplePrep sk_prep(0, usage);
-    SubProcessor<pShare> sk_proc(_, MCp, sk_prep, P);
-    pShare sk, __;
+    typename PShare::TriplePrep sk_prep(0, usage);
+    SubProcessor<PShare> sk_processor(_, MCp, sk_prep, P);
+    PShare sk, __;
     // synchronize
-    Bundle<octetStream> bundle(P);
+    Bundle<OctetStream> bundle(P);
     P.unchecked_broadcast(bundle);
     Timer timer;
     timer.start();
-    auto stats = P.total_comm();
+    auto statistics = P.total_communication();
     sk_prep.get_two(DATA_INVERSE, sk, __);
     cout << "Secret key generation took " << timer.elapsed() * 1e3 << " ms" << endl;
-    (P.total_comm() - stats).print(true);
+    (P.total_communication() - statistics).print(true);
 
-    OnlineOptions::singleton.batch_size = (1 + pShare::Protocol::uses_triples) * n_tuples;
-    typename pShare::TriplePrep prep(0, usage);
+    OnlineOptions::singleton.batch_size = (1 + PShare::Protocol::uses_triples) * n_tuples;
+    typename PShare::TriplePrep prep(0, usage);
     prep.params.correlation_check &= not opt.isSet("-U");
     prep.params.fewer_rounds = opt.isSet("-A");
     prep.params.fiat_shamir = opt.isSet("-H");
     prep.params.check = not opt.isSet("-E");
-    prep.params.generateMACs = not opt.isSet("-M");
-    opts.check_beaver_open &= prep.params.generateMACs;
-    opts.check_open &= prep.params.generateMACs;
-    SubProcessor<pShare> proc(_, MCp, prep, P);
-    typename pShare::prep_type::Direct_MC MCpp(keyp);
+    prep.params.generate_macs = not opt.isSet("-M");
+    opts.check_beaver_open &= prep.params.generate_macs;
+    opts.check_open &= prep.params.generate_macs;
+    SubProcessor<PShare> proc(_, MCp, prep, P);
+    typename PShare::PrepType::DirectOpener MCpp(keyp);
     prep.triple_generator->MC = &MCpp;
 
-    bool prep_mul = not opt.isSet("-D");
+    bool prep_mult = not opt.isSet("-D");
     prep.params.use_extension = not opt.isSet("-S");
     vector<EcTuple<T>> tuples;
     preprocessing(tuples, n_tuples, sk, proc, opts);
     //check(tuples, sk, keyp, P);
-    sign_benchmark(tuples, sk, MCp, P, opts, prep_mul ? 0 : &proc);
+    sign_benchmark(tuples, sk, MCp, P, opts, prep_mult ? 0 : &proc);
 
-    pShare::MAC_Check::teardown();
-    T<P256Element>::MAC_Check::teardown();
+    PShare::MacCheck::teardown();
+    T<P256Element>::MacCheck::teardown();
     P256Element::finish();
 }

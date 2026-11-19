@@ -74,7 +74,7 @@ void CommunicationThread::run()
 template<class T>
 void Receiver<T>::run_with_error()
 {
-    octetStream* os = 0;
+    OctetStream* os = 0;
     while (in.pop(os))
     {
         os->reset_write_head();
@@ -94,15 +94,15 @@ void Receiver<T>::run_with_error()
 }
 
 template<class T>
-void Receiver<T>::request(octetStream& os)
+void Receiver<T>::request(OctetStream& os)
 {
     in.push(&os);
 }
 
 template<class T>
-void Receiver<T>::wait(octetStream& os)
+void Receiver<T>::wait(OctetStream& os)
 {
-    octetStream* queued = 0;
+    OctetStream* queued = 0;
     out.pop(queued);
     if (queued != &os)
       throw runtime_error("error in receive thread");
@@ -115,4 +115,4 @@ void Receiver<T>::fail()
 }
 
 template class Receiver<int>;
-template class Receiver<ssl_socket*>;
+template class Receiver<SslSocket*>;

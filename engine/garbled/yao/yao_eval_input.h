@@ -13,7 +13,7 @@ public:
 	YaoEvaluator& evaluator;
 	BitVector inputs;
 	int i_bit;
-	octetStream os;
+	OctetStream os;
 
 	YaoEvalInput() :
 			evaluator(YaoEvaluator::s())

@@ -15,7 +15,7 @@ template<int K, int S>
 class MalRepRingShare : public MaliciousRep3Share<SignedZ2<K>>
 {
     typedef SignedZ2<K> T;
-    typedef MaliciousRep3Share<T> super;
+    typedef MaliciousRep3Share<T> Super;
     typedef MalRepRingShare This;
 
 public:
@@ -23,13 +23,13 @@ public:
     const static int SECURITY = S;
 
     typedef Beaver<MalRepRingShare> BasicProtocol;
-    typedef HashMaliciousRepMC<MalRepRingShare> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef HashMaliciousRepOpener<MalRepRingShare> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ReplicatedInput<MalRepRingShare> Input;
-    typedef ReplicatedPO<This> PO;
+    typedef ReplicatedPo<This> PO;
     typedef SpecificPrivateOutput<This> PrivateOutput;
     typedef MalRepRingPrepWithBits<MalRepRingShare> LivePrep;
-    typedef MaliciousRep3Share<Z2<K + S>> prep_type;
+    typedef MaliciousRep3Share<Z2<K + S>> PrepType;
     typedef Z2<S> random_type;
     typedef MalRepRingShare<K + 2, S> SquareToBitShare;
     typedef MalRepRingPrep<MalRepRingShare> SquarePrep;
@@ -40,7 +40,7 @@ public:
     {
     }
     template<class U>
-    MalRepRingShare(const U& other) : super(other)
+    MalRepRingShare(const U& other) : Super(other)
     {
     }
 };

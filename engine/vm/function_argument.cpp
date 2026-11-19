@@ -34,7 +34,7 @@ void FunctionArgument::open(ifstream& file, const string& name,
     }
 }
 
-void FunctionArgument::check_type(const string& type_string)
+void FunctionArgument::CheckType(const string& type_string)
 {
     if (type_string != get_type_string()
             and get_type_string() != "-")

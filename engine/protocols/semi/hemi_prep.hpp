@@ -31,9 +31,9 @@ void HemiPrep<T>::basic_setup(Player& P)
     pairwise_machine = new PairwiseMachine(P);
     auto& machine = *pairwise_machine;
     auto& setup = machine.setup<FD>();
-    setup.params.set_matrix_dim_from_options();
+    setup.params.set_matrix_dimension_from_options();
     setup.params.set_sec(OnlineOptions::singleton.security_parameter);
-    secure_init(setup, P, machine, typename T::clear(), 0);
+    secure_initialize(setup, P, machine, typename T::clear(), 0);
     T::clear::template init<typename FD::T>();
 }
 
@@ -45,10 +45,10 @@ const FHE_PK& HemiPrep<T>::get_pk()
 }
 
 template<class T>
-const typename T::clear::FD& HemiPrep<T>::get_FTD()
+const typename T::clear::FD& HemiPrep<T>::get_ftd()
 {
     assert(pairwise_machine);
-    return pairwise_machine->setup<FD>().FieldD;
+    return pairwise_machine->setup<FD>().field_d;
 }
 
 template<class T>
@@ -86,7 +86,7 @@ vector<Multiplier<typename T::clear::FD>*>& HemiPrep<T>::get_multipliers()
             basic_setup(P);
         pairwise_machine->setup<FD>().covert_key_generation(P,
                 *pairwise_machine, 1);
-        BaseMachine::add_one_off(P.total_comm());
+        BaseMachine::add_one_off(P.total_communication());
     }
     lock.unlock();
 
@@ -104,12 +104,12 @@ void HemiPrep<T>::buffer_triples()
     assert(this->proc != 0);
     auto& P = this->proc->P;
     auto& multipliers = get_multipliers();
-    auto& FieldD = pairwise_machine->setup<FD>().FieldD;
-    Plaintext_<FD> a(FieldD), b(FieldD), c(FieldD);
+    auto& field_d = pairwise_machine->setup<FD>().field_d;
+    Plaintext_<FD> a(field_d), b(field_d), c(field_d);
     a.randomize(G);
     b.randomize(G);
     c.mul(a, b);
-    Bundle<octetStream> bundle(P);
+    Bundle<OctetStream> bundle(P);
     pairwise_machine->pk.encrypt(a).pack(bundle.mine);
     P.unchecked_broadcast(bundle);
     Ciphertext C(pairwise_machine->pk);

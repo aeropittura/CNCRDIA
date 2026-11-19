@@ -17,7 +17,7 @@
 
 
 template <class T>
-void Triple_Checking(const Player& P, MAC_Check<T>& MC, int nm,
+void triple_checking(const Player& P, MacCheck<T>& MC, int nm,
     int output_thread, TripleSacriFactory< Share<T> >& factory, bool write_output,
     bool clear, string dir)
 {
@@ -30,8 +30,8 @@ void Triple_Checking(const Player& P, MAC_Check<T>& MC, int nm,
         clear, dir);
 
   T te,t;
-  Create_Random(t,P);
-  vector<Share<T> > Sh_PO(2*amortize),Sh_Tau(amortize);
+  create_random(t,P);
+  vector<Share<T> > sh_po(2*amortize),sh_tau(amortize);
   vector<T> PO(2*amortize),Tau(amortize);
   vector<Share<T> > a1(amortize),b1(amortize),c1(amortize);
   vector<Share<T> > a2(amortize),b2(amortize),c2(amortize);
@@ -44,34 +44,34 @@ void Triple_Checking(const Player& P, MAC_Check<T>& MC, int nm,
       if (this_loop>left_todo)
         { this_loop=left_todo;
           PO.resize(2*this_loop);
-          Sh_PO.resize(2*this_loop);
+          sh_po.resize(2*this_loop);
           Tau.resize(this_loop);
-          Sh_Tau.resize(this_loop);
+          sh_tau.resize(this_loop);
         }
      
       for (int i=0; i<this_loop; i++)
         {
           factory.get(a1[i], b1[i], c1[i]);
           factory.get(a2[i], b2[i], c2[i]);
-          Sh_PO[2*i].mul(a1[i],t);
-          Sh_PO[2*i].sub(Sh_PO[2*i],a2[i]);
-          Sh_PO[2*i+1].sub(b1[i],b2[i]);
+          sh_po[2*i].mul(a1[i],t);
+          sh_po[2*i].sub(sh_po[2*i],a2[i]);
+          sh_po[2*i+1].sub(b1[i],b2[i]);
 	}
-      MC.POpen_Begin(PO,Sh_PO,P);
-      MC.POpen_End(PO,Sh_PO,P);
+      MC.POpen_Begin(PO,sh_po,P);
+      MC.POpen_End(PO,sh_po,P);
 
       for (int i=0; i<this_loop; i++)
-        { Sh_Tau[i].mul(c1[i],t);
-          Sh_Tau[i].sub(Sh_Tau[i],c2[i]);
+        { sh_tau[i].mul(c1[i],t);
+          sh_tau[i].sub(sh_tau[i],c2[i]);
           temp.mul(a2[i],PO[2*i+1]);
-          Sh_Tau[i].sub(Sh_Tau[i],temp);
+          sh_tau[i].sub(sh_tau[i],temp);
           temp.mul(b2[i],PO[2*i]);
-          Sh_Tau[i].sub(Sh_Tau[i],temp);
+          sh_tau[i].sub(sh_tau[i],temp);
           te = (PO[2*i] * PO[2*i+1]);
-          Sh_Tau[i].sub(Sh_Tau[i], Share<T>::constant(te,P.my_num(),MC.get_alphai()));
+          sh_tau[i].sub(sh_tau[i], Share<T>::constant(te,P.my_num(),MC.get_alphai()));
         }
-      MC.POpen_Begin(Tau,Sh_Tau,P);
-      MC.POpen_End(Tau,Sh_Tau,P);
+      MC.POpen_Begin(Tau,sh_tau,P);
+      MC.POpen_End(Tau,sh_tau,P);
 
       for (int i=0; i<this_loop; i++)
         { if (!Tau[i].is_zero())
@@ -84,7 +84,7 @@ void Triple_Checking(const Player& P, MAC_Check<T>& MC, int nm,
                     cout << PO[3 * j + 2] << " != " << prod << " = "
                         << PO[3 * j + 1] << " * " << PO[3 * j] << endl;
                 }
-              throw Offline_Check_Error("Multiplication Triples");
+              throw OfflineCheckError("Multiplication Triples");
 	    }
           if (write_output)
             {
@@ -105,20 +105,20 @@ void Triple_Checking(const Player& P, MAC_Check<T>& MC, int nm,
 
 
 template <class T>
-void Inverse_Checking(const Player& P, MAC_Check<T>& MC, int nr,
+void inverse_checking(const Player& P, MacCheck<T>& MC, int nr,
     int output_thread, TripleSacriFactory<Share<T> >& triple_factory,
     TupleSacriFactory<Share<T> >& inverse_factor, bool write_output,
     bool clear, string dir)
 {
   CODE_LOCATION
-  ofstream outf_inv;
+  ofstream outf_inverse;
   if (write_output)
-    open_prep_file<T>(outf_inv, "Inverses", P.my_num(), output_thread, false,
+    open_prep_file<T>(outf_inverse, "Inverses", P.my_num(), output_thread, false,
         clear, dir);
 
   T te,t;
-  Create_Random(t,P);
-  vector<Share<T> > Sh_PO(2*amortize),Sh_Tau(amortize);
+  create_random(t,P);
+  vector<Share<T> > sh_po(2*amortize),sh_tau(amortize);
   vector<T> PO(2*amortize),Tau(amortize);
   vector<Share<T> > a1(amortize),b1(amortize),c1(amortize);
   vector<Share<T> > a2(amortize),b2(amortize),c2(amortize);
@@ -131,42 +131,42 @@ void Inverse_Checking(const Player& P, MAC_Check<T>& MC, int nr,
       if (this_loop>left_todo)
         { this_loop=left_todo;
           PO.resize(2*this_loop);
-          Sh_PO.resize(2*this_loop);
+          sh_po.resize(2*this_loop);
           Tau.resize(this_loop);
-          Sh_Tau.resize(this_loop);
+          sh_tau.resize(this_loop);
         }
 
       for (int i=0; i<this_loop; i++)
         {
           inverse_factor.get(a1[i], b1[i]);
           triple_factory.get(a2[i], b2[i], c2[i]);
-          Sh_PO[2*i].mul(a1[i],t);
-          Sh_PO[2*i].sub(Sh_PO[2*i],a2[i]);
-          Sh_PO[2*i+1].sub(b1[i],b2[i]);
+          sh_po[2*i].mul(a1[i],t);
+          sh_po[2*i].sub(sh_po[2*i],a2[i]);
+          sh_po[2*i+1].sub(b1[i],b2[i]);
         }
-      MC.POpen_Begin(PO,Sh_PO,P);
-      MC.POpen_End(PO,Sh_PO,P);
+      MC.POpen_Begin(PO,sh_po,P);
+      MC.POpen_End(PO,sh_po,P);
 
       auto t_shared = Share<T>::constant(t, P.my_num(), MC.get_alphai());
 
       for (int i=0; i<this_loop; i++)
         {
-          Sh_Tau[i].sub(c2[i],t_shared);
+          sh_tau[i].sub(c2[i],t_shared);
           temp.mul(a2[i],PO[2*i+1]);
-          Sh_Tau[i].add(Sh_Tau[i],temp);
+          sh_tau[i].add(sh_tau[i],temp);
           temp.mul(b1[i],PO[2*i]);
-          Sh_Tau[i].add(Sh_Tau[i],temp);
+          sh_tau[i].add(sh_tau[i],temp);
         }
-      MC.POpen_Begin(Tau,Sh_Tau,P);
-      MC.POpen_End(Tau,Sh_Tau,P);
+      MC.POpen_Begin(Tau,sh_tau,P);
+      MC.POpen_End(Tau,sh_tau,P);
 
       for (int i=0; i<this_loop; i++)
         { if (!Tau[i].is_zero())
-            { throw Offline_Check_Error("Inverses"); }
+            { throw OfflineCheckError("Inverses"); }
           if (write_output)
             {
-              a1[i].output(outf_inv,false);
-              b1[i].output(outf_inv,false);
+              a1[i].output(outf_inverse,false);
+              b1[i].output(outf_inverse,false);
             }
         }
 
@@ -175,13 +175,13 @@ void Inverse_Checking(const Player& P, MAC_Check<T>& MC, int nr,
 
   if (write_output)
     {
-      outf_inv.close();
+      outf_inverse.close();
     }
 }
 
 
 template <class T>
-void Square_Checking(const Player& P, MAC_Check<T>& MC, int ns,
+void square_checking(const Player& P, MacCheck<T>& MC, int ns,
         int output_thread, TupleSacriFactory<Share<T> >& square_factory,
         bool write_output, bool clear, string dir)
 {
@@ -193,9 +193,9 @@ void Square_Checking(const Player& P, MAC_Check<T>& MC, int ns,
   }
 
   T te,t,t2;
-  Create_Random(t,P);
+  create_random(t,P);
   t2 = t * t;
-  vector<Share<T> > Sh_PO(amortize);
+  vector<Share<T> > sh_po(amortize);
   vector<T> PO(amortize);
   vector<Share<T> > f(amortize),h(amortize),a(amortize),b(amortize);
   Share<T>  temp;
@@ -208,7 +208,7 @@ void Square_Checking(const Player& P, MAC_Check<T>& MC, int ns,
       if (this_loop>left_todo)
         { this_loop=left_todo;
           PO.resize(this_loop);
-          Sh_PO.resize(this_loop);
+          sh_po.resize(this_loop);
         }
 
       for (int i=0; i<this_loop; i++)
@@ -216,26 +216,26 @@ void Square_Checking(const Player& P, MAC_Check<T>& MC, int ns,
           square_factory.get(f[i], h[i]);
           square_factory.get(a[i], b[i]);
 
-          Sh_PO[i].mul(a[i],t);
-          Sh_PO[i].sub(Sh_PO[i],f[i]);
+          sh_po[i].mul(a[i],t);
+          sh_po[i].sub(sh_po[i],f[i]);
         }
-      MC.POpen_Begin(PO,Sh_PO,P);
-      MC.POpen_End(PO,Sh_PO,P);
+      MC.POpen_Begin(PO,sh_po,P);
+      MC.POpen_End(PO,sh_po,P);
 
       for (int i=0; i<this_loop; i++)
-        { Sh_PO[i].mul(b[i],t2);
-          Sh_PO[i].sub(Sh_PO[i],h[i]);
+        { sh_po[i].mul(b[i],t2);
+          sh_po[i].sub(sh_po[i],h[i]);
           temp.mul(a[i],t);
           temp.add(temp,f[i]);
           temp.mul(temp,PO[i]);
-          Sh_PO[i].sub(Sh_PO[i],temp);
+          sh_po[i].sub(sh_po[i],temp);
         }
-      MC.POpen_Begin(PO,Sh_PO,P);
-      MC.POpen_End(PO,Sh_PO,P);
+      MC.POpen_Begin(PO,sh_po,P);
+      MC.POpen_End(PO,sh_po,P);
 
       for (int i=0; i<this_loop; i++)
         { if (!PO[i].is_zero())
-            { throw Offline_Check_Error("Squares"); }
+            { throw OfflineCheckError("Squares"); }
           if (write_output)
             {
               a[i].output(outf_s,false); b[i].output(outf_s,false);
@@ -248,36 +248,36 @@ void Square_Checking(const Player& P, MAC_Check<T>& MC, int ns,
   outf_s.close(); 
 }
 
-void Bit_Checking(const Player& P, MAC_Check<gfp>& MC, int nb,
-        int output_thread, TupleSacriFactory<Share<gfp> >& square_factory,
-        SingleSacriFactory<Share<gfp> >& bit_factory, bool write_output,
+void bit_checking(const Player& P, MacCheck<Gfp>& MC, int nb,
+        int output_thread, TupleSacriFactory<Share<Gfp> >& square_factory,
+        SingleSacriFactory<Share<Gfp> >& bit_factory, bool write_output,
         bool clear, string dir)
 {
   CODE_LOCATION
-  gfp dummy;
+  Gfp dummy;
   ofstream outf_b;
   if (write_output)
-    open_prep_file<gfp>(outf_b, "Bits", P.my_num(), output_thread, false, clear,
+    open_prep_file<Gfp>(outf_b, "Bits", P.my_num(), output_thread, false, clear,
         dir);
 
-  gfp te,t,t2;
-  Create_Random(t,P);
+  Gfp te,t,t2;
+  create_random(t,P);
   t2 = t * t;
-  vector<Share<gfp> > Sh_PO(amortize);
-  vector<gfp> PO(amortize);
-  vector<Share<gfp> > f(amortize),h(amortize),a(amortize),b(amortize);
-  Share<gfp>  temp;
+  vector<Share<Gfp> > sh_po(amortize);
+  vector<Gfp> PO(amortize);
+  vector<Share<Gfp> > f(amortize),h(amortize),a(amortize),b(amortize);
+  Share<Gfp>  temp;
 
   // Do the bits checking
   PO.resize(amortize);
-  Sh_PO.resize(amortize);
+  sh_po.resize(amortize);
   int left_todo=nb;
   while (left_todo>0)
     { int this_loop=amortize;
       if (this_loop>left_todo)
 	{ this_loop=left_todo;
           PO.resize(this_loop);
-          Sh_PO.resize(this_loop);
+          sh_po.resize(this_loop);
 	}
 
       for (int i=0; i<this_loop; i++)
@@ -285,26 +285,26 @@ void Bit_Checking(const Player& P, MAC_Check<gfp>& MC, int nb,
           square_factory.get(f[i], h[i]);
           bit_factory.get(a[i]);
 
-          Sh_PO[i].mul(a[i],t);
-          Sh_PO[i].sub(Sh_PO[i],f[i]);
+          sh_po[i].mul(a[i],t);
+          sh_po[i].sub(sh_po[i],f[i]);
 	}
-      MC.POpen_Begin(PO,Sh_PO,P);
-      MC.POpen_End(PO,Sh_PO,P);
+      MC.POpen_Begin(PO,sh_po,P);
+      MC.POpen_End(PO,sh_po,P);
 
       for (int i=0; i<this_loop; i++)
-        { Sh_PO[i].mul(a[i],t2);
-          Sh_PO[i].sub(Sh_PO[i],h[i]);
+        { sh_po[i].mul(a[i],t2);
+          sh_po[i].sub(sh_po[i],h[i]);
           temp.mul(a[i],t);
           temp.add(temp,f[i]);
           temp.mul(temp,PO[i]);
-          Sh_PO[i].sub(Sh_PO[i],temp);
+          sh_po[i].sub(sh_po[i],temp);
         }
-      MC.POpen_Begin(PO,Sh_PO,P);
-      MC.POpen_End(PO,Sh_PO,P);
+      MC.POpen_Begin(PO,sh_po,P);
+      MC.POpen_End(PO,sh_po,P);
 
       for (int i=0; i<this_loop; i++)
         { if (!PO[i].is_zero())
-            { throw Offline_Check_Error("Bits"); }
+            { throw OfflineCheckError("Bits"); }
           if (write_output)
             a[i].output(outf_b,false);
 	}
@@ -315,27 +315,27 @@ void Bit_Checking(const Player& P, MAC_Check<gfp>& MC, int nb,
 }
 
 
-template void Triple_Checking(const Player& P, MAC_Check<gfp>& MC, int nm,
-        int output_thread, TripleSacriFactory<Share<gfp> >& factory,
+template void triple_checking(const Player& P, MacCheck<Gfp>& MC, int nm,
+        int output_thread, TripleSacriFactory<Share<Gfp> >& factory,
         bool write_output, bool clear, string dir);
-template void Triple_Checking(const Player& P, MAC_Check<gf2n_short>& MC,
+template void triple_checking(const Player& P, MacCheck<Gf2nShort>& MC,
         int nm, int output_thread,
-        TripleSacriFactory<Share<gf2n_short> >& factory, bool write_output,
+        TripleSacriFactory<Share<Gf2nShort> >& factory, bool write_output,
         bool clear, string dir);
 
-template void Square_Checking(const Player& P, MAC_Check<gfp>& MC, int ns,
-        int output_thread, TupleSacriFactory<Share<gfp> >& square_factory,
+template void square_checking(const Player& P, MacCheck<Gfp>& MC, int ns,
+        int output_thread, TupleSacriFactory<Share<Gfp> >& square_factory,
         bool write_output, bool clear, string dir);
-template void Square_Checking(const Player& P, MAC_Check<gf2n_short>& MC,
+template void square_checking(const Player& P, MacCheck<Gf2nShort>& MC,
         int ns, int output_thread,
-        TupleSacriFactory<Share<gf2n_short> >& square_factory,
+        TupleSacriFactory<Share<Gf2nShort> >& square_factory,
         bool write_output, bool clear, string dir);
 
-template void Inverse_Checking(const Player& P, MAC_Check<gfp>& MC, int nr,
-        int output_thread, TripleSacriFactory<Share<gfp> >& triple_factory,
-        TupleSacriFactory<Share<gfp> >& inverse_factor, bool write_output,
+template void inverse_checking(const Player& P, MacCheck<Gfp>& MC, int nr,
+        int output_thread, TripleSacriFactory<Share<Gfp> >& triple_factory,
+        TupleSacriFactory<Share<Gfp> >& inverse_factor, bool write_output,
         bool clear, string dir);
-template void Inverse_Checking(const Player& P, MAC_Check<gf2n_short>& MC, int nr,
-        int output_thread, TripleSacriFactory<Share<gf2n_short> >& triple_factory,
-        TupleSacriFactory<Share<gf2n_short> >& inverse_factor, bool write_output,
+template void inverse_checking(const Player& P, MacCheck<Gf2nShort>& MC, int nr,
+        int output_thread, TripleSacriFactory<Share<Gf2nShort> >& triple_factory,
+        TupleSacriFactory<Share<Gf2nShort> >& inverse_factor, bool write_output,
         bool clear, string dir);

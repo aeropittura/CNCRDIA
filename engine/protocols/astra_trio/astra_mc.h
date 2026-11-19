@@ -8,18 +8,18 @@
 #include "protocols/common/mac_check_base.h"
 
 template<class T>
-class AstraMC : public MAC_Check_Base<T>
+class AstraOpener : public MacCheckBase<T>
 {
 public:
-    AstraMC(typename T::mac_key_type = {}, int = 0, int = 0)
+    AstraOpener(typename T::MacKeyType = {}, int = 0, int = 0)
     {
     }
 
-    virtual typename T::open_type prepare_summand(const T& secret, int my_num);
+    virtual typename T::OpenType prepare_summand(const T& secret, int my_num);
 
     void exchange(const Player& P);
 
-    AstraMC& get_part_MC()
+    AstraOpener& get_part_opener()
     {
         return *this;
     }

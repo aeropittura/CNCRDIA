@@ -29,8 +29,8 @@ public:
     void buffer_triples();
     void buffer_bits();
 
-    void buffer_squares() { throw not_implemented(); }
-    void buffer_inverses() { throw not_implemented(); }
+    void buffer_squares() { throw NotImplemented(); }
+    void buffer_inverses() { throw NotImplemented(); }
 
     void buffer_inputs(int player);
 

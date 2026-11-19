@@ -14,7 +14,7 @@ template<class T>
 class SemiRep3Prep : public virtual SemiHonestRingPrep<T>,
         public virtual ReplicatedRingPrep<T>
 {
-    typedef typename T::bit_type BT;
+    typedef typename T::BitType BT;
 
     vector<BT> b;
 
@@ -37,9 +37,9 @@ public:
     void get_one_no_count(Dtype dtype, T& a)
     {
         if (dtype != DATA_BIT)
-            throw not_implemented();
+            throw NotImplemented();
 
-        typename T::bit_type b;
+        typename T::BitType b;
         this->get_dabit_no_count(a, b);
     }
 };

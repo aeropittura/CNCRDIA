@@ -20,7 +20,7 @@ public:
     static void trans(StackedVector<T>& dest, const StackedVector<T>& source,
             int n_outputs, const ArgVector& args)
     {
-        vec_trans(dest, source, n_outputs, args);
+        vector_trans(dest, source, n_outputs, args);
     }
 };
 
@@ -28,37 +28,37 @@ template<class U>
 class AstraSecret : public U, public AstraSecretBase<AstraSecret<U>>
 {
     typedef AstraSecret This;
-    typedef U super;
+    typedef U Super;
 
 public:
     typedef This part_type;
-    typedef This small_type;
+    typedef This SmallType;
 
-    typedef typename super::template mc_template<This> MC;
-    typedef MC MAC_Check;
+    typedef typename Super::template OpenerTemplate<This> MC;
+    typedef MC MacCheck;
 
     typedef NoLivePrep<This> LivePrep;
-    typedef typename super::template protocol_template<This> Protocol;
-    typedef typename super::template input_template<This> Input;
+    typedef typename Super::template ProtocolTemplate<This> Protocol;
+    typedef typename Super::template InputTemplate<This> Input;
 
-    static const bool is_real = super::is_real;
-    static const bool symmetric = super::symmetric;
-    static const int default_length = super::clear::N_BITS;
+    static const bool is_real = Super::is_real;
+    static const bool symmetric = Super::symmetric;
+    static const int default_length = Super::clear::N_BITS;
 
     static bool real_shares(const Player& P)
     {
-        return super::real_shares(P);
+        return Super::real_shares(P);
     }
 
-    static MC* new_mc(typename super::mac_key_type)
+    static MC* new_opener(typename Super::MacKeyType)
     {
         return new MC;
     }
 
-    static This constant(const typename super::clear& value, int my_num,
-            typename super::mac_key_type, int = -1)
+    static This constant(const typename Super::clear& value, int my_num,
+            typename Super::MacKeyType, int = -1)
     {
-        return super::constant(value, my_num);
+        return Super::constant(value, my_num);
     }
 
     AstraSecret()
@@ -66,14 +66,14 @@ public:
     }
     template <class T>
     AstraSecret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 
     void load_clear(int n, const Integer& x)
     {
         this->check_length(n, x);
-        *this = super::constant(x);
+        *this = Super::constant(x);
     }
 
     void bitcom(StackedVector<This>& S, const ArgVector& regs)

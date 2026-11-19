@@ -72,13 +72,13 @@ public:
 };
 
 template<class T>
-octetStream file_signature(const typename T::mac_type& mac_key)
+OctetStream file_signature(const typename T::MacType& mac_key)
 {
-    octetStream res(T::type_string());
+    OctetStream res(T::type_string());
     T::specification(res);
     if (T::has_mac)
     {
-        if (mac_key == typename T::mac_type())
+        if (mac_key == typename T::MacType())
         {
             assert(T::get_mac_key() != 0);
             T::get_mac_key().pack(res);
@@ -90,21 +90,21 @@ octetStream file_signature(const typename T::mac_type& mac_key)
 }
 
 template<class T>
-octetStream file_signature(true_type)
+OctetStream file_signature(true_type)
 {
-    octetStream res(T::type_string());
+    OctetStream res(T::type_string());
     T::specification(res);
     return res;
 }
 
 template<class T>
-octetStream file_signature(false_type)
+OctetStream file_signature(false_type)
 {
-    return file_signature<T>(typename T::mac_type());
+    return file_signature<T>(typename T::MacType());
 }
 
 template<class T>
-octetStream file_signature()
+OctetStream file_signature()
 {
     return file_signature<T>(T::is_clear);
 }
@@ -122,7 +122,7 @@ bool has_mac(false_type)
 }
 
 template<class T>
-octetStream check_file_signature(ifstream& file, const string& filename)
+OctetStream check_file_signature(ifstream& file, const string& filename)
 {
 #ifdef DEBUG_FILE_SIGNATURE
     bool debug = true;
@@ -130,7 +130,7 @@ octetStream check_file_signature(ifstream& file, const string& filename)
     bool debug = OnlineOptions::singleton.has_option("debug_file_signature");
 #endif
 
-    octetStream file_spec;
+    OctetStream file_spec;
     try
     {
         file_spec.input(file);
@@ -139,13 +139,13 @@ octetStream check_file_signature(ifstream& file, const string& filename)
     {
         if (debug)
             printf("malformed signature in %s\n", filename.c_str());
-        throw signature_mismatch(filename);
+        throw SignatureMismatch(filename);
     }
-    catch (IO_Error&)
+    catch (IoError&)
     {
         if (debug)
             printf("IO error in %s\n", filename.c_str());
-        throw signature_mismatch(filename);
+        throw SignatureMismatch(filename);
     }
     if (file_signature<T>() != file_spec)
     {
@@ -156,7 +156,7 @@ octetStream check_file_signature(ifstream& file, const string& filename)
             pprint_bytes("found   ", file_spec.get_data(), file_spec.get_length());
             pprint_bytes("expected", exp.get_data(), exp.get_length());
         }
-        throw signature_mismatch(filename, has_mac<T>(T::is_clear));
+        throw SignatureMismatch(filename, has_mac<T>(T::is_clear));
     }
     return file_spec;
 }
@@ -258,7 +258,7 @@ inline void Buffer<T, U>::fill_buffer()
 template<class T, class U>
 ifstream* Buffer<T, U>::open()
 {
-    throw IO_Error(T::type_string() + " buffer not set up");
+    throw IoError(T::type_string() + " buffer not set up");
 }
 
 template<class T, class U>

@@ -18,29 +18,29 @@ class HonestMajorityFieldMachine
 {
 public:
     HonestMajorityFieldMachine(int argc, const char** argv);
-    HonestMajorityFieldMachine(int argc, const char** argv, ez::ezOptionParser& opt,
+    HonestMajorityFieldMachine(int argc, const char** argv, ez::EzOptionParser& opt,
             int nplayers = 3);
 };
 
-template<template<class T> class U, template<class T> class V, class W, class X = gf2n>
+template<template<class T> class U, template<class T> class V, class W, class X = Gf2n>
 class FieldMachine
 {
 public:
-    FieldMachine(int argc, const char** argv, ez::ezOptionParser& opt,
-            OnlineOptions& online_opts, int nplayers = 0);
+    FieldMachine(int argc, const char** argv, ez::EzOptionParser& opt,
+            OnlineOptions& online_options, int nplayers = 0);
 };
 
 template<template<class U> class T, template<class U> class V = T,
-        class W = gf2n, class X = DishonestMajorityMachine>
+        class W = Gf2n, class X = DishonestMajorityMachine>
 class DishonestMajorityFieldMachine
 {
 public:
     DishonestMajorityFieldMachine(int argc, const char** argv,
-            ez::ezOptionParser& opt, bool live_prep_default = true)
+            ez::EzOptionParser& opt, bool live_prep_default = true)
     {
-        OnlineOptions& online_opts = OnlineOptions::singleton;
-        online_opts = {opt, argc, argv, T<gfp0>(), live_prep_default, W()};
+        OnlineOptions& online_options = OnlineOptions::singleton;
+        online_options = {opt, argc, argv, T<Gfp0>(), live_prep_default, W()};
 
-        FieldMachine<T, V, X, W>(argc, argv, opt, online_opts);
+        FieldMachine<T, V, X, W>(argc, argv, opt, online_options);
     }
 };

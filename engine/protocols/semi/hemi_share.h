@@ -15,11 +15,11 @@ template<class T>
 class HemiShare : public SemiShare<T>
 {
     typedef HemiShare This;
-    typedef SemiShare<T> super;
+    typedef SemiShare<T> Super;
 
 public:
-    typedef SemiMC<This> MAC_Check;
-    typedef DirectSemiMC<This> Direct_MC;
+    typedef SemiOpener<This> MacCheck;
+    typedef DirectSemiOpener<This> DirectOpener;
     typedef SemiInput<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     // matrix multiplication only with prime order field
@@ -30,7 +30,7 @@ public:
     typedef Semi<This> BasicProtocol;
 
     static const bool needs_ot = false;
-    static const bool local_mul = true;
+    static const bool local_mult = true;
     static true_type triple_matmul;
 
     static string alt()
@@ -43,7 +43,7 @@ public:
     }
     template<class U>
     HemiShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 

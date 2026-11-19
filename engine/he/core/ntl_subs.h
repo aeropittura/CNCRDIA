@@ -19,7 +19,7 @@ class Parameters
 
 public:
   Ring R;
-  bigint pr0, pr1;
+  Bigint pr0, pr1;
 
   Parameters(int n_parties, int plaintext_length, int sec, int slack = 0,
       bool round_up = false) :
@@ -29,17 +29,17 @@ public:
   }
 
   template<class FD>
-  void generate_setup(FHE_Params& params, FD& FTD)
+  void generate_setup(FheParameters& params, FD& FTD)
   {
-    SPDZ_Data_Setup(params, FTD);
+    spdz_data_setup(params, FTD);
     params.set(R, {pr0, pr1});
   }
 
   template<class FD>
-  void SPDZ_Data_Setup(FHE_Params& params, FD& FTD);
+  void spdz_data_setup(FheParameters& params, FD& FTD);
 
-  int SPDZ_Data_Setup_Char_p_Sub(int idx, int& m, bigint& p,
-      FHE_Params& params);
+  int spdz_data_setup_char_p_sub(int idx, int& m, Bigint& p,
+      FheParameters& params);
 
 };
 
@@ -50,33 +50,33 @@ void generate_setup(int nparties, int lgp, int lg2,
 // semi-homomorphic, includes slack
 template <class FD>
 int generate_semi_setup(int plaintext_length, int sec,
-    FHE_Params& params, FD& FieldD, bool round_up, int n = 1);
+    FheParameters& params, FD& field_d, bool round_up, int n = 1);
 
 // field-independent semi-homomorphic setup
-int common_semi_setup(FHE_Params& params, int m, bigint p, int& lgp0, int lgp1,
+int common_semi_setup(FheParameters& params, int m, Bigint p, int& lgp0, int lgp1,
     bool round_up);
 
-void init(Ring& Rg, int m, bool generate_poly);
-void init(P2Data& P2D,const Ring& Rg);
+void init(Ring& rg, int m, bool generate_polynomial);
+void init(P2Data& P2D,const Ring& rg);
 
 namespace NTL
 {
 class GF2X;
 }
 
-NTL::GF2X get_F(const Ring& Rg);
+NTL::GF2X get_F(const Ring& rg);
 
 // generate moduli according to lengths and other parameters
-void generate_moduli(bigint& pr0, bigint& pr1, const int m,
-        const bigint p, const int lg2p0, const int lg2p1);
+void generate_moduli(Bigint& pr0, Bigint& pr1, const int m,
+        const Bigint p, const int lg2p0, const int lg2p1);
 
-void generate_modulus(bigint& pr, const int m, const bigint p, const int lg2pr,
-    const string& i = "0", const bigint& pr0 = 0);
+void generate_modulus(Bigint& pr, const int m, const Bigint p, const int lg2pr,
+    const string& i = "0", const Bigint& pr0 = 0);
 
 // pre-generated dimensions for characteristic 2
 void char_2_dimension(int& m, int& lg2);
 
 // try to avoid expensive generation by loading from disk if possible
-void load_or_generate(P2Data& P2D, const Ring& Rg);
+void load_or_generate(P2Data& P2D, const Ring& rg);
 
-int phi_N(int N);
+int phi_n(int N);

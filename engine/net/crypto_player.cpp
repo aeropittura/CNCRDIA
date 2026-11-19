@@ -43,7 +43,7 @@ void ssl_error(string side, string other, string me, exception& e)
         if (buffer.str().empty())
             cerr << "<'" << filename << "' not found>";
         else
-            cerr << octetStream(buffer.str()).hash();
+            cerr << OctetStream(buffer.str()).hash();
         if (i == 0)
             cerr << "/";
     }
@@ -52,8 +52,8 @@ void ssl_error(string side, string other, string me, exception& e)
     exit(1);
 }
 
-CryptoPlayer::CryptoPlayer(const Names& Nms, const string& id_base) :
-        MultiPlayer<ssl_socket*>(Nms, id_base),
+CryptoPlayer::CryptoPlayer(const Names& nms, const string& id_base) :
+        MultiPlayer<SslSocket*>(nms, id_base),
         ctx("P" + to_string(my_num()))
 {
     sockets.resize(num_players());
@@ -65,7 +65,7 @@ CryptoPlayer::CryptoPlayer(const Names& Nms, const string& id_base) :
 
     for (int i = 0; i < 2; i++)
     {
-        PlainPlayer player(Nms, id_base + (i ? "recv" : ""));
+        PlainPlayer player(nms, id_base + (i ? "recv" : ""));
         plaintext_sockets[i] = player.sockets;
         close_client_socket(player.socket(my_num()));
         player.sockets.clear();
@@ -85,24 +85,24 @@ CryptoPlayer::CryptoPlayer(const Names& Nms, const string& id_base) :
             continue;
         }
 
-        senders[i] = new Sender<ssl_socket*>(
+        senders[i] = new Sender<SslSocket*>(
                 i < my_num() ? sockets[i] : other_sockets[i], i);
-        receivers[i] = new Receiver<ssl_socket*>(
+        receivers[i] = new Receiver<SslSocket*>(
                 i < my_num() ? other_sockets[i] : sockets[i], i);
     }
 }
 
 void CryptoPlayer::connect(int i, vector<int>* plaintext_sockets)
 {
-    sockets[i] = new ssl_socket(io_service, ctx, plaintext_sockets[0][i],
+    sockets[i] = new SslSocket(io_service, ctx, plaintext_sockets[0][i],
             "P" + to_string(i), "P" + to_string(my_num()), i < my_num());
-    other_sockets[i] = new ssl_socket(io_service, ctx, plaintext_sockets[1][i],
+    other_sockets[i] = new SslSocket(io_service, ctx, plaintext_sockets[1][i],
             "P" + to_string(i), "P" + to_string(my_num()), i < my_num());
 
 }
 
-CryptoPlayer::CryptoPlayer(const Names& Nms, int id_base) :
-        CryptoPlayer(Nms, to_string(id_base))
+CryptoPlayer::CryptoPlayer(const Names& nms, int id_base) :
+        CryptoPlayer(nms, to_string(id_base))
 {
 }
 
@@ -117,21 +117,21 @@ CryptoPlayer::~CryptoPlayer()
     }
 }
 
-void CryptoPlayer::send_to_no_stats(int other, const octetStream& o) const
+void CryptoPlayer::send_to_no_statistics(int other, const OctetStream& o) const
 {
     assert(other != my_num());
     senders[other]->request(o);
     senders[other]->wait(o);
 }
 
-void CryptoPlayer::receive_player_no_stats(int other, octetStream& o) const
+void CryptoPlayer::receive_player_no_statistics(int other, OctetStream& o) const
 {
     assert(other != my_num());
     receivers[other]->request(o);
     receivers[other]->wait(o);
 }
 
-size_t CryptoPlayer::send_no_stats(int player, const PlayerBuffer& buffer,
+size_t CryptoPlayer::send_no_statistics(int player, const PlayerBuffer& buffer,
         bool block) const
 {
     assert(player != my_num());
@@ -145,7 +145,7 @@ size_t CryptoPlayer::send_no_stats(int player, const PlayerBuffer& buffer,
         return send_non_blocking(socket, buffer.data, buffer.size);
 }
 
-size_t CryptoPlayer::recv_no_stats(int player, const PlayerBuffer& buffer,
+size_t CryptoPlayer::receive_no_statistics(int player, const PlayerBuffer& buffer,
         bool block) const
 {
     assert(player != my_num());
@@ -159,13 +159,13 @@ size_t CryptoPlayer::recv_no_stats(int player, const PlayerBuffer& buffer,
         return receive_non_blocking(socket, buffer.data, buffer.size);
 }
 
-void CryptoPlayer::exchange_no_stats(int other, const octetStream& to_send,
-        octetStream& to_receive) const
+void CryptoPlayer::exchange_no_statistics(int other, const OctetStream& to_send,
+        OctetStream& to_receive) const
 {
     assert(other != my_num());
     if (&to_send == &to_receive)
     {
-        MultiPlayer<ssl_socket*>::exchange_no_stats(other, to_send, to_receive);
+        MultiPlayer<SslSocket*>::exchange_no_statistics(other, to_send, to_receive);
     }
     else
     {
@@ -176,34 +176,34 @@ void CryptoPlayer::exchange_no_stats(int other, const octetStream& to_send,
     }
 }
 
-void CryptoPlayer::pass_around_no_stats(const octetStream& to_send,
-        octetStream& to_receive, int offset) const
+void CryptoPlayer::pass_around_no_statistics(const OctetStream& to_send,
+        OctetStream& to_receive, int offset) const
 {
     assert(get_player(offset) != my_num());
     if (&to_send == &to_receive)
     {
-        MultiPlayer<ssl_socket*>::pass_around_no_stats(to_send, to_receive, offset);
+        MultiPlayer<SslSocket*>::pass_around_no_statistics(to_send, to_receive, offset);
     }
     else
     {
 #ifdef TIME_ROUNDS
-        Timer recv_timer;
-        TimeScope ts(recv_timer);
+        Timer receive_timer;
+        TimeScope ts(receive_timer);
 #endif
         senders[get_player(offset)]->request(to_send);
         receivers[get_player(-offset)]->request(to_receive);
         senders[get_player(offset)]->wait(to_send);
         receivers[get_player(-offset)]->wait(to_receive);
 #ifdef TIME_ROUNDS
-        cout << "Exchange time: " << recv_timer.elapsed() << " seconds to receive "
+        cout << "Exchange time: " << receive_timer.elapsed() << " seconds to receive "
             << 1e-3 * to_receive.get_length() << " KB" << endl;
 #endif
     }
 }
 
-void CryptoPlayer::send_receive_all_no_stats(const vector<vector<bool>>& channels,
-        const vector<octetStream>& to_send,
-        vector<octetStream>& to_receive) const
+void CryptoPlayer::send_receive_all_no_statistics(const vector<vector<bool>>& channels,
+        const vector<OctetStream>& to_send,
+        vector<OctetStream>& to_receive) const
 {
     to_receive.resize(num_players());
     bool global = channels.empty();
@@ -227,9 +227,9 @@ void CryptoPlayer::send_receive_all_no_stats(const vector<vector<bool>>& channel
     }
 }
 
-void CryptoPlayer::partial_broadcast_no_stats(const vector<bool>& my_senders,
+void CryptoPlayer::partial_broadcast_no_statistics(const vector<bool>& my_senders,
         const vector<bool>& my_receivers,
-        vector<octetStream>& os) const
+        vector<OctetStream>& os) const
 {
     for (int offset = 1; offset < num_players(); offset++)
     {
@@ -254,7 +254,7 @@ void CryptoPlayer::partial_broadcast_no_stats(const vector<bool>& my_senders,
     }
 }
 
-void CryptoPlayer::Broadcast_Receive_no_stats(vector<octetStream>& os) const
+void CryptoPlayer::broadcast_receive_no_statistics(vector<OctetStream>& os) const
 {
     for (int offset = 1; offset < num_players(); offset++)
     {

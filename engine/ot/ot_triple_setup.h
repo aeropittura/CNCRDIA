@@ -10,14 +10,14 @@
 /*
  * Class for creating and storing base OTs between every pair of parties.
  */
-class OTTripleSetup
+class OtTripleSetup
 {
-    typedef vector< array<BitVector, 2> > sender_type;
-    typedef vector<BitVector> receiver_type;
+    typedef vector< array<BitVector, 2> > SenderType;
+    typedef vector<BitVector> ReceiverType;
 
     void run(int i);
 
-    vector<BaseOT*> baseOTs;
+    vector<BaseOT*> base_ots;
 
     PRNG G;
     int nparties;
@@ -26,13 +26,13 @@ class OTTripleSetup
 public:
     class SetupJob
     {
-        OTTripleSetup& setup;
+        OtTripleSetup& setup;
         int i;
 
     public:
         pthread_t thread;
 
-        SetupJob(OTTripleSetup& setup, int i) :
+        SetupJob(OtTripleSetup& setup, int i) :
                 setup(setup), i(i), thread(0)
         {
         }
@@ -45,8 +45,8 @@ public:
 
     map<string,Timer> timers;
     vector<TwoPartyPlayer*> players;
-    vector<sender_type> baseSenderInputs;
-    vector<receiver_type> baseReceiverOutputs;
+    vector<SenderType> base_sender_inputs;
+    vector<ReceiverType> base_receiver_outputs;
     BitVector base_receiver_inputs;
 
     int get_nparties() const { return nparties; }
@@ -54,21 +54,21 @@ public:
     int get_my_num() const { return my_num; }
     int get_base_receiver_input(int i) const { return base_receiver_inputs[i]; }
 
-    OTTripleSetup() : nparties(0), my_num(0)
+    OtTripleSetup() : nparties(0), my_num(0)
     {
     }
 
-    OTTripleSetup(Player& N, bool real_OTs = true)
+    OtTripleSetup(Player& N, bool real_ots = true)
         : nparties(N.num_players()), my_num(N.my_num())
     {
         int nbase = 128;
         base_receiver_inputs.resize(nbase);
-        baseOTs.resize(nparties - 1);
-        baseSenderInputs.resize(nparties - 1);
-        baseReceiverOutputs.resize(nparties - 1);
+        base_ots.resize(nparties - 1);
+        base_sender_inputs.resize(nparties - 1);
+        base_receiver_outputs.resize(nparties - 1);
 
 #ifdef VERBOSE_BASEOT
-        if (real_OTs)
+        if (real_ots)
             cout << "Doing real base OTs\n";
         else
             cout << "Doing fake base OTs\n";
@@ -86,13 +86,13 @@ public:
             players.push_back(new VirtualTwoPartyPlayer(N, other_player));
 
             // sets up a pair of base OTs, playing both roles
-            if (real_OTs)
+            if (real_ots)
             {
-                baseOTs[i] = new BaseOT(nbase, players[i]);
+                base_ots[i] = new BaseOT(nbase, players[i]);
             }
             else
             {
-                baseOTs[i] = new FakeOT(nbase, players[i]);
+                base_ots[i] = new FakeOt(nbase, players[i]);
             }
         }
 
@@ -108,7 +108,7 @@ public:
     //template <class T>
     //T get_mac_key();
 
-    OTTripleSetup get_fresh();
+    OtTripleSetup get_fresh();
 
     BaseOT get_base(size_t index);
 
@@ -121,27 +121,27 @@ public:
             return other;
     }
 
-    void pack(octetStream& os) const;
-    void unpack(octetStream& os);
+    void pack(OctetStream& os) const;
+    void unpack(OctetStream& os);
 
     void check(TwoPartyPlayer& P);
 };
 
-class OnDemandOTTripleSetup
+class OnDemandOtTripleSetup
 {
-    map<Player*, OTTripleSetup*> setups;
+    map<Player*, OtTripleSetup*> setups;
 
 public:
-    ~OnDemandOTTripleSetup()
+    ~OnDemandOtTripleSetup()
     {
         for (auto& setup : setups)
             delete setup.second;
     }
 
-    OTTripleSetup get_fresh(Player& P)
+    OtTripleSetup get_fresh(Player& P)
     {
         if (setups.find(&P) == setups.end())
-            setups[&P] = new OTTripleSetup(P, true);
+            setups[&P] = new OtTripleSetup(P, true);
         return setups[&P]->get_fresh();
     }
 };

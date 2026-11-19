@@ -103,7 +103,7 @@ int main(int argc, char** argv)
     if (argc > 5 + nparties)
         port_base = atoi(argv[5 + nparties]);
 
-    bigint::init_thread();
+    Bigint::initialize_thread();
 
     // Setup connections from this client to each party socket
     Client client(hostnames, port_base, my_client_id);
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
     auto& sockets = client.sockets;
     for (int i = 0; i < nparties; i++)
     {
-        octetStream os;
+        OctetStream os;
         os.store(finish);
         os.Send(sockets[i]);
     }
@@ -122,9 +122,9 @@ int main(int argc, char** argv)
     {
     case 'p':
     {
-        gfp::init_field(specification.get<bigint>());
-        cerr << "using prime " << gfp::pr() << endl;
-        run<gfp, gfp>(salary_value, client);
+        Gfp::initialize_field(specification.get<Bigint>());
+        cerr << "using prime " << Gfp::pr() << endl;
+        run<Gfp, Gfp>(salary_value, client);
         break;
     }
     case 'R':

@@ -11,7 +11,7 @@ using namespace std;
 #include "protocols/common/share.h"
 #include "he/core/addable_vector.h"
 
-template<class T> class MatrixMC;
+template<class T> class MatrixOpener;
 
 template<class T>
 class NonInitVector
@@ -260,24 +260,24 @@ template<class T>
 class ShareMatrix : public ValueMatrix<T>, public ShareInterface
 {
     typedef ShareMatrix This;
-    typedef ValueMatrix<T> super;
+    typedef ValueMatrix<T> Super;
 
 public:
-    typedef MatrixMC<T> MAC_Check;
+    typedef MatrixOpener<T> MacCheck;
     typedef Beaver<ShareMatrix> Protocol;
     typedef ::Input<This> Input;
     typedef DummyLivePrep<T> LivePrep;
 
     typedef ValueMatrix<typename T::clear> clear;
-    typedef ValueMatrix<typename T::open_type> open_type;
-    typedef typename T::mac_key_type mac_key_type;
+    typedef ValueMatrix<typename T::OpenType> OpenType;
+    typedef typename T::MacKeyType MacKeyType;
 
     static string type_string()
     {
         return "matrix";
     }
 
-    static This constant(const clear& other, int my_num, mac_key_type key)
+    static This constant(const clear& other, int my_num, MacKeyType key)
     {
         This res(other.n_rows, other.n_cols);
         if (not other.entries.v.empty())
@@ -297,7 +297,7 @@ public:
 
     template<class U>
     ShareMatrix(const U& other) :
-        super(other)
+        Super(other)
     {
     }
 
@@ -310,7 +310,7 @@ public:
         return res;
     }
 
-    ShareMatrix from_col(int start, int size) const
+    ShareMatrix from_column(int start, int size) const
     {
         ShareMatrix res(this->n_rows, min(size, this->n_cols - start));
         res.entries.clear();
@@ -320,20 +320,20 @@ public:
         return res;
     }
 
-    ShareMatrix from(int start_row, int start_col, int* sizes, bool for_real =
+    ShareMatrix from(int start_row, int start_column, int* sizes, bool for_real =
             true) const
     {
         ShareMatrix res(min(sizes[0], this->n_rows - start_row),
-                min(sizes[1], this->n_cols - start_col));
+                min(sizes[1], this->n_cols - start_column));
         if (not for_real)
             return res;
         for (int i = 0; i < res.n_rows; i++)
             for (int j = 0; j < res.n_cols; j++)
-                res.entries.v.push_back((*this)[{start_row + i, start_col + j}]);
+                res.entries.v.push_back((*this)[{start_row + i, start_column + j}]);
         return res;
     }
 
-    void add_from_col(int start, const ShareMatrix& other)
+    void add_from_column(int start, const ShareMatrix& other)
     {
         this->entries.init();
         for (int i = 0; i < this->n_rows; i++)
@@ -343,7 +343,7 @@ public:
 };
 
 template<class T>
-ShareMatrix<T> operator*(const typename ShareMatrix<T>::open_type& a,
+ShareMatrix<T> operator*(const typename ShareMatrix<T>::OpenType& a,
         const ShareMatrix<T>& b)
 {
     ShareMatrix<T> res;
@@ -361,25 +361,25 @@ ShareMatrix<T> operator*(const ShareMatrix<T>& b,
 }
 
 template<class T>
-class MatrixMC : public MAC_Check_Base<ShareMatrix<T>>
+class MatrixOpener : public MacCheckBase<ShareMatrix<T>>
 {
     friend class Hemi<T>;
 
-    typename T::MAC_Check& inner;
+    typename T::MacCheck& inner;
 
 public:
-    MatrixMC(typename T::MAC_Check& inner) :
-            MAC_Check_Base<ShareMatrix<T>>(inner.get_alphai()), inner(inner)
+    MatrixOpener(typename T::MacCheck& inner) :
+            MacCheckBase<ShareMatrix<T>>(inner.get_alphai()), inner(inner)
     {
     }
 
-    ~MatrixMC()
+    ~MatrixOpener()
     {
     }
 
     void exchange(const Player& P)
     {
-        inner.init_open(P);
+        inner.initialize_open(P);
         for (auto& share : this->secrets)
         {
             share.check();

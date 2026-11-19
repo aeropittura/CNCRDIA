@@ -61,8 +61,8 @@ void Rep4RingPrep<T>::buffer_bits()
 {
     CODE_LOCATION
     assert(this->proc != 0);
-    SeededPRNG G;
-    octetStream os;
+    SeededPrng G;
+    OctetStream os;
     Player& P = this->proc->P;
     if (P.my_num() % 2 == 0)
     {
@@ -77,15 +77,15 @@ void Rep4RingPrep<T>::buffer_bits()
 
     auto& protocol = this->proc->protocol;
 
-    vector<typename T::open_type> bits;
+    vector<typename T::OpenType> bits;
     int batch_size = BaseMachine::batch_size<T>(DATA_BIT);
     bits.reserve(batch_size);
     for (int i = 0; i < batch_size; i++)
         bits.push_back(G.get_bit());
 
-    protocol.init_mul();
+    protocol.initialize_mult();
     protocol.reset_joint_input(batch_size);
-    vector<typename Rep4<T>::ResTuple> a(batch_size), b(batch_size);
+    vector<typename Rep4<T>::ResultTuple> a(batch_size), b(batch_size);
     protocol.prepare_joint_input(0, 1, 3, 2, bits, a);
     protocol.prepare_joint_input(2, 3, 1, 0, bits, b);
     protocol.append_hashes(protocol.send_os);
@@ -95,7 +95,7 @@ void Rep4RingPrep<T>::buffer_bits()
     protocol.check_hashes(protocol.receive_os);
 
     auto results = protocol.results;
-    protocol.init_mul();
+    protocol.initialize_mult();
     for (int i = 0; i < batch_size; i++)
         protocol.prepare_mul(a[i].res, b[i].res);
     protocol.exchange();

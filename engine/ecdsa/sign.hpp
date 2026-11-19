@@ -54,8 +54,8 @@ inline P256Element::Scalar hash_to_scalar(const unsigned char* message, size_t l
 template<template<class U> class T>
 EcSignature sign(const unsigned char* message, size_t length,
         EcTuple<T> tuple,
-        typename T<P256Element::Scalar>::MAC_Check& MC,
-        typename T<P256Element>::MAC_Check& MCc,
+        typename T<P256Element::Scalar>::MacCheck& MC,
+        typename T<P256Element>::MacCheck& MCc,
         Player& P,
         EcdsaOptions opts,
         P256Element pk,
@@ -65,23 +65,23 @@ EcSignature sign(const unsigned char* message, size_t length,
     (void) pk;
     Timer timer;
     timer.start();
-    auto stats = P.total_comm();
+    auto statistics = P.total_communication();
     EcSignature signature;
-    vector<P256Element> opened_R;
-    if (opts.R_after_msg)
-        MCc.POpen_Begin(opened_R, {tuple.secret_R}, P);
+    vector<P256Element> opened_r;
+    if (opts.r_after_message)
+        MCc.POpen_Begin(opened_r, {tuple.secret_r}, P);
     T<P256Element::Scalar> prod = tuple.b;
     auto& protocol = proc->protocol;
     if (proc)
     {
-        protocol.init_mul();
+        protocol.initialize_mult();
         protocol.prepare_mul(sk, tuple.a);
         protocol.start_exchange();
     }
-    if (opts.R_after_msg)
+    if (opts.r_after_message)
     {
-        MCc.POpen_End(opened_R, {tuple.secret_R}, P);
-        tuple.R = opened_R[0];
+        MCc.POpen_End(opened_r, {tuple.secret_r}, P);
+        tuple.R = opened_r[0];
         if (opts.fewer_rounds)
             tuple.R /= tuple.c;
     }
@@ -94,7 +94,7 @@ EcSignature sign(const unsigned char* message, size_t length,
     auto rx = tuple.R.x();
     signature.s = MC.open(
             tuple.a * hash_to_scalar(message, length) + prod * rx, P);
-    auto diff = (P.total_comm() - stats);
+    auto diff = (P.total_communication() - statistics);
     cout << "Minimal signing took " << timer.elapsed() * 1e3 << " ms and sending "
             << diff.sent << " bytes" << endl;
     diff.print(true);
@@ -105,7 +105,7 @@ inline
 EcSignature sign(const unsigned char* message, size_t length, P256Element::Scalar sk)
 {
     EcSignature signature;
-    auto k = SeededPRNG().get<P256Element::Scalar>();
+    auto k = SeededPrng().get<P256Element::Scalar>();
     signature.R = k;
     auto rx = signature.R.x();
     signature.s = k.invert() * (hash_to_scalar(message, length) + rx * sk);
@@ -129,24 +129,24 @@ void check(EcSignature signature, const unsigned char* message, size_t length,
 
 template<template<class U> class T>
 void sign_benchmark(vector<EcTuple<T>>& tuples, T<P256Element::Scalar> sk,
-        typename T<P256Element::Scalar>::MAC_Check& MCp, Player& P,
+        typename T<P256Element::Scalar>::MacCheck& MCp, Player& P,
         EcdsaOptions& opts,
         SubProcessor<T<P256Element::Scalar>>* proc = 0)
 {
     unsigned char message[1024];
-    GlobalPRNG(P).get_octets(message, 1024);
-    typename T<P256Element>::Direct_MC MCc(MCp.get_alphai());
+    GlobalPrng(P).get_octets(message, 1024);
+    typename T<P256Element>::DirectOpener MCc(MCp.get_alphai());
 
     // synchronize
-    Bundle<octetStream> bundle(P);
+    Bundle<OctetStream> bundle(P);
     P.unchecked_broadcast(bundle);
     Timer timer;
     timer.start();
-    auto stats = P.total_comm();
+    auto statistics = P.total_communication();
     P256Element pk = MCc.open(sk, P);
     MCc.Check(P);
     cout << "Public key generation took " << timer.elapsed() * 1e3 << " ms" << endl;
-    (P.total_comm() - stats).print(true);
+    (P.total_communication() - statistics).print(true);
 
     for (size_t i = 0; i < min(10lu, tuples.size()); i++)
     {
@@ -157,10 +157,10 @@ void sign_benchmark(vector<EcTuple<T>>& tuples, T<P256Element::Scalar> sk,
         Timer timer;
         timer.start();
         auto& check_player = MCp.get_check_player(P);
-        auto stats = check_player.total_comm();
+        auto statistics = check_player.total_communication();
         MCp.Check(P);
         MCc.Check(P);
-        auto diff = (check_player.total_comm() - stats);
+        auto diff = (check_player.total_communication() - statistics);
         cout << "Online checking took " << timer.elapsed() * 1e3 << " ms and sending "
             << diff.sent << " bytes" << endl;
         diff.print();

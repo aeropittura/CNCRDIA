@@ -8,21 +8,21 @@
 
 template<class T,class FD,class S>
 void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
-             const Ciphertext& cm,bool NewCiphertext,
+             const Ciphertext& cm,bool new_ciphertext,
              const Player& P,EncCommitBase<T,FD,S>& EC,
              const FHE_PK& pk,const FHE_SK& share)
 {
   DistDecrypt<FD> dd(P, share, pk, m.get_field());
-  Reshare(m, cc, cm, NewCiphertext, P, EC, pk, dd);
+  Reshare(m, cc, cm, new_ciphertext, P, EC, pk, dd);
 }
 
 template<class T,class FD,class S>
 void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
-             const Ciphertext& cm,bool NewCiphertext,
+             const Ciphertext& cm,bool new_ciphertext,
              const Player& P,EncCommitBase<T,FD,S>& EC,
              const FHE_PK& pk,DistDecrypt<FD>& dd)
 {
-  const FHE_Params& params=pk.get_params();
+  const FheParameters& params=pk.get_parameters();
 
   // Step 1
   Ciphertext cf(params);
@@ -37,7 +37,7 @@ void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
 
   // Step 3
   Plaintext_<FD>& mf = dd.mf;
-  dd.run(cmf, NewCiphertext);
+  dd.run(cmf, new_ciphertext);
   
   // Step 4
   if (P.my_num()==0)
@@ -46,9 +46,9 @@ void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
     { m=f; m.negate(); }
  
   // Step 5
-  if (NewCiphertext)
+  if (new_ciphertext)
     {
-      Random_Coins rc(params);
+      RandomCoins rc(params);
       pk.encrypt(cc,mf,rc);
       // And again
       if (cf.level()==0) { cc.Scale(m.get_field().get_prime()); }
@@ -59,25 +59,25 @@ void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
 
 
 
-template void Reshare(Plaintext<gfp,FFT_Data,bigint>& m,Ciphertext& cc,
-                      const Ciphertext& cm,bool NewCiphertext,
-                      const Player& P,EncCommitBase<gfp,FFT_Data,bigint>& EC,
-                      const FHE_PK& pk,DistDecrypt<FFT_Data>& dd);
+template void Reshare(Plaintext<Gfp,FftData,Bigint>& m,Ciphertext& cc,
+                      const Ciphertext& cm,bool new_ciphertext,
+                      const Player& P,EncCommitBase<Gfp,FftData,Bigint>& EC,
+                      const FHE_PK& pk,DistDecrypt<FftData>& dd);
 
-template void Reshare(Plaintext<gf2n_short,P2Data,int>& m,Ciphertext& cc,
-                      const Ciphertext& cm,bool NewCiphertext,
-                      const Player& P,EncCommitBase<gf2n_short,P2Data,int>& EC,
+template void Reshare(Plaintext<Gf2nShort,P2Data,int>& m,Ciphertext& cc,
+                      const Ciphertext& cm,bool new_ciphertext,
+                      const Player& P,EncCommitBase<Gf2nShort,P2Data,int>& EC,
                       const FHE_PK& pk,DistDecrypt<P2Data>& dd);
 
 
-template void Reshare(Plaintext<gfp,FFT_Data,bigint>& m,Ciphertext& cc,
-                      const Ciphertext& cm,bool NewCiphertext,
-                      const Player& P,EncCommitBase<gfp,FFT_Data,bigint>& EC,
+template void Reshare(Plaintext<Gfp,FftData,Bigint>& m,Ciphertext& cc,
+                      const Ciphertext& cm,bool new_ciphertext,
+                      const Player& P,EncCommitBase<Gfp,FftData,Bigint>& EC,
                       const FHE_PK& pk,const FHE_SK& share);
 
-template void Reshare(Plaintext<gf2n_short,P2Data,int>& m,Ciphertext& cc,
-                      const Ciphertext& cm,bool NewCiphertext,
-                      const Player& P,EncCommitBase<gf2n_short,P2Data,int>& EC,
+template void Reshare(Plaintext<Gf2nShort,P2Data,int>& m,Ciphertext& cc,
+                      const Ciphertext& cm,bool new_ciphertext,
+                      const Player& P,EncCommitBase<Gf2nShort,P2Data,int>& EC,
                       const FHE_PK& pk,const FHE_SK& share);
 
 

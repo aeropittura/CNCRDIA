@@ -14,14 +14,14 @@
  * Shamir secret sharing opening protocol (indirect communication)
  */
 template<class T>
-class IndirectShamirMC : public MAC_Check_Base<T>
+class IndirectShamirOpener : public MacCheckBase<T>
 {
-    vector<octetStream> oss;
-    octetStream os;
+    vector<OctetStream> oss;
+    OctetStream os;
 
 public:
-    IndirectShamirMC(typename T::mac_key_type = {}, int = 0, int = 0) {}
-    ~IndirectShamirMC() {}
+    IndirectShamirOpener(typename T::MacKeyType = {}, int = 0, int = 0) {}
+    ~IndirectShamirOpener() {}
 
     virtual void exchange(const Player& P);
 };
@@ -30,54 +30,54 @@ public:
  * Shamir secret sharing opening protocol (direct communication)
  */
 template<class T>
-class ShamirMC : public IndirectShamirMC<T>
+class ShamirOpener : public IndirectShamirOpener<T>
 {
-    typedef typename T::open_type open_type;
-    typedef typename T::open_type::Scalar rec_type;
-    vector<typename T::open_type::Scalar> reconstruction;
+    typedef typename T::OpenType OpenType;
+    typedef typename T::OpenType::Scalar RecType;
+    vector<typename T::OpenType::Scalar> reconstruction;
 
-    ShamirMC(const ShamirMC&);
+    ShamirOpener(const ShamirOpener&);
 
-    void finalize(vector<typename T::open_type>& values, const vector<T>& S);
+    void finalize(vector<typename T::OpenType>& values, const vector<T>& S);
 
 protected:
-    Bundle<octetStream>* os;
+    Bundle<OctetStream>* os;
     const Player* player;
     int threshold;
 
     void prepare(const vector<T>& S, const Player& P);
 
 public:
-    ShamirMC(int threshold = 0);
+    ShamirOpener(int threshold = 0);
 
-    // emulate MAC_Check
-    ShamirMC(const typename T::mac_key_type& _, int __ = 0, int ___ = 0) : ShamirMC()
+    // emulate MacCheck
+    ShamirOpener(const typename T::MacKeyType& _, int __ = 0, int ___ = 0) : ShamirOpener()
     { (void)_; (void)__; (void)___; }
 
-    // emulate Direct_MAC_Check
-    ShamirMC(const typename T::mac_key_type& _, Names& ____, int __ = 0, int ___ = 0) :
-        ShamirMC()
+    // emulate DirectMacCheck
+    ShamirOpener(const typename T::MacKeyType& _, Names& ____, int __ = 0, int ___ = 0) :
+        ShamirOpener()
     { (void)_; (void)__; (void)___; (void)____; }
 
-    virtual ~ShamirMC();
+    virtual ~ShamirOpener();
 
-    void POpen(vector<typename T::open_type>& values,const vector<T>& S,const Player& P);
-    void POpen_Begin(vector<typename T::open_type>& values,const vector<T>& S,const Player& P);
-    void POpen_End(vector<typename T::open_type>& values,const vector<T>& S,const Player& P);
+    void POpen(vector<typename T::OpenType>& values,const vector<T>& S,const Player& P);
+    void POpen_Begin(vector<typename T::OpenType>& values,const vector<T>& S,const Player& P);
+    void POpen_End(vector<typename T::OpenType>& values,const vector<T>& S,const Player& P);
 
-    virtual void init_open(const Player& P, int n = 0);
+    virtual void initialize_open(const Player& P, int n = 0);
     virtual void prepare_open(const T& secret, int = -1);
     virtual void exchange(const Player& P);
-    virtual typename T::open_type finalize_raw();
-    virtual array<typename T::open_type*, 2> finalize_several(size_t n);
+    virtual typename T::OpenType finalize_raw();
+    virtual array<typename T::OpenType*, 2> finalize_several(size_t n);
 
     void Check(const Player& P) { (void)P; }
 
     void start_exchange(const Player& P);
     void stop_exchange(const Player& P);
 
-    vector<rec_type> get_reconstruction(const Player& P, int n = 0);
-    open_type reconstruct(const vector<open_type>& shares);
+    vector<RecType> get_reconstruction(const Player& P, int n = 0);
+    OpenType reconstruct(const vector<OpenType>& shares);
 
     int get_threshold() const { return threshold; }
 };

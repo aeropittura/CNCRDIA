@@ -17,19 +17,19 @@ typename T::Protocol Beaver<T>::branch()
     typename T::Protocol res(P);
     res.prep = prep;
     res.MC = MC;
-    res.init_mul();
+    res.initialize_mult();
     return res;
 }
 
 template<class T>
-void Beaver<T>::init(Preprocessing<T>& prep, typename T::MAC_Check& MC)
+void Beaver<T>::init(Preprocessing<T>& prep, typename T::MacCheck& MC)
 {
     this->prep = &prep;
     this->MC = &MC;
 }
 
 template<class T>
-void Beaver<T>::init_mul()
+void Beaver<T>::initialize_mult()
 {
     assert(this->prep);
     assert(this->MC);
@@ -53,7 +53,7 @@ void Beaver<T>::prepare_mul(const T& x, const T& y, int n)
 {
     if (not T::clear::binary or fast_mode)
     {
-        prepare_mul_fast(x, y);
+        prepare_mult_fast(x, y);
         return;
     }
 
@@ -67,7 +67,7 @@ void Beaver<T>::prepare_mul(const T& x, const T& y, int n)
 }
 
 template<class T>
-void Beaver<T>::prepare_mul_fast(const T& x, const T& y)
+void Beaver<T>::prepare_mult_fast(const T& x, const T& y)
 {
     multiplicands.push_back({x, y});
 }
@@ -90,7 +90,7 @@ void Beaver<T>::exchange()
 {
     CODE_LOCATION
     size_t n_mults = lengths.size() + multiplicands.size();
-    MC->init_open(P, n_mults);
+    MC->initialize_open(P, n_mults);
     if (not T::clear::binary or fast_mode)
     {
         pre_fast_exchange();
@@ -126,7 +126,7 @@ void Beaver<T>::post_fast_exchange()
     results.clear();
     for (auto& triple : triples)
     {
-        this->add_mul(-1);
+        this->add_mult(-1);
         // assignments necessary for GCC
         auto eps = MC->finalize_raw();
         auto delta = MC->finalize_raw();
@@ -140,7 +140,7 @@ void Beaver<T>::start_exchange()
 {
     if (not T::clear::binary or fast_mode)
     {
-        MC->init_open(P, multiplicands.size());
+        MC->initialize_open(P, multiplicands.size());
         pre_fast_exchange();
         MC->start_exchange(P);
     }
@@ -168,10 +168,10 @@ template<class T>
 T Beaver<T>::finalize_mul(int n)
 {
     if (not T::clear::binary or fast_mode)
-        return finalize_mul_fast();
+        return finalize_mult_fast();
     else
     {
-        this->add_mul(n);
+        this->add_mult(n);
         // deliberately complicated to work around GCC bug
         it += 2;
         return finalize(*triple++, *(it - 2), *(it - 1), P.my_num());
@@ -179,14 +179,14 @@ T Beaver<T>::finalize_mul(int n)
 }
 
 template<class T>
-T Beaver<T>::finalize_mul_fast()
+T Beaver<T>::finalize_mult_fast()
 {
     return results.next();
 }
 
 template<class T>
-T Beaver<T>::finalize(array<T, 3>& triple, const open_type& eps,
-        const open_type& delta, int my_num)
+T Beaver<T>::finalize(array<T, 3>& triple, const OpenType& eps,
+        const OpenType& delta, int my_num)
 {
     T& tmp = triple[2];
     tmp += eps * triple[1];

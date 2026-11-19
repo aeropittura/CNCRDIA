@@ -16,6 +16,6 @@ public:
         return 8 * BitVec::size();
     }
 
-    void pack(octetStream& os) const;
-    void unpack(octetStream& os);
+    void pack(OctetStream& os) const;
+    void unpack(OctetStream& os);
 };

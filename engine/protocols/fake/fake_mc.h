@@ -8,10 +8,10 @@
 #include "protocols/common/mac_check_base.h"
 
 template<class T>
-class FakeMC : public MAC_Check_Base<T>
+class FakeOpener : public MacCheckBase<T>
 {
 public:
-    FakeMC(typename T::mac_key_type, int = 0, int = 0)
+    FakeOpener(typename T::MacKeyType, int = 0, int = 0)
     {
     }
 
@@ -21,7 +21,7 @@ public:
             this->values.push_back(x);
     }
 
-    FakeMC& get_part_MC()
+    FakeOpener& get_part_opener()
     {
         return *this;
     }

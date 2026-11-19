@@ -43,45 +43,45 @@
 template<template<class U> class T>
 void run(int argc, const char** argv)
 {
-    bigint::init_thread();
-    ez::ezOptionParser opt;
+    Bigint::initialize_thread();
+    ez::EzOptionParser opt;
     EcdsaOptions opts(opt, argc, argv);
-    opts.R_after_msg |= is_same<T<P256Element>, AtlasShare<P256Element>>::value;
+    opts.r_after_message |= is_same<T<P256Element>, AtlasShare<P256Element>>::value;
     Names N(opt, argc, argv,
             3 + is_same<T<P256Element>, Rep4Share<P256Element>>::value);
     int n_tuples = 1000;
-    if (not opt.lastArgs.empty())
-        n_tuples = atoi(opt.lastArgs[0]->c_str());
+    if (not opt.last_args.empty())
+        n_tuples = atoi(opt.last_args[0]->c_str());
     CryptoPlayer P(N, "ecdsa");
     P256Element::init();
-    typedef T<P256Element::Scalar> pShare;
+    typedef T<P256Element::Scalar> PShare;
     OnlineOptions::singleton.batch_size = 1;
     // synchronize
-    Bundle<octetStream> bundle(P);
+    Bundle<OctetStream> bundle(P);
     P.unchecked_broadcast(bundle);
 
-    typename pShare::mac_key_type mac_key;
-    pShare::read_or_generate_mac_key("", P, mac_key);
+    typename PShare::MacKeyType mac_key;
+    PShare::read_or_generate_mac_key("", P, mac_key);
 
     Timer timer;
     timer.start();
-    auto stats = P.total_comm();
+    auto statistics = P.total_communication();
     ProtocolSet<typename T<P256Element::Scalar>::Honest> set(P, mac_key);
-    pShare sk = set.protocol.get_random();
+    PShare sk = set.protocol.get_random();
     cout << "Secret key generation took " << timer.elapsed() * 1e3 << " ms" << endl;
-    (P.total_comm() - stats).print(true);
+    (P.total_communication() - statistics).print(true);
 
-    OnlineOptions::singleton.batch_size = (1 + pShare::Protocol::uses_triples) * n_tuples;
+    OnlineOptions::singleton.batch_size = (1 + PShare::Protocol::uses_triples) * n_tuples;
     DataPositions usage;
-    typename pShare::TriplePrep prep(0, usage);
-    typename pShare::MAC_Check MCp(mac_key);
+    typename PShare::TriplePrep prep(0, usage);
+    typename PShare::MacCheck MCp(mac_key);
     ArithmeticProcessor _({}, 0);
-    SubProcessor<pShare> proc(_, MCp, prep, P);
+    SubProcessor<PShare> proc(_, MCp, prep, P);
 
-    bool prep_mul = not opt.isSet("-D");
+    bool prep_mult = not opt.isSet("-D");
     vector<EcTuple<T>> tuples;
     preprocessing<T>(tuples, n_tuples, sk, proc, opts);
 //    check(tuples, sk, {}, P);
-    sign_benchmark<T>(tuples, sk, MCp, P, opts, prep_mul ? 0 : &proc);
+    sign_benchmark<T>(tuples, sk, MCp, P, opts, prep_mult ? 0 : &proc);
     P256Element::finish();
 }

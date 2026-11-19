@@ -11,5 +11,5 @@
 
 int main(int argc, const char** argv)
 {
-    RealProgramParty<MaliciousRep3Share<gf2n_long>>(argc, argv);
+    RealProgramParty<MaliciousRep3Share<Gf2nLong>>(argc, argv);
 }

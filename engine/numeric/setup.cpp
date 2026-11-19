@@ -13,15 +13,15 @@
  * Just setup the primes, doesn't need NTL.
  * Sets idx and m to be used by SHE setup if necessary
  */
-bigint SPDZ_Data_Setup_Primes(int lgp)
+Bigint spdz_data_setup_primes(int lgp)
 {
   int idx, m;
-  bigint p;
-  SPDZ_Data_Setup_Primes(p, lgp, idx, m);
+  Bigint p;
+  spdz_data_setup_primes(p, lgp, idx, m);
   return p;
 }
 
-void SPDZ_Data_Setup_Primes(bigint& p,int lgp,int& idx,int& m)
+void spdz_data_setup_primes(Bigint& p,int lgp,int& idx,int& m)
 {
 #ifdef VERBOSE
   cerr << "Setting up parameters" << endl;
@@ -71,19 +71,19 @@ int default_m(int& lgp, int& idx)
   return m;
 }
 
-bigint generate_prime(int lgp, int m, bool force_degree)
+Bigint generate_prime(int lgp, int m, bool force_degree)
 {
-  bigint p;
+  Bigint p;
   generate_prime(p, lgp, m, force_degree);
   return p;
 }
 
-void generate_prime(bigint& p, int lgp, int m, bool force_degree)
+void generate_prime(Bigint& p, int lgp, int m, bool force_degree)
 {
   if (OnlineOptions::singleton.prime > 0)
     {
       p = OnlineOptions::singleton.prime;
-      if (!probPrime(p))
+      if (!prob_prime(p))
         {
           throw runtime_error(to_string(p) + " is not a prime");
         }
@@ -105,16 +105,16 @@ void generate_prime(bigint& p, int lgp, int m, bool force_degree)
   if (not force_degree)
     m = max(m, default_m(lgp, idx));
 
-  bigint u;
+  Bigint u;
   int ex;
-  ex = lgp - numBits(m);
+  ex = lgp - num_bits(m);
   if (ex < 0)
     throw runtime_error(to_string(lgp) + "-bit primes too small "
             "for our parameters");
   u = 1;
   u = (u << ex) * m;
   p = u + 1;
-  while (!probPrime(p) || numBits(p) < lgp)
+  while (!prob_prime(p) || num_bits(p) < lgp)
     {
       u = u + m;
       p = u + 1;
@@ -122,12 +122,12 @@ void generate_prime(bigint& p, int lgp, int m, bool force_degree)
 
 #ifdef VERBOSE
   cerr << "\t p = " << p << "  u = " << u << "  :   ";
-  cerr << lgp << " <= " << numBits(p) << endl;
+  cerr << lgp << " <= " << num_bits(p) << endl;
 #endif
 }
 
 
-void Zp_Data::write_setup(const string& dirname) const
+void ZpData::write_setup(const string& dirname) const
 {
   auto& p = pr;
 
@@ -154,24 +154,24 @@ void Zp_Data::write_setup(const string& dirname) const
     throw file_error("cannot write to " + ss.str());
 }
 
-void Zp_Data::check_setup(const string& dir)
+void ZpData::check_setup(const string& dir)
 {
-  bigint p;
+  Bigint p;
   bool mont = true;
   string filename = dir + "Params-Data";
   ifstream(filename) >> p >> mont;
   if (p == 0)
-    throw setup_error("no modulus in " + filename);
+    throw SetupError("no modulus in " + filename);
   if (p != pr)
-    throw setup_error("wrong modulus in " + filename);
+    throw SetupError("wrong modulus in " + filename);
   if (mont != montgomery)
-    throw setup_error("Montgomery different in " + filename);
+    throw SetupError("Montgomery different in " + filename);
 }
 
-string get_prep_sub_dir(const string& prep_dir, int nparties, int log2mod,
+string get_prep_sub_directory(const string& prep_directory, int nparties, int log2mod,
         const string& type_short, bool create)
 {
-  string res = prep_dir + "/" + to_string(nparties) + "-" + type_short;
+  string res = prep_directory + "/" + to_string(nparties) + "-" + type_short;
   if (log2mod > 1)
     res += "-" + to_string(log2mod);
   res += "/";

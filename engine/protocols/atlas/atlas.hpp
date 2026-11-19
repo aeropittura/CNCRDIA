@@ -22,7 +22,7 @@ array<T, 2> Atlas<T>::get_double_sharing()
 {
     if (double_sharings.empty())
     {
-        SeededPRNG G;
+        SeededPrng G;
         PRNG G2 = G;
         BufferScope scope(shamir, this->buffer_size);
         BufferScope scope2(shamir2, this->buffer_size);
@@ -40,7 +40,7 @@ array<T, 2> Atlas<T>::get_double_sharing()
 }
 
 template<class T>
-void Atlas<T>::init_mul()
+void Atlas<T>::initialize_mult()
 {
     oss.reset();
     oss2.reset();
@@ -57,7 +57,7 @@ void Atlas<T>::prepare_mul(const T& x, const T& y, int)
 }
 
 template<class T>
-void Atlas<T>::prepare(const typename T::open_type& product)
+void Atlas<T>::prepare(const typename T::OpenType& product)
 {
     auto r = get_double_sharing();
     (product + r[0]).pack(oss2[next_king]);
@@ -81,7 +81,7 @@ void Atlas<T>::exchange()
     for (size_t j = P.get_player(-base_king); j < masks.size();
             j += P.num_players())
     {
-        typename T::open_type e;
+        typename T::OpenType e;
         for (int i = 0; i < 2 * t + 1; i++)
         {
             auto tmp = oss[i].template get<T>();
@@ -108,9 +108,9 @@ T Atlas<T>::finalize_mul(int)
 }
 
 template<class T>
-void Atlas<T>::init_dotprod()
+void Atlas<T>::initialize_dotprod()
 {
-    init_mul();
+    initialize_mult();
     dotprod_share = 0;
 }
 

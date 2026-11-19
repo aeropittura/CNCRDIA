@@ -49,8 +49,8 @@ public:
     
     void randomize(PRNG& G, size_t size);
 
-    void pack(octetStream& o) const;
-    void unpack(octetStream& o);
+    void pack(OctetStream& o) const;
+    void unpack(OctetStream& o);
 
     size_t size() const { return rows.size(); }
 
@@ -123,5 +123,5 @@ public:
         return {*this, other};
     }
 
-    void pack(octetStream& o) const;
+    void pack(OctetStream& o) const;
 };

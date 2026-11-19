@@ -70,7 +70,7 @@ void FakeSecret::trans(StackedVector<FakeSecret>& dest,
         const StackedVector<FakeSecret>& source, int n_outputs,
         const ArgVector& args)
 {
-	square64 square;
+	Square64 square;
 	for (size_t i = n_outputs; i < args.size(); i++)
 		square.rows[i - n_outputs] = source[args[i]].a;
 	square.transpose(args.size() - n_outputs, n_outputs);

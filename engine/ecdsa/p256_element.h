@@ -13,7 +13,7 @@
 class P256Element : public ValueInterface
 {
 public:
-    typedef gfp_<2, 4> Scalar;
+    typedef Gfp_<2, 4> Scalar;
 
 private:
     static EC_GROUP* curve;
@@ -35,7 +35,7 @@ public:
     static void init(int nid = NID_X9_62_prime256v1);
     static void finish();
 
-    static void specification(octetStream& os);
+    static void specification(OctetStream& os);
 
     P256Element();
     P256Element(const P256Element& other);
@@ -60,8 +60,8 @@ public:
     bool operator==(const P256Element& other) const;
     bool operator!=(const P256Element& other) const;
 
-    void pack(octetStream& os, int = -1) const;
-    void unpack(octetStream& os, int = -1);
+    void pack(OctetStream& os, int = -1) const;
+    void unpack(OctetStream& os, int = -1);
 
     void output(ostream& s, bool human) const;
 

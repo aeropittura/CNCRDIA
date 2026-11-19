@@ -14,18 +14,18 @@ template<class T, class U>
 void bits_from_square_in_ring(vector<T>& bits, int buffer_size, U* bit_prep);
 
 /**
- * SPDZ2k preprocessing
+ * Spdz2k preprocessing
  */
 template<class T>
 class Spdz2kPrep : public virtual MaliciousRingPrep<T>,
         public virtual MascotTriplePrep<T>,
         public virtual RingOnlyPrep<T>
 {
-    typedef typename T::bit_prep_type BitShare;
-    DataPositions bit_pos;
+    typedef typename T::BitPrepType BitShare;
+    DataPositions bit_position;
     MascotTriplePrep<BitShare>* bit_prep;
-    SubProcessor<BitShare>* bit_proc;
-    typename BitShare::MAC_Check* bit_MC;
+    SubProcessor<BitShare>* bit_processor;
+    typename BitShare::MacCheck* bit_opener;
     DabitSacrifice<T> dabit_sacrifice;
 
 public:
@@ -34,7 +34,7 @@ public:
 
     void set_protocol(typename T::Protocol& protocol);
 
-    void buffer_inverses() { throw division_by_zero(); }
+    void buffer_inverses() { throw DivisionByZero(); }
     void buffer_bits();
     void buffer_dabits(ThreadQueues* queues);
 

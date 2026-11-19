@@ -54,7 +54,7 @@ bool Hemi<T>::use_plain_matmul(const array<int, 3> dim, SubProcessor<T>& process
         {
             get_matrix_prep(dim, processor);
         }
-        catch (no_matrix_prep&)
+        catch (NoMatrixPrep&)
         {
             return true;
         }
@@ -68,13 +68,13 @@ bool Hemi<T>::use_plain_matmul(const array<int, 3> dim, SubProcessor<T>& process
             get_matrix_prep(dim, processor);
             found = true;
         }
-        catch (signature_mismatch&)
+        catch (SignatureMismatch&)
         {
         }
 
-        Bundle<octetStream> os(processor.P);
+        Bundle<OctetStream> os(processor.P);
         os.mine.store(found);
-        processor.P.Broadcast_Receive(os);
+        processor.P.broadcast_receive(os);
         os.mine.reset_read_head();
 
         for (auto& o : os)
@@ -120,9 +120,9 @@ void Hemi<T>::matmulsm(SubProcessor<T>& processor, MemoryPart<T>& source,
 
     for (auto it = dim.begin(); it < dim.end(); it += 12)
     {
-        array<int, 3> real_dims({int(it[3]), int(it[4]), int(it[5])});
+        array<int, 3> real_dimensions({int(it[3]), int(it[4]), int(it[5])});
 
-        if (use_plain_matmul(real_dims, processor))
+        if (use_plain_matmul(real_dimensions, processor))
             plain_args.insert(plain_args.end(), it, it + 12);
         else
             complex_args.insert(complex_args.end(), it, it + 12);
@@ -131,7 +131,7 @@ void Hemi<T>::matmulsm(SubProcessor<T>& processor, MemoryPart<T>& source,
     if (not plain_args.empty())
         processor.matmulsm(source, plain_args);
 
-    auto& S = processor.get_S();
+    auto& S = processor.get_s();
 
     // Perform the matrix multiplications in sequence.
     // They are not merged into one communication round since that would require multiple matrix_preps to
@@ -141,52 +141,52 @@ void Hemi<T>::matmulsm(SubProcessor<T>& processor, MemoryPart<T>& source,
     auto Proc = processor.Proc;
     assert(Proc);
 
-    for (auto matmulArgs = complex_args.begin();
-            matmulArgs < complex_args.end(); matmulArgs += 12)
+    for (auto matmul_args = complex_args.begin();
+            matmul_args < complex_args.end(); matmul_args += 12)
     {
-        auto C = S.begin() + matmulArgs[0];
-        size_t firstFactorBase  = Proc->get_Ci().at(matmulArgs[1]).get();
-        size_t secondFactorBase = Proc->get_Ci().at(matmulArgs[2]).get();
-        int resultNumberOfRows = matmulArgs[3];
-        int usedNumberOfFirstFactorColumns = matmulArgs[4];
-        int resultNumberOfColumns = matmulArgs[5];
-        int firstFactorTotalNumberOfColumns = matmulArgs[10];
-        int secondFactorTotalNumberOfColumns = matmulArgs[11];
+        auto C = S.begin() + matmul_args[0];
+        size_t first_factor_base  = Proc->get_ci().at(matmul_args[1]).get();
+        size_t second_factor_base = Proc->get_ci().at(matmul_args[2]).get();
+        int result_number_of_rows = matmul_args[3];
+        int used_number_of_first_factor_columns = matmul_args[4];
+        int result_number_of_columns = matmul_args[5];
+        int first_factor_total_number_of_columns = matmul_args[10];
+        int second_factor_total_number_of_columns = matmul_args[11];
 
-        assert(C + resultNumberOfRows * resultNumberOfColumns <= S.end());
+        assert(C + result_number_of_rows * result_number_of_columns <= S.end());
 
-        ShareMatrix<T> A(resultNumberOfRows, usedNumberOfFirstFactorColumns), B(usedNumberOfFirstFactorColumns, resultNumberOfColumns);
+        ShareMatrix<T> A(result_number_of_rows, used_number_of_first_factor_columns), B(used_number_of_first_factor_columns, result_number_of_columns);
         if (not T::real_shares(processor.P))
         {
             matrix_multiply(A, B, processor);
             continue;
         }
 
-        for (int i = 0; i < resultNumberOfRows; i++) {
-            auto actualFirstFactorRow = Proc->get_Ci().at(matmulArgs[6] + i).get();
+        for (int i = 0; i < result_number_of_rows; i++) {
+            auto actual_first_factor_row = Proc->get_ci().at(matmul_args[6] + i).get();
 
-            for (int k = 0; k < usedNumberOfFirstFactorColumns; k++)
+            for (int k = 0; k < used_number_of_first_factor_columns; k++)
             {
-                auto actualFirstFactorColumn = Proc->get_Ci().at(matmulArgs[7] + k).get();
-                A.entries.v.push_back(source.at(firstFactorBase + actualFirstFactorRow * firstFactorTotalNumberOfColumns + actualFirstFactorColumn));
+                auto actual_first_factor_column = Proc->get_ci().at(matmul_args[7] + k).get();
+                A.entries.v.push_back(source.at(first_factor_base + actual_first_factor_row * first_factor_total_number_of_columns + actual_first_factor_column));
             }
         }
 
 
-        for (int k = 0; k < usedNumberOfFirstFactorColumns; k++) {
-            auto actualSecondFactorRow = Proc->get_Ci().at(matmulArgs[8] + k).get();
-            for (int j = 0; j < resultNumberOfColumns; j++)
+        for (int k = 0; k < used_number_of_first_factor_columns; k++) {
+            auto actual_second_factor_row = Proc->get_ci().at(matmul_args[8] + k).get();
+            for (int j = 0; j < result_number_of_columns; j++)
             {
-                auto actualSecondFactorColumn = Proc->get_Ci().at(matmulArgs[9] + j).get();
-                B.entries.v.push_back(source.at(secondFactorBase + actualSecondFactorRow * secondFactorTotalNumberOfColumns + actualSecondFactorColumn));
+                auto actual_second_factor_column = Proc->get_ci().at(matmul_args[9] + j).get();
+                B.entries.v.push_back(source.at(second_factor_base + actual_second_factor_row * second_factor_total_number_of_columns + actual_second_factor_column));
             }
         }
 
         auto res = matrix_multiply(A, B, processor);
 
-        for (int i = 0; i < resultNumberOfRows; i++)
-            for (int j = 0; j < resultNumberOfColumns; j++)
-                *(C + i * resultNumberOfColumns + j) = res[{i, j}];
+        for (int i = 0; i < result_number_of_rows; i++)
+            for (int j = 0; j < result_number_of_columns; j++)
+                *(C + i * result_number_of_columns + j) = res[{i, j}];
     }
 }
 
@@ -197,7 +197,7 @@ ShareMatrix<T> Hemi<T>::matrix_multiply(const ShareMatrix<T>& A,
     CODE_LOCATION
     if (mc == 0)
     {
-        mc = new MatrixMC<T>(processor.MC);
+        mc = new MatrixOpener<T>(processor.MC);
     }
 
     Beaver<ShareMatrix<T>> beaver(this->P);
@@ -207,24 +207,24 @@ ShareMatrix<T> Hemi<T>::matrix_multiply(const ShareMatrix<T>& A,
     bool verbose = OnlineOptions::singleton.has_option("verbose_matmul");
 
     int max_inner = OnlineOptions::singleton.batch_size;
-    int max_cols = OnlineOptions::singleton.batch_size;
+    int max_columns = OnlineOptions::singleton.batch_size;
 
     if (not OnlineOptions::singleton.live_prep)
     {
         max_inner = A.n_cols;
-        max_cols = B.n_cols;
+        max_columns = B.n_cols;
     }
 
     for (int i = 0; i < A.n_cols; i += max_inner)
     {
-        for (int j = 0; j < B.n_cols; j += max_cols)
+        for (int j = 0; j < B.n_cols; j += max_columns)
         {
             auto subdim = dims;
             subdim[1] = min(max_inner, A.n_cols - i);
-            subdim[2] = min(max_cols, B.n_cols - j);
+            subdim[2] = min(max_columns, B.n_cols - j);
             auto& prep = get_matrix_prep(subdim, processor);
             beaver.init(prep, *mc);
-            beaver.init_mul();
+            beaver.initialize_mult();
             bool for_real = T::real_shares(processor.P);
             if (verbose)
                 fprintf(stderr, "matmul prepare\n");
@@ -241,7 +241,7 @@ ShareMatrix<T> Hemi<T>::matrix_multiply(const ShareMatrix<T>& A,
             }
             beaver.exchange();
             if (for_real)
-                C.add_from_col(j, beaver.finalize_mul());
+                C.add_from_column(j, beaver.finalize_mul());
         }
     }
 
@@ -290,7 +290,7 @@ template<class T>
 void Conv2dTuple::run_matrix(SubProcessor<T>& processor)
 {
     CODE_LOCATION
-    auto& S = processor.get_S();
+    auto& S = processor.get_s();
     array<int, 3> dim = matrix_dimensions();
     ShareMatrix<T> A(dim[0], dim[1]), B(dim[1], dim[2]);
 
@@ -363,9 +363,9 @@ void Conv2dTuple::run_matrix(SubProcessor<T>& processor)
 }
 
 template<class T>
-TimerWithComm Hemi<T>::prep_time()
+TimerWithCommunication Hemi<T>::prep_time()
 {
-    TimerWithComm res;
+    TimerWithCommunication res;
     for (auto& prep : matrix_preps)
         res += prep.second->prep_timer;
     return res;

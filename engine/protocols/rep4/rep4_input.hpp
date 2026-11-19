@@ -8,14 +8,14 @@
 #include "protocols/rep4/rep4_input.h"
 
 template<class T>
-Rep4Input<T>::Rep4Input(SubProcessor<T>& proc, MAC_Check_Base<T>&) :
+Rep4Input<T>::Rep4Input(SubProcessor<T>& proc, MacCheckBase<T>&) :
         InputBase<T>(&proc), protocol(proc.P), P(proc.P)
 {
     assert(P.num_players() == 4);
 }
 
 template<class T>
-Rep4Input<T>::Rep4Input(MAC_Check_Base<T>&, Preprocessing<T>&, Player& P,
+Rep4Input<T>::Rep4Input(MacCheckBase<T>&, Preprocessing<T>&, Player& P,
         Rep4<T>*) :
         protocol(P), P(P)
 {
@@ -37,7 +37,7 @@ void Rep4Input<T>::reset(int player)
 }
 
 template<class T>
-void Rep4Input<T>::add_mine(const typename T::open_type& input, int)
+void Rep4Input<T>::add_mine(const typename T::OpenType& input, int)
 {
     auto& prot = protocol;
     T res;
@@ -92,7 +92,7 @@ void Rep4Input<T>::check()
     if (not check_needed)
         return;
 
-    octetStream os[2][2];
+    OctetStream os[2][2];
     for (int i = 0; i < 2; i++)
     {
         hashes[i].final(os[0][i]);
@@ -100,7 +100,7 @@ void Rep4Input<T>::check()
     }
     for (int i = 0; i < 2; i++)
         if (os[0][i] != os[1][1 - i])
-            throw mac_fail();
+            throw MacFail();
 }
 
 template<class T>
@@ -110,7 +110,7 @@ T Rep4Input<T>::finalize_mine()
 }
 
 template<class T>
-void Rep4Input<T>::finalize_other(int player, T& target, octetStream&, int)
+void Rep4Input<T>::finalize_other(int player, T& target, OctetStream&, int)
 {
     target = results[player].next();
     switch (P.get_offset(player))

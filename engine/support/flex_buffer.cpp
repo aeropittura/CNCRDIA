@@ -13,7 +13,7 @@ using namespace std;
 #define BUFFER_DIR "/tmp"
 #endif
 
-ReceivedMsgStore::~ReceivedMsgStore()
+ReceivedMessageStore::~ReceivedMessageStore()
 {
 #ifdef VERBOSE
 	cerr << "Stored " << (double)total_size / 1e9 << " GB in "
@@ -24,7 +24,7 @@ ReceivedMsgStore::~ReceivedMsgStore()
 	    remove(file.c_str());
 }
 
-void ReceivedMsgStore::push(ReceivedMsg& msg)
+void ReceivedMessageStore::push(ReceivedMessage& msg)
 {
 #ifdef DEBUG_STORE
     cout << "pushing msg of length " << msg.size() << endl;
@@ -60,7 +60,7 @@ void ReceivedMsgStore::push(ReceivedMsg& msg)
 	}
 }
 
-bool ReceivedMsgStore::pop(ReceivedMsg& msg)
+bool ReceivedMessageStore::pop(ReceivedMessage& msg)
 {
 	TimeScope ts(pop_timer);
 	if (mem_size != 0)

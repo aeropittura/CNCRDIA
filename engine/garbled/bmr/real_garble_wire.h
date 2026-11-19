@@ -16,7 +16,7 @@ class GarbleInputter : public InputterBase
 public:
 	RealProgramParty<T>& party;
 
-	Bundle<octetStream> oss;
+	Bundle<OctetStream> oss;
 	PointerVector<pair<RealGarbleWire<T>*, int>> tuples;
 
 	GarbleInputter();
@@ -24,7 +24,7 @@ public:
 };
 
 template<class T>
-class RealGarbleWire : public PRFRegister
+class RealGarbleWire : public PrfRegister
 {
 	friend class RealProgramParty<T>;
 	friend class GarbleInputter<T>;
@@ -46,12 +46,12 @@ public:
 	static void inputbvec(GC::Processor<GC::Secret<RealGarbleWire>>& processor,
 			ProcessorBase& input_processor, const ArgVector& args);
 
-	void garble(PRFOutputs& prf_output, const RealGarbleWire<T>& left,
+	void garble(PrfOutputs& prf_output, const RealGarbleWire<T>& left,
 			const RealGarbleWire<T>& right);
 
 	void XOR(const RealGarbleWire& left, const RealGarbleWire& right);
 
-	void input(party_id_t from, char input = -1);
+	void input(PartyId from, char input = -1);
 	void public_input(bool value);
 	void random();
 	void output();

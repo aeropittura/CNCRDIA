@@ -30,11 +30,11 @@ PostSacriBin::~PostSacriBin()
     }
 }
 
-void PostSacriBin::init_mul()
+void PostSacriBin::initialize_mult()
 {
     if ((int) inputs.size() >= OnlineOptions::singleton.batch_size)
         check();
-    honest.init_mul();
+    honest.initialize_mult();
 }
 
 void PostSacriBin::prepare_mul(const T& x, const T& y, int n)
@@ -66,10 +66,10 @@ void PostSacriBin::check()
     assert(inputs.size() == outputs.size());
     for (size_t i = 0; i < inputs.size(); i++)
         to_check.push_back({{inputs[i][0], inputs[i][1], outputs[i].first}});
-    GlobalPRNG G(P);
+    GlobalPrng G(P);
     for (size_t i = 0; i < inputs.size(); i++)
         to_check.push_back(get_d1_triple(G, outputs[i].second));
-    HashMaliciousRepMC<T> MC;
+    HashMaliciousRepOpener<T> MC;
     vector<array<T, 3>> _(N);
     TripleShuffleSacrifice<T>(2, 6).triple_sacrifice(_, to_check, P, MC, 0, inputs.size());
     MC.Check(P);
@@ -77,7 +77,7 @@ void PostSacriBin::check()
     outputs.clear();
 }
 
-array<PostSacriBin::T, 3> PostSacriBin::get_d1_triple(GlobalPRNG& G, int n_bits)
+array<PostSacriBin::T, 3> PostSacriBin::get_d1_triple(GlobalPrng& G, int n_bits)
 {
     while (d1.size() < N)
         d1.push_back(get_d2_triple(T::N_BITS));
@@ -106,7 +106,7 @@ void PostSacriBin::get(Dtype type, T* res)
         // optimistic triple generation
         Replicated<T> protocol(P);
         generate_triples(check_triples, 2 * N + 6, &protocol, T::N_BITS);
-        HashMaliciousRepMC<T> MC;
+        HashMaliciousRepOpener<T> MC;
         sacrifice.triple_sacrifice(d2, check_triples, P, MC, 0);
         MC.Check(P);
         assert(d2.size() == N);

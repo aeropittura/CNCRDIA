@@ -60,7 +60,7 @@ double Timer::elapsed_then_reset()
 double Timer::idle()
 {
   if (running)
-    throw Processor_Error("Timer running.");
+    throw ProcessorError("Timer running.");
   else
     return convert_ns_to_seconds(elapsed_since_last_start());
 }

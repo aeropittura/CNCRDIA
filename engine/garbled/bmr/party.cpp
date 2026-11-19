@@ -40,7 +40,7 @@ ProgramParty* ProgramParty::singleton = 0;
 BaseParty::BaseParty()
 {
 #ifdef DEBUG_PRNG_PARTY
-	octet seed[SEED_SIZE];
+	Octet seed[SEED_SIZE];
 	memset(seed, 0, sizeof(seed));
 	seed[0] = id;
 	prng.SetSeed(seed);
@@ -51,12 +51,12 @@ BaseParty::~BaseParty()
 {
 }
 
-void BaseParty::NodeReady()
+void BaseParty::node_ready()
 {
 	printf("Node is ready\n");
 }
 
-void BaseParty::NewMessage(int from, ReceivedMsg& msg)
+void BaseParty::NewMessage(int from, ReceivedMessage& msg)
 {
 	(void) from;
 	char* message = msg.data();
@@ -139,7 +139,7 @@ void BaseParty::NewMessage(int from, ReceivedMsg& msg)
 		cout << "Launching online phase at " << timer.elapsed() << endl;
 		_node->print_waiting();
 		// store a token item in case it's needed just before ending the program
-		ReceivedMsg msg;
+		ReceivedMessage msg;
 		// to avoid copying from address 0
 		msg.resize(1);
 		// for valgrind
@@ -249,7 +249,7 @@ FakeProgramParty::FakeProgramParty(int argc, const char** argv) :
 	}
 	cout << "Compiler: " << prev << endl;
 	P = new PlainPlayer(N, 0);
-	Share<gf2n_long>::MAC_Check::setup(*P);
+	Share<Gf2nLong>::MacCheck::setup(*P);
 	if (argc > 4)
 		threshold = atoi(argv[4]);
 	cout << "Threshold for multi-threaded evaluation: " << threshold << endl;
@@ -260,7 +260,7 @@ ProgramParty::~ProgramParty()
 	reset();
 	if (P)
 	{
-        cerr << "Data sent in online phase = " << P->total_comm().sent * 1e-6
+        cerr << "Data sent in online phase = " << P->total_communication().sent * 1e-6
                 << " MB (this party only)" << endl;
 		delete P;
 	}
@@ -283,7 +283,7 @@ FakeProgramParty::~FakeProgramParty()
         cerr << "Dynamic storage: " << 1e-9 * dynamic_memory.capacity_in_bytes()
                 << " GB" << endl;
 #endif
-    Share<gf2n_long>::MAC_Check::teardown();
+    Share<Gf2nLong>::MacCheck::teardown();
 }
 
 void FakeProgramParty::_compute_prfs_outputs(Key* keys)
@@ -302,7 +302,7 @@ void ProgramParty::reset()
 	CommonParty::reset();
 }
 
-void ProgramParty::store_garbled_circuit(ReceivedMsg& msg)
+void ProgramParty::store_garbled_circuit(ReceivedMessage& msg)
 {
 	garbled_storage = max(msg.size(), garbled_storage);
 	garbled_circuits.push(msg);
@@ -349,20 +349,20 @@ void FakeProgramParty::receive_all_keys(Register& reg, bool external)
 		reg.keys[external][i] = *(keys_for_prf++);
 }
 
-void FakeProgramParty::process_prf_output(PRFOutputs& prf_output,
-		PRFRegister* wire, const PRFRegister* left, const PRFRegister* right)
+void FakeProgramParty::process_prf_output(PrfOutputs& prf_output,
+		PrfRegister* wire, const PrfRegister* left, const PrfRegister* right)
 {
 	(void) wire, (void) left, (void) right;
 	prf_output.serialize(buffers[TYPE_PRF_OUTPUTS], _id, get_n_parties());
 }
 
-void FakeProgramParty::receive_spdz_wires(ReceivedMsg& msg)
+void FakeProgramParty::receive_spdz_wires(ReceivedMessage& msg)
 {
 	int op;
 	msg.unserialize(op);
 	spdz_wires[op].push_back({});
 	size_t l = msg.left();
-	spdz_wires[op].back().append((octet*)msg.consume(l), l);
+	spdz_wires[op].back().append((Octet*)msg.consume(l), l);
 	spdz_storage += l;
 #ifdef DEBUG_SPDZ_WIRES
 	cout << "receive " << dec << spdz_wires[op].back().get_length() << "/"
@@ -370,11 +370,11 @@ void FakeProgramParty::receive_spdz_wires(ReceivedMsg& msg)
 #endif
 	if (op == SPDZ_MAC)
 	{
-		gf2n_long spdz_mac_key;
+		Gf2nLong spdz_mac_key;
 		spdz_mac_key.unpack(spdz_wires[op].back());
 		if (!MC)
 		{
-			MC = new MAC_Check_<Share<gf2n_long>>(spdz_mac_key);
+			MC = new MacCheck_<Share<Gf2nLong>>(spdz_mac_key);
 			cout << "MAC key: " << hex << spdz_mac_key << endl;
 			mac_key = spdz_mac_key;
 		}

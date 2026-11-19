@@ -39,12 +39,12 @@ void EncCommit<T,FD,S>::init(const Player& PP,const FHE_PK& fhepk,int params,con
 
 // Set up for active
 template<class T,class FD,class S>
-void EncCommit<T,FD,S>::init(const Player& PP,const FHE_PK& fhepk,condition cc,const FD& FieldD,int thr)
+void EncCommit<T,FD,S>::init(const Player& PP,const FHE_PK& fhepk,condition cc,const FD& field_d,int thr)
 { 
   covert=false;
   thread=thr;
 
-  const FHE_Params& params=fhepk.get_params();
+  const FheParameters& params=fhepk.get_parameters();
 
   t = DEFAULT_T;
   b = DEFAULT_B;
@@ -60,10 +60,10 @@ void EncCommit<T,FD,S>::init(const Player& PP,const FHE_PK& fhepk,condition cc,c
 
   // Currently cannot deal with cond!=Full for active adversaries
   if (cond!=Full)
-    { throw not_implemented(); }
+    { throw NotImplemented(); }
 
   c.resize(t);
-  m.resize(t, Plaintext<T,FD,S>(FieldD));
+  m.resize(t, Plaintext<T,FD,S>(field_d));
   for (int i=0; i<t; i++)
     { c[i].resize((*P).num_players(),Ciphertext(params)); 
       m[i].assign_zero(Polynomial);
@@ -84,20 +84,20 @@ void covert_generation(Plaintext_<FD>& mess, vector<Ciphertext>& C,
     const vector<const FHE_PK*>& pks, const Player* P, int num_runs, condition cond)
 {
   CODE_LOCATION
-  const FHE_Params& params=(*pks[0]).get_params();
+  const FheParameters& params=(*pks[0]).get_parameters();
 
   /* Commit to the seeds */
-  vector< vector<octetStream> > seeds(num_runs, vector<octetStream>((*P).num_players()));
-  vector< vector<octetStream> > Comm_seeds(num_runs,  vector<octetStream>((*P).num_players()));
-  vector<octetStream> Open_seeds(num_runs);
+  vector< vector<OctetStream> > seeds(num_runs, vector<OctetStream>((*P).num_players()));
+  vector< vector<OctetStream> > communication_seeds(num_runs,  vector<OctetStream>((*P).num_players()));
+  vector<OctetStream> open_seeds(num_runs);
 
   vector<PRNG> G(num_runs);
-  Commit_To_Seeds(G,seeds,Comm_seeds,Open_seeds,*P,num_runs);
+  commit_to_seeds(G,seeds,communication_seeds,open_seeds,*P,num_runs);
 
   // Generate the messages and ciphertexts
   vector< Plaintext_<FD> > m(num_runs,mess.get_field());
   vector<Ciphertext>   c(num_runs,params);
-  Random_Coins rc(params);
+  RandomCoins rc(params);
   for (int i=0; i<num_runs; i++)
     { m[i].randomize(G[i],cond);
       rc.generate(G[i]);
@@ -110,28 +110,28 @@ void covert_generation(Plaintext_<FD>& mess, vector<Ciphertext>& C,
     }
 
   // Broadcast and receive ciphertexts
-  vector< vector<octetStream> > ctx(num_runs, vector<octetStream> ((*P).num_players()));
+  vector< vector<OctetStream> > ctx(num_runs, vector<OctetStream> ((*P).num_players()));
   for (int i=0; i<num_runs; i++)
     { c[i].pack(ctx[i][(*P).my_num()]);
-      (*P).Broadcast_Receive(ctx[i]);
+      (*P).broadcast_receive(ctx[i]);
     }
 
   // Compute and commit to the challenge value
   vector<unsigned int> e((*P).num_players());
-  vector<octetStream> Comm_e((*P).num_players());
-  vector<octetStream> Open_e((*P).num_players());
-  Commit_To_Challenge(e,Comm_e,Open_e,*P,num_runs);
+  vector<OctetStream> communication_e((*P).num_players());
+  vector<OctetStream> open_e((*P).num_players());
+  commit_to_challenge(e,communication_e,open_e,*P,num_runs);
   
   // Open challenge
-  int challenge=Open_Challenge(e,Open_e,Comm_e,*P,num_runs);
+  int challenge=open_challenge(e,open_e,communication_e,*P,num_runs);
 
   // Open seeds, but not the challenge run
-  Open(seeds,Comm_seeds,Open_seeds,*P,num_runs,challenge);
+  Open(seeds,communication_seeds,open_seeds,*P,num_runs,challenge);
 
   // Now check all the prior executions
   Plaintext_<FD> mm(mess.get_field());
   Ciphertext cc(params);
-  octetStream occ;
+  OctetStream occ;
   for (int i=0; i<num_runs; i++)
     { if (i!=challenge)
         { for (int j=0; j<(*P).num_players(); j++)
@@ -149,7 +149,7 @@ void covert_generation(Plaintext_<FD>& mess, vector<Ciphertext>& C,
                       //cout << i << " " << j << " " << P.socket(j) << " " << mm << endl;
                       //cout << i << " " << j << " " << P.socket(j) << " " << rc << endl;
                       //cout << i << " " << j << " " << P.socket(j) << " " << cc << endl;
-                      throw bad_enccommit(); 
+                      throw BadEnccommit(); 
                     }
 		}
 	    }
@@ -173,7 +173,7 @@ void covert_generation(Plaintext_<FD>& mess, vector<Ciphertext>& C,
 template<class T,class FD,class S>
 void EncCommit<T,FD,S>::next_active(Plaintext<T,FD,S>& mess, vector<Ciphertext>& C) const
 {
-  const FHE_Params& params=(*pk).get_params();
+  const FheParameters& params=(*pk).get_parameters();
 
   if (not has_left()) { Create_More(); }
   mess=m[cnt];
@@ -183,7 +183,7 @@ void EncCommit<T,FD,S>::next_active(Plaintext<T,FD,S>& mess, vector<Ciphertext>&
   cnt--;
 }
 
-bool check_norm(const Rq_Element& value, const bigint& bound)
+bool check_norm(const RqElement& value, const Bigint& bound)
 {
   bool res = (value.infinity_norm() > bound);
   if (res)
@@ -196,23 +196,23 @@ template<class T,class FD,class S>
 void EncCommit<T,FD,S>::Create_More() const
 {
   CODE_LOCATION
-  const FHE_Params& params=(*pk).get_params();
+  const FheParameters& params=(*pk).get_parameters();
 
   // Tweak by using p rather than p/2, as we do not center the ciphertexts
   int rhoi=(int) (6*params.get_R());
-  bigint comm = active_mask(params.phi_m(), b, t);
-  bigint Bound1=m[0].get_field().get_prime()*comm;
-  bigint Bound2=comm;
-  bigint Bound3=rhoi*comm;
-  bigint UBound1=2*(Bound1-m[0].get_field().get_prime());
-  bigint UBound2=2*(Bound2-1);
-  bigint UBound3=2*(Bound3-rhoi);
+  Bigint comm = active_mask(params.phi_m(), b, t);
+  Bigint bound1=m[0].get_field().get_prime()*comm;
+  Bigint bound2=comm;
+  Bigint bound3=rhoi*comm;
+  Bigint UBound1=2*(bound1-m[0].get_field().get_prime());
+  Bigint UBound2=2*(bound2-1);
+  Bigint UBound3=2*(bound3-rhoi);
 
   int my_num=(*P).my_num();
   /* First generate the good ciphertexts and messages for myself */
   PRNG G;
-  G.ReSeed();
-  vector<Random_Coins> rc(t,params);
+  G.re_seed();
+  vector<RandomCoins> rc(t,params);
   for (int i=0; i<t; i++)
     { m[i].randomize(G,cond);
       rc[i].generate(G);
@@ -220,25 +220,25 @@ void EncCommit<T,FD,S>::Create_More() const
     }
 
   // Broadcast and receive ciphertexts "c"
-  vector< vector<octetStream> > ctx_c(t, vector<octetStream> ((*P).num_players()));
+  vector< vector<OctetStream> > ctx_c(t, vector<OctetStream> ((*P).num_players()));
   for (int i=0; i<t; i++)
     { c[i][my_num].pack(ctx_c[i][my_num]);
-      (*P).Broadcast_Receive(ctx_c[i]);
+      (*P).broadcast_receive(ctx_c[i]);
       for (int j=0; j<(*P).num_players(); j++)
 	{ if (j!=my_num)
 	    { c[i][j].unpack(ctx_c[i][j]); }
         }
     }
 
-  vector< vector<octetStream> > seeds(2*TT, vector<octetStream>((*P).num_players()));
-  vector< vector<octetStream> > Comm_seeds(2*TT,  vector<octetStream>((*P).num_players()));
-  vector< octetStream > ctx_Delta((*P).num_players());
+  vector< vector<OctetStream> > seeds(2*TT, vector<OctetStream>((*P).num_players()));
+  vector< vector<OctetStream> > communication_seeds(2*TT,  vector<OctetStream>((*P).num_players()));
+  vector< OctetStream > context_delta((*P).num_players());
   Ciphertext ctx_C(params);
-  vector<octetStream> Open_seeds(2*TT);
-  vector<PRNG> Gseed(2*TT);
+  vector<OctetStream> open_seeds(2*TT);
+  vector<PRNG> gseed(2*TT);
   vector<int> open(2*TT);
-  vector<Rq_Element> z(4,Rq_Element(params.FFTD(),polynomial,polynomial));
-  vector<octetStream> Comm_data((*P).num_players());
+  vector<RqElement> z(4,RqElement(params.FFTD(),polynomial,polynomial));
+  vector<OctetStream> communication_data((*P).num_players());
 
   char filename[1024];
   bool fail=true;
@@ -250,37 +250,37 @@ void EncCommit<T,FD,S>::Create_More() const
       for (int i=0; i<2*TT; i++)
         { for (int j=0; j<(*P).num_players(); j++)
 	    { seeds[i][j].reset_write_head(); 
-	      Comm_seeds[i][j].reset_write_head(); 
+	      communication_seeds[i][j].reset_write_head(); 
             } 
-	  Open_seeds[i].reset_write_head(); 
+	  open_seeds[i].reset_write_head(); 
         }
       for (int j=0; j<(*P).num_players(); j++)
-	{ Comm_data[j].reset_write_head();  }
+	{ communication_data[j].reset_write_head();  }
       
-      Commit_To_Seeds(Gseed,seeds,Comm_seeds,Open_seeds,*P,2*TT);
+      commit_to_seeds(gseed,seeds,communication_seeds,open_seeds,*P,2*TT);
 
       // Now generate and transmit/receive the Delta's
-      Rq_Element m_Delta(Rq_Element(params.FFTD(),polynomial,polynomial));
-      Random_Coins rc_Delta(params);
+      RqElement m_delta(RqElement(params.FFTD(),polynomial,polynomial));
+      RandomCoins rc_delta(params);
       for (int i=0; i<2*TT; i++)
         { if (cond!=Full) 
-             { throw not_implemented(); }
+             { throw NotImplemented(); }
           else          
-             { m_Delta.from(UniformGenerator<bigint>(Gseed[i],numBits(Bound1))); }
-          rc_Delta.generateUniform(Gseed[i],Bound2,Bound3,Bound3);
+             { m_delta.from(UniformGenerator<Bigint>(gseed[i],num_bits(bound1))); }
+          rc_delta.generate_uniform(gseed[i],bound2,bound3,bound3);
           Ciphertext Delta(params);
-          (*pk).quasi_encrypt(Delta,m_Delta,rc_Delta);
+          (*pk).quasi_encrypt(Delta,m_delta,rc_delta);
           for (int j=0; j<(*P).num_players(); j++)
-	    { ctx_Delta[j].reset_write_head(); }
-          Delta.pack(ctx_Delta[my_num]);
-          (*P).Broadcast_Receive(ctx_Delta);
+	    { context_delta[j].reset_write_head(); }
+          Delta.pack(context_delta[my_num]);
+          (*P).broadcast_receive(context_delta);
            
-          // Output the ctx_Delta to a file
+          // Output the context_delta to a file
           snprintf(filename,1024,"%sctx_Delta-%d-%d-%d",file_prefix,my_num,i,thread);
           ofstream outf(filename);
           for (int j=0; j<(*P).num_players(); j++)
 	    {
-              ctx_C.unpack(ctx_Delta[j]);
+              ctx_C.unpack(context_delta[j]);
               timers["ciphertext writing"].start();
               ctx_C.output(outf);
               timers["ciphertext writing"].stop();
@@ -289,13 +289,13 @@ void EncCommit<T,FD,S>::Create_More() const
         }
 
       // Generate a random seed and use it to determine which Delta's to open
-      octet seed[SEED_SIZE];
-      Create_Random_Seed(seed,*P,SEED_SIZE);
+      Octet seed[SEED_SIZE];
+      create_random_seed(seed,*P,SEED_SIZE);
       PRNG RG; RG.SetSeed(seed);
     
-      Rq_Element mm(params.FFTD(),polynomial,polynomial);
+      RqElement mm(params.FFTD(),polynomial,polynomial);
       Ciphertext cc(params);
-      Random_Coins rr(params);
+      RandomCoins rr(params);
       for (int i=0; i<2*TT; i++) { open[i]=0; }
       for (int i=0; i<TT; i++)
         { int j=RG.get_uint()%(2*TT);
@@ -304,10 +304,10 @@ void EncCommit<T,FD,S>::Create_More() const
         }
     
       // Now open the seeds we have decided to open
-      Open(seeds,Comm_seeds,Open_seeds,open,*P,2*TT);
+      Open(seeds,communication_seeds,open_seeds,open,*P,2*TT);
     
       // Now check all opened Delta's are OK for all players
-      octetStream occ,ctx_D;
+      OctetStream occ,context_d;
       for (int i=0; i<2*TT; i++)
         { if (open[i]==1)
            { snprintf(filename,1024,"%sctx_Delta-%d-%d-%d",file_prefix,my_num,i,thread);
@@ -321,19 +321,19 @@ void EncCommit<T,FD,S>::Create_More() const
                    { PRNG G;
                      G.SetSeed(seeds[i][j].get_data());
                      if (cond!=Full) 
-                        { throw not_implemented(); }
+                        { throw NotImplemented(); }
                      else   
-	                { mm.from(UniformGenerator<bigint>(G, numBits(Bound1))); }
-                     rr.generateUniform(G,Bound2,Bound3,Bound3);
+	                { mm.from(UniformGenerator<Bigint>(G, num_bits(bound1))); }
+                     rr.generate_uniform(G,bound2,bound3,bound3);
                      (*pk).quasi_encrypt(cc,mm,rr);
                      occ.reset_write_head();
                      cc.pack(occ);
-                     ctx_D.reset_write_head();
-                     ctx_C.pack(ctx_D);
-                     if (!occ.equals(ctx_D))
+                     context_d.reset_write_head();
+                     ctx_C.pack(context_d);
+                     if (!occ.equals(context_d))
                         { cout << "Error opening position " << i << endl; 
                           // Can only get here if Prover is trying to cheat so abort
-                          throw bad_enccommit(); 
+                          throw BadEnccommit(); 
                         }
                    }
 	       }
@@ -341,7 +341,7 @@ void EncCommit<T,FD,S>::Create_More() const
            }
         }
 
-      // Now move all unopened values of ctx_Delta,seeds to the first TT positions
+      // Now move all unopened values of context_delta,seeds to the first TT positions
       //   - Done via index
       int count=0;
       vector<int> index(TT);
@@ -358,16 +358,16 @@ void EncCommit<T,FD,S>::Create_More() const
               PRNG G;
               G.SetSeed(seeds[index[b*i+j]][my_num].get_data());
               if (cond!=Full) 
-                { throw not_implemented();
+                { throw NotImplemented();
                 }
               else   
-	        { m_Delta.from(UniformGenerator<bigint>(G, numBits(Bound1))); }
-              rc_Delta.generateUniform(G,Bound2,Bound3,Bound3);
+	        { m_delta.from(UniformGenerator<Bigint>(G, num_bits(bound1))); }
+              rc_delta.generate_uniform(G,bound2,bound3,bound3);
               
               auto vm=m[i].get_iterator();
               z[0].from(vm);
-              add(z[0],z[0],m_Delta);
-              add(rr,rc[i],rc_Delta);
+              add(z[0],z[0],m_delta);
+              add(rr,rc[i],rc_delta);
               z[1]=rr.u();
               z[2]=rr.v();
               z[3]=rr.w();
@@ -377,16 +377,16 @@ void EncCommit<T,FD,S>::Create_More() const
               if (check_norm(z[2], UBound3)) { cout << "F2:" << i << " " << j <<  endl; fail=true; }
               if (check_norm(z[3], UBound3)) { cout << "F3:" << i << " " << j <<  endl; fail=true; }
               // Set my data to transmit
-              Comm_data[my_num].reset_write_head(); 
+              communication_data[my_num].reset_write_head(); 
               if (!fail)
-                 { z[0].pack(Comm_data[my_num]);
-                   z[1].pack(Comm_data[my_num]);
-                   z[2].pack(Comm_data[my_num]);
-                   z[3].pack(Comm_data[my_num]);
+                 { z[0].pack(communication_data[my_num]);
+                   z[1].pack(communication_data[my_num]);
+                   z[2].pack(communication_data[my_num]);
+                   z[3].pack(communication_data[my_num]);
 	         }
-              (*P).Broadcast_Receive(Comm_data);
-	      Ciphertext enc1(params),enc2(params),eDelta(params);
-              octetStream oe1,oe2;
+              (*P).broadcast_receive(communication_data);
+	      Ciphertext enc1(params),enc2(params),e_delta(params);
+              OctetStream oe1,oe2;
 
               snprintf(filename,1024,"%sctx_Delta-%d-%d-%d",file_prefix,my_num,index[b*i+j],thread);
               ifstream inpf(filename);
@@ -396,18 +396,18 @@ void EncCommit<T,FD,S>::Create_More() const
                   ctx_C.input(inpf);
                   timers["ciphertext reading"].stop();
                   if (k!=my_num)
-	            { if (Comm_data[k].get_length()==0)
+	            { if (communication_data[k].get_length()==0)
 	                { fail=true; }
                       else
-	                { z[0].unpack(Comm_data[k]);
-	                  z[1].unpack(Comm_data[k]);
-	                  z[2].unpack(Comm_data[k]);
-	                  z[3].unpack(Comm_data[k]);
+	                { z[0].unpack(communication_data[k]);
+	                  z[1].unpack(communication_data[k]);
+	                  z[2].unpack(communication_data[k]);
+	                  z[3].unpack(communication_data[k]);
 	                  // Check size (any wrong means proving cheating)
-                          if (z[0].infinity_norm()>UBound1) { cout << "R0" << endl; throw bad_enccommit(); }
-                          if (z[1].infinity_norm()>UBound2) { cout << "R1" << endl; throw bad_enccommit(); }
-                          if (z[2].infinity_norm()>UBound3) { cout << "R2" << endl; throw bad_enccommit(); }
-                          if (z[3].infinity_norm()>UBound3) { cout << "R3" << endl; throw bad_enccommit(); }
+                          if (z[0].infinity_norm()>UBound1) { cout << "R0" << endl; throw BadEnccommit(); }
+                          if (z[1].infinity_norm()>UBound2) { cout << "R1" << endl; throw BadEnccommit(); }
+                          if (z[2].infinity_norm()>UBound3) { cout << "R2" << endl; throw BadEnccommit(); }
+                          if (z[3].infinity_norm()>UBound3) { cout << "R3" << endl; throw BadEnccommit(); }
 	                  // Need to encrypt with z0,..,z1 and check equal to ci+delta_{b*i+j}
 	                  rr.assign(z[1],z[2],z[3]);
                           (*pk).quasi_encrypt(enc1,z[0],rr);
@@ -416,7 +416,7 @@ void EncCommit<T,FD,S>::Create_More() const
 	                  enc2.pack(oe2);
                           // If this is not true then we have a cheating prover
 	                  if (!oe1.equals(oe2))
-	                    { cout << "EFail " << k << endl; throw bad_enccommit(); }
+	                    { cout << "EFail " << k << endl; throw BadEnccommit(); }
                         }
                     }
                 }
@@ -426,15 +426,15 @@ void EncCommit<T,FD,S>::Create_More() const
       if (fail) { iter++; }
     }
   if (fail)
-    { throw bad_enccommit(); }
+    { throw BadEnccommit(); }
 
   cnt=t-1;
 }
 
 
-template class EncCommit<gfp,FFT_Data,bigint>;
-template class EncCommit<gf2n_short,P2Data,int>;
+template class EncCommit<Gfp,FftData,Bigint>;
+template class EncCommit<Gf2nShort,P2Data,int>;
 
-template class EncCommitBase<gfp,FFT_Data,bigint>;
-template class EncCommitBase<gf2n_short,P2Data,int>;
+template class EncCommitBase<Gfp,FftData,Bigint>;
+template class EncCommitBase<Gf2nShort,P2Data,int>;
 

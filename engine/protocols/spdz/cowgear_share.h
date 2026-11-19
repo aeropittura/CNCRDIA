@@ -13,18 +13,18 @@ template<class T>
 class CowGearShare : public Share<T>
 {
     typedef CowGearShare This;
-    typedef Share<T> super;
+    typedef Share<T> Super;
 
 public:
-    typedef MAC_Check_<This> MAC_Check;
-    typedef Direct_MAC_Check<This> Direct_MC;
+    typedef MacCheck_<This> MacCheck;
+    typedef DirectMacCheck<This> DirectOpener;
     typedef ::Input<This> Input;
     typedef ::PrivateOutput<This> PrivateOutput;
     typedef Beaver<This> BasicProtocol;
     typedef SPDZ<This> Protocol;
     typedef CowGearPrep<This> LivePrep;
     typedef DummyMatrixPrep<This> MatrixPrep;
-    typedef Share<typename T::FD::T> prep_check_type;
+    typedef Share<typename T::FD::T> PrepCheckType;
 
     const static bool needs_ot = false;
 
@@ -35,7 +35,7 @@ public:
     }
     template<class U>
     CowGearShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 

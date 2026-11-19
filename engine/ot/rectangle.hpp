@@ -92,7 +92,7 @@ template<class U, class V>
 template<class T>
 void Rectangle<U, V>::to(T& result)
 {
-	result = bigint(0);
+	result = Bigint(0);
 	for (int i = 0; i < min(N_ROWS, result.N_BITS); i++)
 	{
 		result += T(rows[i]) << i;
@@ -100,14 +100,14 @@ void Rectangle<U, V>::to(T& result)
 }
 
 template<class U, class V>
-void Rectangle<U, V>::pack(octetStream& o) const
+void Rectangle<U, V>::pack(OctetStream& o) const
 {
 	for (int i = 0; i < N_ROWS; i++)
 		rows[i].pack(o);
 }
 
 template<class U, class V>
-void Rectangle<U, V>::unpack(octetStream& o)
+void Rectangle<U, V>::unpack(OctetStream& o)
 {
 	for (int i = 0; i < N_ROWS; i++)
 		rows[i].unpack(o);

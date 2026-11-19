@@ -11,40 +11,40 @@
 #include "he/core/fhe_keys.h"
 #include "net/player.h"
 
-void Encrypt_Rq_Element(Ciphertext& c, const Rq_Element& mess,
-        const Random_Coins& rc, const FHE_PK& pk);
+void Encrypt_Rq_Element(Ciphertext& c, const RqElement& mess,
+        const RandomCoins& rc, const FHE_PK& pk);
 
-void Run_Gen_Protocol(FHE_PK& pk, FHE_SK& sk, const Player& P, int num_runs,
+void run_gen_protocol(FHE_PK& pk, FHE_SK& sk, const Player& P, int num_runs,
         bool commit);
 
 
-class DistKeyGen
+class DistKeyGenerator
 {
-    const FHE_Params& params;
+    const FheParameters& params;
 
 public:
-    Random_Coins rc1, rc2;
-    Rq_Element secret;
-    Rq_Element a;
-    Rq_Element e;
-    Rq_Element b;
+    RandomCoins rc1, rc2;
+    RqElement secret;
+    RqElement a;
+    RqElement e;
+    RqElement b;
     FHE_PK pk;
     Ciphertext enc_dash;
     Ciphertext enc;
-    bigint p;
+    Bigint p;
 
-    static void fake(FHE_PK& pk, vector<FHE_SK>& sks, const bigint& p, int nparties);
+    static void fake(FHE_PK& pk, vector<FHE_SK>& sks, const Bigint& p, int nparties);
 
-    DistKeyGen(const FHE_Params& params, const bigint& p);
-    void Gen_Random_Data(PRNG& G);
-    DistKeyGen& operator+=(const DistKeyGen& other);
-    void sum_a(const vector<Rq_Element>& as);
+    DistKeyGenerator(const FheParameters& params, const Bigint& p);
+    void gen_random_data(PRNG& G);
+    DistKeyGenerator& operator+=(const DistKeyGenerator& other);
+    void sum_a(const vector<RqElement>& as);
     void compute_b();
-    void compute_enc_dash(const vector<Rq_Element>& bs);
+    void compute_enc_dash(const vector<RqElement>& bs);
     void compute_enc_dash();
     void compute_enc(const vector<Ciphertext>& enc_dashs);
     void compute_enc();
     void sum_enc(const vector<Ciphertext>& enc);
     void finalize(FHE_PK& pk, FHE_SK& sk);
-    void check_equality(const DistKeyGen& other);
+    void check_equality(const DistKeyGenerator& other);
 };

@@ -26,7 +26,7 @@ void first_phase(string filename, int n_mults, int circuit_sec)
 {
     // specify number of multiplications (at most one) and function privacy parameter
     // increase the latter to accommodate more operations
-    FHE_Params params(n_mults, circuit_sec);
+    FheParameters params(n_mults, circuit_sec);
 
     // generate parameters for computation modulo a 32-bit prime
     params.basic_generation_mod_prime(32);
@@ -35,10 +35,10 @@ void first_phase(string filename, int n_mults, int circuit_sec)
     cout << "computation modulo " << params.get_plaintext_modulus() << endl;
 
     // generate key pair
-    FHE_KeyPair pair(params);
+    FheKeyPair pair(params);
     pair.generate();
 
-    Plaintext_mod_prime plaintext(params);
+    PlaintextModPrime plaintext(params);
 
     // set first two plaintext slots
     plaintext.set_element(0, 4);
@@ -48,7 +48,7 @@ void first_phase(string filename, int n_mults, int circuit_sec)
     Ciphertext ciphertext = pair.pk.encrypt(plaintext);
 
     // store for second phase
-    octetStream os;
+    OctetStream os;
     params.pack(os);
     pair.pk.pack(os);
     ciphertext.pack(os);
@@ -62,12 +62,12 @@ void second_phase(string filename)
 {
     // read from file
     ifstream in(filename);
-    octetStream os;
+    OctetStream os;
     os.input(in);
-    FHE_Params params;
+    FheParameters params;
     FHE_PK pk(params);
     FHE_SK sk(params);
-    Plaintext_mod_prime plaintext(params);
+    PlaintextModPrime plaintext(params);
     Ciphertext ciphertext(params);
 
     // parameter must be set correctly first

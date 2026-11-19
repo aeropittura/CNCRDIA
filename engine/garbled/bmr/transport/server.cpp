@@ -22,10 +22,10 @@ Server::Server(int port, int expected_clients, ServerUpdatable* updatable, unsig
 	 _expected_clients(expected_clients),
 	 _port(port),
 	 _updatable(updatable),
-	 _max_msg_sz(max_message_size)
+	 _max_message_size(max_message_size)
 {
 	_clients = new int[expected_clients]();
-	_clients_addr = new struct sockaddr_in[expected_clients]();
+	_clients_address = new struct sockaddr_in[expected_clients]();
 	timers.resize(expected_clients);
 
 	_servfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -57,7 +57,7 @@ Server::~Server() {
 	for (int i=0; i<_expected_clients; i++)
 		close(_clients[i]);
 	delete[] (_clients);
-	delete[] (_clients_addr);
+	delete[] (_clients_address);
 	delete starter;
 	for (unsigned i = 0; i < listeners.size(); i++)
 		delete listeners[i];
@@ -67,13 +67,13 @@ void Server::_start_server() {
 	socklen_t socksize = sizeof(struct sockaddr_in);
 	printf("Server:: Ready for clients...\n");
 	for(int i=0; i<_expected_clients; i++) {
-        int fd = accept(_servfd, (sockaddr*)&_clients_addr[i], &socksize);
+        int fd = accept(_servfd, (sockaddr*)&_clients_address[i], &socksize);
         _clients[i] = fd;
 		printf("expected clients = %d, i=%d\n", _expected_clients, i);
         if (fd == -1) {
         	printf("Server:: accept: error in connecting socket\n%s\n",strerror(errno));
         } else {
-			printf("Server:: Incoming connection from %s:%d\n",inet_ntoa(_clients_addr[i].sin_addr), ntohs(_clients_addr[i].sin_port));
+			printf("Server:: Incoming connection from %s:%d\n",inet_ntoa(_clients_address[i].sin_addr), ntohs(_clients_address[i].sin_port));
 			// Using the following disables the automatic buffer size (ipv4.tcp_rmem)
 			// in favour of the core.rmem_max, which is worse.
 			//setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &NETWORK_BUFFER_SIZE, sizeof(NETWORK_BUFFER_SIZE));
@@ -81,66 +81,66 @@ void Server::_start_server() {
         }
 	}
 
-	_updatable->ClientsConnected();
+	_updatable->clients_connected();
 }
 
 void Server::_listen_to_client(int id){
 	size_t msg_len = 0;
-	int n_recv = 0;
+	int n_receive = 0;
 	size_t total_received;
 	size_t remaining;
-	ReceivedMsg msg;
+	ReceivedMessage msg;
 #ifdef DEBUG_FLEXBUF
 	cout << "msg from " << id << " stored at " << &msg << endl;
 #endif
 	while (true) {
 		timers[id].start();
-		n_recv = recv(_clients[id], &msg_len, sizeof(msg_len), MSG_WAITALL);
+		n_receive = recv(_clients[id], &msg_len, sizeof(msg_len), MSG_WAITALL);
 		timers[id].stop();
 #ifdef DEBUG_COMM
 		cout << "message of size " << msg_len << " coming in from " << id << endl;
 #endif
 		msg.resize(msg_len);
-		if (!_handle_recv_len(id, n_recv, sizeof(msg_len)))
+		if (!_handle_receive_length(id, n_receive, sizeof(msg_len)))
 			return;
 //		printf("Server:: waiting for a message of len = %d\n", msg_len);
 		total_received = 0;
 		remaining = 0;
 		while (total_received != msg_len) {
-			remaining = (msg_len-total_received)>_max_msg_sz ? _max_msg_sz : (msg_len-total_received);
+			remaining = (msg_len-total_received)>_max_message_size ? _max_message_size : (msg_len-total_received);
 			timers[id].start();
-			n_recv = recv(_clients[id], msg.data()+total_received, remaining, 0 /* MSG_WAITALL*/);
+			n_receive = recv(_clients[id], msg.data()+total_received, remaining, 0 /* MSG_WAITALL*/);
 			timers[id].stop();
-//			printf("n_recv = %d\n", n_recv);
-			if (!_handle_recv_len(id, n_recv,remaining)) {
+//			printf("n_receive = %d\n", n_receive);
+			if (!_handle_receive_length(id, n_receive,remaining)) {
 				printf("returning\n");
 				return;
 			}
-			total_received += n_recv;
+			total_received += n_receive;
 //			printf("total_received = %d\n", total_received);
 		}
 //		printf("Server:: received %d: \n", msg_len);
-		_updatable->NewMsg(msg, &_clients_addr[id]);
+		_updatable->NewMsg(msg, &_clients_address[id]);
 	}
 	printf("stop listening to %d\n", id);
 }
 
-bool Server::_handle_recv_len(int id, size_t actual_len, size_t expected_len) {
-//	printf("Server:: received msg from %d len = %u\n",id, actual_len);
-	if (actual_len == 0) {
+bool Server::_handle_receive_length(int id, size_t actual_length, size_t expected_length) {
+//	printf("Server:: received msg from %d len = %u\n",id, actual_length);
+	if (actual_length == 0) {
 #ifdef DEBUG_COMM
 		printf("Server:: [%d]: Error: n_recv==0 Connection closed\n", id);
 #endif
-		_updatable->NodeAborted(&_clients_addr[id]);
+		_updatable->node_aborted(&_clients_address[id]);
 		return false;
 //		exit(1);
-	} else if (actual_len == -1U) {
+	} else if (actual_length == -1U) {
 		printf("Server:: [%d]: Error: n_recv==-1. \"%s\"\n",id, strerror(errno));
-		_updatable->NodeAborted(&_clients_addr[id]);
+		_updatable->node_aborted(&_clients_address[id]);
 		return false;
 //		exit(1);
-	} else if (actual_len < expected_len) {
-//		printf("Server:: [%d]: Error: n_recv < %d; n_recv=%d; \"%d\"\n",id, expected_len, actual_len,strerror(errno));
+	} else if (actual_length < expected_length) {
+//		printf("Server:: [%d]: Error: n_receive < %d; n_receive=%d; \"%d\"\n",id, expected_length, actual_length,strerror(errno));
 		return true;
 	}
 	return true;

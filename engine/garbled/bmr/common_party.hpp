@@ -21,7 +21,7 @@ GC::BreakType CommonParty::first_phase(GC::Program& program,
 	{
 		next = program.execute(processor, dynamic_memory);
 	}
-	catch (needs_cleaning& e)
+	catch (NeedsCleaning& e)
 	{
 		next = GC::CLEANING_BREAK;
 		processor.PC--;
@@ -56,7 +56,7 @@ GC::BreakType CommonParty::second_phase(GC::Program& program,
 	{
 		next = program.execute(processor, dynamic_memory);
 	}
-	catch (needs_cleaning& e)
+	catch (NeedsCleaning& e)
 	{
 		next = GC::CLEANING_BREAK;
         processor.PC--;

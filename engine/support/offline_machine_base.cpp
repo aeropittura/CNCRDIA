@@ -12,7 +12,7 @@ using namespace std;
 
 OfflineMachineBase::OfflineMachineBase() :
         my_num(0), nplayers(0), ntriples(0),
-        nTriplesPerThread(0)
+        n_triples_per_thread(0)
 {
 }
 
@@ -80,10 +80,10 @@ void OfflineMachineBase::parse_options(int argc, const char** argv)
     opt.get("-p")->getInt(my_num);
     opt.get("-N")->getInt(nplayers);
     opt.get("-x")->getInt(nthreads);
-    opt.get("-n")->getLongLong(ntriples);
+    opt.get("-n")->get_long_long(ntriples);
     output = opt.get("-o")->isSet;
 
-    nTriplesPerThread =  DIV_CEIL(ntriples, nthreads);
+    n_triples_per_thread =  DIV_CEIL(ntriples, nthreads);
 }
 
 void OfflineMachineBase::start_networking_with_server(string hostname,

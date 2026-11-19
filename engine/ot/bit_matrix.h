@@ -15,14 +15,14 @@
 using namespace std;
 
 class BitVector;
-class gf2n_long;
+class Gf2nLong;
 class PRNG;
-class octetStream;
+class OctetStream;
 
-typedef unsigned char octet;
+typedef unsigned char Octet;
 
-union square128 {
-    typedef gf2n_long RowType;
+union Square128 {
+    typedef Gf2nLong RowType;
 
     const static int N_ROWS = 128;
 
@@ -37,39 +37,39 @@ union square128 {
     __m256i doublerows[64];
 #endif
     __m128i rows[128];
-    octet bytes[128][16];
+    Octet bytes[128][16];
     int16_t doublebytes[128][8];
     int32_t words[128][4];
 
-    square128() {}
+    Square128() {}
 
     bool get_bit(int x, int y)
     { return (bytes[x][y/8] >> (y % 8)) & 1; }
 
     void set_zero();
 
-    square128& operator^=(square128& other);
-    square128& operator^=(const __m128i* other);
-    square128& operator^=(BitVector& other);
-    bool operator==(square128& other);
+    Square128& operator^=(Square128& other);
+    Square128& operator^=(const __m128i* other);
+    Square128& operator^=(BitVector& other);
+    bool operator==(Square128& other);
 
-    square128& add(square128& other);
-    square128& sub(square128& other);
-    square128& rsub(square128& other);
-    square128& sub(const __m128i* other);
-    square128& sub(const void* other) { return sub((__m128i*)other); }
+    Square128& add(Square128& other);
+    Square128& sub(Square128& other);
+    Square128& rsub(Square128& other);
+    Square128& sub(const __m128i* other);
+    Square128& sub(const void* other) { return sub((__m128i*)other); }
 
-    void bit_sub(const BitVector&, int) { throw not_implemented(); }
+    void bit_sub(const BitVector&, int) { throw NotImplemented(); }
 
     void randomize(PRNG& G);
     void randomize(int row, PRNG& G);
-    void conditional_add(BitVector& conditions, square128& other, int offset);
+    void conditional_add(BitVector& conditions, Square128& other, int offset);
     void transpose(int n_rows = 128, int n_cols = 128);
     template <class T>
     void to(T& result);
 
-    void check_transpose(square128& dual, int i, int k);
-    void check_transpose(square128& dual);
+    void check_transpose(Square128& dual, int i, int k);
+    void check_transpose(Square128& dual);
     void print(int i, int k);
     void print();
     void print_octets();
@@ -77,8 +77,8 @@ union square128 {
 
     // Pack and unpack in native format
     //   i.e. Dont care about conversion to human readable form
-    void pack(octetStream& o) const;
-    void unpack(octetStream& o);
+    void pack(OctetStream& o) const;
+    void unpack(OctetStream& o);
 };
 
 // allocator to counter GCC bug
@@ -144,11 +144,11 @@ public:
 
     // Pack and unpack in native format
     //   i.e. Dont care about conversion to human readable form
-    void pack(octetStream& o) const;
-    void unpack(octetStream& o);
+    void pack(OctetStream& o) const;
+    void unpack(OctetStream& o);
 };
 
-class BitMatrix : public Matrix<square128>
+class BitMatrix : public Matrix<Square128>
 {
 public:
     BitMatrix() {}
@@ -157,7 +157,7 @@ public:
     __m128i& operator[](int i) { return squares[i / 128].rows[i % 128]; }
     __m128i& at(size_t i);
 
-    bool lsb(size_t i) { return int128((*this)[i]).get_bit(0); }
+    bool lsb(size_t i) { return Int128((*this)[i]).get_bit(0); }
     BitVector lsbs() const;
 
     void resize(int length);
@@ -183,7 +183,7 @@ public:
     Slice<U>& sub(BitVector& other, int repeat = 1);
 
     void randomize(int row, PRNG& G);
-    void conditional_add(BitVector& conditions, U& other, bool useOffset = false);
+    void conditional_add(BitVector& conditions, U& other, bool use_offset = false);
     void transpose();
 
     template <class T>
@@ -191,8 +191,8 @@ public:
 
     // Pack and unpack in native format
     //   i.e. Dont care about conversion to human readable form
-    void pack(octetStream& o) const;
-    void unpack(octetStream& o);
+    void pack(OctetStream& o) const;
+    void unpack(OctetStream& o);
 };
 
 typedef Slice<BitMatrix> BitMatrixSlice;

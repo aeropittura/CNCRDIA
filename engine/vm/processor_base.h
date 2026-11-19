@@ -29,13 +29,13 @@ protected:
   // Optional argument to tape
   Integer arg;
   vector<Integer> arg_stack;
-  vector<int> PC_stack;
+  vector<int> pc_stack;
 
   string get_parameterized_filename(int my_num, int thread_num,
       const string& prefix);
 
 public:
-  ExecutionStats stats;
+  ExecutionStats statistics;
 
   ofstream stdout_redirect_file;
 

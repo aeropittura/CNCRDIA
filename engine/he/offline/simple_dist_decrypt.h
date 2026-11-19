@@ -13,7 +13,7 @@ class SimpleDistDecrypt : public DistDecrypt<FD>
 {
 public:
     SimpleDistDecrypt(const Player& P, const PartSetup<FD>& setup) :
-            DistDecrypt<FD>(P, setup.sk, setup.pk, setup.FieldD) {}
+            DistDecrypt<FD>(P, setup.sk, setup.pk, setup.field_d) {}
 
     void intermediate_step();
     void reshare(Plaintext<typename FD::T, FD, typename FD::S>& m,

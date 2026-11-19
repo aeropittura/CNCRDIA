@@ -16,28 +16,28 @@
 #include "protocols/common/replicated_prep.hpp"
 
 template<class T>
-OTPrep<T>::OTPrep(SubProcessor<T>* proc, DataPositions& usage) :
+OtPrep<T>::OtPrep(SubProcessor<T>* proc, DataPositions& usage) :
         BufferPrep<T>(usage), BitPrep<T>(proc, usage),
         triple_generator(0)
 {
 }
 
 template<class T>
-OTPrep<T>::~OTPrep()
+OtPrep<T>::~OtPrep()
 {
     if (triple_generator)
         delete triple_generator;
 }
 
 template<class T>
-void OTPrep<T>::set_protocol(typename T::Protocol& protocol)
+void OtPrep<T>::set_protocol(typename T::Protocol& protocol)
 {
     BitPrep<T>::set_protocol(protocol);
     SubProcessor<T>* proc = this->proc;
     assert(proc != 0);
 
     // make sure not to use Montgomery multiplication
-    T::open_type::next::template init<typename T::open_type>(false);
+    T::OpenType::next::template init<typename T::OpenType>(false);
 
     assert(not triple_generator);
     triple_generator = new typename T::TripleGenerator(
@@ -61,14 +61,14 @@ void MascotTriplePrep<T>::buffer_triples()
 
     auto& params = this->params;
     auto& triple_generator = this->triple_generator;
-    params.generateBits = false;
+    params.generate_bits = false;
     triple_generator->set_batch_size(
             BaseMachine::batch_size<T>(DATA_TRIPLE, this->buffer_size));
     triple_generator->generate();
     triple_generator->unlock();
     triple_generator->set_batch_size(OnlineOptions::singleton.batch_size);
-    assert(triple_generator->uncheckedTriples.size() != 0);
-    for (auto& triple : triple_generator->uncheckedTriples)
+    assert(triple_generator->unchecked_triples.size() != 0);
+    for (auto& triple : triple_generator->unchecked_triples)
         this->triples.push_back(
         {{ triple.a[0], triple.b, triple.c[0] }});
 }
@@ -90,7 +90,7 @@ template<class T>
 template<int>
 void MascotDabitOnlyPrep<T>::buffer_bits(false_type)
 {
-    this->params.generateBits = true;
+    this->params.generate_bits = true;
     auto& triple_generator = this->triple_generator;
     triple_generator->set_batch_size(
             BaseMachine::batch_size<T>(DATA_BIT, this->buffer_size));

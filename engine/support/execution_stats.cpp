@@ -29,14 +29,14 @@ ExecutionStats ExecutionStats::operator-(const ExecutionStats& other) const
 void ExecutionStats::print() const
 {
     cerr << "Instruction statistics:" << endl;
-    set<pair<size_t, int>> sorted_stats;
+    set<pair<size_t, int>> sorted_statistics;
     for (auto& x : *this)
     {
         if (x.second)
-            sorted_stats.insert({x.second, x.first});
+            sorted_statistics.insert({x.second, x.first});
     }
     size_t total = 0;
-    for (auto& x : sorted_stats)
+    for (auto& x : sorted_statistics)
     {
         auto opcode = x.second;
         auto calls = x.first;

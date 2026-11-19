@@ -15,8 +15,8 @@ namespace GC
 template<class T>
 CcdPrep<T>::~CcdPrep()
 {
-    if (part_proc)
-        delete part_proc;
+    if (part_processor)
+        delete part_processor;
 }
 
 template<class T>
@@ -25,15 +25,15 @@ void CcdPrep<T>::set_protocol(typename T::Protocol& protocol)
     auto& thread = ShareThread<T>::s();
     assert(thread.MC);
 
-    if (part_proc)
+    if (part_processor)
     {
-        assert(&part_proc->MC == &thread.MC->get_part_MC());
-        assert(&part_proc->P == &protocol.get_part().P);
+        assert(&part_processor->MC == &thread.MC->get_part_opener());
+        assert(&part_processor->P == &protocol.get_part().P);
         return;
     }
 
-    part_proc = new SubProcessor<typename T::part_type>(
-            thread.MC->get_part_MC(), part_prep, protocol.get_part().P);
+    part_processor = new SubProcessor<typename T::part_type>(
+            thread.MC->get_part_opener(), part_prep, protocol.get_part().P);
 }
 
 }

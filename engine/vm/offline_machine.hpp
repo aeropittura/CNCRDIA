@@ -12,13 +12,13 @@
 template<class W>
 template<class V>
 OfflineMachine<W>::OfflineMachine(int argc, const char** argv,
-        ez::ezOptionParser& opt, OnlineOptions& online_opts, V,
+        ez::EzOptionParser& opt, OnlineOptions& online_options, V,
         int nplayers) :
-        W(argc, argv, opt, online_opts, V(), nplayers), playerNames(
-                W::playerNames), P(*this->new_player("machine"))
+        W(argc, argv, opt, online_options, V(), nplayers), player_names(
+                W::player_names), P(*this->new_player("machine"))
 {
-    load_schedule(online_opts.progname, false);
-    Program program(playerNames.num_players());
+    load_schedule(online_options.progname, false);
+    Program program(player_names.num_players());
     program.parse(bc_filenames[0]);
     progs.push_back(program);
 
@@ -42,32 +42,32 @@ template<class W>
 template<class T, class U>
 int OfflineMachine<W>::run()
 {
-    if (this->online_opts.prime)
-        T::clear::init_field(this->online_opts.prime);
+    if (this->online_options.prime)
+        T::clear::initialize_field(this->online_options.prime);
     else
-        T::clear::init_default(this->online_opts.prime_length());
-    Machine<T, U>::init_binary_domains(this->online_opts.security_parameter,
+        T::clear::initialize_default(this->online_options.prime_length());
+    Machine<T, U>::initialize_binary_domains(this->online_options.security_parameter,
             this->get_lg2());
-    auto binary_mac_key = T::bit_type::LivePrep::get_mac_key(P);
-    typename T::bit_type::LivePrep bit_prep(usage);
-    GC::ShareThread<typename T::bit_type> thread(bit_prep, P, binary_mac_key);
+    auto binary_mac_key = T::BitType::LivePrep::get_mac_key(P);
+    typename T::BitType::LivePrep bit_prep(usage);
+    GC::ShareThread<typename T::BitType> thread(bit_prep, P, binary_mac_key);
 
     // setup before generation to fix prime
     T::LivePrep::basic_setup(P);
 
-    T::MAC_Check::setup(P);
-    T::bit_type::MAC_Check::setup(P);
-    U::MAC_Check::setup(P);
+    T::MacCheck::setup(P);
+    T::BitType::MacCheck::setup(P);
+    U::MacCheck::setup(P);
 
     generate<T>();
-    generate<typename T::bit_type::part_type>();
+    generate<typename T::BitType::part_type>();
     generate<U>();
 
     thread.MC->Check(P);
 
-    T::MAC_Check::teardown();
-    T::bit_type::MAC_Check::teardown();
-    U::MAC_Check::teardown();
+    T::MacCheck::teardown();
+    T::BitType::MacCheck::teardown();
+    U::MacCheck::teardown();
 
     return 0;
 }
@@ -87,7 +87,7 @@ void OfflineMachine<W>::generate()
     auto mac_key = T::LivePrep::get_mac_key(P);
     DataPositions generated;
     generated.set_num_players(P.num_players());
-    typename T::MAC_Check output(mac_key);
+    typename T::MacCheck output(mac_key);
     typename T::LivePrep preprocessing(0, generated);
     SubProcessor<T> processor(output, preprocessing, P);
 
@@ -96,7 +96,7 @@ void OfflineMachine<W>::generate()
     {
         auto my_usage = domain_usage[i];
         Dtype dtype = Dtype(i);
-        string filename = Sub_Data_Files<T>::get_filename(playerNames, dtype,
+        string filename = SubDataFiles<T>::get_filename(player_names, dtype,
                 0);
         if (my_usage > 0)
         {
@@ -108,9 +108,9 @@ void OfflineMachine<W>::generate()
                         j < buffered_total(my_usage, BUFFER_SIZE); j++)
                 {
                     T a;
-                    typename T::bit_type b;
+                    typename T::BitType b;
                     preprocessing.get_dabit(a, b);
-                    dabit<T>(a, b).output(out, false);
+                    Dabit<T>(a, b).output(out, false);
                 }
             }
             else if (not (i == DATA_RANDOM or i == DATA_OPEN))
@@ -129,13 +129,13 @@ void OfflineMachine<W>::generate()
             remove(filename.c_str());
     }
 
-    long additional_inputs = Sub_Data_Files<T>::additional_inputs(usage);
+    long additional_inputs = SubDataFiles<T>::additional_inputs(usage);
 
     for (int i = 0; i < P.num_players(); i++)
     {
         auto n_inputs = usage.inputs[i][T::clear::field_type()]
                 + additional_inputs;
-        string filename = Sub_Data_Files<T>::get_input_filename(playerNames, i, 0);
+        string filename = SubDataFiles<T>::get_input_filename(player_names, i, 0);
         if (n_inputs > 0)
         {
             ofstream out(filename, iostream::out | iostream::binary);
@@ -162,10 +162,10 @@ void OfflineMachine<W>::generate()
 
         for (int n_bits = 1; n_bits <= max(100, max_n_bits); n_bits++)
         {
-            int batch = edabitvec<T>::MAX_SIZE;
+            int batch = Edabitvec<T>::MAX_SIZE;
             int total = usage.edabits[{false, n_bits}] +
                     usage.edabits[{true, n_bits}];
-            string filename = Sub_Data_Files<T>::get_edabit_filename(playerNames,
+            string filename = SubDataFiles<T>::get_edabit_filename(player_names,
                                 n_bits, 0);
             if (total > 0)
             {
@@ -188,5 +188,5 @@ void OfflineMachine<W>::generate()
 template<class W>
 const Names& OfflineMachine<W>::get_N()
 {
-    return playerNames;
+    return player_names;
 }

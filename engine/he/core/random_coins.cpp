@@ -2,20 +2,20 @@
 #include "he/core/random_coins.h"
 #include "he/core/fhe_keys.h"
 
-Int_Random_Coins::Int_Random_Coins(const FHE_PK& pk) :
-    Int_Random_Coins(pk.get_params())
+IntRandomCoins::IntRandomCoins(const FHE_PK& pk) :
+    IntRandomCoins(pk.get_parameters())
 {
 }
 
-Random_Coins::Random_Coins(const FHE_PK& pk) :
-    Random_Coins(pk.get_params())
+RandomCoins::RandomCoins(const FHE_PK& pk) :
+    RandomCoins(pk.get_parameters())
 {
 }
 
-void add(Random_Coins& ans,const Random_Coins& x,const Random_Coins& y)
+void add(RandomCoins& ans,const RandomCoins& x,const RandomCoins& y)
 { 
-  if (x.params!=y.params)   { throw params_mismatch(); }
-  if (ans.params!=y.params) { throw params_mismatch(); }
+  if (x.params!=y.params)   { throw ParametersMismatch(); }
+  if (ans.params!=y.params) { throw ParametersMismatch(); }
 
   add(ans.uu,x.uu,y.uu); 
   add(ans.vv,x.vv,y.vv); 

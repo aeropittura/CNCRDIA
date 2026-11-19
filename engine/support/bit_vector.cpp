@@ -26,13 +26,13 @@ void BitVector::resize_zero(size_t new_nbits)
         avx_memzero(bytes + old_nbytes, nbytes - old_nbytes);
 }
 
-const void* BitVector::get_ptr_to_byte(size_t i, size_t block_size) const
+const void* BitVector::get_pointer_to_byte(size_t i, size_t block_size) const
 {
     assert(i + block_size <= nbytes);
     return bytes + i * block_size;
 }
 
-const void* BitVector::get_ptr_to_bit(size_t i, size_t block_size) const
+const void* BitVector::get_pointer_to_bit(size_t i, size_t block_size) const
 {
     assert((i * block_size) % 8 == 0);
     assert((i + 1) * block_size <= nbits);
@@ -126,7 +126,7 @@ void BitVector::randomize(PRNG& G)
 void BitVector::randomize_at(size_t a, size_t nb, PRNG& G)
 {
     if (nb < 1)
-        throw invalid_length();
+        throw InvalidLength();
     G.get_octets(bytes + a, nb);
 }
 
@@ -162,7 +162,7 @@ void BitVector::input(istream& s,bool human)
             cout << "IO problem. Empty file?" << endl;
             throw file_error("BitVector input");
         }
-      throw end_of_file();
+      throw EndOfFile();
     }
     int len;
     if (human)
@@ -184,16 +184,16 @@ void BitVector::input(istream& s,bool human)
 }
 
 
-void BitVectorView::pack(octetStream& o) const
+void BitVectorView::pack(OctetStream& o) const
 {
     o.store_int(nbits, 8);
-    o.append((octet*)bytes, nbytes);
+    o.append((Octet*)bytes, nbytes);
 }
 
-void BitVector::unpack(octetStream& o)
+void BitVector::unpack(OctetStream& o)
 {
     resize(o.get_int(8));
-    o.consume((octet*)bytes, nbytes);
+    o.consume((Octet*)bytes, nbytes);
 }
 
 BitVector::BitVector(const vector<Bit>& other) : BitVector(other.size())
@@ -210,7 +210,7 @@ BitVector::BitVector(const vector<Bit>& other) : BitVector(other.size())
     }
 }
 
-BitVector& BitVector::operator =(const octetStream other)
+BitVector& BitVector::operator =(const OctetStream other)
 {
     resize(other.get_length() * 8);
     memcpy(bytes, other.get_data(), nbytes);

@@ -51,12 +51,12 @@ public:
   void run_with_catch(const Player& P, const FHE_PK& pk,
       const Ciphertext& calpha, EncCommitBase<T, FD, S>& EC,
       DistDecrypt<FD>& dd, const T& alphai);
-  int sacrifice_with_catch(const Player& P, MAC_Check<T>& MC);
+  int sacrifice_with_catch(const Player& P, MacCheck<T>& MC);
 
   virtual void run(const Player& P, const FHE_PK& pk,
       const Ciphertext& calpha, EncCommitBase<T, FD, S>& EC,
       DistDecrypt<FD>& dd, const T& alphai) = 0;
-  virtual int sacrifice(const Player& P, MAC_Check<T>& MC) = 0;
+  virtual int sacrifice(const Player& P, MacCheck<T>& MC) = 0;
 
   int num_slots() { return n_slots; }
 
@@ -83,7 +83,7 @@ public:
       const Ciphertext& calpha, EncCommitBase<T, FD, S>& EC,
       DistDecrypt<FD>& dd, const T& alphai);
 
-  int sacrifice(const Player& P, MAC_Check<T>& MC);
+  int sacrifice(const Player& P, MacCheck<T>& MC);
   void get(Share<T>& a, Share<T>& b, Share<T>& c);
   void reset() { i = 0; }
 
@@ -106,7 +106,7 @@ protected:
 public:
   Plaintext_<FD> values[2], macs[2];
 
-  TupleProducer(const FD& FieldD, int output_thread = 0,
+  TupleProducer(const FD& field_d, int output_thread = 0,
       bool write_output = true);
   virtual ~TupleProducer() {}
 
@@ -132,7 +132,7 @@ public:
   Plaintext_<FD> &ai, &bi;
   Plaintext_<FD> &gam_ai, &gam_bi;
 
-  InverseProducer(const FD& FieldD, int my_num, int output_thread = 0,
+  InverseProducer(const FD& field_d, int my_num, int output_thread = 0,
       bool write_output = true, bool produce_triples = true,
       string dir = PREP_DIR);
   string data_type() { return "Inverses"; }
@@ -141,7 +141,7 @@ public:
   void run(const Player& P, const FHE_PK& pk, const Ciphertext& calpha, 
       EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd, const T& alphai);
   void get(Share<T>& a, Share<T>& b);
-  int sacrifice(const Player& P, MAC_Check<T>& MC);
+  int sacrifice(const Player& P, MacCheck<T>& MC);
 };
 
 template <class FD>
@@ -154,7 +154,7 @@ public:
   Plaintext_<FD> &ai, &bi;
   Plaintext_<FD> &gam_ai, &gam_bi;
 
-  SquareProducer(const FD& FieldD, int my_num, int output_thread = 0,
+  SquareProducer(const FD& field_d, int my_num, int output_thread = 0,
       bool write_output = true, string dir = PREP_DIR);
   string data_type() { return "Squares"; }
 
@@ -162,48 +162,48 @@ public:
   void run(const Player& P, const FHE_PK& pk, const Ciphertext& calpha,
       EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd, const T& alphai);
   void get(Share<T>& a, Share<T>& b) { TupleProducer<FD>::get(a, b); }
-  int sacrifice(const Player& P, MAC_Check<T>& MC);
+  int sacrifice(const Player& P, MacCheck<T>& MC);
 };
 
-class gfpBitProducer : public Producer<FFT_Data>,
-    public SingleSacriFactory< Share<gfp> >
+class GfpBitProducer : public Producer<FftData>,
+    public SingleSacriFactory< Share<Gfp> >
 {
-  typedef FFT_Data FD;
+  typedef FftData FD;
 
   unsigned int i;
   Plaintext_<FD> vi, gam_vi;
 
-  SquareProducer<FFT_Data> square_producer;
+  SquareProducer<FftData> square_producer;
   bool produce_squares;
 
 public:
-  vector< Share<gfp> > bits;
+  vector< Share<Gfp> > bits;
 
-  gfpBitProducer(const FD& FieldD, int my_num, int output_thread = 0,
+  GfpBitProducer(const FD& field_d, int my_num, int output_thread = 0,
       bool write_output = true, bool produce_squares = true,
       string dir = PREP_DIR);
   string data_type() { return "Bits"; }
 
   void clear() { bits.clear(); }
   void run(const Player& P, const FHE_PK& pk, const Ciphertext& calpha,
-      EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd, const gfp& alphai);
+      EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd, const Gfp& alphai);
   int output(const Player& P, int thread, int output_thread = 0);
 
-  void get(Share<gfp>& a);
-  int sacrifice(const Player& P, MAC_Check<T>& MC);
+  void get(Share<Gfp>& a);
+  int sacrifice(const Player& P, MacCheck<T>& MC);
 };
 
 // glue
 template<class FD>
-Producer<FD>* new_bit_producer(const FD& FieldD, const Player& P,
+Producer<FD>* new_bit_producer(const FD& field_d, const Player& P,
     const FHE_PK& pk, int covert,
     bool produce_squares = true, int thread_num = 0, bool write_output = true,
     string dir = PREP_DIR);
 
-class gf2nBitProducer : public Producer<P2Data>
+class Gf2nBitProducer : public Producer<P2Data>
 {
   typedef P2Data FD;
-  typedef gf2n_short T;
+  typedef Gf2nShort T;
 
   ofstream outf;
   bool write_output;
@@ -211,7 +211,7 @@ class gf2nBitProducer : public Producer<P2Data>
   EncCommit_<FD> ECB;
 
 public:
-  gf2nBitProducer(const Player& P, const FHE_PK& pk, int covert,
+  Gf2nBitProducer(const Player& P, const FHE_PK& pk, int covert,
       int output_thread = 0, bool write_output = true, string dir = PREP_DIR);
   string data_type() { return "Bits"; }
 
@@ -219,7 +219,7 @@ public:
   void run(const Player& P, const FHE_PK& pk, const Ciphertext& calpha,
       EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd, const T& alphai);
 
-  int sacrifice(const Player& P, MAC_Check<T>& MC);
+  int sacrifice(const Player& P, MacCheck<T>& MC);
 };
 
 template <class FD>
@@ -253,7 +253,7 @@ public:
       EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd, const T& alphai,
       int player);
 
-  int sacrifice(const Player& P, MAC_Check<T>& MC);
+  int sacrifice(const Player& P, MacCheck<T>& MC);
 
   // no ops
   string open_file(ofstream& outf, int my_num, int thread_num, bool initial,

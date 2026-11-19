@@ -60,15 +60,15 @@ public:
 
     typedef typename T::DynamicMemory DynamicMemory;
 
-    typedef NoShare bit_type;
+    typedef NoShare BitType;
 
     typedef typename T::Input Input;
 
-    typedef typename T::out_type out_type;
+    typedef typename T::OutType OutType;
 
-    typedef int MAC_Check;
-    typedef int mac_key_type;
-    typedef void DefaultMC;
+    typedef int MacCheck;
+    typedef int MacKeyType;
+    typedef void DefaultOpener;
     typedef void MC;
     typedef NoProtocol<Secret> Protocol;
 
@@ -95,9 +95,9 @@ public:
 
     static int threshold(int nplayers) { return T::threshold(nplayers); }
 
-    static Secret<T> input(party_id_t from, const int128& input, int n_bits = -1);
+    static Secret<T> input(PartyId from, const Int128& input, int n_bits = -1);
     static Secret<T> input(Processor<Secret<T>>& processor, const InputArgs& args);
-    void random(int n_bits, int128 share);
+    void random(int n_bits, Int128 share);
     void random_bit();
     template <class U>
     static void store_clear_in_dynamic(U& mem, const vector<ClearWriteAccess>& accesses)
@@ -152,7 +152,7 @@ public:
     static void run_tapes(const ArgVector& args) { T::run_tapes(args); }
 
     template<class U>
-    static string proto_fake_opts() { return U::fake_opts(); }
+    static string protocol_fake_options() { return U::fake_options(); }
 
     Secret();
     Secret(const Integer& x) { *this = x; }
@@ -174,7 +174,7 @@ public:
 
     void xor_(int n, const Secret<T>& x, const Secret<T>& y)
     {
-        resize_regs(n);
+        resize_registers(n);
         for (int i = 0; i < n; i++)
             XOR<T>(registers[i], x.get_reg(i), y.get_reg(i));
     }
@@ -193,12 +193,12 @@ public:
 
     int size() const { return registers.size(); }
     size_t maximum_size() const { return registers.size(); }
-    RegVector& get_regs() { return registers; }
-    const RegVector& get_regs() const { return registers; }
+    RegVector& get_registers() { return registers; }
+    const RegVector& get_registers() const { return registers; }
 
     const T& get_reg(int i) const { return registers.at(i); }
     T& get_reg(int i) { return registers.at(i); }
-    void resize_regs(size_t n);
+    void resize_registers(size_t n);
 
     void mask(Secret& res, size_t n) const;
     Secret mask(size_t n) const;

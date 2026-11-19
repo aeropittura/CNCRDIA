@@ -11,13 +11,13 @@
 using namespace std;
 
 template<class T, class U>
-class KeyGenBitFactory
+class KeyGeneratorBitFactory
 {
     U& keygen;
     deque<T>& buffer;
 
 public:
-    KeyGenBitFactory(U& keygen, deque<T>& buffer) :
+    KeyGeneratorBitFactory(U& keygen, deque<T>& buffer) :
             keygen(keygen), buffer(buffer)
     {
     }
@@ -36,33 +36,33 @@ public:
  * Somewhat homomorphic encryption key generation using MASCOT
  */
 template<int L, int M>
-class HighGearKeyGen
+class HighGearKeyGenerator
 {
 public:
-    typedef KeyGenProtocol<1, -1> Proto0;
-    typedef KeyGenProtocol<2, -1> Proto1;
+    typedef KeyGeneratorProtocol<1, -1> Proto0;
+    typedef KeyGeneratorProtocol<2, -1> Proto1;
 
-    typedef typename Proto0::share_type share_type0;
-    typedef typename Proto1::share_type share_type1;
+    typedef typename Proto0::ShareType ShareType0;
+    typedef typename Proto1::ShareType ShareType1;
 
-    typedef typename share_type0::open_type open_type0;
-    typedef typename share_type1::open_type open_type1;
+    typedef typename ShareType0::OpenType OpenType0;
+    typedef typename ShareType1::OpenType OpenType1;
 
-    typedef ShareVector<share_type0> vector_type0;
-    typedef ShareVector<share_type1> vector_type1;
+    typedef ShareVector<ShareType0> VectorType0;
+    typedef ShareVector<ShareType1> VectorType1;
 
-    typedef typename share_type0::bit_type BT;
+    typedef typename ShareType0::BitType BT;
 
     Player& P;
-    const FHE_Params& params;
+    const FheParameters& params;
 
     Proto0 proto0;
     Proto1 proto1;
 
-    deque<share_type0> bits0;
-    deque<share_type1> bits1;
+    deque<ShareType0> bits0;
+    deque<ShareType1> bits1;
 
-    HighGearKeyGen(Player& P, const FHE_Params& params);
+    HighGearKeyGenerator(Player& P, const FheParameters& params);
 
     void buffer_mabits();
 

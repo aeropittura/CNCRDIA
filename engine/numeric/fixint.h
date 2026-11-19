@@ -8,63 +8,63 @@
 #include "numeric/z2k.h"
 
 template<int L>
-class fixint : public SignedZ2<64 * (L + 1)>
+class Fixint : public SignedZ2<64 * (L + 1)>
 {
     static const int N_OVERFLOW = 60;
 
 public:
-    typedef SignedZ2<64 * (L + 1)> super;
-    typedef typename conditional<L == 0, super, SignedZ2<64 * L>>::type pack_type;
+    typedef SignedZ2<64 * (L + 1)> Super;
+    typedef typename conditional<L == 0, Super, SignedZ2<64 * L>>::type PackType;
 
-    fixint()
+    Fixint()
     {
     }
 
     template<class T>
-    fixint(const T& other) :
-            super(other)
+    Fixint(const T& other) :
+            Super(other)
     {
         auto check = mp_limb_signed_t(this->a[this->N_WORDS - 1]) >> N_OVERFLOW;
         assert(check == 0 or check == -1);
     }
 
-    fixint operator-(const fixint& other) const
+    Fixint operator-(const Fixint& other) const
     {
-        return super::operator-(other);
+        return Super::operator-(other);
     }
 
-    fixint operator-() const
+    Fixint operator-() const
     {
-        return super::operator-();
+        return Super::operator-();
     }
 
-    fixint operator^(const fixint& other) const
+    Fixint operator^(const Fixint& other) const
     {
         assert(L == 0);
-        return fixint(this->a[0] ^ other.a[0]);
+        return Fixint(this->a[0] ^ other.a[0]);
     }
 
-    void generateUniform(PRNG& G, int n_bits, bool positive = true)
+    void generate_uniform(PRNG& G, int n_bits, bool positive = true)
     {
-        G.get(bigint::tmp, n_bits, positive);
-        *this = bigint::tmp;
+        G.get(Bigint::tmp, n_bits, positive);
+        *this = Bigint::tmp;
     }
 
-    void randomBnd(PRNG& G, const bigint& bound, bool positive)
+    void random_bnd(PRNG& G, const Bigint& bound, bool positive)
     {
-        G.randomBnd(bigint::tmp, bound, positive);
-        *this = bigint::tmp;
+        G.random_bnd(Bigint::tmp, bound, positive);
+        *this = Bigint::tmp;
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
-        pack_type tmp = *this;
+        PackType tmp = *this;
         tmp.pack(os);
     }
 
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
-        pack_type tmp;
+        PackType tmp;
         tmp.unpack(os);
         *this = tmp;
     }
@@ -83,36 +83,36 @@ public:
     void allocate_slots(const T& limit)
     {
         int n_bits = this->size_in_bits();
-        if (numBits(limit) - N_OVERFLOW > n_bits)
+        if (num_bits(limit) - N_OVERFLOW > n_bits)
         {
             throw runtime_error("Fixed-length integer too small. "
                     "Maybe change N_LIMBS_RAND to at least " +
-                    to_string((numBits(limit) - N_OVERFLOW) / 64));
+                    to_string((num_bits(limit) - N_OVERFLOW) / 64));
         }
     }
 };
 
 template<int L>
-bigint operator-(const bigint& x, const fixint<L>& y)
+Bigint operator-(const Bigint& x, const Fixint<L>& y)
 {
-    return x - (bigint::tmp = y);
+    return x - (Bigint::tmp = y);
 }
 
 template<int L>
-bigint& operator+=(bigint& x, const fixint<L>& y)
+Bigint& operator+=(Bigint& x, const Fixint<L>& y)
 {
-    x += (bigint::tmp = y);
+    x += (Bigint::tmp = y);
     return x;
 }
 
 template<int L>
-bigint operator%(const fixint<L>& x, const bigint& y)
+Bigint operator%(const Fixint<L>& x, const Bigint& y)
 {
-    return (bigint::tmp = x) % y;
+    return (Bigint::tmp = x) % y;
 }
 
 template<int L>
-fixint<L>& operator%=(fixint<L>& x, const bigint& y)
+Fixint<L>& operator%=(Fixint<L>& x, const Bigint& y)
 {
-    return x = (bigint::tmp = x) % y;
+    return x = (Bigint::tmp = x) % y;
 }

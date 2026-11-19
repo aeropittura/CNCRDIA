@@ -5,4 +5,4 @@
 
 #include "parties/shared/maximal.hpp"
 
-template class Machine<HemiShare<gfp_<0, 2>>>;
+template class Machine<HemiShare<Gfp_<0, 2>>>;

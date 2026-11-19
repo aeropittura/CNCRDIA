@@ -122,7 +122,7 @@ public:
     }
 };
 
-class InputVecArgs
+class InputVectorArgs
 {
 public:
     int from;
@@ -132,7 +132,7 @@ public:
     ArgVector::value_type params[2];
     ArgVector dest;
 
-    InputVecArgs(ArgVector::const_iterator it) : n_bits(params[0]), n_shift(params[1])
+    InputVectorArgs(ArgVector::const_iterator it) : n_bits(params[0]), n_shift(params[1])
     {
         n = *it++;
         n_bits = n - 3;
@@ -144,11 +144,11 @@ public:
     }
 };
 
-class InputVecArgList : public InputArgListBase<InputVecArgs>
+class InputVectorArgList : public InputArgListBase<InputVectorArgs>
 {
 public:
-    InputVecArgList(const ArgVector& args) :
-            InputArgListBase<InputVecArgs>(args)
+    InputVectorArgList(const ArgVector& args) :
+            InputArgListBase<InputVectorArgs>(args)
     {
     }
 };

@@ -8,7 +8,7 @@
 #include "garbled/bmr/register.h"
 #include "garbled/bmr/common.h"
 
-struct PRFTuple {
+struct PrfTuple {
     Key outputs[2][2][2][1];
     // i = 0..3
     Key for_garbling(int i)
@@ -31,18 +31,18 @@ struct PRFTuple {
 	 *						for every party j={1...n}
 	 *							F_{k^i_{x,b}}(e,j,g,)
 	 */
-struct PRFOutputs {
+struct PrfOutputs {
 #ifdef MAX_N_PARTIES
-	PRFTuple tuples[MAX_N_PARTIES];
-	PRFOutputs(int n_parties) { (void)n_parties; }
+	PrfTuple tuples[MAX_N_PARTIES];
+	PrfOutputs(int n_parties) { (void)n_parties; }
 #else
-	vector<PRFTuple> tuples;
+	vector<PrfTuple> tuples;
 
-	PRFOutputs(int n_parties) : tuples(n_parties) {}
+	PrfOutputs(int n_parties) : tuples(n_parties) {}
 #endif
-	PRFTuple& operator[](int i) { return tuples[i]; }
+	PrfTuple& operator[](int i) { return tuples[i]; }
 	void serialize(SendBuffer& buffer, int my_id, int n_parties);
-	void print_prfs(gate_id_t g, wire_id_t* in_wires, party_id_t my_id, int n_parties);
+	void print_prfs(GateId g, WireId* in_wires, PartyId my_id, int n_parties);
 };
 
 class GarbledGate : public KeyTuple<4> {
@@ -77,16 +77,16 @@ public:
 	   	   * 				(1||g||1),(1||g||2),...,(1||g||n)
 	   	   */
 
-	gate_id_t id;
+	GateId id;
 
 	GarbledGate(int n_parties) : KeyTuple<4>(n_parties), id(-1) {}
 	virtual ~GarbledGate();
 
-	void init_inputs(gate_id_t g, int n_parties);
+	void initialize_inputs(GateId g, int n_parties);
 
-    char* input(int e, party_id_t j) { return (char*)&prf_inputs[e][j-1]; }
+    char* input(int e, PartyId j) { return (char*)&prf_inputs[e][j-1]; }
 
-    void compute_prfs_outputs(const Register** in_wires, int my_id, SendBuffer& buffer, gate_id_t g);
-    void compute_prfs_outputs(const Register** in_wires, int my_id, PRFOutputs& outputs, gate_id_t g);
+    void compute_prfs_outputs(const Register** in_wires, int my_id, SendBuffer& buffer, GateId g);
+    void compute_prfs_outputs(const Register** in_wires, int my_id, PrfOutputs& outputs, GateId g);
     void print();
 };

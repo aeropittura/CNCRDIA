@@ -34,7 +34,7 @@ void ShuffleSacrifice::shuffle(vector<U>& check_triples, Player& P)
     int buffer_size = check_triples.size();
 
     // shuffle
-    GlobalPRNG G(P);
+    GlobalPrng G(P);
     for (int i = 0; i < buffer_size; i++)
     {
         int remaining = buffer_size - i;
@@ -46,7 +46,7 @@ void ShuffleSacrifice::shuffle(vector<U>& check_triples, Player& P)
 template<class T>
 void TripleShuffleSacrifice<T>::triple_combine(vector<array<T, 3> >& triples,
         vector<array<T, 3> >& to_combine, Player& P,
-        typename T::MAC_Check& MC)
+        typename T::MacCheck& MC)
 {
     CODE_LOCATION
     int buffer_size = to_combine.size();
@@ -55,7 +55,7 @@ void TripleShuffleSacrifice<T>::triple_combine(vector<array<T, 3> >& triples,
 
     shuffle(to_combine, P);
 
-    vector<typename T::open_type> opened;
+    vector<typename T::OpenType> opened;
     vector<T> masked;
     masked.reserve(N);
     for (int i = 0; i < N; i++)
@@ -87,8 +87,8 @@ void TripleShuffleSacrifice<T>::triple_combine(vector<array<T, 3> >& triples,
 }
 
 template<class T>
-void DabitShuffleSacrifice<T>::dabit_sacrifice(vector<dabit<T> >& output,
-        vector<dabit<T> >& to_check, SubProcessor<T>& proc,
+void DabitShuffleSacrifice<T>::dabit_sacrifice(vector<Dabit<T> >& output,
+        vector<Dabit<T> >& to_check, SubProcessor<T>& proc,
         ThreadQueues* queues)
 {
     CODE_LOCATION
@@ -106,22 +106,22 @@ void DabitShuffleSacrifice<T>::dabit_sacrifice(vector<dabit<T> >& output,
 
     // opening C
     vector<T> shares;
-    vector<typename T::bit_type::part_type> bit_shares;
+    vector<typename T::BitType::part_type> bit_shares;
     for (int i = 0; i < C; i++)
     {
         shares.push_back(to_check.back().first);
         bit_shares.push_back(to_check.back().second);
         to_check.pop_back();
     }
-    vector<typename T::open_type> opened;
+    vector<typename T::OpenType> opened;
     MC.POpen(opened, shares, P);
-    vector<typename T::bit_type::part_type::open_type> bits;
-    auto& MCB = *T::bit_type::part_type::new_mc(
-            GC::ShareThread<typename T::bit_type>::s().MC->get_alphai());
+    vector<typename T::BitType::part_type::OpenType> bits;
+    auto& MCB = *T::BitType::part_type::new_opener(
+            GC::ShareThread<typename T::BitType>::s().MC->get_alphai());
     MCB.POpen(bits, bit_shares, P);
     for (int i = 0; i < C; i++)
         if (typename T::clear(opened[i]) != bits[i].get())
-            throw Offline_Check_Error("dabit shuffle opening");
+            throw OfflineCheckError("dabit shuffle opening");
 
     // sacrifice buckets
     typename T::Protocol protocol(P);
@@ -170,7 +170,7 @@ void DabitShuffleSacrifice<T>::dabit_sacrifice(vector<dabit<T> >& output,
     MCB.POpen(bits, bit_shares, P);
     for (int i = 0; i < (B - 1) * N; i++)
         if (typename T::clear(opened[i]) != bits[i].get())
-            throw Offline_Check_Error("dabit shuffle opening");
+            throw OfflineCheckError("dabit shuffle opening");
     MCB.Check(P);
 
     to_check.resize(N);
@@ -185,8 +185,8 @@ EdabitShuffleSacrifice<T>::EdabitShuffleSacrifice(int n_bits) :
 }
 
 template<class T>
-void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
-        vector<T>& wholes, vector<vector<typename T::bit_type::part_type>>& parts,
+void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<Edabit<T> >& output,
+        vector<T>& wholes, vector<vector<typename T::BitType::part_type>>& parts,
         SubProcessor<T>& proc, bool strict, int player,
         ThreadQueues* queues)
 {
@@ -204,10 +204,10 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
     auto& P = proc.P;
     auto& MC = proc.MC;
 
-    typedef typename T::bit_type::part_type BT;
-    typedef typename BT::small_type ST;
-    vector<edabit<T>> to_check;
-    size_t dl = T::bit_type::part_type::default_length;
+    typedef typename T::BitType::part_type BT;
+    typedef typename BT::SmallType ST;
+    vector<Edabit<T>> to_check;
+    size_t dl = T::BitType::part_type::default_length;
     assert(wholes.size() >= size_t(minimum_n_inputs(minimum_n_outputs())));
     assert(parts.size() >= n_bits);
     for (auto& x: parts)
@@ -216,7 +216,7 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
     RunningTimer init_timer;
     to_check.reserve(wholes.size());
     size_t n_bits_input = parts.size();
-    assert(n_bits_input <= edabit<T>::second_type::MAX_SIZE);
+    assert(n_bits_input <= Edabit<T>::second_type::MAX_SIZE);
     for (int i1 = 0; i1 < DIV_CEIL(wholes.size(), dl); i1++)
     {
         int n = min(dl, wholes.size() - i1 * dl);
@@ -247,8 +247,8 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
     RunningTimer personal_timer;
     if (player >= 0)
     {
-        auto &party = GC::ShareThread<typename T::bit_type>::s();
-        SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+        auto &party = GC::ShareThread<typename T::BitType>::s();
+        SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
                 *proc.personal_bit_preps.at(player), P);
         int n_triples = DIV_CEIL((B - 1) * N * n_bits, dl);
         proc.personal_bit_preps.at(player)->buffer_personal_triples(n_triples,
@@ -271,7 +271,7 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
 
     // opening C
     vector<T> shares;
-    vector<typename BT::small_type> bit_shares;
+    vector<typename BT::SmallType> bit_shares;
     for (int i = 0; i < C; i++)
     {
         assert(to_check.back().second.size() * i == bit_shares.size());
@@ -280,11 +280,11 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
                 to_check.back().second.end());
         to_check.pop_back();
     }
-    vector<typename T::open_type> opened;
+    vector<typename T::OpenType> opened;
     MC.POpen(opened, shares, P);
-    vector<typename BT::small_type::open_type> bits;
-    auto& MCB = *BT::small_type::new_mc(
-            GC::ShareThread<typename T::bit_type>::s().MC->get_alphai());
+    vector<typename BT::SmallType::OpenType> bits;
+    auto& MCB = *BT::SmallType::new_opener(
+            GC::ShareThread<typename T::BitType>::s().MC->get_alphai());
     MCB.POpen(bits, bit_shares, P);
     size_t n_bits_to_open = bits.size() / C;
     for (int i = 0; i < C; i++)
@@ -300,7 +300,7 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
             for (size_t j = 0; j < n_bits_to_open; j++)
                 cout << bits.at(i * n_bits_to_open + j);
             cout << endl;
-            throw Offline_Check_Error("edabit shuffle opening");
+            throw OfflineCheckError("edabit shuffle opening");
         }
     }
 
@@ -361,7 +361,7 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice(vector<edabit<T> >& output,
 }
 
 template<class T>
-void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_check,
+void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<Edabit<T>>& to_check,
         bool strict, int player, SubProcessor<T>& proc, int begin,
         int end, const void* supply)
 {
@@ -371,16 +371,16 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
 }
 
 template<class T>
-void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_check,
+void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<Edabit<T>>& to_check,
         bool strict, int player, SubProcessor<T>& proc, int begin,
         int end, LimitedPrep<BT>& personal_prep, const void* supply)
 {
-    typedef typename T::bit_type::part_type BT;
-    typedef typename BT::small_type ST;
+    typedef typename T::BitType::part_type BT;
+    typedef typename BT::SmallType ST;
 
     int N = end - begin;
-    size_t total_N = to_check.size() / B;
-    assert(to_check.size() == B * total_N);
+    size_t total_n = to_check.size() / B;
+    assert(to_check.size() == B * total_n);
     size_t n_bits_to_open = to_check[begin].second.size();
     ThreadQueues* queues = 0;
     auto& P = proc.P;
@@ -400,7 +400,7 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
         assert(b.size() == n_bits_to_open);
         for (int j = 1; j < B; j++)
         {
-            auto& g = to_check[begin + i + total_N * j].second;
+            auto& g = to_check[begin + i + total_n * j].second;
             assert(g.size() == n_bits_to_open);
             int l = i * (B - 1) + j - 1;
             int l1 = l / BT::default_length;
@@ -419,7 +419,7 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
 
     RunningTimer add_timer;
     vector<vector<BT>> sums;
-    auto& party = GC::ShareThread<typename T::bit_type>::s();
+    auto& party = GC::ShareThread<typename T::BitType>::s();
     if (supply)
     {
         auto& triples = *(vector<array<BT, 3>>*)supply;
@@ -433,15 +433,15 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
     }
     if (player < 0)
     {
-        SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+        SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
                 proc.bit_prep, P);
-        BitAdder().add(sums, summands, bit_proc, BT::default_length, queues);
+        BitAdder().add(sums, summands, bit_processor, BT::default_length, queues);
     }
     else
     {
-        SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+        SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
                 personal_prep, P);
-        BitAdder().add(sums, summands, bit_proc, BT::default_length, queues,
+        BitAdder().add(sums, summands, bit_processor, BT::default_length, queues,
                 player);
     }
     summands.clear();
@@ -450,13 +450,13 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
 #endif
 
     vector<T> shares;
-    vector<typename BT::small_type> bit_shares;
+    vector<typename BT::SmallType> bit_shares;
 
     RunningTimer sacri_prep_timer;
     // cannot delete overflow in GF(p)
-    strict |= T::open_type::N_BITS < 0;
-    int n_shift = (T::open_type::N_BITS - n_bits);
-    vector<edabit<T>> to_sanitize;
+    strict |= T::OpenType::N_BITS < 0;
+    int n_shift = (T::OpenType::N_BITS - n_bits);
+    vector<Edabit<T>> to_sanitize;
     if (strict)
         to_sanitize.reserve(N * (B - 1));
     else
@@ -469,11 +469,11 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
         auto& a = to_check[begin + i].first;
         for (int j = 1; j < B; j++)
         {
-            auto& f = to_check[begin + i + total_N * j].first;
+            auto& f = to_check[begin + i + total_n * j].first;
             int l = i * (B - 1) + j - 1;
             int l1 = l / BT::default_length;
             int l2 = l % BT::default_length;
-            typename edabit<T>::second_type* bits = 0;
+            typename Edabit<T>::second_type* bits = 0;
             if (strict)
             {
                 to_sanitize.push_back({a + f, {}});
@@ -518,10 +518,10 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
     Timer open_timer;
     open_timer.start();
 #endif
-    vector<typename T::open_type> opened;
-    vector<typename BT::small_type::open_type> bits;
-    auto& MCB = *BT::small_type::new_mc(
-            GC::ShareThread<typename T::bit_type>::s().MC->get_alphai());
+    vector<typename T::OpenType> opened;
+    vector<typename BT::SmallType::OpenType> bits;
+    auto& MCB = *BT::SmallType::new_opener(
+            GC::ShareThread<typename T::BitType>::s().MC->get_alphai());
     MC.POpen(opened, shares, P);
     MCB.POpen(bits, bit_shares, P);
 #ifdef VERBOSE_EDA
@@ -540,7 +540,7 @@ void EdabitShuffleSacrifice<T>::edabit_sacrifice_buckets(vector<edabit<T>>& to_c
         {
             cout << hex << single << " vs " << sum
                     << endl;
-            throw Offline_Check_Error("edabit shuffle bucket opening");
+            throw OfflineCheckError("edabit shuffle bucket opening");
         }
     }
 #ifdef VERBOSE_EDA

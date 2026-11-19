@@ -80,10 +80,10 @@ class EncCommit : public EncCommitBase<T,FD,S>
 
   public:
 
-  static bigint active_mask(int phim, int TT = DEFAULT_T * DEFAULT_B,
+  static Bigint active_mask(int phim, int TT = DEFAULT_T * DEFAULT_B,
       int delta = DEFAULT_DELTA)
   { return 4 * delta * TT * phim; }
-  static bigint active_slack(int phim) { return 2 * active_mask(phim); }
+  static Bigint active_slack(int phim) { return 2 * active_mask(phim); }
 
   EncCommit() : cnt(-1) { ; }
   ~EncCommit();
@@ -111,7 +111,7 @@ class EncCommit : public EncCommitBase<T,FD,S>
 
   void next(Plaintext<T,FD,S>& mess, vector<Ciphertext>& C)
     {
-      if (C.size() != 0 and pk->get_params() != C[0].get_params())
+      if (C.size() != 0 and pk->get_parameters() != C[0].get_parameters())
         C.clear();
       if (covert)
 	{ next_covert(mess,C); }
@@ -138,14 +138,14 @@ void covert_generation(Plaintext_<FD>& mess, vector<Ciphertext>& C,
     const vector<const FHE_PK*>& pks, const Player* P, int num_runs, condition cond);
 
 template <class FD>
-void generate_mac_key(typename FD::T& key_share, Ciphertext& key, const FD& FieldD,
+void generate_mac_key(typename FD::T& key_share, Ciphertext& key, const FD& field_d,
     FHE_PK& pk, Player& P, int covert)
 {
   EncCommit_<FD> ec(P, pk, covert, Diagonal);
-  Plaintext_<FD> mess(FieldD);
+  Plaintext_<FD> mess(field_d);
   ec.next(mess, key);
 
   /* Check all OK */
-  P.Check_Broadcast();
+  P.check_broadcast();
   key_share = mess.element(0);
 }

@@ -16,7 +16,7 @@ void FixInput_<Integer>::read(std::istream& in, const ArgVector::value_type* par
 }
 
 template<>
-void FixInput_<bigint>::read(std::istream& in, const ArgVector::value_type* params)
+void FixInput_<Bigint>::read(std::istream& in, const ArgVector::value_type* params)
 {
 #ifdef HIGH_PREC_INPUT
     mpf_class x;

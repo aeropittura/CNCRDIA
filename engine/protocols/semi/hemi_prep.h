@@ -25,7 +25,7 @@ class HemiPrep : public SemiHonestRingPrep<T>
 
     vector<Multiplier<FD>*> multipliers;
 
-    SeededPRNG G;
+    SeededPrng G;
 
     map<string, Timer> timers;
 
@@ -40,7 +40,7 @@ public:
     static void teardown();
 
     static const FHE_PK& get_pk();
-    static const FD& get_FTD();
+    static const FD& get_ftd();
 
     static bool bits_from_dabits();
 

@@ -12,9 +12,9 @@ template<class T, class U, class V>
 string full_secrets_filename(T& setup, U& machine, const Player& P,
         int num_runs, V)
 {
-    octetStream os;
+    OctetStream os;
     setup.params.pack(os);
-    setup.FieldD.pack(os);
+    setup.field_d.pack(os);
     bool covert = num_runs > 0;
     assert(covert == V());
     string filename = PREP_DIR + setup.protocol_name(covert) + "-Secrets-"
@@ -29,7 +29,7 @@ template<class T, class U, class V, class W>
 void read_or_generate_secrets(T& setup, Player& P, U& machine,
         int num_runs, V, W, bool read_only = false)
 {
-    octetStream os;
+    OctetStream os;
     string filename = full_secrets_filename(setup, machine, P, num_runs, V());
     string error;
 
@@ -49,7 +49,7 @@ void read_or_generate_secrets(T& setup, Player& P, U& machine,
         setup.check(P, machine);
         machine.check(P);
     }
-    catch (mismatch_among_parties& e)
+    catch (MismatchAmongParties& e)
     {
         if (error.empty())
             error = e.what();
@@ -66,7 +66,7 @@ void read_or_generate_secrets(T& setup, Player& P, U& machine,
         W::LivePrep::adjust_mac_key(P);
 
         ofstream output(filename);
-        octetStream os;
+        OctetStream os;
         setup.pack(os);
         machine.pack(os);
         os.output(output);
@@ -77,24 +77,24 @@ void read_or_generate_secrets(T& setup, Player& P, U& machine,
 }
 
 template <class T, class U, class V>
-void secure_init(T& setup, Player& P, U& machine, int sec, V, bool read_only,
+void secure_initialize(T& setup, Player& P, U& machine, int sec, V, bool read_only,
         true_type)
 {
     OnlineOptions::singleton.prime = V::pr(true);
-    setup.secure_init(P, machine,
+    setup.secure_initialize(P, machine,
             V::length() ? V::length() : OnlineOptions::singleton.lgp, sec,
             read_only);
 }
 
 template<class T, class U, class V>
-void secure_init(T& setup, Player& P, U& machine, int sec, V, bool read_only,
+void secure_initialize(T& setup, Player& P, U& machine, int sec, V, bool read_only,
         false_type)
 {
-    setup.secure_init(P, machine, V::length(), sec, read_only);
+    setup.secure_initialize(P, machine, V::length(), sec, read_only);
 }
 
 template <class T, class U, class V>
-void secure_init(T& setup, Player& P, U& machine, V, int sec, bool read_only = false)
+void secure_initialize(T& setup, Player& P, U& machine, V, int sec, bool read_only = false)
 {
-    secure_init(setup, P, machine, sec, V(), read_only, V::prime_field);
+    secure_initialize(setup, P, machine, sec, V(), read_only, V::prime_field);
 }

@@ -7,5 +7,5 @@
 
 int main(int argc, const char** argv)
 {
-    OTMachine(argc, argv).run();
+    OtMachine(argc, argv).run();
 }

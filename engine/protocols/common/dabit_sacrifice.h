@@ -30,11 +30,11 @@ public:
         return n_outputs + S;
     }
 
-    void sacrifice_without_bit_check(vector<dabit<T>>& dabits,
-            vector<dabit<T>>& check_dabits, SubProcessor<T>& proc,
+    void sacrifice_without_bit_check(vector<Dabit<T>>& dabits,
+            vector<Dabit<T>>& check_dabits, SubProcessor<T>& proc,
             ThreadQueues* queues = 0);
 
-    void sacrifice_and_check_bits(vector<dabit<T>>& dabits,
-            vector<dabit<T>>& check_dabits, SubProcessor<T>& proc,
+    void sacrifice_and_check_bits(vector<Dabit<T>>& dabits,
+            vector<Dabit<T>>& check_dabits, SubProcessor<T>& proc,
             ThreadQueues* queues = 0);
 };

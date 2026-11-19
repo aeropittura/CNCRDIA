@@ -16,8 +16,8 @@ void P256Element::init(int nid)
     assert(curve != 0);
     auto modulus = EC_GROUP_get0_order(curve);
     auto mod = BN_bn2dec(modulus);
-    Scalar::get_ZpD() = {};
-    Scalar::init_field(mod, false);
+    Scalar::get_zp_d() = {};
+    Scalar::initialize_field(mod, false);
     free(mod);
 }
 
@@ -28,7 +28,7 @@ void P256Element::finish()
     curve = 0;
 }
 
-void P256Element::specification(octetStream& os)
+void P256Element::specification(OctetStream& os)
 {
     Scalar::specification(os);
 }
@@ -45,7 +45,7 @@ P256Element::P256Element(const Scalar& other) :
         P256Element()
 {
     BIGNUM* exp = BN_new();
-    BN_dec2bn(&exp, bigint(other).get_str().c_str());
+    BN_dec2bn(&exp, Bigint(other).get_str().c_str());
     assert(EC_POINT_mul(curve, point, exp, 0, 0, 0) != 0);
     BN_free(exp);
 }
@@ -84,7 +84,7 @@ P256Element::Scalar P256Element::x() const
     assert(EC_POINT_get_affine_coordinates_GFp(curve, point, x, 0, 0) != 0);
 #endif
     char* xx = BN_bn2dec(x);
-    Scalar res((bigint(xx)));
+    Scalar res((Bigint(xx)));
     OPENSSL_free(xx);
     BN_free(x);
     return res;
@@ -108,7 +108,7 @@ P256Element P256Element::operator *(const Scalar& other) const
 {
     P256Element res;
     BIGNUM* exp = BN_new();
-    BN_dec2bn(&exp, bigint(other).get_str().c_str());
+    BN_dec2bn(&exp, Bigint(other).get_str().c_str());
     assert(EC_POINT_mul(curve, res.point, 0, point, exp, 0) != 0);
     BN_free(exp);
     return res;
@@ -121,9 +121,9 @@ bool P256Element::operator ==(const P256Element& other) const
     return not cmp;
 }
 
-void P256Element::pack(octetStream& os, int) const
+void P256Element::pack(OctetStream& os, int) const
 {
-    octet* buffer;
+    Octet* buffer;
     size_t length = EC_POINT_point2buf(curve, point,
             POINT_CONVERSION_COMPRESSED, &buffer, 0);
     assert(length != 0);
@@ -132,7 +132,7 @@ void P256Element::pack(octetStream& os, int) const
     free(buffer);
 }
 
-void P256Element::unpack(octetStream& os, int)
+void P256Element::unpack(OctetStream& os, int)
 {
     size_t length = os.get_int(8);
     assert(

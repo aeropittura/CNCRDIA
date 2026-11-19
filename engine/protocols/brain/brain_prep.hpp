@@ -16,7 +16,7 @@ template<class T> class ZProtocol;
 template<int L>
 class Zint : public SignedZ2<L + 2>
 {
-    typedef SignedZ2<L + 2> super;
+    typedef SignedZ2<L + 2> Super;
 
 public:
     static string type_string()
@@ -29,7 +29,7 @@ public:
     }
 
     template<class T>
-    Zint(const T& other) : super(other)
+    Zint(const T& other) : Super(other)
     {
     }
 
@@ -66,7 +66,7 @@ class ZShare : public Rep3Share<Zint<U::Z_BITS>>
 {
 public:
     typedef ZProtocol<U> Protocol;
-    typedef ReplicatedMC<ZShare> MAC_Check;
+    typedef ReplicatedOpener<ZShare> MacCheck;
 
     ZShare()
     {
@@ -84,7 +84,7 @@ class ZProtocol : public Replicated<Rep3Share<Zint<U::Z_BITS>>>
 {
     typedef Rep3Share<Zint<U::Z_BITS>> T;
     vector<T> random;
-    SeededPRNG G;
+    SeededPrng G;
     ReplicatedInput<Rep3Share<Zint<U::N_MASK_BITS>>> input;
 
 public:
@@ -124,48 +124,48 @@ public:
 template<class T>
 void BrainPrep<T>::basic_setup(Player&)
 {
-    gfp2::init_default(DIV_CEIL(T::Z_BITS + 3, 8) * 8);
+    Gfp2::initialize_default(DIV_CEIL(T::Z_BITS + 3, 8) * 8);
 }
 
 template<class T>
 void BrainPrep<T>::buffer_triples()
 {
     CODE_LOCATION
-    if(gfp2::get_ZpD().pr_bit_length
-            <= ZProtocol<T>::share_type::clear::N_BITS)
+    if(Gfp2::get_zp_d().pr_bit_length
+            <= ZProtocol<T>::ShareType::clear::N_BITS)
         throw runtime_error(
-                to_string(gfp2::get_ZpD().pr_bit_length)
+                to_string(Gfp2::get_zp_d().pr_bit_length)
                         + "-bit prime too short for "
-                        + to_string(ZProtocol<T>::share_type::clear::N_BITS)
+                        + to_string(ZProtocol<T>::ShareType::clear::N_BITS)
                         + "-bit integer computation");
-    typedef Rep3Share<gfp2> pShare;
+    typedef Rep3Share<Gfp2> PShare;
     auto buffer_size = BaseMachine::batch_size<T>(DATA_TRIPLE);
     Player& P = this->protocol->P;
     vector<array<ZShare<T>, 3>> triples;
-    vector<array<Rep3Share<gfp2>, 3>> check_triples;
+    vector<array<Rep3Share<Gfp2>, 3>> check_triples;
     DataPositions usage;
-    HashMaliciousRepMC<pShare> MC;
-    vector<Rep3Share<gfp2>> masked, checks;
-    vector<gfp2> opened;
-    ZProtocol<T> Z_protocol(P);
-    Replicated<pShare> p_protocol(P);
-    generate_triples(triples, buffer_size, &Z_protocol);
+    HashMaliciousRepOpener<PShare> MC;
+    vector<Rep3Share<Gfp2>> masked, checks;
+    vector<Gfp2> opened;
+    ZProtocol<T> z_protocol(P);
+    Replicated<PShare> p_protocol(P);
+    generate_triples(triples, buffer_size, &z_protocol);
     check_triples.resize(buffer_size);
-    p_protocol.init_mul();
+    p_protocol.initialize_mult();
     for (int i = 0; i < buffer_size; i++)
     {
-        pShare a = p_protocol.get_random();
-        pShare b = triples[i][1];
+        PShare a = p_protocol.get_random();
+        PShare b = triples[i][1];
         p_protocol.prepare_mul(a, b);
         check_triples[i][0] = a;
         check_triples[i][1] = b;
     }
     p_protocol.exchange();
-    auto t = Create_Random<gfp2>(P);
+    auto t = create_random<Gfp2>(P);
     for (int i = 0; i < buffer_size; i++)
     {
         check_triples[i][2] = p_protocol.finalize_mul();
-        pShare a = triples[i][0];
+        PShare a = triples[i][0];
         auto& f = check_triples[i][0];
         masked.push_back(a * t - f);
     }
@@ -173,12 +173,12 @@ void BrainPrep<T>::buffer_triples()
     for (int i = 0; i < buffer_size; i++)
     {
         auto& b = check_triples[i][1];
-        pShare c = triples[i][2];
+        PShare c = triples[i][2];
         auto& h = check_triples[i][2];
         auto& rho = opened[i];
         checks.push_back(t * c - h - rho * b);
     }
-    MC.CheckFor(0, checks, P);
+    MC.check_for(0, checks, P);
     MC.Check(P);
     for (auto& x : triples)
         this->triples.push_back({{x[0], x[1], x[2]}});

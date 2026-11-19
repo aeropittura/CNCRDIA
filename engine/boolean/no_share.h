@@ -57,7 +57,7 @@ public:
         return DATA_GF2;
     }
 
-    static void init_minimum(int)
+    static void initialize_minimum(int)
     {
     }
 
@@ -69,7 +69,7 @@ public:
     NoValue() {}
     NoValue(bool) {}
     NoValue(ValueInterface) {}
-    NoValue(int128) {}
+    NoValue(Int128) {}
 
     void assign(const char*) { fail(); }
 
@@ -96,8 +96,8 @@ public:
     void input(istream&, bool) { fail(); }
     void output(ostream&, bool) {}
 
-    void pack(octetStream&) const { fail(); }
-    void unpack(const octetStream&) {}
+    void pack(OctetStream&) const { fail(); }
+    void unpack(const OctetStream&) {}
 };
 
 inline ostream& operator<<(ostream& o, NoValue)
@@ -108,24 +108,24 @@ inline ostream& operator<<(ostream& o, NoValue)
 class NoShare : public ShareInterface
 {
 public:
-    typedef DummyMC<NoShare> MC;
+    typedef DummyOpener<NoShare> MC;
     typedef DummyProtocol<NoShare> Protocol;
     typedef NoInput<NoShare> Input;
     typedef DummyLivePrep<NoShare> LivePrep;
-    typedef DummyMC<NoShare> MAC_Check;
+    typedef DummyOpener<NoShare> MacCheck;
     typedef SecureShuffleBase<NoShare> Shuffler;
 
-    typedef NoValue open_type;
+    typedef NoValue OpenType;
     typedef NoValue clear;
-    typedef NoValue mac_key_type;
+    typedef NoValue MacKeyType;
 
-    typedef NoShare small_type;
+    typedef NoShare SmallType;
 
-    typedef SwitchableOutput out_type;
+    typedef SwitchableOutput OutType;
 
     static const bool is_real = false;
 
-    static MC* new_mc(mac_key_type)
+    static MC* new_opener(MacKeyType)
     {
         return new MC;
     }
@@ -135,7 +135,7 @@ public:
         return "no";
     }
 
-    static void specification(octetStream&)
+    static void specification(OctetStream&)
     {
         fail();
     }
@@ -169,7 +169,7 @@ public:
 
     static void sync(vector<Integer>&, Player*) { fail(); }
 
-    static NoShare constant(const GC::Clear&, int, mac_key_type, int = -1) { fail(); return {}; }
+    static NoShare constant(const GC::Clear&, int, MacKeyType, int = -1) { fail(); return {}; }
 
     NoShare() {}
 
@@ -213,7 +213,7 @@ public:
     void input(istream&, bool) { fail(); }
     void output(ostream&, bool) { fail(); }
 
-    void pack(octetStream&) const { fail(); }
+    void pack(OctetStream&) const { fail(); }
 };
 
 inline ostream& operator<<(ostream& o, NoShare)

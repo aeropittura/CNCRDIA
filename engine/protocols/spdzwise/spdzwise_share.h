@@ -11,7 +11,7 @@
 
 template<class T> class NoLivePrep;
 template<class T> class NotImplementedInput;
-template<class T> class SpdzWiseMC;
+template<class T> class SpdzWiseOpener;
 template<class T> class SpdzWisePrep;
 template<class T> class SpdzWiseInput;
 
@@ -23,16 +23,16 @@ class MaliciousRepSecret;
 template<class T>
 class SpdzWiseShare : public Share_<T, T>
 {
-    typedef Share_<T, T> super;
+    typedef Share_<T, T> Super;
 
 public:
     typedef T part_type;
-    typedef T open_part_type;
+    typedef T OpenPartType;
     typedef typename T::clear clear;
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
 
-    typedef SpdzWiseMC<SpdzWiseShare> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef SpdzWiseOpener<SpdzWiseShare> MacCheck;
+    typedef MacCheck DirectOpener;
 
     typedef SpdzWise<SpdzWiseShare> Protocol;
     typedef SpdzWisePrep<SpdzWiseShare> LivePrep;
@@ -42,7 +42,7 @@ public:
     typedef SpdzWiseShare Honest;
     typedef LivePrep TriplePrep;
 
-    typedef typename T::bit_type bit_type;
+    typedef typename T::BitType BitType;
 
     static const bool expensive = true;
 
@@ -58,12 +58,12 @@ public:
 
     static void read_or_generate_mac_key(string directory, Player& P, T& mac_key);
 
-    static open_type get_rec_factor(int i, int n)
+    static OpenType get_rec_factor(int i, int n)
     {
         return T::get_rec_factor(i, n);
     }
 
-    static void specification(octetStream& os)
+    static void specification(OctetStream& os)
     {
         T::specification(os);
     }
@@ -74,17 +74,17 @@ public:
 
     template<class U>
     SpdzWiseShare(const Share_<U, U>& other) :
-            super(other)
+            Super(other)
     {
     }
 
     SpdzWiseShare(const T& share, const T& mac) :
-            super(share, mac)
+            Super(share, mac)
     {
     }
 
-    void pack(octetStream& os, bool full = true) const;
-    void pack(octetStream& os, open_type factor) const;
+    void pack(OctetStream& os, bool full = true) const;
+    void pack(OctetStream& os, OpenType factor) const;
 };
 
 template<class T> class MaliciousRep3Share;

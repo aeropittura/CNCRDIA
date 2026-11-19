@@ -16,19 +16,19 @@
 template<class T> class ReplicatedPrep;
 template<class T> class SemiRep3Prep;
 template<class T> class ReplicatedRingPrep;
-template<class T> class ReplicatedPO;
+template<class T> class ReplicatedPo;
 template<class T> class SpecificPrivateOutput;
 
 template<class T, int L>
 class RepShare : public FixedVec<T, L>, public ShareInterface
 {
     typedef RepShare This;
-    typedef FixedVec<T, L> super;
+    typedef FixedVec<T, L> Super;
 
 public:
     typedef T clear;
-    typedef T open_type;
-    typedef This share_type;
+    typedef T OpenType;
+    typedef This ShareType;
 
     const static bool needs_ot = false;
     const static bool dishonest_majority = false;
@@ -39,7 +39,7 @@ public:
         return 1;
     }
 
-    static void specification(octetStream& os)
+    static void specification(OctetStream& os)
     {
         T::specification(os);
     }
@@ -49,7 +49,7 @@ public:
     }
     template<class U>
     RepShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 
@@ -69,18 +69,18 @@ public:
         return *this;
     }
 
-    void pack(octetStream& os, T) const
+    void pack(OctetStream& os, T) const
     {
         pack(os, false);
     }
-    void pack(octetStream& os, bool full = true) const
+    void pack(OctetStream& os, bool full = true) const
     {
         if (full)
             FixedVec<T, L>::pack(os);
         else
             (*this)[0].pack(os);
     }
-    void unpack(octetStream& os, bool full = true)
+    void unpack(OctetStream& os, bool full = true)
     {
         assert(full);
         FixedVec<T, L>::unpack(os);
@@ -105,8 +105,8 @@ public:
     {
         for (int i = 0; i < inst.get_size(); i++)
         {
-            auto& dest = proc.get_S_ref(inst.get_r(0) + i);
-            auto& source = proc.get_S_ref(inst.get_r(1) + i);
+            auto& dest = proc.get_s_ref(inst.get_r(0) + i);
+            auto& source = proc.get_s_ref(inst.get_r(1) + i);
             dest = source >> inst.get_n();
         }
     }
@@ -115,17 +115,17 @@ public:
 template<class T>
 class Rep3Share : public RepShare<T, 2>
 {
-    typedef RepShare<T, 2> super;
+    typedef RepShare<T, 2> Super;
     typedef Rep3Share This;
 
 public:
     typedef T clear;
 
     typedef Replicated<Rep3Share> Protocol;
-    typedef ReplicatedMC<Rep3Share> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef ReplicatedOpener<Rep3Share> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ReplicatedInput<Rep3Share> Input;
-    typedef ReplicatedPO<This> PO;
+    typedef ReplicatedPo<This> PO;
     typedef SpecificPrivateOutput<This> PrivateOutput;
     typedef typename conditional<T::characteristic_two,
             ReplicatedPrep<Rep3Share>, SemiRep3Prep<Rep3Share>>::type LivePrep;
@@ -134,7 +134,7 @@ public:
 
     typedef Rep3Share Scalar;
 
-    typedef GC::SemiHonestRepSecret bit_type;
+    typedef GC::SemiHonestRepSecret BitType;
 
     const static bool needs_ot = false;
     const static bool dishonest_majority = false;
@@ -157,7 +157,7 @@ public:
     }
 
     static Rep3Share constant(T value, int my_num,
-            typename super::mac_key_type = {})
+            typename Super::MacKeyType = {})
     {
         This res;
         Replicated<Rep3Share>::assign(res, value, my_num);
@@ -169,7 +169,7 @@ public:
     }
     template<class U>
     Rep3Share(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 
@@ -178,10 +178,10 @@ public:
         FixedVec<T, 2>::assign(buffer);
     }
 
-    clear local_mul(const Rep3Share& other) const
+    clear local_mult(const Rep3Share& other) const
     {
-        auto a = (*this)[0].lazy_mul(other.lazy_sum());
-        auto b = (*this)[1].lazy_mul(other[0]);
+        auto a = (*this)[0].lazy_mult(other.lazy_sum());
+        auto b = (*this)[1].lazy_mult(other[0]);
         return a.lazy_add(b);
     }
 };

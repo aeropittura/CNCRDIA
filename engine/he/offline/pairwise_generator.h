@@ -22,17 +22,17 @@ class PairwiseGenerator : public GeneratorBase
     template<class U> friend class CowGearPrep;
 
     PlaintextVector<FD> a, b, c;
-    AddableVector<Rq_Element> b_mod_q;
+    AddableVector<RqElement> b_mod_q;
     vector<Multiplier<FD>*> multipliers;
     TripleProducer_<FD> producer;
     MultiEncCommit<FD> EC;
-    MAC_Check<T> MC;
+    MacCheck<T> MC;
 
     int n_ciphertexts;
 
     // temporary data
     AddableVector<Ciphertext> C;
-    octetStream ciphertexts, cleartexts;
+    OctetStream ciphertexts, cleartexts;
 
     size_t volatile_memory;
 

@@ -23,16 +23,16 @@ void IndividualInput<U>::reset(int player)
 }
 
 template<class T>
-vector<vector<typename T::open_type>> ShamirInput<T>::get_vandermonde(
+vector<vector<typename T::OpenType>> ShamirInput<T>::get_vandermonde(
         size_t t, size_t n)
 {
-    vector<vector<typename T::open_type>> vandermonde(n);
+    vector<vector<typename T::OpenType>> vandermonde(n);
 
     for (int i = 0; i < int(n); i++)
         if (vandermonde[i].size() < t)
         {
             vandermonde[i].resize(t);
-            typename T::open_type x = 1;
+            typename T::OpenType x = 1;
             for (size_t j = 0; j < t; j++)
             {
                 x *= (i + 1);
@@ -60,9 +60,9 @@ void ShamirInput<T>::init()
 }
 
 template<class T>
-void ShamirInput<T>::add_mine(const typename T::open_type& input, int n_bits)
+void ShamirInput<T>::add_mine(const typename T::OpenType& input, int n_bits)
 {
-    this->maybe_init(this->P);
+    this->maybe_initialize(this->P);
 
     (void) n_bits;
     auto& P = this->P;
@@ -80,7 +80,7 @@ void ShamirInput<T>::add_mine(const typename T::open_type& input, int n_bits)
     for (int i = threshold; i < n; i++)
     {
         int player = P.get_player(1 + i);
-        typename T::open_type x = input
+        typename T::OpenType x = input
                 * reconstruction.at(i - threshold).at(0);
         for (int j = 0; j < t; j++)
             x += randomness[j] * reconstruction.at(i - threshold).at(j + 1);
@@ -95,10 +95,10 @@ void ShamirInput<T>::add_mine(const typename T::open_type& input, int n_bits)
 
 template<class T>
 void ShamirInput<T>::finalize_other(int player, T& target,
-        octetStream& o, int n_bits)
+        OctetStream& o, int n_bits)
 {
     if (this->P.get_offset(player) >= this->P.num_players() - threshold)
-        target.randomize(this->recv_prngs.at(player));
+        target.randomize(this->receive_prngs.at(player));
     else
         IndividualInput<T>::finalize_other(player, target, o, n_bits);
 }
@@ -106,7 +106,7 @@ void ShamirInput<T>::finalize_other(int player, T& target,
 template<class U>
 void IndividualInput<U>::add_sender(int player)
 {
-    this->maybe_init(this->P);
+    this->maybe_initialize(this->P);
     senders[player] = true;
 }
 
@@ -153,7 +153,7 @@ void IndividualInput<T>::stop_exchange()
 }
 
 template<class T>
-void IndividualInput<T>::finalize_other(int player, T& target, octetStream& o,
+void IndividualInput<T>::finalize_other(int player, T& target, OctetStream& o,
         int n_bits)
 {
     (void) player;

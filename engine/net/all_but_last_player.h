@@ -23,29 +23,29 @@ public:
         delete N;
     }
 
-    void send_to(int player, const octetStream& o) const
+    void send_to(int player, const OctetStream& o) const
     {
         P.send_to(player, o);
     }
 
-    void receive_player(int i, octetStream& o) const
+    void receive_player(int i, OctetStream& o) const
     {
         P.receive_player(i, o);
     }
 
-    void send_to_no_stats(int, const octetStream&) const
+    void send_to_no_statistics(int, const OctetStream&) const
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
-    void receive_player_no_stats(int, octetStream&) const
+    void receive_player_no_statistics(int, OctetStream&) const
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
-    void send_receive_all_no_stats(const vector<vector<bool>>& channels,
-            const vector<octetStream>& to_send,
-            vector<octetStream>& to_receive) const
+    void send_receive_all_no_statistics(const vector<vector<bool>>& channels,
+            const vector<OctetStream>& to_send,
+            vector<OctetStream>& to_receive) const
     {
         auto my_channels = channels;
         if (channels.empty())
@@ -63,7 +63,7 @@ public:
         to_receive.resize(P.num_players() - 1);
     }
 
-    void Broadcast_Receive_no_stats(vector<octetStream>& os) const
+    void broadcast_receive_no_statistics(vector<OctetStream>& os) const
     {
         vector<bool> senders(P.num_players(), true), receivers(P.num_players(),
                 true);

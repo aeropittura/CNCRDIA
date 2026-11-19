@@ -3,21 +3,21 @@
 
 void* run_ot(void* job)
 {
-    ((OTTripleSetup::SetupJob*)job)->run();
+    ((OtTripleSetup::SetupJob*)job)->run();
     return 0;
 }
 
-void OTTripleSetup::setup()
+void OtTripleSetup::setup()
 {
     timeval baseOTstart, baseOTend;
     gettimeofday(&baseOTstart, NULL);
 
-    G.ReSeed();
+    G.re_seed();
     for (int i = 0; i < get_nbase(); i++)
     {
         base_receiver_inputs[i] = G.get_uchar() & 1;
     }
-    //baseReceiverInput.randomize(G);
+    //base_receiver_input.randomize(G);
 
     vector<SetupJob> threads;
     for (int i = 0; i < nparties - 1; i++)
@@ -32,24 +32,24 @@ void OTTripleSetup::setup()
     cout << "\t\tBaseTime: " << basetime/1000000 << endl << flush;
 #endif
 
-    for (size_t i = 0; i < baseOTs.size(); i++)
+    for (size_t i = 0; i < base_ots.size(); i++)
     {
-        delete baseOTs.at(i);
+        delete base_ots.at(i);
     }
 
     // Receiver send something to force synchronization
-    // (since Sender finishes baseOTs before Receiver)
+    // (since Sender finishes base_ots before Receiver)
 }
 
-void OTTripleSetup::run(int i)
+void OtTripleSetup::run(int i)
 {
-    baseOTs.at(i)->set_receiver_inputs(base_receiver_inputs);
-    baseOTs.at(i)->exec_base(false);
-    baseSenderInputs.at(i) = baseOTs.at(i)->sender_inputs;
-    baseReceiverOutputs.at(i) = baseOTs.at(i)->receiver_outputs;
+    base_ots.at(i)->set_receiver_inputs(base_receiver_inputs);
+    base_ots.at(i)->exec_base(false);
+    base_sender_inputs.at(i) = base_ots.at(i)->sender_inputs;
+    base_receiver_outputs.at(i) = base_ots.at(i)->receiver_outputs;
 }
 
-void OTTripleSetup::close_connections()
+void OtTripleSetup::close_connections()
 {
     for (size_t i = 0; i < players.size(); i++)
     {
@@ -57,70 +57,70 @@ void OTTripleSetup::close_connections()
     }
 }
 
-OTTripleSetup OTTripleSetup::get_fresh()
+OtTripleSetup OtTripleSetup::get_fresh()
 {
-    OTTripleSetup res = *this;
+    OtTripleSetup res = *this;
     for (int i = 0; i < nparties - 1; i++)
     {
         auto bot = get_base(i);
-        res.baseSenderInputs.at(i) = bot.sender_inputs;
-        res.baseReceiverOutputs.at(i) = bot.receiver_outputs;
+        res.base_sender_inputs.at(i) = bot.sender_inputs;
+        res.base_receiver_outputs.at(i) = bot.receiver_outputs;
     }
     return res;
 }
 
-BaseOT OTTripleSetup::get_base(size_t index)
+BaseOT OtTripleSetup::get_base(size_t index)
 {
     BaseOT bot(get_nbase(), 0);
     bot.receiver_inputs = base_receiver_inputs;
-    bot.sender_inputs = baseSenderInputs.at(index);
-    bot.receiver_outputs = baseReceiverOutputs.at(index);
+    bot.sender_inputs = base_sender_inputs.at(index);
+    bot.receiver_outputs = base_receiver_outputs.at(index);
     bot.set_seeds();
     bot.extend_length();
-    baseSenderInputs.at(index) = bot.sender_inputs;
-    baseReceiverOutputs.at(index) = bot.receiver_outputs;
+    base_sender_inputs.at(index) = bot.sender_inputs;
+    base_receiver_outputs.at(index) = bot.receiver_outputs;
     bot.extend_length();
     return bot;
 }
 
-void OTTripleSetup::pack(octetStream& os) const
+void OtTripleSetup::pack(OctetStream& os) const
 {
     os.store(my_num);
-    os.store(baseSenderInputs);
-    os.store(baseReceiverOutputs);
+    os.store(base_sender_inputs);
+    os.store(base_receiver_outputs);
     base_receiver_inputs.pack(os);
 }
 
-void OTTripleSetup::unpack(octetStream& os)
+void OtTripleSetup::unpack(OctetStream& os)
 {
     os.get(my_num);
-    os.get(baseSenderInputs);
-    os.get(baseReceiverOutputs);
+    os.get(base_sender_inputs);
+    os.get(base_receiver_outputs);
     base_receiver_inputs.unpack(os);
 
-    nparties = baseSenderInputs.size() + 1;
+    nparties = base_sender_inputs.size() + 1;
     size_t nbase = get_nbase();
 
     assert(my_num < nparties);
-    assert(baseReceiverOutputs.size() == baseSenderInputs.size());
-    for (auto& x : baseReceiverOutputs)
+    assert(base_receiver_outputs.size() == base_sender_inputs.size());
+    for (auto& x : base_receiver_outputs)
         assert(x.size() == size_t(nbase));
-    for (auto& x : baseSenderInputs)
+    for (auto& x : base_sender_inputs)
         assert(x.size() == size_t(nbase));
 }
 
-void OTTripleSetup::check(TwoPartyPlayer& P)
+void OtTripleSetup::check(TwoPartyPlayer& P)
 {
     insecure("reveal for check");
     int index = index_for(P.other_player_num());
-    vector<octetStream> os(2);
-    os[0].store(baseSenderInputs.at(index));
+    vector<OctetStream> os(2);
+    os[0].store(base_sender_inputs.at(index));
     P.send_receive_player(os);
-    sender_type x;
+    SenderType x;
     os[1].get(x);
     for (size_t i = 0; i < base_receiver_inputs.size(); i++)
     {
         auto bit = base_receiver_inputs.get_bit(i);
-        assert(baseReceiverOutputs.at(index).at(i) == x.at(i)[bit]);
+        assert(base_receiver_outputs.at(index).at(i) == x.at(i)[bit]);
     }
 }

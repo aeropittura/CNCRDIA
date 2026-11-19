@@ -19,7 +19,7 @@ class IndividualInput : public PairwiseKeyInput<T>
 {
 protected:
     Player& P;
-    octetStreams os;
+    OctetStreams os;
     vector<bool> senders;
 
 public:
@@ -38,7 +38,7 @@ public:
     void add_other(int player, int n_bits = -1);
     void send_mine();
     void exchange();
-    void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
+    void finalize_other(int player, T& target, OctetStream& o, int n_bits = -1);
 
     void start_exchange();
     void stop_exchange();
@@ -52,7 +52,7 @@ class ShamirInput : public IndividualInput<T>
 {
     friend class Shamir<T>;
 
-    vector<vector<typename T::open_type>> reconstruction;
+    vector<vector<typename T::OpenType>> reconstruction;
 
     vector<typename T::Scalar> randomness;
 
@@ -61,10 +61,10 @@ class ShamirInput : public IndividualInput<T>
     void init();
 
 public:
-    static vector<vector<typename T::open_type>> get_vandermonde(size_t t,
+    static vector<vector<typename T::OpenType>> get_vandermonde(size_t t,
             size_t n);
 
-    ShamirInput(SubProcessor<T>& proc, typename T::MAC_Check& MC) :
+    ShamirInput(SubProcessor<T>& proc, typename T::MacCheck& MC) :
             ShamirInput<T>(&proc, proc.P)
     {
         (void) MC;
@@ -81,11 +81,11 @@ public:
         init();
     }
 
-    ShamirInput(IndirectShamirMC<T>&, Preprocessing<T>&, Player& P) :
+    ShamirInput(IndirectShamirOpener<T>&, Preprocessing<T>&, Player& P) :
             ShamirInput<T>(0, P)
     {
     }
 
-    void add_mine(const typename T::open_type& input, int n_bits = -1);
-    void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
+    void add_mine(const typename T::OpenType& input, int n_bits = -1);
+    void finalize_other(int player, T& target, OctetStream& o, int n_bits = -1);
 };

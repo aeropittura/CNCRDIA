@@ -14,10 +14,10 @@ void Commit_And_Open(vector< vector<T> >& data,const Player& P,int num_runs)
 {
   CODE_LOCATION
   int num_players=P.num_players();
-  vector< vector<octetStream> > Comm_data(num_runs, vector<octetStream>(num_players));
-  vector<octetStream> Open_data(num_runs);
-  Commit(Comm_data,Open_data,data,P,num_runs);
-  Open(data,Comm_data,Open_data,P,num_runs);
+  vector< vector<OctetStream> > communication_data(num_runs, vector<OctetStream>(num_players));
+  vector<OctetStream> open_data(num_runs);
+  Commit(communication_data,open_data,data,P,num_runs);
+  Open(data,communication_data,open_data,P,num_runs);
 }
 
 
@@ -28,16 +28,16 @@ void Commit_And_Open(vector< vector<T> >& data,const Player& P,int num_runs)
  * On output data[i][j] contains all the data
  */
 template<class T>
-void Transmit_Data(vector< vector<T> >& data,const Player& P,int num_runs)
+void transmit_data(vector< vector<T> >& data,const Player& P,int num_runs)
 {
   CODE_LOCATION
   int my_number=P.my_num();
   int num_players=P.num_players();
   for (int i=0; i<num_runs; i++)
     {
-      vector<octetStream> t_data(num_players);
+      vector<OctetStream> t_data(num_players);
       data[i][my_number].pack(t_data[my_number]);
-      P.Broadcast_Receive(t_data);
+      P.broadcast_receive(t_data);
       for (int j=0; j<num_players; j++)
         if (j!=my_number)
           data[i][j].unpack(t_data[j]);
@@ -46,9 +46,9 @@ void Transmit_Data(vector< vector<T> >& data,const Player& P,int num_runs)
 
 
 
-template void Commit_And_Open(vector< vector<Rq_Element> >& data,const Player& P,int num_runs);
+template void Commit_And_Open(vector< vector<RqElement> >& data,const Player& P,int num_runs);
 template void Commit_And_Open(vector< vector<Ciphertext> >& data,const Player& P,int num_runs);
 
-template void Transmit_Data(vector< vector<Rq_Element> >& data,const Player& P,int num_runs);
-template void Transmit_Data(vector< vector<Ciphertext> >& data,const Player& P,int num_runs);
+template void transmit_data(vector< vector<RqElement> >& data,const Player& P,int num_runs);
+template void transmit_data(vector< vector<Ciphertext> >& data,const Player& P,int num_runs);
 

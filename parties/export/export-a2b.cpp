@@ -7,7 +7,7 @@
 
 #include "parties/shared/minimal.hpp"
 
-template<class share_type, class gf2n_type = NoShare<gf2n>>
+template<class ShareType, class Gf2nType = NoShare<Gf2n>>
 void run(int, const char**);
 
 int main(int argc, const char** argv)
@@ -15,21 +15,21 @@ int main(int argc, const char** argv)
     if (argc < 2 or argv[2] == string("ring"))
         run<Rep3Share2<64>>(argc, argv);
     else if (argv[2] == string("atlas"))
-        run<AtlasShare<gfp_<0, 2>>>(argc, argv);
+        run<AtlasShare<Gfp_<0, 2>>>(argc, argv);
     else if (argv[2] == string("mascot"))
-        run<Share<gfp_<0, 2>>, Share<gf2n>>(argc, argv);
+        run<Share<Gfp_<0, 2>>, Share<Gf2n>>(argc, argv);
     else if (argv[2] == string("cowgear"))
-        run<CowGearShare<gfp_<0, 2>>>(argc, argv);
+        run<CowGearShare<Gfp_<0, 2>>>(argc, argv);
     else if (argv[2] == string("dealer-ring"))
         run<DealerShare<SignedZ2<64>>>(argc, argv);
     else if (argv[2] == string("hemi"))
-        run<HemiShare<gfp_<0, 2>>>(argc, argv);
+        run<HemiShare<Gfp_<0, 2>>>(argc, argv);
     else if (argv[2] == string("rep4-ring"))
         run<Rep4Share2<64>>(argc, argv);
     else if (argv[2] == string("semi2k"))
         run<Semi2kShare<64>>(argc, argv);
     else if (argv[2] == string("spdz2k"))
-        run<Spdz2kShare<64, 64>, Share<gf2n>>(argc, argv);
+        run<Spdz2kShare<64, 64>, Share<Gf2n>>(argc, argv);
     else if (argv[2] == string("sy-rep-ring"))
         run<SpdzWiseRingShare<64, 40>>(argc, argv);
     else
@@ -39,7 +39,7 @@ int main(int argc, const char** argv)
     }
 }
 
-template<class share_type, class gf2n_type>
+template<class ShareType, class Gf2nType>
 void run(int argc, const char** argv)
 {
     assert(argc > 3);
@@ -47,21 +47,21 @@ void run(int argc, const char** argv)
     int port_base = 9999;
     Names N(my_number, atoi(argv[3]), "localhost", port_base);
 
-    typedef typename share_type::bit_type bit_share_type;
+    typedef typename ShareType::BitType BitShareType;
 
-    Machine<share_type, gf2n_type> machine(N);
-    Opener<bit_share_type> MC(machine.get_player(), machine.get_bit_mac_key());
+    Machine<ShareType, Gf2nType> machine(N);
+    Opener<BitShareType> MC(machine.get_player(), machine.get_bit_mac_key());
 
     int n = 10;
-    vector<share_type> inputs;
+    vector<ShareType> inputs;
     for (int i = 0; i < n; i++)
         inputs.push_back(
-                share_type::constant(i + 1, my_number,
+                ShareType::constant(i + 1, my_number,
                         machine.get_sint_mac_key()));
 
-    vector<vector<bit_share_type>> outputs(n,
-            vector<bit_share_type>(1,
-                    bit_share_type::constant(0, my_number,
+    vector<vector<BitShareType>> outputs(n,
+            vector<BitShareType>(1,
+                    BitShareType::constant(0, my_number,
                             machine.get_bit_mac_key())));
 
     vector<FunctionArgument> args = {{inputs}, {16, outputs}};
@@ -69,7 +69,7 @@ void run(int argc, const char** argv)
 
     machine.run_function("a2b", res, args);
 
-    MC.init_open();
+    MC.initialize_open();
     for (auto& x : outputs)
         MC.prepare_open(x.at(0));
     MC.exchange();
@@ -86,7 +86,7 @@ void run(int argc, const char** argv)
         for (int i = 0; i < n; i++)
         {
             auto x = MC.finalize_open();
-            if (x != i + 1 and share_type::real_shares(machine.get_player()))
+            if (x != i + 1 and ShareType::real_shares(machine.get_player()))
             {
                 cerr << "error at " << i << ": " << x << endl;
                 exit(1);

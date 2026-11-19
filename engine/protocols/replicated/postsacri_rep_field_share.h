@@ -13,17 +13,17 @@ template<class T> class PostSacrifice;
 template<class T>
 class PostSacriRepFieldShare : public MaliciousRep3Share<T>
 {
-    typedef MaliciousRep3Share<T> super;
+    typedef MaliciousRep3Share<T> Super;
     typedef PostSacriRepFieldShare This;
 
 public:
-    typedef typename super::clear clear;
+    typedef typename Super::clear clear;
 
     typedef PostSacrifice<PostSacriRepFieldShare> BasicProtocol;
-    typedef HashMaliciousRepMC<PostSacriRepFieldShare> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef HashMaliciousRepOpener<PostSacriRepFieldShare> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ReplicatedInput<PostSacriRepFieldShare> Input;
-    typedef ReplicatedPO<This> PO;
+    typedef ReplicatedPo<This> PO;
     typedef SpecificPrivateOutput<This> PrivateOutput;
     typedef MaliciousRepPrepWithBits<PostSacriRepFieldShare> LivePrep;
     typedef MaybeHemi<This> Protocol;
@@ -33,7 +33,7 @@ public:
     {
     }
     template<class U>
-    PostSacriRepFieldShare(const U& other) : super(other)
+    PostSacriRepFieldShare(const U& other) : Super(other)
     {
     }
 };

@@ -17,15 +17,15 @@
 #define SSL_DIR "Player-Data/"
 #endif
 
-typedef boost::asio::io_context ssl_service;
+typedef boost::asio::io_context SslService;
 
 void check_ssl_file(string filename);
 void ssl_error(string side, string other, string server, exception& e);
 
-class ssl_ctx : public boost::asio::ssl::context
+class SslContext : public boost::asio::ssl::context
 {
 public:
-    ssl_ctx(string me) :
+    SslContext(string me) :
             boost::asio::ssl::context(boost::asio::ssl::context::tlsv12)
     {
         string prefix = SSL_DIR + me;
@@ -40,7 +40,7 @@ public:
     }
 };
 
-class ssl_socket : public boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
+class SslSocket : public boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
 {
     typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> parent;
 
@@ -65,7 +65,7 @@ class ssl_socket : public boost::asio::ssl::stream<boost::asio::ip::tcp::socket>
     }
 
 public:
-    ssl_socket(ssl_service& io_service,
+    SslSocket(SslService& io_service,
             boost::asio::ssl::context& ctx, int plaintext_socket, string other,
             string me, bool client) :
             parent(io_service, ctx)
@@ -80,7 +80,7 @@ public:
         if (client)
             try
             {
-                handshake(ssl_socket::client);
+                handshake(SslSocket::client);
             } catch (exception& e)
             {
                 ssl_error("Client", other, me, e);
@@ -90,7 +90,7 @@ public:
         {
             try
             {
-                handshake(ssl_socket::server);
+                handshake(SslSocket::server);
             } catch (exception& e)
             {
                 ssl_error("Server", other, me, e);
@@ -101,12 +101,12 @@ public:
     }
 };
 
-inline size_t send_non_blocking(ssl_socket* socket, octet* data, size_t length)
+inline size_t send_non_blocking(SslSocket* socket, Octet* data, size_t length)
 {
     return socket->write_some(boost::asio::buffer(data, length));
 }
 
-inline void send(ssl_socket* socket, octet* data, size_t length)
+inline void send(SslSocket* socket, Octet* data, size_t length)
 {
     size_t sent = 0;
 #ifdef VERBOSE_SSL
@@ -121,19 +121,19 @@ inline void send(ssl_socket* socket, octet* data, size_t length)
     }
 }
 
-inline void receive(ssl_socket* socket, octet* data, size_t length)
+inline void receive(SslSocket* socket, Octet* data, size_t length)
 {
     size_t received = 0;
     while (received < length)
         received += socket->read_some(boost::asio::buffer(data + received, length - received));
 }
 
-inline size_t receive_non_blocking(ssl_socket* socket, octet* data, size_t length)
+inline size_t receive_non_blocking(SslSocket* socket, Octet* data, size_t length)
 {
     return socket->read_some(boost::asio::buffer(data, length));
 }
 
-inline size_t receive_all_or_nothing(ssl_socket* socket, octet* data, size_t length)
+inline size_t receive_all_or_nothing(SslSocket* socket, Octet* data, size_t length)
 {
     receive(socket, data, length);
     return length;

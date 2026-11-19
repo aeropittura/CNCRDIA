@@ -10,13 +10,13 @@
 class EcdsaOptions
 {
 public:
-    bool prep_mul;
+    bool prep_mult;
     bool fewer_rounds;
     bool check_open;
     bool check_beaver_open;
-    bool R_after_msg;
+    bool r_after_message;
 
-    EcdsaOptions(ez::ezOptionParser& opt, int argc, const char** argv)
+    EcdsaOptions(ez::EzOptionParser& opt, int argc, const char** argv)
     {
         opt.add(
                 "", // Default.
@@ -64,11 +64,11 @@ public:
                 "--R-after-msg" // Flag token.
         );
         opt.parse(argc, argv);
-        prep_mul = not opt.isSet("-D");
+        prep_mult = not opt.isSet("-D");
         fewer_rounds = opt.isSet("-P");
         check_open = not opt.isSet("-C");
         check_beaver_open = not opt.isSet("-B");
-        R_after_msg = opt.isSet("-R");
-        opt.resetArgs();
+        r_after_message = opt.isSet("-R");
+        opt.reset_args();
     }
 };

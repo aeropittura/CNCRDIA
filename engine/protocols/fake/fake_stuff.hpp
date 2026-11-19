@@ -49,7 +49,7 @@ void make_vector_share(T* Sa,const U& a,int N,const V& key,PRNG& G)
 {
   int length = Sa[0].default_length;
   for (int i = 0; i < N; i++)
-    Sa[i].resize_regs(length);
+    Sa[i].resize_registers(length);
   for (int j = 0; j < length; j++)
     {
       vector<typename T::part_type> shares(N);
@@ -108,7 +108,7 @@ void make_share(FixedVec<T, 2>* Sa, const V& a, int N, const U& key, PRNG& G);
 
 template<class T, class U>
 inline void make_share(vector<T>& Sa,
-    const typename T::open_type& a, int N, const U& key,
+    const typename T::OpenType& a, int N, const U& key,
     PRNG& G)
 {
   Sa.resize(N);
@@ -202,13 +202,13 @@ void check_share(vector<Share<T> >& Sa,
       cout << "Input MAC:  " << mac << endl;
       cout << "Actual MAC: " << res << endl;
       cout << "MAC key:    " << key << endl;
-      throw mac_fail();
+      throw MacFail();
     }
 }
 
 template<class T>
 void check_share(vector<T>& Sa, typename T::clear& value,
-    typename T::mac_type& mac, int N, const typename T::mac_key_type& key)
+    typename T::MacType& mac, int N, const typename T::MacKeyType& key)
 {
   assert(N == 3);
   value = 0;
@@ -226,7 +226,7 @@ void check_share(vector<T>& Sa, typename T::clear& value,
         cout << a << " != " << b << endl;
         for (int i = 0; i < N; i++)
           cout << Sa[i] << endl;
-        throw bad_value("invalid replicated secret sharing");
+        throw BadValue("invalid replicated secret sharing");
       }
     }
 }
@@ -260,26 +260,26 @@ void write_mac_key(const string& directory, int i, int nplayers, U key)
   outf << nplayers << endl;
   key.output(outf,true);
   if (outf.fail())
-    throw IO_Error("cannot write to " + filename.str());
+    throw IoError("cannot write to " + filename.str());
   outf.close();
 }
 
 template <class T>
-void write_mac_key(const Names& N, typename T::mac_key_type key)
+void write_mac_key(const Names& N, typename T::MacKeyType key)
 {
-  write_mac_key(get_prep_sub_dir<T>(N.num_players()), N.my_num(),
+  write_mac_key(get_prep_sub_directory<T>(N.num_players()), N.my_num(),
       N.num_players(), key);
 }
 
 template <class T>
-void read_mac_key(const Names& N, typename T::mac_key_type& key)
+void read_mac_key(const Names& N, typename T::MacKeyType& key)
 {
-  read_mac_key(get_prep_sub_dir<T>(N.num_players()), N, key);
+  read_mac_key(get_prep_sub_directory<T>(N.num_players()), N, key);
   T::set_mac_key(key);
 }
 
 template <class T>
-void maybe_read_mac_key(const Names& N, typename T::mac_key_type& key)
+void maybe_read_mac_key(const Names& N, typename T::MacKeyType& key)
 {
   try
   {
@@ -317,13 +317,13 @@ void read_mac_key(const string& directory, int player_num, int nplayers, U& key)
 #ifdef VERBOSE
       cerr << "Could not open MAC key file. Perhaps it needs to be generated?\n";
 #endif
-      throw mac_key_error(filename);
+      throw MacKeyError(filename);
     }
   inpf >> nn;
   if (nn!=nplayers)
     { cerr << "KeyGen was last run with " << nn << " players." << endl;
       cerr << "  - You are running Online with " << nplayers << " players." << endl;
-      throw mac_key_error(filename);
+      throw MacKeyError(filename);
     }
 
   try
@@ -332,28 +332,28 @@ void read_mac_key(const string& directory, int player_num, int nplayers, U& key)
   }
   catch(exception&)
   {
-      throw mac_key_error(filename);
+      throw MacKeyError(filename);
   }
 
   if (inpf.fail())
-      throw mac_key_error(filename);
+      throw MacKeyError(filename);
 
   inpf.close();
 }
 
 template<class T>
-typename T::mac_key_type read_generate_write_mac_key(Player& P,
+typename T::MacKeyType read_generate_write_mac_key(Player& P,
         string directory)
 {
   if (directory == "")
-    directory = get_prep_sub_dir<T>(P.num_players());
-  typename T::mac_key_type res, tmp;
+    directory = get_prep_sub_directory<T>(P.num_players());
+  typename T::MacKeyType res, tmp;
 
   try
   {
       read_mac_key(directory, P.my_num(), P.num_players(), tmp);
   }
-  catch (mac_key_error&)
+  catch (MacKeyError&)
   {
   }
 
@@ -376,7 +376,7 @@ inline GC::NoValue read_generate_write_mac_key<GC::NoShare>(Player&,
 template <class U>
 KeySetup<U> read_global_mac_key(const string& directory, int nparties)
 {
-  if (is_same<typename U::mac_share_type::open_type, GC::NoValue>())
+  if (is_same<typename U::MacShareType::OpenType, GC::NoValue>())
     return {};
 
   KeySetup<U> res;
@@ -388,7 +388,7 @@ KeySetup<U> read_global_mac_key(const string& directory, int nparties)
   cout << U::type_string() << "keys :" << endl;
   for (int i= 0; i < nparties; i++)
     {
-      typename U::mac_key_type pp;
+      typename U::MacKeyType pp;
       read_mac_key(directory, i, nparties, pp);
       cout << " Key " << i << ": " << pp << endl;
       key += pp;
@@ -466,9 +466,9 @@ void generate_mac_keys(KeySetup<T>& key_setup,
   auto& key = key_setup.key;
   auto& key_shares = key_setup.key_shares;
   key.assign_zero();
-  int tmpN = 0;
+  int temp_n = 0;
   ifstream inpf;
-  prep_data_prefix = get_prep_sub_dir<T>(prep_data_prefix, nplayers, true);
+  prep_data_prefix = get_prep_sub_directory<T>(prep_data_prefix, nplayers, true);
   bool generate = false;
   key_shares.resize(nplayers);
 
@@ -478,7 +478,7 @@ void generate_mac_keys(KeySetup<T>& key_setup,
     {
       auto& pp = key_shares[i];
       string filename;
-      filename = mac_filename<typename T::mac_key_type>(prep_data_prefix, i);
+      filename = mac_filename<typename T::MacKeyType>(prep_data_prefix, i);
       inpf.open(filename);
       if (inpf.fail())
         {
@@ -489,7 +489,7 @@ void generate_mac_keys(KeySetup<T>& key_setup,
         }
       else
         {
-          inpf >> tmpN; // not needed here
+          inpf >> temp_n; // not needed here
           pp.input(inpf,true);
           inpf.close();
           if (pp.is_zero())
@@ -499,7 +499,7 @@ void generate_mac_keys(KeySetup<T>& key_setup,
             }
         }
       cout << " Key " << i << ": " << pp << ", ";
-      octetStream os;
+      OctetStream os;
       pp.pack(os);
       pprint_bytes("raw", (unsigned char*) os.get_data(), os.get_length());
     }
@@ -514,7 +514,7 @@ void generate_mac_keys(KeySetup<T>& key_setup,
         {
           auto& pp = key_shares[i];
           string filename;
-          filename = mac_filename<typename T::mac_key_type>(prep_data_prefix,
+          filename = mac_filename<typename T::MacKeyType>(prep_data_prefix,
               i);
           ofstream outf(filename);
           if (outf.fail())
@@ -544,7 +544,7 @@ template<class T>
 void make_mult_triples(const KeySetup<T>& key, int N, int ntrip,
     bool zero, string prep_data_prefix, PRNG& G, int thread_num = -1)
 {
-  T::clear::write_setup(get_prep_sub_dir<T>(prep_data_prefix, N));
+  T::clear::write_setup(get_prep_sub_directory<T>(prep_data_prefix, N));
   Files<T> files(N, key, prep_data_prefix, DATA_TRIPLE, G, thread_num);
 
   typename T::clear a,b,c;
@@ -555,7 +555,7 @@ void make_mult_triples(const KeySetup<T>& key, int N, int ntrip,
         a.randomize(G);
       if (!zero)
         b.randomize(G);
-      auto c = typename T::open_type(a) * b;
+      auto c = typename T::OpenType(a) * b;
       files.output_shares(a);
       files.output_shares(b);
       files.output_shares(c);
@@ -609,7 +609,7 @@ void plain_edabits(vector<T>& as,
 
   if (max_size <= 64 and length <= 64)
     {
-      square64 square;
+      Square64 square;
       for (int j = 0; j < max_size; j++)
         square.rows[j] = Z2<64>(as[j]).get_limb(0);
       square.transpose(max_size, length);

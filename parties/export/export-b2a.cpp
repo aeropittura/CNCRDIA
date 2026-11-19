@@ -12,14 +12,14 @@ int main(int argc, const char** argv)
     int port_base = 9999;
     Names N(my_number, 3, "localhost", port_base);
 
-    typedef Rep3Share2<64> share_type;
-    Machine<share_type> machine(N);
-    Opener<share_type> MC(machine.get_player(), machine.get_sint_mac_key());
-    MixedProtocolSet<share_type> set(machine.get_player(), machine);
+    typedef Rep3Share2<64> ShareType;
+    Machine<ShareType> machine(N);
+    Opener<ShareType> MC(machine.get_player(), machine.get_sint_mac_key());
+    MixedProtocolSet<ShareType> set(machine.get_player(), machine);
 
     int n = 10;
-    vector<share_type> outputs(n);
-    vector<vector<share_type::bit_type>> inputs(n);
+    vector<ShareType> outputs(n);
+    vector<vector<ShareType::BitType>> inputs(n);
 
     auto& inputter = set.binary.input;
     inputter.reset(0);
@@ -37,7 +37,7 @@ int main(int argc, const char** argv)
 
     machine.run_function("b2a", res, args);
 
-    MC.init_open();
+    MC.initialize_open();
     for (auto& x : outputs)
         MC.prepare_open(x);
     MC.exchange();

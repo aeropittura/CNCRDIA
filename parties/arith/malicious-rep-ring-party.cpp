@@ -12,7 +12,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     MalRepRingOptions::singleton = MalRepRingOptions(opt, argc, argv);
     HonestMajorityRingMachineWithSecurity<MalRepRingShare, MaliciousRep3Share>(argc, argv, opt);
 }

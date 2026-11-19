@@ -10,8 +10,8 @@ using namespace std;
 
 #include "numeric/bigint.h"
 
-template<class sint, class sgf2n> class Machine;
-template<class sint, class sgf2n> class Processor;
+template<class Sint, class Sgf2n> class Machine;
+template<class Sint, class Sgf2n> class Processor;
 template<class T> class SubProcessor;
 template<class T> class MemoryPart;
 template<class T> class StackedVector;
@@ -340,13 +340,13 @@ enum RegType {
   MAX_REG_TYPE,
 };
 
-template<class sint, class sgf2n>
+template<class Sint, class Sgf2n>
 struct TempVars {
-  typename sgf2n::clear ans2;
-  typename sint::clear ansp;
-  sint Sansp;
-  bigint aa,aa2;
-  typename sint::open_type rrp, xip;
+  typename Sgf2n::clear ans2;
+  typename Sint::clear ansp;
+  Sint sansp;
+  Bigint aa,aa2;
+  typename Sint::OpenType rrp, xip;
 };
 
 typedef vector<unsigned> ArgVector;
@@ -377,8 +377,8 @@ public:
   int get_size() const { return size; }
 
   // Reads a single instruction from the istream
-  void parse(istream& s, int inst_pos);
-  void parse_operands(istream& s, int pos, int file_pos);
+  void parse(istream& s, int inst_position);
+  void parse_operands(istream& s, int pos, int file_position);
 
   bool is_gf2n_instruction() const { return ((opcode&0x100)!=0); }
   virtual int get_reg_type() const;
@@ -406,26 +406,26 @@ public:
 
   // Execute this instruction, updateing the processor and memory
   // and streams pointing to the triples etc
-  template<class sint, class sgf2n>
-  void execute(Processor<sint, sgf2n>& Proc) const;
+  template<class Sint, class Sgf2n>
+  void execute(Processor<Sint, Sgf2n>& Proc) const;
 
-  template<class cgf2n>
-  void execute_clear_gf2n(StackedVector<cgf2n>& registers, MemoryPart<cgf2n>& memory,
+  template<class Cgf2n>
+  void execute_clear_gf2n(StackedVector<Cgf2n>& registers, MemoryPart<Cgf2n>& memory,
       ArithmeticProcessor& Proc) const;
 
-  template<class cgf2n>
-  void gbitdec(StackedVector<cgf2n>& registers) const;
-  template<class cgf2n>
-  void gbitcom(StackedVector<cgf2n>& registers) const;
+  template<class Cgf2n>
+  void gbitdec(StackedVector<Cgf2n>& registers) const;
+  template<class Cgf2n>
+  void gbitcom(StackedVector<Cgf2n>& registers) const;
 
-  void execute_regint(ArithmeticProcessor& Proc, MemoryPart<Integer>& Mi) const;
+  void execute_regint(ArithmeticProcessor& Proc, MemoryPart<Integer>& mi) const;
   void incint(StackedVector<Integer>& Ci) const;
 
   void shuffle(ArithmeticProcessor& Proc) const;
   void bitdecint(ArithmeticProcessor& Proc) const;
 
   void groupsumint(StackedVector<Integer>& Ci) const;
-  void qs_perm(StackedVector<Integer>& Ci) const;
+  void qs_permutation(StackedVector<Integer>& Ci) const;
 
   template<class T>
   void print(SwitchableOutput& out, T* v, T* p = 0, T* s = 0, T* z = 0,

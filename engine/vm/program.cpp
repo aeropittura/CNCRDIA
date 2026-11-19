@@ -70,7 +70,7 @@ void Program::parse_with_error(string filename)
   {
     parse(pinp);
   }
-  catch (bytecode_error& e)
+  catch (BytecodeError& e)
   {
     stringstream os;
     os << "Cannot parse " << filename << " (" << e.what() << ")" << endl;
@@ -79,7 +79,7 @@ void Program::parse_with_error(string filename)
     if (not OnlineOptions::singleton.executable.empty())
       os << " using 'make " << OnlineOptions::singleton.executable << "'";
     os << ".";
-    throw bytecode_error(os.str());
+    throw BytecodeError(os.str());
   }
 
   // compute hash
@@ -107,7 +107,7 @@ void Program::parse(istream& s)
       {
         instr.parse(s, p.size());
       }
-      catch (bytecode_error&)
+      catch (BytecodeError&)
       {
         throw;
       }
@@ -122,7 +122,7 @@ void Program::parse(istream& s)
           stringstream os;
           os << "error while parsing " << hex << showbase << instr.opcode
               << " at " << dec << p.size();
-          throw bytecode_error(os.str());
+          throw BytecodeError(os.str());
         }
 
       p.push_back(instr);

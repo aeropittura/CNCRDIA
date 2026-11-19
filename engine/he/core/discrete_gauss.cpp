@@ -4,9 +4,9 @@
 
 void DiscreteGauss::set(double RR)
 {
-  if (RR > 0 or NewHopeB < 1)
-    NewHopeB = max(1, int(round(2 * RR * RR)));
-  assert(NewHopeB > 0);
+  if (RR > 0 or new_hope_b < 1)
+    new_hope_b = max(1, int(round(2 * RR * RR)));
+  assert(new_hope_b > 0);
 }
 
 
@@ -14,14 +14,14 @@ void DiscreteGauss::set(double RR)
 /* This uses the approximation to a Gaussian via
  * binomial distribution
  *
- * This procedure consumes 2*NewHopeB bits
+ * This procedure consumes 2*new_hope_b bits
  *
  */
 int DiscreteGauss::sample(PRNG &G, int stretch) const
 {
   int s= 0;
   // stretch refers to the standard deviation
-  int B = NewHopeB * stretch * stretch;
+  int B = new_hope_b * stretch * stretch;
   for (int i = 0; i < B; i++)
     {
       s += G.get_bit();
@@ -47,7 +47,7 @@ int sample_half(PRNG& G)
 
 bool DiscreteGauss::operator!=(const DiscreteGauss& other) const
 {
-  if (other.NewHopeB != NewHopeB)
+  if (other.new_hope_b != new_hope_b)
     return true;
   else
     return false;

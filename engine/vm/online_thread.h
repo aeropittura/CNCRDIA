@@ -8,22 +8,22 @@
 #include <vector>
 using namespace std;
 
-template<class sint, class sgf2n> class Machine;
+template<class Sint, class Sgf2n> class Machine;
 
-template<class sint, class sgf2n>
+template<class Sint, class Sgf2n>
 class thread_info
 {
   public: 
 
   int thread_num;
-  Names*  Nms;
-  typename sgf2n::mac_key_type *alpha2i;
-  typename sint::mac_key_type *alphapi;
+  Names*  nms;
+  typename Sgf2n::MacKeyType *alpha2i;
+  typename Sint::MacKeyType *alphapi;
 
-  Machine<sint, sgf2n>* machine;
-  Processor<sint, sgf2n>* processor;
+  Machine<Sint, Sgf2n>* machine;
+  Processor<Sint, Sgf2n>* processor;
 
-  static void* Main_Func(void *ptr);
+  static void* main_func(void *ptr);
 
   static void purge_preprocessing(const Names& N, int thread_num);
 
@@ -31,6 +31,6 @@ class thread_info
   static void print_usage(ostream& o, const vector<T>& regs,
       const char* name);
 
-  void Sub_Main_Func();
-  void Main_Func_With_Purge();
+  void sub_main_func();
+  void main_func_with_purge();
 };

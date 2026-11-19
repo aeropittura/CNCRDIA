@@ -33,7 +33,7 @@ Processor<T>::Processor(Machine<T>& machine) :
 
 template <class T>
 Processor<T>::Processor(Memories<T>& memories, Machine<T>* machine) :
-		machine(machine), memories(memories), PC(0), last_PC(0), time(0),
+		machine(machine), memories(memories), PC(0), last_pc(0), time(0),
 		complexity(0)
 {
 }
@@ -117,7 +117,7 @@ void GC::Processor<T>::check_input(const U& in, const ArgVector::value_type* par
 							+ "-bit fixed-point number with "
 							+ to_string(params[1]) + "-bit precision: "
 							+ to_string(
-									mpf_class(bigint(in)) * exp2(-params[1])));
+									mpf_class(Bigint(in)) * exp2(-params[1])));
 	}
 }
 
@@ -203,12 +203,12 @@ void GC::Processor<T>::store_clear_in_dynamic(const ArgVector& args,
 
 template<class T>
 template<class U, class V>
-void Processor<T>::mem_op(int n, U& dest, const V& source,
-        Integer dest_address, Integer source_address)
+void Processor<T>::memory_op(int n, U& dest, const V& source,
+        Integer destination_address, Integer source_address)
 {
-    dest.check_index(dest_address + n - 1);
+    dest.check_index(destination_address + n - 1);
     source.check_index(source_address + n - 1);
-    auto d = &dest[dest_address.get()];
+    auto d = &dest[destination_address.get()];
     auto s = &source[source_address.get()];
     for (int i = 0; i < n; i++)
     {
@@ -218,15 +218,15 @@ void Processor<T>::mem_op(int n, U& dest, const V& source,
 
 template<class T>
 template<class U, class V>
-void Processor<T>::indirect_mem_load(U& dest, const V& source,
+void Processor<T>::indirect_memory_load(U& dest, const V& source,
         const StackedVector<Integer>& Ci, const BaseInstruction& instruction)
 {
     size_t n = instruction.get_size();
-    size_t dest_address = instruction.get_r(0);
+    size_t destination_address = instruction.get_r(0);
     size_t source_address = instruction.get_r(1);
-    dest.check_index(dest_address + n - 1);
+    dest.check_index(destination_address + n - 1);
     Ci.check_index(source_address + n - 1);
-    auto d = &dest[dest_address];
+    auto d = &dest[destination_address];
     auto s = &Ci[source_address];
     for (size_t i = 0; i < n; i++)
     {
@@ -236,15 +236,15 @@ void Processor<T>::indirect_mem_load(U& dest, const V& source,
 
 template<class T>
 template<class U, class V>
-void Processor<T>::indirect_mem_store(U& dest, const V& source,
+void Processor<T>::indirect_memory_store(U& dest, const V& source,
         const StackedVector<Integer>& Ci, const BaseInstruction& instruction)
 {
     size_t n = instruction.get_size();
-    size_t dest_address = instruction.get_r(1);
+    size_t destination_address = instruction.get_r(1);
     size_t source_address = instruction.get_r(0);
-    Ci.check_index(dest_address + n - 1);
+    Ci.check_index(destination_address + n - 1);
     source.check_index(source_address + n - 1);
-    auto d = &Ci[dest_address];
+    auto d = &Ci[destination_address];
     auto s = &source[source_address];
     for (size_t i = 0; i < n; i++)
     {
@@ -370,15 +370,15 @@ void Processor<T>::andrsvec(const ArgVector& args)
         {
             if (i % N_BITS == 0)
                 for (int j = 0; j < n_args; j++)
-                    S.at(*(it + j) + i / N_BITS).resize_regs(
+                    S.at(*(it + j) + i / N_BITS).resize_registers(
                             min(N_BITS, size - i));
 
             T y;
-            y.get_regs().push_back(S.at(base + i / N_BITS).get_reg(i % N_BITS));
+            y.get_registers().push_back(S.at(base + i / N_BITS).get_reg(i % N_BITS));
             for (int j = 0; j < n_args; j++)
             {
                 T x, tmp;
-                x.get_regs().push_back(
+                x.get_registers().push_back(
                         S.at(*(it + n_args + 1 + j) + i / N_BITS).get_reg(
                                 i % N_BITS));
                 tmp.and_(1, x, y, false);
@@ -483,9 +483,9 @@ void ShareSecret<T>::sync(vector<Integer>& values, Player* P)
         if (proto)
             proto->sync(values, *P);
         else
-            throw no_singleton();
+            throw NoSingleton();
     }
-    catch (no_singleton&)
+    catch (NoSingleton&)
     {
         if (P)
             ProtocolBase<T>::sync(values, *P);
@@ -534,13 +534,13 @@ void Processor<T>::print_reg_signed(unsigned n_bits, Integer reg)
     }
     else
     {
-        bigint tmp = 0;
+        Bigint tmp = 0;
         for (int i = 0; i < DIV_CEIL(n_bits, Clear::N_BITS); i++)
         {
-            tmp += bigint((unsigned long)C[reg + i].get()) << (i * Clear::N_BITS);
+            tmp += Bigint((unsigned long)C[reg + i].get()) << (i * Clear::N_BITS);
         }
-        if (tmp >= bigint(1) << (n_bits - 1))
-            tmp -= bigint(1) << n_bits;
+        if (tmp >= Bigint(1) << (n_bits - 1))
+            tmp -= Bigint(1) << n_bits;
         out << dec << tmp << flush;
     }
 }
@@ -560,8 +560,8 @@ void Processor<T>::print_str(int n)
 template <class T>
 void Processor<T>::print_float(const ArgVector& args)
 {
-    bigint::output_float(out,
-            bigint::get_float(C[args[0]], C[args[1]], C[args[2]], C[args[3]]),
+    Bigint::output_float(out,
+            Bigint::get_float(C[args[0]], C[args[1]], C[args[2]], C[args[3]]),
             C[args[4]]);
 }
 
@@ -616,7 +616,7 @@ void Processor<T>::call_tape(const BaseInstruction& instruction, U& dynamic_memo
 
     auto new_arg = I.at(instruction.get_r(1)).get();
 
-    PC_stack.push_back(PC);
+    pc_stack.push_back(PC);
     arg_stack.push_back(this->arg);
     push_stack();
     I.push_stack();
@@ -633,8 +633,8 @@ void Processor<T>::call_tape(const BaseInstruction& instruction, U& dynamic_memo
     pop_stack(args);
     I.pop_stack(args, INT);
 
-    PC = PC_stack.back();
-    PC_stack.pop_back();
+    PC = pc_stack.back();
+    pc_stack.pop_back();
     this->arg = arg_stack.back();
     arg_stack.pop_back();
 }
@@ -644,7 +644,7 @@ void GC::Processor<T>::generate_secure_shuffle(
         const BaseInstruction& instruction, StackedVector<Integer>& Ci)
 {
     size_t n = instruction.get_n();
-    vector<typename T::Shuffler::shuffle_type*> shuffles;
+    vector<typename T::Shuffler::ShuffleType*> shuffles;
     for (int i = 0; i < instruction.get_size(); i++)
     {
         auto res = memories.shuffle_store.add(n);
@@ -753,7 +753,7 @@ void Processor<T>::transvec(const BaseInstruction& instruction)
     auto& args = instruction.get_start();
     assert(args.size() == 4);
     int n_outputs = args[0];
-    int dest_base = args[1];
+    int destination_base = args[1];
     int n_inputs = args[2];
     int source_base = args[3];
     int dl = T::default_length;
@@ -770,7 +770,7 @@ void Processor<T>::transvec(const BaseInstruction& instruction)
     for (int i = 0; i < n_inputs; i++)
         trans_args.push_back(i * DIV_CEIL(n_outputs, dl));
     T::trans(dest, source, n_outputs, trans_args);
-    it = S.begin() + dest_base;
+    it = S.begin() + destination_base;
     assert(it + dest.size() <= S.end());
     auto dit = dest.begin();
     for (int i = 0; i < n_output_units; i++)

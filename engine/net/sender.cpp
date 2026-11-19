@@ -45,7 +45,7 @@ void Sender<T>::stop()
 template<class T>
 void Sender<T>::run_with_error()
 {
-    const octetStream* os = 0;
+    const OctetStream* os = 0;
     while (in.pop(os))
     {
 #ifdef VERBOSE_SSL
@@ -64,15 +64,15 @@ void Sender<T>::run_with_error()
 }
 
 template<class T>
-void Sender<T>::request(const octetStream& os)
+void Sender<T>::request(const OctetStream& os)
 {
     in.push(&os);
 }
 
 template<class T>
-void Sender<T>::wait(const octetStream& os)
+void Sender<T>::wait(const OctetStream& os)
 {
-    const octetStream* queued = 0;
+    const OctetStream* queued = 0;
     out.pop(queued);
     if (queued != &os)
       throw runtime_error("error in send thread");
@@ -85,4 +85,4 @@ void Sender<T>::fail()
 }
 
 template class Sender<int>;
-template class Sender<ssl_socket*>;
+template class Sender<SslSocket*>;

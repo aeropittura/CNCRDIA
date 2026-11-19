@@ -11,7 +11,7 @@
 
 
 template<class T, class FD, class S>
-Plaintext<T, FD, S>::Plaintext(const FHE_Params& params) :
+Plaintext<T, FD, S>::Plaintext(const FheParameters& params) :
     Plaintext(params.get_plaintext_field_data<FD>(), Both)
 {
 }
@@ -20,62 +20,62 @@ Plaintext<T, FD, S>::Plaintext(const FHE_Params& params) :
 template<class T, class FD, class S>
 unsigned int Plaintext<T, FD, S>::num_slots() const
 {
-  return (*Field_Data).phi_m();
+  return (*field_data).phi_m();
 }
 
 template<class T, class FD, class S>
 int Plaintext<T, FD, S>::degree() const
 {
-  return (*Field_Data).phi_m();
+  return (*field_data).phi_m();
 }
 
 
 template<>
-unsigned int Plaintext<gf2n_short,P2Data,int>::num_slots() const
+unsigned int Plaintext<Gf2nShort,P2Data,int>::num_slots() const
 {
-  return (*Field_Data).num_slots();
+  return (*field_data).num_slots();
 }
 
 template<>
-int Plaintext<gf2n_short,P2Data,int>::degree() const
+int Plaintext<Gf2nShort,P2Data,int>::degree() const
 {
-  return (*Field_Data).degree();
+  return (*field_data).degree();
 }
 
 
 template<>
-void Plaintext<gfp, FFT_Data, bigint>::from(const Generator<bigint>& source) const
+void Plaintext<Gfp, FftData, Bigint>::from(const Generator<Bigint>& source) const
 {
   b.resize(degree());
   for (auto& x : b)
     {
-      source.get(bigint::tmp);
-      x = bigint::tmp;
+      source.get(Bigint::tmp);
+      x = Bigint::tmp;
     }
 }
 
 
 template<>
-void Plaintext<gfp,FFT_Data,bigint>::from_poly() const
+void Plaintext<Gfp,FftData,Bigint>::from_polynomial() const
 {
   if (type!=Polynomial) { return; }
 
-  Ring_Element e(*Field_Data,polynomial);
+  RingElement e(*field_data,polynomial);
   e.from(b);
   e.change_rep(evaluation);
   a.resize(num_slots());
   for (unsigned int i=0; i<a.size(); i++)
-    a[i] = gfp(e.get_element(i), e.get_FFTD().get_prD());
+    a[i] = Gfp(e.get_element(i), e.get_fftd().get_pr_d());
   type=Both;
 }
 
 
 template<>
-void Plaintext<gfp,FFT_Data,bigint>::to_poly() const
+void Plaintext<Gfp,FftData,Bigint>::to_polynomial() const
 {
   if (type!=Evaluation) { return; }
 
-  Ring_Element e(*Field_Data,evaluation);
+  RingElement e(*field_data,evaluation);
   for (unsigned int i=0; i<a.size(); i++)
     { e.set_element(i,a[i].get()); }
   e.change_rep(polynomial);
@@ -86,27 +86,27 @@ void Plaintext<gfp,FFT_Data,bigint>::to_poly() const
 
 
 template<>
-void Plaintext<gf2n_short,P2Data,int>::from_poly() const
+void Plaintext<Gf2nShort,P2Data,int>::from_polynomial() const
 { 
   if (type!=Polynomial) { return; }
   a.resize(num_slots());
-  (*Field_Data).backward(a,b); 
+  (*field_data).backward(a,b); 
   type=Both;
 }
 
 
 template<>
-void Plaintext<gf2n_short,P2Data,int>::to_poly() const
+void Plaintext<Gf2nShort,P2Data,int>::to_polynomial() const
 { 
   if (type!=Evaluation) { return; }
-  (*Field_Data).forward(b,a); 
+  (*field_data).forward(b,a); 
   type=Both;
 }
 
 
 
 template<class T, class FD, class S>
-void Plaintext<T, FD, S>::allocate(PT_Type type) const
+void Plaintext<T, FD, S>::allocate(PtType type) const
 {
   if (type != Evaluation)
     b.resize(degree());
@@ -117,7 +117,7 @@ void Plaintext<T, FD, S>::allocate(PT_Type type) const
 
 
 template<class T, class FD, class S>
-void Plaintext<T, FD, S>::allocate_slots(const bigint& value)
+void Plaintext<T, FD, S>::allocate_slots(const Bigint& value)
 {
   b.resize(degree());
   for (auto& x : b)
@@ -125,14 +125,14 @@ void Plaintext<T, FD, S>::allocate_slots(const bigint& value)
 }
 
 template<>
-void Plaintext<gf2n_short, P2Data, int>::allocate_slots(const bigint& value)
+void Plaintext<Gf2nShort, P2Data, int>::allocate_slots(const Bigint& value)
 {
   // nothing to allocate for int
   (void)value;
 }
 
 template<>
-int Plaintext<gfp, FFT_Data, bigint>::get_min_alloc()
+int Plaintext<Gfp, FftData, Bigint>::get_min_alloc()
 {
   int res = 1 << 30;
   for (auto& x : b)
@@ -141,25 +141,25 @@ int Plaintext<gfp, FFT_Data, bigint>::get_min_alloc()
 }
 
 
-void signed_mod(bigint& x, const bigint& mod, const bigint& half_mod, const bigint& dest_mod)
+void signed_mod(Bigint& x, const Bigint& mod, const Bigint& half_mod, const Bigint& destination_mod)
 {
   if (x > half_mod)
     x -= mod;
-  x %= dest_mod;
+  x %= destination_mod;
   if (x < 0)
-    x += dest_mod;
+    x += destination_mod;
 }
 
 template<class T, class FD, class S>
-void Plaintext<T, FD, S>::set_poly_mod(const Generator<bigint>& generator,const bigint& mod)
+void Plaintext<T, FD, S>::set_polynomial_mod(const Generator<Bigint>& generator,const Bigint& mod)
 {
   allocate(Polynomial);
-  bigint half_mod = mod / 2;
+  Bigint half_mod = mod / 2;
   for (unsigned int i=0; i<b.size(); i++)
     {
-      generator.get(bigint::tmp);
-      signed_mod(bigint::tmp, mod, half_mod, Field_Data->get_prime());
-      b[i] = bigint::tmp;
+      generator.get(Bigint::tmp);
+      signed_mod(Bigint::tmp, mod, half_mod, field_data->get_prime());
+      b[i] = Bigint::tmp;
     }
 }
 
@@ -167,41 +167,41 @@ void Plaintext<T, FD, S>::set_poly_mod(const Generator<bigint>& generator,const 
 
 
 template<>
-void Plaintext<gf2n_short,P2Data,int>::set_poly_mod(const vector<bigint>& vv,const bigint& mod)
+void Plaintext<Gf2nShort,P2Data,int>::set_polynomial_mod(const vector<Bigint>& vv,const Bigint& mod)
 {
   vector<P2Data::poly_type> pol(vv.size());
-  bigint te;
+  Bigint te;
   for (unsigned int i=0; i<vv.size(); i++)
     { if (vv[i]>mod/2) { te=vv[i]-mod; }
       else             { te=vv[i];     }
-      pol[i]=isOdd(te);
+      pol[i]=is_odd(te);
     }
-  set_poly(pol);
+  set_polynomial(pol);
 }
 
 
 template<>
-void Plaintext<gf2n_short,P2Data,int>::set_poly_mod(const Generator<bigint>& generator,const bigint& mod)
+void Plaintext<Gf2nShort,P2Data,int>::set_polynomial_mod(const Generator<Bigint>& generator,const Bigint& mod)
 {
   allocate(Polynomial);
-  bigint half_mod = mod / 2;
-  bigint te;
+  Bigint half_mod = mod / 2;
+  Bigint te;
   for (unsigned int i=0; i<b.size(); i++)
     {
       generator.get(te);
       if (te > half_mod)
         te -= mod;
-      b[i]=isOdd(te);
+      b[i]=is_odd(te);
     }
 }
 
 
 template<class T>
-void rand_poly(vector<T>& b,PRNG& G,const bigint& pr,bool positive=true)
+void random_polynomial(vector<T>& b,PRNG& G,const Bigint& pr,bool positive=true)
 {
   for (unsigned int i=0; i<b.size(); i++)
     {
-      b[i].randomBnd(G, pr, positive);
+      b[i].random_bnd(G, pr, positive);
     }
 }
 
@@ -210,7 +210,7 @@ void Plaintext<T,FD,S>::randomize(PRNG& G,condition cond)
 {
   switch (cond)
     { case Full:
-        rand_poly(b,G,(*Field_Data).get_prime());
+        random_polynomial(b,G,(*field_data).get_prime());
         type=Polynomial;
         break;
       case Diagonal:
@@ -238,7 +238,7 @@ void Plaintext<T,FD,S>::randomize(PRNG& G,condition cond)
 
 
 template<class T,class FD,class S>
-void Plaintext<T,FD,S>::randomize(PRNG& G, int n_bits, bool Diag, PT_Type t)
+void Plaintext<T,FD,S>::randomize(PRNG& G, int n_bits, bool Diag, PtType t)
 {
   allocate(t);
   switch(t)
@@ -247,20 +247,20 @@ void Plaintext<T,FD,S>::randomize(PRNG& G, int n_bits, bool Diag, PT_Type t)
       if (Diag)
         {
           assign_zero(t);
-          b[0].generateUniform(G, n_bits, false);
+          b[0].generate_uniform(G, n_bits, false);
         }
       else
         for (size_t i = 0; i < num_slots(); i++)
-          b[i].generateUniform(G, n_bits, false);
+          b[i].generate_uniform(G, n_bits, false);
       break;
     default:
-      throw not_implemented();
+      throw NotImplemented();
   }
 }
 
 
 template<class T,class FD,class S>
-void Plaintext<T,FD,S>::assign_zero(PT_Type t)
+void Plaintext<T,FD,S>::assign_zero(PtType t)
 { 
   type=t;
   allocate();
@@ -278,7 +278,7 @@ void Plaintext<T,FD,S>::assign_zero(PT_Type t)
 }
 
 template<class T,class FD,class S>
-void Plaintext<T,FD,S>::assign_one(PT_Type t)
+void Plaintext<T,FD,S>::assign_one(PtType t)
 { 
   type=t;
   allocate();
@@ -296,23 +296,23 @@ void Plaintext<T,FD,S>::assign_one(PT_Type t)
 }
 
 template<class T,class FD,class S>
-void Plaintext<T,FD,S>::assign_constant(T constant, PT_Type t)
+void Plaintext<T,FD,S>::assign_constant(T constant, PtType t)
 {
   allocate(Evaluation);
   for (auto& x : a)
       x = constant;
   if (t != Evaluation)
-      to_poly();
+      to_polynomial();
 }
 
 template<class T,class FD,class S>
 Plaintext<T,FD,S>& Plaintext<T,FD,S>::operator+=(
     const Plaintext& y)
 {
-  if (Field_Data!=y.Field_Data)  { throw field_mismatch(); }
+  if (field_data!=y.field_data)  { throw FieldMismatch(); }
 
-  to_poly();
-  y.to_poly();
+  to_polynomial();
+  y.to_polynomial();
 
   if (b.size() != y.b.size())
     throw length_error("size mismatch");
@@ -323,15 +323,15 @@ Plaintext<T,FD,S>& Plaintext<T,FD,S>::operator+=(
 
 
 template<>
-void add(Plaintext<gfp,FFT_Data,bigint>& z,const Plaintext<gfp,FFT_Data,bigint>& x,
-                                           const Plaintext<gfp,FFT_Data,bigint>& y)
+void add(Plaintext<Gfp,FftData,Bigint>& z,const Plaintext<Gfp,FftData,Bigint>& x,
+                                           const Plaintext<Gfp,FftData,Bigint>& y)
 {
-  if (z.Field_Data!=x.Field_Data)  { throw field_mismatch(); }
-  if (z.Field_Data!=y.Field_Data)  { throw field_mismatch(); }
+  if (z.field_data!=x.field_data)  { throw FieldMismatch(); }
+  if (z.field_data!=y.field_data)  { throw FieldMismatch(); }
 
   if (x.type==Both && y.type!=Both)      { z.type=y.type; }
   else if (y.type==Both && x.type!=Both) { z.type=x.type; }
-  else if (x.type!=y.type)               { throw rep_mismatch(); }
+  else if (x.type!=y.type)               { throw RepMismatch(); }
   else                                   { z.type=x.type; }
 
   z.allocate();
@@ -344,8 +344,8 @@ void add(Plaintext<gfp,FFT_Data,bigint>& z,const Plaintext<gfp,FFT_Data,bigint>&
   if (z.type!=Evaluation)
     { for (unsigned int i=0; i<z.b.size(); i++)
         { z.b[i]=x.b[i]+y.b[i];
-          if (z.b[i]>(*z.Field_Data).get_prime())
-	    { z.b[i]-=(*z.Field_Data).get_prime(); }
+          if (z.b[i]>(*z.field_data).get_prime())
+	    { z.b[i]-=(*z.field_data).get_prime(); }
 	}
     }
 }
@@ -354,15 +354,15 @@ void add(Plaintext<gfp,FFT_Data,bigint>& z,const Plaintext<gfp,FFT_Data,bigint>&
 
 
 template<>
-void add(Plaintext<gf2n_short,P2Data,int>& z,const Plaintext<gf2n_short,P2Data,int>& x,
-                                       const Plaintext<gf2n_short,P2Data,int>& y)
+void add(Plaintext<Gf2nShort,P2Data,int>& z,const Plaintext<Gf2nShort,P2Data,int>& x,
+                                       const Plaintext<Gf2nShort,P2Data,int>& y)
 {
-  if (z.Field_Data!=x.Field_Data)  { throw field_mismatch(); }
-  if (z.Field_Data!=y.Field_Data)  { throw field_mismatch(); }
+  if (z.field_data!=x.field_data)  { throw FieldMismatch(); }
+  if (z.field_data!=y.field_data)  { throw FieldMismatch(); }
 
   if (x.type==Both && y.type!=Both)      { z.type=y.type; }
   else if (y.type==Both && x.type!=Both) { z.type=x.type; }
-  else if (x.type!=y.type)               { throw rep_mismatch(); }
+  else if (x.type!=y.type)               { throw RepMismatch(); }
   else                                   { z.type=x.type; }
 
   z.allocate();
@@ -382,15 +382,15 @@ void add(Plaintext<gf2n_short,P2Data,int>& z,const Plaintext<gf2n_short,P2Data,i
 
 
 template<>
-void sub(Plaintext<gfp,FFT_Data,bigint>& z,const Plaintext<gfp,FFT_Data,bigint>& x,
-                                           const Plaintext<gfp,FFT_Data,bigint>& y)
+void sub(Plaintext<Gfp,FftData,Bigint>& z,const Plaintext<Gfp,FftData,Bigint>& x,
+                                           const Plaintext<Gfp,FftData,Bigint>& y)
 {
-  if (z.Field_Data!=x.Field_Data)  { throw field_mismatch(); }
-  if (z.Field_Data!=y.Field_Data)  { throw field_mismatch(); }
+  if (z.field_data!=x.field_data)  { throw FieldMismatch(); }
+  if (z.field_data!=y.field_data)  { throw FieldMismatch(); }
 
   if (x.type==Both && y.type!=Both)      { z.type=y.type; }
   else if (y.type==Both && x.type!=Both) { z.type=x.type; }
-  else if (x.type!=y.type)               { throw rep_mismatch(); }
+  else if (x.type!=y.type)               { throw RepMismatch(); }
   else                                   { z.type=x.type; }
 
   z.allocate();
@@ -406,7 +406,7 @@ void sub(Plaintext<gfp,FFT_Data,bigint>& z,const Plaintext<gfp,FFT_Data,bigint>&
           z.b[i]=x.b[i];
           z.b[i]-=y.b[i];
           if (z.b[i]<0)
-            { z.b[i]+=(*z.Field_Data).get_prime(); }
+            { z.b[i]+=(*z.field_data).get_prime(); }
         }
     }
 }
@@ -416,15 +416,15 @@ void sub(Plaintext<gfp,FFT_Data,bigint>& z,const Plaintext<gfp,FFT_Data,bigint>&
 
 
 template<>
-void sub(Plaintext<gf2n_short,P2Data,int>& z,const Plaintext<gf2n_short,P2Data,int>& x,
-                                       const Plaintext<gf2n_short,P2Data,int>& y)
+void sub(Plaintext<Gf2nShort,P2Data,int>& z,const Plaintext<Gf2nShort,P2Data,int>& x,
+                                       const Plaintext<Gf2nShort,P2Data,int>& y)
 {
-  if (z.Field_Data!=x.Field_Data)  { throw field_mismatch(); }
-  if (z.Field_Data!=y.Field_Data)  { throw field_mismatch(); }
+  if (z.field_data!=x.field_data)  { throw FieldMismatch(); }
+  if (z.field_data!=y.field_data)  { throw FieldMismatch(); }
 
   if (x.type==Both && y.type!=Both)      { z.type=y.type; }
   else if (y.type==Both && x.type!=Both) { z.type=x.type; }
-  else if (x.type!=y.type)               { throw rep_mismatch(); }
+  else if (x.type!=y.type)               { throw RepMismatch(); }
   else                                   { z.type=x.type; }
 
   z.allocate();
@@ -447,11 +447,11 @@ void sub(Plaintext<gf2n_short,P2Data,int>& z,const Plaintext<gf2n_short,P2Data,i
 template<class T,class FD,class S>
 void mul(Plaintext<T,FD,S>& z,const Plaintext<T,FD,S>& x,const Plaintext<T,FD,S>& y)
 {
-  if (z.Field_Data!=x.Field_Data)  { throw field_mismatch(); }
-  if (z.Field_Data!=y.Field_Data)  { throw field_mismatch(); }
+  if (z.field_data!=x.field_data)  { throw FieldMismatch(); }
+  if (z.field_data!=y.field_data)  { throw FieldMismatch(); }
 
-  if (y.type==Polynomial) { throw not_implemented(); }
-  if (x.type==Polynomial) { throw not_implemented(); }
+  if (y.type==Polynomial) { throw NotImplemented(); }
+  if (x.type==Polynomial) { throw NotImplemented(); }
   z.type=Evaluation;
 
   z.allocate();
@@ -461,7 +461,7 @@ void mul(Plaintext<T,FD,S>& z,const Plaintext<T,FD,S>& x,const Plaintext<T,FD,S>
 
 
 template<>
-void Plaintext<gfp,FFT_Data,bigint>::negate()
+void Plaintext<Gfp,FftData,Bigint>::negate()
 {
   if (type!=Polynomial)
     {
@@ -473,7 +473,7 @@ void Plaintext<gfp,FFT_Data,bigint>::negate()
     { for (unsigned int i=0; i<b.size(); i++)
         { if (b[i]!=0)
             {
-              b[i]-=(*Field_Data).get_prime();
+              b[i]-=(*field_data).get_prime();
               b[i].negate();
             }
 	}
@@ -483,7 +483,7 @@ void Plaintext<gfp,FFT_Data,bigint>::negate()
 
 
 template<>
-void Plaintext<gf2n_short,P2Data,int>::negate()
+void Plaintext<Gf2nShort,P2Data,int>::negate()
 {
   return;
 }
@@ -491,10 +491,10 @@ void Plaintext<gf2n_short,P2Data,int>::negate()
 
 
 template<class T, class FD, class _>
-AddableVector<typename FD::poly_type> Plaintext<T, FD, _>::mul_by_X_i(int i,
+AddableVector<typename FD::poly_type> Plaintext<T, FD, _>::mult_by_x_i(int i,
     const FHE_PK& pk) const
 {
-  return AddableVector<S>(get_poly()).mul_by_X_i(i, pk);
+  return AddableVector<S>(get_polynomial()).mult_by_x_i(i, pk);
 }
 
 
@@ -502,10 +502,10 @@ AddableVector<typename FD::poly_type> Plaintext<T, FD, _>::mul_by_X_i(int i,
 template<class T,class FD,class S>
 bool Plaintext<T,FD,S>::equals(const Plaintext& x) const
 {
-  if (Field_Data!=x.Field_Data) { return false; }
+  if (field_data!=x.field_data) { return false; }
   if (type!=x.type)
-    { if (type==Evaluation) { x.from_poly(); }
-      else                  { from_poly(); }
+    { if (type==Evaluation) { x.from_polynomial(); }
+      else                  { from_polynomial(); }
     }
 
   if (type!=Polynomial and x.type!=Polynomial)
@@ -522,7 +522,7 @@ bool Plaintext<T,FD,S>::equals(const Plaintext& x) const
 }
 
 template<>
-bool Plaintext<gfp, FFT_Data, bigint>::is_diagonal() const
+bool Plaintext<Gfp, FftData, Bigint>::is_diagonal() const
 {
   if (type != Evaluation)
     {
@@ -543,10 +543,10 @@ bool Plaintext<gfp, FFT_Data, bigint>::is_diagonal() const
 }
 
 template<>
-bool Plaintext<gf2n_short, P2Data, int>::is_diagonal() const
+bool Plaintext<Gf2nShort, P2Data, int>::is_diagonal() const
 {
   if (type == Polynomial)
-    from_poly();
+    from_polynomial();
 
   auto first = a[0];
   for (auto& x : a)
@@ -559,14 +559,14 @@ bool Plaintext<gf2n_short, P2Data, int>::is_diagonal() const
 
 
 template <class T,class FD,class S>
-void Plaintext<T,FD,S>::pack(octetStream& o) const
+void Plaintext<T,FD,S>::pack(OctetStream& o) const
 {
-  to_poly();
+  to_polynomial();
   o.store(b);
 }
 
 template <class T,class FD,class S>
-void Plaintext<T,FD,S>::unpack(octetStream& o)
+void Plaintext<T,FD,S>::unpack(OctetStream& o)
 {
   o.get(b);
   auto size = b.size();
@@ -578,11 +578,11 @@ void Plaintext<T,FD,S>::unpack(octetStream& o)
 
 
 template <>
-size_t Plaintext<gfp, FFT_Data, bigint>::report_size(ReportType type)
+size_t Plaintext<Gfp, FftData, Bigint>::report_size(ReportType type)
 {
   size_t res = 0;
   if (type != MINIMAL)
-    res += sizeof(gfp) * a.capacity();
+    res += sizeof(Gfp) * a.capacity();
   for (unsigned int i = 0; i < b.size(); i++)
     res += b[i].report_size(type);
   return res;
@@ -590,11 +590,11 @@ size_t Plaintext<gfp, FFT_Data, bigint>::report_size(ReportType type)
 
 
 template <>
-size_t Plaintext<gf2n_short, P2Data, int>::report_size(ReportType type)
+size_t Plaintext<Gf2nShort, P2Data, int>::report_size(ReportType type)
 {
   size_t res = 0;
   if (type != MINIMAL)
-    res += sizeof(gf2n_short) * a.capacity();
+    res += sizeof(Gf2nShort) * a.capacity();
   res += sizeof(int) * b.size();
   return res;
 }
@@ -611,13 +611,13 @@ void Plaintext<T, FD, S>::print_evaluation(int n_elements, string desc) const
 
 
 
-template class Plaintext<gfp,FFT_Data,bigint>;
+template class Plaintext<Gfp,FftData,Bigint>;
 
-template void mul(Plaintext<gfp,FFT_Data,bigint>& z,const Plaintext<gfp,FFT_Data,bigint>& x,const Plaintext<gfp,FFT_Data,bigint>& y);
+template void mul(Plaintext<Gfp,FftData,Bigint>& z,const Plaintext<Gfp,FftData,Bigint>& x,const Plaintext<Gfp,FftData,Bigint>& y);
 
 
 
-template class Plaintext<gf2n_short,P2Data,int>;
+template class Plaintext<Gf2nShort,P2Data,int>;
 
-template void mul(Plaintext<gf2n_short,P2Data,int>& z,const Plaintext<gf2n_short,P2Data,int>& x,const Plaintext<gf2n_short,P2Data,int>& y);
+template void mul(Plaintext<Gf2nShort,P2Data,int>& z,const Plaintext<Gf2nShort,P2Data,int>& x,const Plaintext<Gf2nShort,P2Data,int>& y);
 

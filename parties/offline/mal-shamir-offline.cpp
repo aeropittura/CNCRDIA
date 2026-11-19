@@ -10,7 +10,7 @@
 int main(int argc, const char** argv)
 {
     auto& opts = ShamirOptions::singleton;
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     opts = {opt, argc, argv};
     HonestMajorityFieldMachine<MaliciousShamirShare,
             OfflineMachine<HonestMajorityMachine>>(argc, argv, opt,

@@ -43,10 +43,10 @@ class SoftState
     osuCrypto::AlignedUnVector<osuCrypto::block> messages;
 #endif
 
-    OTExtensionWithMatrix& ext;
+    OtExtensionWithMatrix& ext;
 
-    typedef pair<const BitVector*, bool> job_type;
-    WaitQueue<job_type> job_queue, res_queue;
+    typedef pair<const BitVector*, bool> JobType;
+    WaitQueue<JobType> job_queue, result_queue;
 
     pthread_t thread;
 
@@ -55,45 +55,45 @@ class SoftState
     void run();
 
 public:
-    SoftState(OTExtensionWithMatrix& ext);
+    SoftState(OtExtensionWithMatrix& ext);
     ~SoftState();
 
-    void generate(const BitVector& newReceiverInput, bool just_bits);
+    void generate(const BitVector& new_receiver_input, bool just_bits);
 
     void soft_sender(size_t n, bool just_bits);
-    void soft_receiver(size_t n, const BitVector& newReceiverInput,
+    void soft_receiver(size_t n, const BitVector& new_receiver_input,
             bool just_bits);
 };
 
-OTExtensionWithMatrix OTExtensionWithMatrix::setup(TwoPartyPlayer& player,
-        int128 delta, OT_ROLE role, bool passive)
+OtExtensionWithMatrix OtExtensionWithMatrix::setup(TwoPartyPlayer& player,
+        Int128 delta, OT_ROLE role, bool passive)
 {
-    BaseOT baseOT(128, &player, INV_ROLE(role));
+    BaseOT base_ot(128, &player, INV_ROLE(role));
     PRNG G;
-    G.ReSeed();
-    baseOT.set_receiver_inputs(delta);
-    baseOT.exec_base(false);
-    return OTExtensionWithMatrix(baseOT, &player, passive);
+    G.re_seed();
+    base_ot.set_receiver_inputs(delta);
+    base_ot.exec_base(false);
+    return OtExtensionWithMatrix(base_ot, &player, passive);
 }
 
-OTExtensionWithMatrix::OTExtensionWithMatrix(const BaseOT& baseOT, TwoPartyPlayer* player,
-        bool passive) : OTCorrelator(baseOT, player, passive)
+OtExtensionWithMatrix::OtExtensionWithMatrix(const BaseOT& base_ot, TwoPartyPlayer* player,
+        bool passive) : OtCorrelator(base_ot, player, passive)
 {
-    init_me();
+    initialize_me();
 }
 
-OTExtensionWithMatrix::OTExtensionWithMatrix(Player& P, bool passive) :
-        OTExtensionWithMatrix(BaseMachine::fresh_ot_setup(P).get_base(0),
+OtExtensionWithMatrix::OtExtensionWithMatrix(Player& P, bool passive) :
+        OtExtensionWithMatrix(BaseMachine::fresh_ot_setup(P).get_base(0),
                 new VirtualTwoPartyPlayer(P, 1 - P.my_num()), passive)
 {
     assert(P.num_players() == 2);
-    init_me();
+    initialize_me();
     delete_player = true;
 }
 
-void OTExtensionWithMatrix::init_me()
+void OtExtensionWithMatrix::initialize_me()
 {
-    G.ReSeed();
+    G.re_seed();
     nsubloops = 1;
     agreed = false;
     softspoken_k = 2;
@@ -101,7 +101,7 @@ void OTExtensionWithMatrix::init_me()
     delete_player = false;
 }
 
-OTExtensionWithMatrix::~OTExtensionWithMatrix()
+OtExtensionWithMatrix::~OtExtensionWithMatrix()
 {
     if (state)
         delete state;
@@ -109,7 +109,7 @@ OTExtensionWithMatrix::~OTExtensionWithMatrix()
         delete player;
 }
 
-SoftState::SoftState(OTExtensionWithMatrix& ext) : ext(ext)
+SoftState::SoftState(OtExtensionWithMatrix& ext) : ext(ext)
 {
     assert(ext.player);
 
@@ -151,15 +151,15 @@ void* SoftState::run_thread(void* state)
 
 void SoftState::run()
 {
-    job_type job;
+    JobType job;
     while (job_queue.pop(job))
     {
         soft_receiver(job.first->size(), *job.first, job.second);
-        res_queue.push(job);
+        result_queue.push(job);
     }
 }
 
-bool OTExtensionWithMatrix::use_kos()
+bool OtExtensionWithMatrix::use_kos()
 {
 #ifdef USE_KOS
     return true;
@@ -168,12 +168,12 @@ bool OTExtensionWithMatrix::use_kos()
 #endif
 }
 
-void OTExtensionWithMatrix::protocol_agreement()
+void OtExtensionWithMatrix::protocol_agreement()
 {
     if (agreed)
         return;
 
-    Bundle<octetStream> bundle(*player);
+    Bundle<OctetStream> bundle(*player);
     if (use_kos())
         bundle.mine = string("KOS15");
     else
@@ -182,20 +182,20 @@ void OTExtensionWithMatrix::protocol_agreement()
     if (OnlineOptions::singleton.has_option("high_softspoken"))
         softspoken_k = 8;
 
-    if (OnlineOptions::singleton.has_param("softspoken"))
-        softspoken_k = OnlineOptions::singleton.get_param("softspoken");
+    if (OnlineOptions::singleton.has_parameter("softspoken"))
+        softspoken_k = OnlineOptions::singleton.get_parameter("softspoken");
 
-    int needed = DIV_CEIL(nbaseOTs, softspoken_k) * softspoken_k;
+    int needed = DIV_CEIL(nbase_ots, softspoken_k) * softspoken_k;
 
-    baseReceiverInput.resize_zero(needed);
+    base_receiver_input.resize_zero(needed);
 
-    for (int i = nbaseOTs; i < needed; i++)
+    for (int i = nbase_ots; i < needed; i++)
     {
         auto zero = string(SEED_SIZE, '\0');
-        G_receiver.push_back(zero);
-        G_sender.push_back({});
+        g_receiver.push_back(zero);
+        g_sender.push_back({});
         for (int j = 0; j < 2; j++)
-            G_sender.back().push_back(zero);
+            g_sender.back().push_back(zero);
     }
 
     bundle.mine.store(softspoken_k);
@@ -207,7 +207,7 @@ void OTExtensionWithMatrix::protocol_agreement()
         bundle.compare(*player);
         agreed = true;
     }
-    catch (mismatch_among_parties&)
+    catch (MismatchAmongParties&)
     {
         cerr << "Parties compiled with different OT extensions" << endl;
         cerr << "Set \"USE_KOS\" to the same value on all parties" << endl;
@@ -216,25 +216,25 @@ void OTExtensionWithMatrix::protocol_agreement()
     }
 }
 
-void OTExtensionWithMatrix::transfer(int nOTs,
-        const BitVector& receiverInput, int nloops)
+void OtExtensionWithMatrix::transfer(int n_ots,
+        const BitVector& receiver_input, int nloops)
 {
 #ifdef OTEXT_TIMER
     timeval totalstartv, totalendv;
     gettimeofday(&totalstartv, NULL);
 #endif
-    cout << "\tDoing " << nOTs << " extended OTs as " << role_to_str(ot_role) << endl;
+    cout << "\tDoing " << n_ots << " extended OTs as " << role_to_str(ot_role) << endl;
 
     // resize to account for extra k OTs that are discarded
-    BitVector newReceiverInput(nOTs);
-    for (unsigned int i = 0; i < receiverInput.size_bytes(); i++)
+    BitVector new_receiver_input(n_ots);
+    for (unsigned int i = 0; i < receiver_input.size_bytes(); i++)
     {
-        newReceiverInput.set_byte(i, receiverInput.get_byte(i));
+        new_receiver_input.set_byte(i, receiver_input.get_byte(i));
     }
 
     for (int loop = 0; loop < nloops; loop++)
     {
-        extend(nOTs, newReceiverInput);
+        extend(n_ots, new_receiver_input);
 #ifdef OTEXT_TIMER
         gettimeofday(&totalendv, NULL);
         double elapsed = timeval_diff(&totalstartv, &totalendv);
@@ -248,17 +248,17 @@ void OTExtensionWithMatrix::transfer(int nOTs,
 #endif
 }
 
-void OTExtensionWithMatrix::extend(int nOTs_requested,
-        const BitVector& newReceiverInput, bool hash, bool just_bits)
+void OtExtensionWithMatrix::extend(int n_ots_requested,
+        const BitVector& new_receiver_input, bool hash, bool just_bits)
 {
     CODE_LOCATION
     protocol_agreement();
 
     if (use_kos())
     {
-        extend_correlated(nOTs_requested, newReceiverInput);
+        extend_correlated(n_ots_requested, new_receiver_input);
         if (hash)
-            hash_outputs(nOTs_requested);
+            hash_outputs(n_ots_requested);
         return;
     }
 
@@ -267,34 +267,34 @@ void OTExtensionWithMatrix::extend(int nOTs_requested,
 #else
 
     if (not just_bits)
-        resize(nOTs_requested);
+        resize(n_ots_requested);
 
-    if (nOTs_requested == 0)
+    if (n_ots_requested == 0)
         return;
 
     if (not state)
         state = new SoftState(*this);
 
-    assert(newReceiverInput.size() == unsigned(nOTs_requested));
+    assert(new_receiver_input.size() == unsigned(n_ots_requested));
 
-    state->generate(newReceiverInput, just_bits);
+    state->generate(new_receiver_input, just_bits);
 }
 
-void SoftState::generate(const BitVector& newReceiverInput, bool just_bits)
+void SoftState::generate(const BitVector& new_receiver_input, bool just_bits)
 {
-    auto nOTs_requested = newReceiverInput.size();
-    job_type job(&newReceiverInput, just_bits);
+    auto n_ots_requested = new_receiver_input.size();
+    JobType job(&new_receiver_input, just_bits);
     job_queue.push(job);
     try
     {
-        soft_sender(nOTs_requested, just_bits);
+        soft_sender(n_ots_requested, just_bits);
     }
     catch (exception& e)
     {
         ext.state = 0;
         throw;
     }
-    assert(res_queue.pop() == job);
+    assert(result_queue.pop() == job);
 
 #ifdef USE_LIBOTE1
     channels[0]->send("hello", 6);
@@ -318,7 +318,7 @@ void SoftState::soft_sender(size_t n, bool just_bits)
     osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
     vector<osuCrypto::block> outputs;
-    for (auto& x : ext.G_receiver)
+    for (auto& x : ext.g_receiver)
     {
         outputs.push_back(x.get_doubleword());
     }
@@ -330,7 +330,7 @@ void SoftState::soft_sender(size_t n, bool just_bits)
     sender.malicious = not ext.passive_only;
     tamper = OnlineOptions::singleton.has_option("tamper_libote_sender_base");
     sender.setBaseOts(outputs,
-            {ext.baseReceiverInput.get_ptr(), sender.baseOtCount()}, prng,
+            {ext.base_receiver_input.get_ptr(), sender.baseOtCount()}, prng,
             channel);
 
     // Choose which messages should be sent.
@@ -357,7 +357,7 @@ void SoftState::soft_sender(size_t n, bool just_bits)
 
     auto& sender = *sender_;
     sender.setBaseOts(outputs,
-            {ext.baseReceiverInput.get_ptr(), sender.baseOtCount()});
+            {ext.base_receiver_input.get_ptr(), sender.baseOtCount()});
     auto& co_socket = *co_sockets[ext.player->my_num()];
     coproto::Socket socket({}, co_socket);
     co_socket.tamper = OnlineOptions::singleton.has_option("tamper_libote_sender");
@@ -391,7 +391,7 @@ void SoftState::soft_sender(size_t n, bool just_bits)
         for (int j = 0; j < 2; j++)
             for (int i = 0; i < DIV_CEIL(n, 128); i++)
             {
-                auto& square = ext.senderOutputMatrices[j].squares.at(i);
+                auto& square = ext.sender_output_matrices[j].squares.at(i);
                 for (size_t k = 0; k < min(128lu, n - 128 * i); k++)
                     square.rows[k] = sendMessages[i * 128 + k][j];
             }
@@ -399,7 +399,7 @@ void SoftState::soft_sender(size_t n, bool just_bits)
 }
 
 
-void SoftState::soft_receiver(size_t n, const BitVector& newReceiverInput,
+void SoftState::soft_receiver(size_t n, const BitVector& new_receiver_input,
         bool just_bits)
 {
     if (not (ext.ot_role & RECEIVER))
@@ -411,7 +411,7 @@ void SoftState::soft_receiver(size_t n, const BitVector& newReceiverInput,
     osuCrypto::PRNG prng(osuCrypto::sysRandomSeed());
 
     vector<array<osuCrypto::block, 2>> inputs;
-    for (auto& x : ext.G_sender)
+    for (auto& x : ext.g_sender)
     {
         inputs.push_back({});
         for (int i = 0; i < 2; i++)
@@ -419,9 +419,9 @@ void SoftState::soft_receiver(size_t n, const BitVector& newReceiverInput,
     }
 
     // Choose which messages should be received.
-    BitVector tmp(newReceiverInput);
+    BitVector tmp(new_receiver_input);
     osuCrypto::BitVector choices(tmp.get_ptr(), n);
-    assert (n == newReceiverInput.size());
+    assert (n == new_receiver_input.size());
 
 #ifdef USE_LIBOTE1
     auto& channel = *channels[1 - ext.player->my_num()];
@@ -478,47 +478,47 @@ void SoftState::soft_receiver(size_t n, const BitVector& newReceiverInput,
     else
         for (int i = 0; i < DIV_CEIL(n, 128); i++)
         {
-            auto& square = ext.receiverOutputMatrix.squares.at(i);
+            auto& square = ext.receiver_output_matrix.squares.at(i);
             for (size_t j = 0; j < min(128lu, n - 128 * i); j++)
                 square.rows[j] = messages[128 * i + j];
         }
 }
 #endif
 
-void OTExtensionWithMatrix::extend_correlated(const BitVector& newReceiverInput)
+void OtExtensionWithMatrix::extend_correlated(const BitVector& new_receiver_input)
 {
-    extend_correlated(newReceiverInput.size(), newReceiverInput);
+    extend_correlated(new_receiver_input.size(), new_receiver_input);
 }
 
-void OTExtensionWithMatrix::extend_correlated(int nOTs_requested, const BitVector& newReceiverBits)
+void OtExtensionWithMatrix::extend_correlated(int n_ots_requested, const BitVector& new_receiver_bits)
 {
     CODE_LOCATION
-//    if (nOTs % nbaseOTs != 0)
-//        throw invalid_length(); //"nOTs must be a multiple of nbaseOTs\n");
-    if (nOTs_requested == 0)
+//    if (n_ots % nbase_ots != 0)
+//        throw InvalidLength(); //"n_ots must be a multiple of nbase_ots\n");
+    if (n_ots_requested == 0)
         return;
     // local copy
-    auto newReceiverInput = newReceiverBits;
-    if ((ot_role & RECEIVER) and (size_t)nOTs_requested != newReceiverInput.size())
+    auto new_receiver_input = new_receiver_bits;
+    if ((ot_role & RECEIVER) and (size_t)n_ots_requested != new_receiver_input.size())
         throw runtime_error("wrong number of choice bits");
-    int nOTs_requested_rounded = (nOTs_requested + 127) / 128 * 128;
+    int n_ots_requested_rounded = (n_ots_requested + 127) / 128 * 128;
     // add k + s to account for discarding k OTs
-    int nOTs = nOTs_requested_rounded + 2 * 128;
+    int n_ots = n_ots_requested_rounded + 2 * 128;
 
-    int slice = nOTs / nsubloops / 128;
-    nOTs = slice * nsubloops * 128;
-    resize(nOTs);
-    newReceiverInput.resize_zero(nOTs);
+    int slice = n_ots / nsubloops / 128;
+    n_ots = slice * nsubloops * 128;
+    resize(n_ots);
+    new_receiver_input.resize_zero(n_ots);
 
     // randomize last 128 + 128 bits that will be discarded
     for (int i = 0; i < 4; i++)
-        newReceiverInput.set_word(nOTs/64 - i - 1, G.get_word());
+        new_receiver_input.set_word(n_ots/64 - i - 1, G.get_word());
 
     // subloop for first part to interleave communication with computation
-    for (int start = 0; start < nOTs / 128; start += slice)
+    for (int start = 0; start < n_ots / 128; start += slice)
     {
         expand(start, slice);
-        this->correlate(start, slice, newReceiverInput, true);
+        this->correlate(start, slice, new_receiver_input, true);
         transpose(start, slice);
     }
 
@@ -532,7 +532,7 @@ void OTExtensionWithMatrix::extend_correlated(int nOTs_requested, const BitVecto
         timeval startv, endv;
         gettimeofday(&startv, NULL);
 #endif
-        check_correlation(nOTs, newReceiverInput);
+        check_correlation(n_ots, new_receiver_input);
 #ifdef OTEXT_TIMER
         gettimeofday(&endv, NULL);
         elapsed = timeval_diff(&startv, &endv);
@@ -541,37 +541,37 @@ void OTExtensionWithMatrix::extend_correlated(int nOTs_requested, const BitVecto
 #endif
     }
 
-    receiverOutputMatrix.resize(nOTs_requested_rounded);
-    senderOutputMatrices[0].resize(nOTs_requested_rounded);
-    senderOutputMatrices[1].resize(nOTs_requested_rounded);
-    newReceiverInput.resize(nOTs_requested);
+    receiver_output_matrix.resize(n_ots_requested_rounded);
+    sender_output_matrices[0].resize(n_ots_requested_rounded);
+    sender_output_matrices[1].resize(n_ots_requested_rounded);
+    new_receiver_input.resize(n_ots_requested);
 }
 
-void OTExtensionWithMatrix::expand_transposed()
+void OtExtensionWithMatrix::expand_transposed()
 {
-    for (int i = 0; i < nbaseOTs; i++)
+    for (int i = 0; i < nbase_ots; i++)
     {
         if (ot_role & RECEIVER)
         {
-            receiverOutputMatrix.squares[i/128].randomize(i % 128, G_sender[i][0]);
-            t1.squares[i/128].randomize(i % 128, G_sender[i][1]);
+            receiver_output_matrix.squares[i/128].randomize(i % 128, g_sender[i][0]);
+            t1.squares[i/128].randomize(i % 128, g_sender[i][1]);
         }
         if (ot_role & SENDER)
         {
-            senderOutputMatrices[0].squares[i/128].randomize(i % 128, G_receiver[i]);
+            sender_output_matrices[0].squares[i/128].randomize(i % 128, g_receiver[i]);
         }
     }
 }
 
-void OTExtensionWithMatrix::transpose(int start, int slice)
+void OtExtensionWithMatrix::transpose(int start, int slice)
 {
     if (slice < 0)
-        slice = receiverOutputMatrix.squares.size();
+        slice = receiver_output_matrix.squares.size();
 
-    BitMatrixSlice receiverOutputSlice(receiverOutputMatrix, start, slice);
-    BitMatrixSlice senderOutputSlices[2] = {
-            BitMatrixSlice(senderOutputMatrices[0], start, slice),
-            BitMatrixSlice(senderOutputMatrices[1], start, slice)
+    BitMatrixSlice receiver_output_slice(receiver_output_matrix, start, slice);
+    BitMatrixSlice sender_output_slices[2] = {
+            BitMatrixSlice(sender_output_matrices[0], start, slice),
+            BitMatrixSlice(sender_output_matrices[1], start, slice)
     };
 
     // transpose t0[i] onto receiverOutput and tmp (q[i]) onto senderOutput[i][0]
@@ -583,9 +583,9 @@ void OTExtensionWithMatrix::transpose(int start, int slice)
 #endif
     // transpose in 128-bit chunks
     if (ot_role & RECEIVER)
-        receiverOutputSlice.transpose();
+        receiver_output_slice.transpose();
     if (ot_role & SENDER)
-        senderOutputSlices[0].transpose();
+        sender_output_slices[0].transpose();
 
 #ifdef OTEXT_TIMER
     gettimeofday(&transt2, NULL);
@@ -598,22 +598,22 @@ void OTExtensionWithMatrix::transpose(int start, int slice)
 /*
  * Hash outputs to make into random OT
  */
-void OTExtensionWithMatrix::hash_outputs(int nOTs)
+void OtExtensionWithMatrix::hash_outputs(int n_ots)
 {
-    hash_outputs(nOTs, senderOutputMatrices, receiverOutputMatrix);
+    hash_outputs(n_ots, sender_output_matrices, receiver_output_matrix);
 }
 
-octet* OTExtensionWithMatrix::get_receiver_output(int i)
+Octet* OtExtensionWithMatrix::get_receiver_output(int i)
 {
-    return (octet*)&receiverOutputMatrix.squares[i/128].rows[i%128];
+    return (Octet*)&receiver_output_matrix.squares[i/128].rows[i%128];
 }
 
-octet* OTExtensionWithMatrix::get_sender_output(int choice, int i)
+Octet* OtExtensionWithMatrix::get_sender_output(int choice, int i)
 {
-    return (octet*)&senderOutputMatrices[choice].squares[i/128].rows[i%128];
+    return (Octet*)&sender_output_matrices[choice].squares[i/128].rows[i%128];
 }
 
-OTExtensionWithMatrix::OtBits OTExtensionWithMatrix::bit_extension(
+OtExtensionWithMatrix::OtBits OtExtensionWithMatrix::bit_extension(
         const BitVector& choices, bool multithread)
 {
     assert(choices.size() % 128 == 0);
@@ -634,7 +634,7 @@ OTExtensionWithMatrix::OtBits OTExtensionWithMatrix::bit_extension(
     return res;
 }
 
-void OTExtensionWithMatrix::bit_extension(OtBits& res, const BitVector& choices, size_t start, size_t end)
+void OtExtensionWithMatrix::bit_extension(OtBits& res, const BitVector& choices, size_t start, size_t end)
 {
     size_t budget = 1 << 20;
     for (size_t i = start; i < end; i += budget)
@@ -656,57 +656,57 @@ void OTExtensionWithMatrix::bit_extension(OtBits& res, const BitVector& choices,
         }
         else
         {
-            res.second.set_part(i, receiverOutputMatrix.lsbs());
+            res.second.set_part(i, receiver_output_matrix.lsbs());
             for (int j = 0; j < 2; j++)
-                res.first[j].set_part(i, senderOutputMatrices[j].lsbs());
+                res.first[j].set_part(i, sender_output_matrices[j].lsbs());
         }
     }
     ot_lsbs.clear();
 }
 
-void OTExtensionWithMatrix::print(BitVector& newReceiverInput, int i)
+void OtExtensionWithMatrix::print(BitVector& new_receiver_input, int i)
 {
     if (player->my_num() == 0)
     {
-        print_receiver<gf2n_long>(newReceiverInput, receiverOutputMatrix, i);
-        print_sender(senderOutputMatrices[0].squares[i], senderOutputMatrices[1].squares[i]);
+        print_receiver<Gf2nLong>(new_receiver_input, receiver_output_matrix, i);
+        print_sender(sender_output_matrices[0].squares[i], sender_output_matrices[1].squares[i]);
     }
     else
     {
-        print_sender(senderOutputMatrices[0].squares[i], senderOutputMatrices[1].squares[i]);
-        print_receiver<gf2n_long>(newReceiverInput, receiverOutputMatrix, i);
+        print_sender(sender_output_matrices[0].squares[i], sender_output_matrices[1].squares[i]);
+        print_receiver<Gf2nLong>(new_receiver_input, receiver_output_matrix, i);
     }
 }
 
 template <class T>
-void OTExtensionWithMatrix::print_receiver(BitVector& newReceiverInput, BitMatrix& matrix, int k, int offset)
+void OtExtensionWithMatrix::print_receiver(BitVector& new_receiver_input, BitMatrix& matrix, int k, int offset)
 {
     if (ot_role & RECEIVER)
     {
         for (int i = 0; i < 16; i++)
         {
-            if (newReceiverInput.get_bit((offset + k) * 128 + i))
+            if (new_receiver_input.get_bit((offset + k) * 128 + i))
             {
                 for (int j = 0; j < 33; j++)
                     cout << " ";
                 cout << T(matrix.squares[k].rows[i]);
             }
             else
-                cout << int128(matrix.squares[k].rows[i]);
+                cout << Int128(matrix.squares[k].rows[i]);
             cout << endl;
         }
         cout << endl;
     }
 }
 
-void OTExtensionWithMatrix::print_sender(square128& square0, square128& square1)
+void OtExtensionWithMatrix::print_sender(Square128& square0, Square128& square1)
 {
     if (ot_role & SENDER)
     {
         for (int i = 0; i < 16; i++)
         {
-            cout << int128(square0.rows[i]) << " ";
-            cout << int128(square1.rows[i]) << " ";
+            cout << Int128(square0.rows[i]) << " ";
+            cout << Int128(square1.rows[i]) << " ";
             cout << endl;
         }
         cout << endl;
@@ -714,52 +714,52 @@ void OTExtensionWithMatrix::print_sender(square128& square0, square128& square1)
 }
 
 template <class T>
-void OTExtensionWithMatrix::print_post_correlate(BitVector& newReceiverInput, int j, int offset, int sender)
+void OtExtensionWithMatrix::print_post_correlate(BitVector& new_receiver_input, int j, int offset, int sender)
 {
    cout << "post correlate, sender" << sender << endl;
    if (player->my_num() == sender)
    {
-       T delta = newReceiverInput.get_int128(offset + j);
+       T delta = new_receiver_input.get_int128(offset + j);
        for (int i = 0; i < 16; i++)
        {
-           cout << (int128(receiverOutputMatrix.squares[j].rows[i]));
+           cout << (Int128(receiver_output_matrix.squares[j].rows[i]));
            cout << " ";
-           cout << (T(receiverOutputMatrix.squares[j].rows[i]) - delta);
+           cout << (T(receiver_output_matrix.squares[j].rows[i]) - delta);
            cout << endl;
        }
        cout << endl;
    }
    else
    {
-       print_receiver<T>(baseReceiverInput, senderOutputMatrices[0], j);
+       print_receiver<T>(base_receiver_input, sender_output_matrices[0], j);
    }
 }
 
-void OTExtensionWithMatrix::print_pre_correlate(int i)
+void OtExtensionWithMatrix::print_pre_correlate(int i)
 {
     cout << "pre correlate" << endl;
     if (player->my_num() == 0)
-        print_sender(receiverOutputMatrix.squares[i], t1.squares[i]);
+        print_sender(receiver_output_matrix.squares[i], t1.squares[i]);
     else
-        print_receiver<gf2n_long>(baseReceiverInput, senderOutputMatrices[0], i);
+        print_receiver<Gf2nLong>(base_receiver_input, sender_output_matrices[0], i);
 }
 
-void OTExtensionWithMatrix::print_post_transpose(BitVector& newReceiverInput, int i, int sender)
+void OtExtensionWithMatrix::print_post_transpose(BitVector& new_receiver_input, int i, int sender)
 {
     cout << "post transpose, sender " << sender << endl;
     if (player->my_num() == sender)
     {
-        print_receiver<gf2n_long>(newReceiverInput, receiverOutputMatrix);
+        print_receiver<Gf2nLong>(new_receiver_input, receiver_output_matrix);
     }
     else
     {
-        square128 tmp = senderOutputMatrices[0].squares[i];
-        tmp ^= baseReceiverInput;
-        print_sender(senderOutputMatrices[0].squares[i], tmp);
+        Square128 tmp = sender_output_matrices[0].squares[i];
+        tmp ^= base_receiver_input;
+        print_sender(sender_output_matrices[0].squares[i], tmp);
     }
 }
 
-void OTExtensionWithMatrix::print_pre_expand()
+void OtExtensionWithMatrix::print_pre_expand()
 {
     cout << "pre expand" << endl;
     if (player->my_num() == 0)
@@ -767,7 +767,7 @@ void OTExtensionWithMatrix::print_pre_expand()
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 2; j++)
-                cout << int128(_mm_loadu_si128((__m128i*)G_sender[i][j].get_seed())) << " ";
+                cout << Int128(_mm_loadu_si128((__m128i*)g_sender[i][j].get_seed())) << " ";
             cout << endl;
         }
         cout << endl;
@@ -776,12 +776,12 @@ void OTExtensionWithMatrix::print_pre_expand()
     {
         for (int i = 0; i < 16; i++)
         {
-            if (baseReceiverInput.get_bit(i))
+            if (base_receiver_input.get_bit(i))
             {
                 for (int j = 0; j < 33; j++)
                     cout << " ";
             }
-            cout << int128(_mm_loadu_si128((__m128i*)G_receiver[i].get_seed())) << endl;
+            cout << Int128(_mm_loadu_si128((__m128i*)g_receiver[i].get_seed())) << endl;
         }
         cout << endl;
     }

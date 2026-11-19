@@ -21,13 +21,13 @@ YaoGarbler::YaoGarbler(int thread_num, YaoGarbleMaster& master) :
 		GC::Thread<GC::Secret<YaoGarbleWire>>(thread_num, master),
 		YaoCommon<YaoGarbleWire>(master),
 		master(master),
-		and_proc_timer(CLOCK_PROCESS_CPUTIME_ID),
+		and_processor_timer(CLOCK_PROCESS_CPUTIME_ID),
 		and_main_thread_timer(CLOCK_THREAD_CPUTIME_ID),
 		player(master.N, 1, "thread" + to_string(thread_num)),
-		ot_ext(OTExtensionWithMatrix::setup(player,
+		ot_ext(OtExtensionWithMatrix::setup(player,
 				master.get_delta().get<__m128i>(), SENDER, true))
 {
-	prng.ReSeed();
+	prng.re_seed();
 	set_n_program_threads(master.machine.nthreads);
 	this->init(*this);
 	if (continuous())
@@ -35,7 +35,7 @@ YaoGarbler::YaoGarbler(int thread_num, YaoGarbleMaster& master) :
 	else
 	{
 		processor.out.activate(false);
-		if (not master.opts.cmd_private_output_file.empty())
+		if (not master.opts.command_private_output_file.empty())
 			cerr << "Garbling party cannot output with one-shot computation"
 					<< endl;
 	}
@@ -48,7 +48,7 @@ YaoGarbler::~YaoGarbler()
 #endif
 #ifdef YAO_TIMINGS
 	cout << "AND time: " << and_timer.elapsed() << endl;
-	cout << "AND process timer: " << and_proc_timer.elapsed() << endl;
+	cout << "AND process timer: " << and_processor_timer.elapsed() << endl;
 	cout << "AND main thread timer: " << and_main_thread_timer.elapsed() << endl;
 	cout << "AND prepare timer: " << and_prepare_timer.elapsed() << endl;
 	cout << "AND wait timer: " << and_wait_timer.elapsed() << endl;
@@ -68,7 +68,7 @@ void YaoGarbler::run(GC::Program& program)
 		{
 			b = program.execute(processor, master.memory, -1);
 		}
-		catch (needs_cleaning& e)
+		catch (NeedsCleaning& e)
 		{
 			if (not continuous())
 				throw runtime_error("run-time branching impossible with garbling at once");
@@ -113,16 +113,16 @@ void YaoGarbler::process_receiver_inputs()
 		BitVector _;
 		ot_ext.extend_correlated(inputs.size(), _);
 
-		octetStream os;
+		OctetStream os;
 		for (size_t i = 0; i < inputs.size(); i++)
-			os.serialize(inputs[i] ^ ot_ext.senderOutputMatrices[0][i]);
+			os.serialize(inputs[i] ^ ot_ext.sender_output_matrices[0][i]);
 		player.send(os);
 
 		receiver_input_keys.pop_front();
 	}
 }
 
-NamedCommStats YaoGarbler::extra_comm()
+NamedCommunicationStatistics YaoGarbler::extra_communication()
 {
-	return player.get_comm_stats();
+	return player.get_communication_statistics();
 }

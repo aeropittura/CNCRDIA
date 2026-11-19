@@ -43,21 +43,21 @@ public:
     typedef Memory<FakeSecret> DynamicMemory;
 
     typedef BitVec clear;
-    typedef BitVec open_type;
+    typedef BitVec OpenType;
 
     typedef FakeSecret part_type;
-    typedef FakeSecret small_type;
-    typedef NoShare bit_type;
+    typedef FakeSecret SmallType;
+    typedef NoShare BitType;
 
     typedef FakePrep<FakeSecret> LivePrep;
-    typedef FakeMC<FakeSecret> MC;
-    typedef MC MAC_Check;
-    typedef MC Direct_MC;
+    typedef FakeOpener<FakeSecret> MC;
+    typedef MC MacCheck;
+    typedef MC DirectOpener;
     typedef FakeProtocol<FakeSecret> Protocol;
     typedef FakeInput<FakeSecret> Input;
     typedef SecureShuffleBase<FakeSecret> Shuffler;
 
-    typedef SwitchableOutput out_type;
+    typedef SwitchableOutput OutType;
 
     static string type_string() { return "fake secret"; }
     static string type_short() { return "emulB"; }
@@ -78,7 +78,7 @@ public:
 
     static int threshold(int) { return 0; }
 
-    static MC* new_mc(mac_key_type key) { return new MC(key); }
+    static MC* new_opener(MacKeyType key) { return new MC(key); }
 
     static void store_clear_in_dynamic(Memory<DynamicType>& mem,
     		const vector<GC::ClearWriteAccess>& accesses);
@@ -128,7 +128,7 @@ public:
     static FakeSecret input(GC::Processor<FakeSecret>& processor, const InputArgs& args);
     static FakeSecret input(int from, word input, int n_bits);
 
-    static FakeSecret constant(clear value, int = 0, mac_key_type = {}, int = -1)
+    static FakeSecret constant(clear value, int = 0, MacKeyType = {}, int = -1)
     { return value; }
 
     FakeSecret() {}
@@ -164,9 +164,9 @@ public:
 
     void reveal(int n_bits, Clear& x) { (void) n_bits; x = a; }
 
-    FakeSecret invert() const { throw not_implemented(); }
+    FakeSecret invert() const { throw NotImplemented(); }
 
-    void input(istream&, bool) { throw not_implemented(); }
+    void input(istream&, bool) { throw NotImplemented(); }
 
     bool operator<(FakeSecret) const { return false; }
 

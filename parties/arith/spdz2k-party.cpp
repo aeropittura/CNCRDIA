@@ -16,7 +16,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     opt.add(
         "64", // Default.
         0, // Required?
@@ -30,17 +30,17 @@ int main(int argc, const char** argv)
     int s;
     opt.get("-SP")->getInt(s);
     cerr << "Using SPDZ2k security parameter " << s << endl;
-    opt.resetArgs();
+    opt.reset_args();
     RingOptions ring_options(opt, argc, argv);
-    OnlineOptions& online_opts = OnlineOptions::singleton;
-    online_opts = {opt, argc, argv, Spdz2kShare<64, 64>(), true};
-    DishonestMajorityMachine machine(argc, argv, opt, online_opts, gf2n());
-    int k = ring_options.ring_size_from_opts_or_schedule(online_opts.progname);
+    OnlineOptions& online_options = OnlineOptions::singleton;
+    online_options = {opt, argc, argv, Spdz2kShare<64, 64>(), true};
+    DishonestMajorityMachine machine(argc, argv, opt, online_options, Gf2n());
+    int k = ring_options.ring_size_from_options_or_schedule(online_options.progname);
 
 #undef Z
 #define Z(K, S) \
     if (s == S and k == K) \
-        return machine.run<Spdz2kShare<K, S>, Share<gf2n>>();
+        return machine.run<Spdz2kShare<K, S>, Share<Gf2n>>();
 
     Z(64, 64)
     Z(64, 48)

@@ -28,9 +28,9 @@ class RealProgramParty : public ProgramPartySpec<T>
 
 	DataPositions usage;
 	Preprocessing<T>* prep;
-	SubProcessor<T>* shared_proc;
+	SubProcessor<T>* shared_processor;
 
-	ArithmeticProcessor dummy_proc;
+	ArithmeticProcessor dummy_processor;
 
 	vector<T> deltas;
 
@@ -42,7 +42,7 @@ class RealProgramParty : public ProgramPartySpec<T>
 
 	bool one_shot;
 
-	typename T::mac_key_type mac_key;
+	typename T::MacKeyType mac_key;
 
 public:
 	static RealProgramParty& s();
@@ -56,8 +56,8 @@ public:
 
 	void receive_keys(Register& reg);
 	void receive_all_keys(Register& reg, bool external);
-	void process_prf_output(PRFOutputs& prf_output, PRFRegister* out,
-			const PRFRegister* left, const PRFRegister* right);
+	void process_prf_output(PrfOutputs& prf_output, PrfRegister* out,
+			const PrfRegister* left, const PrfRegister* right);
 
 	void push_spdz_wire(SpdzOp op, const RealGarbleWire<T>& wire);
 

@@ -12,34 +12,34 @@
 
 template <template <class> class T, class FD>
 SimpleGenerator<T,FD>::SimpleGenerator(const Names& N, const PartSetup<FD>& setup,
-        const MultiplicativeMachineParams& machine,
+        const MultiplicativeMachineParameters& machine,
         int thread_num, Dtype data_type, Player* player) :
         GeneratorBase(thread_num, N, player),
         setup(setup), machine(machine),
         volatile_memory(0), dd(P, setup),
-        EC(P, setup.pk, setup.FieldD, timers, machine, thread_num)
+        EC(P, setup.pk, setup.field_d, timers, machine, thread_num)
 {
-    string prep_dir = machine.get_prep_dir<FD>(P);
+    string prep_directory = machine.get_prep_directory<FD>(P);
     if (machine.produce_inputs)
-        producer = new InputProducer<FD>(P, thread_num, machine.output, prep_dir);
+        producer = new InputProducer<FD>(P, thread_num, machine.output, prep_directory);
     else
         switch (data_type)
         {
         case DATA_TRIPLE:
-            producer = new TripleProducer_<FD>(setup.FieldD, P.my_num(),
-                    thread_num, machine.output, prep_dir);
+            producer = new TripleProducer_<FD>(setup.field_d, P.my_num(),
+                    thread_num, machine.output, prep_directory);
             break;
         case DATA_SQUARE:
-            producer = new SquareProducer<FD>(setup.FieldD, P.my_num(),
-                    thread_num, machine.output, prep_dir);
+            producer = new SquareProducer<FD>(setup.field_d, P.my_num(),
+                    thread_num, machine.output, prep_directory);
             break;
         case DATA_BIT:
-            producer = new_bit_producer(setup.FieldD, P, setup.pk, machine.get_covert(), true,
-                    thread_num, machine.output, prep_dir);
+            producer = new_bit_producer(setup.field_d, P, setup.pk, machine.get_covert(), true,
+                    thread_num, machine.output, prep_directory);
             break;
         case DATA_INVERSE:
-            producer = new InverseProducer<FD>(setup.FieldD, P.my_num(),
-                    thread_num, machine.output, true, prep_dir);
+            producer = new InverseProducer<FD>(setup.field_d, P.my_num(),
+                    thread_num, machine.output, true, prep_directory);
             break;
         default:
             throw runtime_error("data type not implemented");
@@ -58,11 +58,11 @@ void SimpleGenerator<T,FD>::run(bool exhaust)
     Timer timer(CLOCK_THREAD_CPUTIME_ID);
     timer.start();
     timers["MC init"].start();
-    MAC_Check<typename FD::T> MC(setup.alphai);
+    MacCheck<typename FD::T> MC(setup.alphai);
     timers["MC init"].stop();
     producer->clear();
     total = 0;
-    while (total < machine.nTriplesPerThread or (exhaust and EC.has_left()))
+    while (total < machine.n_triples_per_thread or (exhaust and EC.has_left()))
     {
         producer->run_with_catch(P, setup.pk, setup.calpha, EC, dd, setup.alphai);
         producer->sacrifice_with_catch(P, MC);
@@ -92,9 +92,9 @@ void SimpleGenerator<T,FD>::report_size(ReportType type, MemoryUsage& res)
     res.add("distributed decryption", dd.report_size(type));
 }
 
-template class SimpleGenerator<SimpleEncCommit_, FFT_Data>;
-template class SimpleGenerator<SummingEncCommit, FFT_Data>;
-template class SimpleGenerator<EncCommit_, FFT_Data>;
+template class SimpleGenerator<SimpleEncCommit_, FftData>;
+template class SimpleGenerator<SummingEncCommit, FftData>;
+template class SimpleGenerator<EncCommit_, FftData>;
 
 template class SimpleGenerator<SimpleEncCommit_, P2Data>;
 template class SimpleGenerator<SummingEncCommit, P2Data>;

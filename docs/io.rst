@@ -99,7 +99,7 @@ functions in :py:class:`~mpcl.core.types.sfix`). The connections are set
 up in the same way as in the previous section. See :ref:`multinode`
 for an example how this is used to distribute every party among
 multiple nodes. If you use the client interface, you should use the
-:cpp:class:`octetStream` class for serialization. The format is the same
+:cpp:class:`OctetStream` class for serialization. The format is the same
 as in the following section.
 
 

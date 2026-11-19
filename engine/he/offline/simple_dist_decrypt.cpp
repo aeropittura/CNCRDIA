@@ -25,7 +25,7 @@ template <class FD>
 Plaintext_<FD> SimpleDistDecrypt<FD>::reshare(const Ciphertext& cm)
 {
     PRNG G;
-    G.ReSeed();
+    G.re_seed();
     this->f.randomize(G, Full);
 
     // Step 3
@@ -42,5 +42,5 @@ Plaintext_<FD> SimpleDistDecrypt<FD>::reshare(const Ciphertext& cm)
 }
 
 
-template class SimpleDistDecrypt<FFT_Data>;
+template class SimpleDistDecrypt<FftData>;
 template class SimpleDistDecrypt<P2Data>;

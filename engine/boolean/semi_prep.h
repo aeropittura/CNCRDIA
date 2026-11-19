@@ -22,15 +22,15 @@ template<class T> class ShareThread;
 class SemiPrep : public BufferPrep<SemiSecret>, ShiftableTripleBuffer<SemiSecret>
 {
     SemiSecret::TripleGenerator* triple_generator;
-    MascotParams params;
+    MascotParameters params;
 
-    SeededPRNG secure_prng;
+    SeededPrng secure_prng;
 
     vector<array<SemiSecret, 3>> mixed_triples;
 
     SemiSecureTripleState* state;
 
-    OTExtensionWithMatrix* rot_ext;
+    OtExtensionWithMatrix* rot_ext;
 
 public:
     SemiPrep(DataPositions& usage, bool = true);
@@ -42,8 +42,8 @@ public:
     void buffer_triples();
     void buffer_bits();
 
-    void buffer_squares() { throw not_implemented(); }
-    void buffer_inverses() { throw not_implemented(); }
+    void buffer_squares() { throw NotImplemented(); }
+    void buffer_inverses() { throw NotImplemented(); }
 
     array<SemiSecret, 3> get_mixed_triple(int n);
 
@@ -61,7 +61,7 @@ public:
 
     void buffer_personal_triples(vector<array<SemiSecret, 3>>&, size_t, size_t)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 };
 

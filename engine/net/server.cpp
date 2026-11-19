@@ -42,9 +42,9 @@ void Server::get_name(int num)
     cerr << "Player " << num << " started." << endl;
 
   // Receive name sent by client (legacy) - not used here
-  octetStream os;
+  OctetStream os;
   os.Receive(socket_num[num]);
-  receive(socket_num[num],(octet*)&ports[num],4);
+  receive(socket_num[num],(Octet*)&ports[num],4);
   if (OnlineOptions::singleton.has_option("debug_networking"))
     cerr << "Player " << num << " listening on " << os.str() << ":"
         << ports[num] << endl;
@@ -60,7 +60,7 @@ void Server::send_names()
    * and the number of machines
    */
   RunningTimer timer;
-  octetStream addresses;
+  OctetStream addresses;
   addresses.store(names);
   addresses.store(ports);
   for (int i=0; i<nmachines; i++)

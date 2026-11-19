@@ -15,7 +15,7 @@
 template<class T>
 MaliciousBitOnlyRepPrep<T>::MaliciousBitOnlyRepPrep(SubProcessor<T>* proc, DataPositions& usage) :
         BufferPrep<T>(usage),
-        honest_prep(0, honest_usage), honest_proc(0)
+        honest_prep(0, honest_usage), honest_processor(0)
 {
     this->proc = proc;
 }
@@ -53,21 +53,21 @@ MaliciousRepPrepWithBits<T>::MaliciousRepPrepWithBits(SubProcessor<T>* proc,
 template<class U>
 MaliciousBitOnlyRepPrep<U>::~MaliciousBitOnlyRepPrep()
 {
-    if (honest_proc)
-        delete honest_proc;
+    if (honest_processor)
+        delete honest_processor;
 }
 
 template<class T>
 void MaliciousBitOnlyRepPrep<T>::set_protocol(typename T::Protocol& protocol)
 {
-    init_honest(protocol.P);
+    initialize_honest(protocol.P);
 }
 
 template<class T>
-void MaliciousBitOnlyRepPrep<T>::init_honest(Player& P)
+void MaliciousBitOnlyRepPrep<T>::initialize_honest(Player& P)
 {
-    if (not honest_proc)
-        honest_proc = new SubProcessor<typename T::Honest>(honest_mc,
+    if (not honest_processor)
+        honest_processor = new SubProcessor<typename T::Honest>(honest_opener,
                 honest_prep, P);
 }
 
@@ -75,34 +75,34 @@ template<class T>
 void MaliciousRepPrep<T>::buffer_triples()
 {
     CODE_LOCATION
-    check_field_size<typename T::open_type>();
+    check_field_size<typename T::OpenType>();
     auto& triples = this->triples;
     auto buffer_size = BaseMachine::batch_size<T>(DATA_TRIPLE,
             this->buffer_size);
     if (OnlineOptions::singleton.has_option("verbose_triples"))
         fprintf(stderr, "creating %d triples (%d)\n", buffer_size,
                 this->buffer_size);
-    auto& honest_proc = this->honest_proc;
-    assert(honest_proc != 0);
-    Player& P = honest_proc->P;
+    auto& honest_processor = this->honest_processor;
+    assert(honest_processor != 0);
+    Player& P = honest_processor->P;
     vector<array<T, 5>> check_triples;
     check_triples.reserve(buffer_size);
-    auto& honest_prot = honest_proc->protocol;
-    honest_prot.init_mul();
-    BufferScope scope(honest_prot, 3 * buffer_size);
+    auto& honest_protocol = honest_processor->protocol;
+    honest_protocol.initialize_mult();
+    BufferScope scope(honest_protocol, 3 * buffer_size);
     for (int i = 0; i < buffer_size; i++)
     {
         check_triples.push_back({});
         auto& tuple = check_triples.back();
         for (int j = 0; j < 3; j++)
-            tuple[j] = honest_prot.get_random();
-        honest_prot.prepare_mul(tuple[0], tuple[2]);
-        honest_prot.prepare_mul(tuple[1], tuple[2]);
+            tuple[j] = honest_protocol.get_random();
+        honest_protocol.prepare_mul(tuple[0], tuple[2]);
+        honest_protocol.prepare_mul(tuple[1], tuple[2]);
     }
-    honest_prot.exchange();
+    honest_protocol.exchange();
     for (int i = 0; i < buffer_size; i++)
         for (int j = 3; j < 5; j++)
-            check_triples[i][j] = honest_prot.finalize_mul();
+            check_triples[i][j] = honest_protocol.finalize_mul();
     sacrifice<T, typename T::random_type>(check_triples, P);
     for (auto& tuple : check_triples)
         triples.push_back({{tuple[0], tuple[2], tuple[3]}});
@@ -114,10 +114,10 @@ void sacrifice(const vector<array<T, 5>>& check_triples, Player& P)
     CODE_LOCATION
     check_field_size<U>();
     vector<T> masked, checks;
-    vector <typename T::open_type> opened;
-    typename T::MAC_Check MC;
+    vector <typename T::OpenType> opened;
+    typename T::MacCheck MC;
     int buffer_size = check_triples.size();
-    auto t = Create_Random<U>(P);
+    auto t = create_random<U>(P);
     masked.reserve(buffer_size);
     for (int i = 0; i < buffer_size; i++)
     {
@@ -132,10 +132,10 @@ void sacrifice(const vector<array<T, 5>>& check_triples, Player& P)
         const T& b = check_triples[i][2];
         const T& c = check_triples[i][3];
         const T& c_prime = check_triples[i][4];
-        typename T::open_type& rho = opened[i];
+        typename T::OpenType& rho = opened[i];
         checks.push_back(T::Mul(c, t) - c_prime - rho * b);
     }
-    MC.CheckFor(0, checks, P);
+    MC.check_for(0, checks, P);
     MC.Check(P);
 }
 
@@ -145,15 +145,15 @@ void MaliciousRepPrep<T>::buffer_squares()
     CODE_LOCATION
     vector<T> masked;
     vector<T> checks;
-    vector<typename T::open_type> opened;
+    vector<typename T::OpenType> opened;
     vector<array<T, 2>> check_squares;
     auto& squares = this->squares;
     auto buffer_size = BaseMachine::batch_size<T>(DATA_SQUARE, this->buffer_size);
     auto& honest_prep = this->honest_prep;
-    auto& honest_proc = this->honest_proc;
+    auto& honest_processor = this->honest_processor;
     auto& MC = this->MC;
-    assert(honest_proc);
-    Player& P = honest_proc->P;
+    assert(honest_processor);
+    Player& P = honest_processor->P;
     squares.clear();
     BufferScope scope(honest_prep, buffer_size);
     for (int i = 0; i < buffer_size; i++)
@@ -165,7 +165,7 @@ void MaliciousRepPrep<T>::buffer_squares()
         squares.push_back({{a, b}});
         check_squares.push_back({{f, h}});
     }
-    auto t = Create_Random<typename T::clear>(P);
+    auto t = create_random<typename T::clear>(P);
     for (int i = 0; i < buffer_size; i++)
     {
         T& a = squares[i][0];
@@ -183,7 +183,7 @@ void MaliciousRepPrep<T>::buffer_squares()
         auto& rho = opened[i];
         checks.push_back(t2 * b - h - rho * (t * a + f));
     }
-    MC.CheckFor(0, checks, P);
+    MC.check_for(0, checks, P);
 }
 
 template<class T>
@@ -192,13 +192,13 @@ void MaliciousBitOnlyRepPrep<T>::buffer_bits()
     CODE_LOCATION
     vector<T> masked;
     vector<T> checks;
-    vector<typename T::open_type> opened;
+    vector<typename T::OpenType> opened;
     vector<array<T, 2>> check_squares;
     auto& bits = this->bits;
     auto buffer_size = BaseMachine::batch_size<T>(DATA_BIT,
             this->buffer_size);
-    assert(honest_proc);
-    Player& P = honest_proc->P;
+    assert(honest_processor);
+    Player& P = honest_processor->P;
     BufferScope scope(honest_prep, buffer_size);
     bits.clear();
     for (int i = 0; i < buffer_size; i++)
@@ -209,7 +209,7 @@ void MaliciousBitOnlyRepPrep<T>::buffer_bits()
         bits.push_back(a);
         check_squares.push_back({{f, h}});
 #ifdef DEBUG_BIT_SACRIFICE
-        typename T::MAC_Check MC;
+        typename T::MacCheck MC;
         if (not (MC.open(a, P).is_zero() or MC.open(a, P).is_one()))
         {
             cout << MC.open(a, P) << endl;
@@ -218,7 +218,7 @@ void MaliciousBitOnlyRepPrep<T>::buffer_bits()
         assert(MC.open(f, P) * MC.open(f, P) == MC.open(h, P));
 #endif
     }
-    auto t = Create_Random<typename T::open_type>(P);
+    auto t = create_random<typename T::OpenType>(P);
     for (int i = 0; i < buffer_size; i++)
     {
         T& a = bits[i];
@@ -226,7 +226,7 @@ void MaliciousBitOnlyRepPrep<T>::buffer_bits()
         masked.push_back(t * a - f);
     }
     MC.POpen(opened, masked, P);
-    typename T::open_type t2 = t * t;
+    typename T::OpenType t2 = t * t;
     for (int i = 0; i < buffer_size; i++)
     {
         T& a = bits[i];
@@ -235,7 +235,7 @@ void MaliciousBitOnlyRepPrep<T>::buffer_bits()
         auto& rho = opened[i];
         checks.push_back(t2 * a - h - rho * (t * a + f));
     }
-    MC.CheckFor(0, checks, P);
+    MC.check_for(0, checks, P);
 }
 
 template<class T>

@@ -19,7 +19,7 @@ using namespace std;
 #include "vm/trunc_pr_tuple.h"
 
 template<class T> class SubProcessor;
-template<class T> class ReplicatedMC;
+template<class T> class ReplicatedOpener;
 template<class T> class ReplicatedInput;
 template<class T> class Preprocessing;
 template<class T> class SecureShuffle;
@@ -71,15 +71,15 @@ public:
 template <class T>
 class ProtocolBase
 {
-    virtual void buffer_random() { throw not_implemented(); }
+    virtual void buffer_random() { throw NotImplemented(); }
 
 protected:
     vector<T> random;
 
-    void add_mul(int n);
+    void add_mult(int n);
 
 public:
-    typedef T share_type;
+    typedef T ShareType;
 
     typedef SecureShuffle<T> Shuffler;
 
@@ -110,10 +110,10 @@ public:
     T mul(const T& x, const T& y);
 
     /// Initialize protocol if needed (repeated call possible)
-    virtual void init(Preprocessing<T>&, typename T::MAC_Check&) {}
+    virtual void init(Preprocessing<T>&, typename T::MacCheck&) {}
 
     /// Initialize multiplication round
-    virtual void init_mul() = 0;
+    virtual void initialize_mult() = 0;
     /// Schedule multiplication of operand pair
     virtual void prepare_mul(const T& x, const T& y, int n = -1) = 0;
     virtual void prepare_mult(const T& x, const T& y, int n, bool repeat);
@@ -124,11 +124,11 @@ public:
     /// Store next multiplication result in ``res``
     virtual void finalize_mult(T& res, int n = -1);
 
-    void prepare_mul_fast(const T& x, const T& y) { prepare_mul(x, y); }
-    T finalize_mul_fast() { return finalize_mul(); }
+    void prepare_mult_fast(const T& x, const T& y) { prepare_mul(x, y); }
+    T finalize_mult_fast() { return finalize_mul(); }
 
     /// Initialize dot product round
-    void init_dotprod() { init_mul(); }
+    void initialize_dotprod() { initialize_mult(); }
     /// Add operand pair to current dot product
     void prepare_dotprod(const T& x, const T& y) { prepare_mul(x, y); }
     /// Finish dot product
@@ -176,14 +176,14 @@ public:
     void forward_sync(vector<U>&) {}
 
     void unsplit(StackedVector<T>&,
-            StackedVector<typename T::bit_type>&, const Instruction&)
+            StackedVector<typename T::BitType>&, const Instruction&)
     { throw runtime_error("unsplitting not implemented"); }
 
     virtual void set_fast_mode(bool) {}
 
     double randomness_time() { return 0; }
 
-    TimerWithComm prep_time() { return {}; }
+    TimerWithCommunication prep_time() { return {}; }
 
     NoExtension get_ot_extension() { return {}; }
 };
@@ -196,7 +196,7 @@ class Replicated : public ReplicatedBase, public ProtocolBase<T>
 {
     typedef typename T::clear value_type;
 
-    array<octetStream, 2> os;
+    array<OctetStream, 2> os;
     IteratorVector<typename T::clear> add_shares;
     typename T::clear dotprod_share;
 
@@ -215,7 +215,7 @@ class Replicated : public ReplicatedBase, public ProtocolBase<T>
 
     template<int MY_NUM>
     void unsplit_finish(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction);
 
 public:
@@ -235,16 +235,16 @@ public:
             share[my_num] = value;
     }
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1) final;
     void exchange();
     T finalize_mul(int n = -1) final;
 
     void prepare_reshare(const typename T::clear& share, int n = -1);
-    void prepare_mul_fast(const T& x, const T& y);
-    T finalize_mul_fast();
+    void prepare_mult_fast(const T& x, const T& y);
+    T finalize_mult_fast();
 
-    void init_dotprod();
+    void initialize_dotprod();
     void prepare_dotprod(const T& x, const T& y);
     void next_dotprod();
     T finalize_dotprod(int length);
@@ -267,7 +267,7 @@ public:
 
     template<int = 0>
     void unsplit(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction);
 
     ReplicatedInput<T>& get_helper_input(size_t i = 0);

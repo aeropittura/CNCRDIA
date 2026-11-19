@@ -40,7 +40,7 @@ computation.
 
 Share types for computation module a prime (and in
 :math:`\mathrm{GF}(2^n)`) generally take one parameter for the
-computation domain. :class:`gfp_` in turn takes two parameters, a
+computation domain. :class:`Gfp_` in turn takes two parameters, a
 counter and the number of limbs. The counter allows to use several
 instances with different parameters. It can be chosen freely, but the
 convention is to use 0 for the online phase and 1 for the offline
@@ -198,21 +198,21 @@ Domain Types
    :widths: 20 80
 
    *
-     - ``gfp_<X, L>``
+     - ``Gfp_<X, L>``
      - Computation modulo a prime. ``L`` is the number of 64-bit
        limbs, that is, it covers primes of bit length
        :math:`64(L-1)+1` to :math:`64L`. The type has to be
-       initialized using :cpp:func:`init_field` or
-       :cpp:func:`init_default`. The latter picks a prime given a bit length.
+       initialized using :cpp:func:`initialize_field` or
+       :cpp:func:`initialize_default`. The latter picks a prime given a bit length.
    *
      - ``SignedZ2<K>`` / ``Z2<K>``
      - Computation modulo :math:`2^K`. This is not a field.
    *
-     - ``gf2n_short`` / ``gf2n_long`` / ``gf2n_<T>``
+     - ``Gf2nShort`` / ``Gf2nLong`` / ``Gf2n_<T>``
      - :math:`GF(2^n)`. ``T`` denotes a type that is used to store the
        values. It must support a variety of integer
        operations. The type has to be initialized using
-       :cpp:func:`init_field`. The choice of degrees is limited. At
+       :cpp:func:`initialize_field`. The choice of degrees is limited. At
        the time of writing, 4, 8, 28, 40, 63, and 128 are supported if the
        storage type is large enough.
 
@@ -237,24 +237,24 @@ Share Types
    *
      - ``ChaiGearShare<T>``
      - `HighGear <https://eprint.iacr.org/2017/1230>`_ with covert key
-       setup. ``T`` must be ``gfp_<X, L>`` or ``gf2n_short``.
+       setup. ``T`` must be ``Gfp_<X, L>`` or ``Gf2nShort``.
    *
      - ``CowGearShare<T>``
      - `LowGear <https://eprint.iacr.org/2017/1230>`_ with covert key
-       setup. ``T`` must be ``gfp_<X, L>`` or ``gf2n_short``.
+       setup. ``T`` must be ``Gfp_<X, L>`` or ``Gf2nShort``.
    *
      - ``HemiShare<T>``
      - Semi-honest protocol with Beaver multiplication based on
-       semi-homomorphic encryption. ``T`` must be ``gfp_<X, L>`` or
-       ``gf2n_short``.
+       semi-homomorphic encryption. ``T`` must be ``Gfp_<X, L>`` or
+       ``Gf2nShort``.
    *
      - ``HighGearShare<T>``
      - `HighGear <https://eprint.iacr.org/2017/1230>`_. ``T`` must be
-       ``gfp_<X, L>`` or ``gf2n_short``.
+       ``Gfp_<X, L>`` or ``Gf2nShort``.
    *
      - ``LowGearShare<T>``
      - `LowGear <https://eprint.iacr.org/2017/1230>`_. ``T`` must be
-       ``gfp_<X, L>`` or ``gf2n_short``.
+       ``Gfp_<X, L>`` or ``Gf2nShort``.
    *
      - ``MaliciousShamirShare<T>``
      - Shamir secret sharing with Beaver multiplication and sacrifice.
@@ -307,11 +307,11 @@ Share Types
    *
      - ``SohoShare<T>``
      - Semi-honest protocol with Beaver multiplication based on
-       somewhat homomorphic encryption. ``T`` must be ``gfp_<X, L>``
-       or ``gf2n_short``.
+       somewhat homomorphic encryption. ``T`` must be ``Gfp_<X, L>``
+       or ``Gf2nShort``.
    *
      - ``Spdz2kShare<K, S>``
-     - `SPDZ2k <https://eprint.iacr.org/2018/482>`_ computing modulo
+     - `Spdz2k <https://eprint.iacr.org/2018/482>`_ computing modulo
        :math:`2^K` with security parameter ``S``.
    *
      - ``SpdzWiseShare<K, S>``
@@ -325,7 +325,7 @@ Share Types
      - ``TemiShare<T>``
      - Semi-honest protocol with Beaver multiplication based on
        threshold semi-homomorphic encryption. ``T`` must be
-       ``gfp_<X, L>`` or ``gf2n_short``.
+       ``Gfp_<X, L>`` or ``Gf2nShort``.
 
 
 Protocol Setup
@@ -359,7 +359,7 @@ Protocol Interfaces
 .. doxygenclass:: InputBase
    :members:
 
-.. doxygenclass:: MAC_Check_Base
+.. doxygenclass:: MacCheckBase
    :members:
 
 .. doxygenclass:: Preprocessing
@@ -372,10 +372,10 @@ Protocol Interfaces
 Domain Reference
 ----------------
 
-.. doxygenclass:: gfp_
+.. doxygenclass:: Gfp_
    :members:
 
-.. doxygenclass:: gfpvar_
+.. doxygenclass:: Gfpvar_
    :members:
 
 .. doxygenclass:: Z2
@@ -385,7 +385,7 @@ Domain Reference
    :members:
 
 The following is not used as a domain, but it helps using the above types,
-in particular ``gfp_<X, L>`` and ``gfpvar_<X, L>``.
+in particular ``Gfp_<X, L>`` and ``Gfpvar_<X, L>``.
 
 .. doxygenclass:: bigint
    :members:

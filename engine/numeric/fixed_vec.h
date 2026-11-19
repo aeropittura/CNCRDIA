@@ -48,7 +48,7 @@ public:
         return string(1, T::type_char());
     }
 
-    static void specification(octetStream& os)
+    static void specification(OctetStream& os)
     {
         T::specification(os);
     }
@@ -107,7 +107,7 @@ public:
     void assign(const void* buffer)
     {
         for (int i = 0; i < L; i++)
-            v[i].assign((octet*) buffer + i * T::size());
+            v[i].assign((Octet*) buffer + i * T::size());
     }
 
     void assign_zero()
@@ -413,12 +413,12 @@ public:
         }
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         for (auto& x : v)
             x.pack(os);
     }
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
         for (auto& x : v)
             x.unpack(os);

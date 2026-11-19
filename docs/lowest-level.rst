@@ -28,7 +28,7 @@ example <low-level>`.
     SeededPRNG G[2];
 
 The protocol requires every pair of parties to have a common PRNG, so
-we need two instances. We use :class:`SeededPRNG` to make sure to
+we need two instances. We use :class:`SeededPrng` to make sure to
 never use an uninitialized one.
 
 .. code-block:: cpp
@@ -37,7 +37,7 @@ never use an uninitialized one.
     octetStream os;
     os.append(G[0].get_seed(), SEED_SIZE);
 
-:class:`octetStream` is generally used to serialize and aggregate
+:class:`OctetStream` is generally used to serialize and aggregate
 network communication. In this case, we use it to store the seed of
 one of the PRNGs.
 
@@ -64,7 +64,7 @@ implicitly uses the required number of bits.
 
 In this example, we use integers modulo :math:`2^{64}`, but the
 protocol also works for any modulus, so we could also use
-:class:`gfp_`.
+:class:`Gfp_`.
 
 .. code-block:: cpp
 
@@ -112,7 +112,7 @@ We clear the buffer, serialize our share, send it to the "next" party,
 and receive one from the "previous" party. This concludes the
 multiplication protocol. :func:`Z2::pack` and :func:`Z2::unpack` are
 main methods for (de-)serialization. All domain classes support
-this. You can use :func:`octetStream::output` to write the buffer to a
+this. You can use :func:`OctetStream::output` to write the buffer to a
 C++ output stream.
 
 .. code-block:: cpp

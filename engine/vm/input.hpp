@@ -38,7 +38,7 @@ Input<T>::Input(SubProcessor<T>& proc) :
 }
 
 template<class T>
-Input<T>::Input(SubProcessor<T>& proc, MAC_Check& mc) :
+Input<T>::Input(SubProcessor<T>& proc, MacCheck& mc) :
         InputBase<T>(&proc), proc(&proc), MC(mc), prep(proc.DataF), P(proc.P),
         shares(proc.P.num_players())
 {
@@ -53,7 +53,7 @@ Input<T>::Input(SubProcessor<T>* proc, Player& P) :
 }
 
 template<class T>
-Input<T>::Input(MAC_Check& MC, Preprocessing<T>& prep, Player& P) :
+Input<T>::Input(MacCheck& MC, Preprocessing<T>& prep, Player& P) :
         proc(0), MC(MC), prep(prep), P(P), shares(P.num_players())
 {
 }
@@ -99,7 +99,7 @@ void InputBase<T>::reset_all(PlayerBase& P)
 }
 
 template<class T>
-void Input<T>::add_mine(const open_type& input, int n_bits)
+void Input<T>::add_mine(const OpenType& input, int n_bits)
 {
     (void) n_bits;
     int player = P.my_num();
@@ -115,13 +115,13 @@ void Input<T>::add_mine(const open_type& input, int n_bits)
 template<class T>
 void Input<T>::add_other(int player, int)
 {
-    open_type t;
+    OpenType t;
     shares.at(player).push_back({});
     prep.get_input(shares[player].back(), t, player);
 }
 
 template<class T>
-void InputBase<T>::add_from_all(const typename T::open_type& input, int n_bits)
+void InputBase<T>::add_from_all(const typename T::OpenType& input, int n_bits)
 {
     for (int i = 0; i < P->num_players(); i++)
         if (i == P->my_num())
@@ -168,7 +168,7 @@ void InputBase<T>::raw_input(SubProcessor<T>& proc, const ArgVector& args,
                     if (T::real_shares(P))
                         this->buffer.input(t);
                 }
-                catch (not_enough_to_buffer& e)
+                catch (NotEnoughToBuffer& e)
                 {
                     throw runtime_error("Insufficient input data to buffer");
                 }
@@ -191,7 +191,7 @@ void InputBase<T>::raw_input(SubProcessor<T>& proc, const ArgVector& args,
         int player = *it++;
         int base = *it++;
         for (int i = 0; i < size; i++)
-            proc.get_S_ref(base + i) = finalize(player);
+            proc.get_s_ref(base + i) = finalize(player);
     }
 }
 
@@ -203,7 +203,7 @@ T Input<T>::finalize_mine()
 
 template<class T>
 void Input<T>::finalize_other(int player, T& target,
-        octetStream& o, int n_bits)
+        OctetStream& o, int n_bits)
 {
     (void) n_bits;
     target = shares[player].next();
@@ -258,7 +258,7 @@ void InputBase<T>::finalize(SubProcessor<T>& Proc, int player,
     auto& input = Proc.input;
     for (int k = 0; k < size; k++)
         for (int j = 0; j < U::N_DEST; j++)
-            Proc.get_S_ref(dest[j] + k) = input.finalize(player);
+            Proc.get_s_ref(dest[j] + k) = input.finalize(player);
 }
 
 template<class T>
@@ -305,7 +305,7 @@ int InputBase<T>::get_player(SubProcessor<T>& Proc, int arg, bool player_from_re
    if (player_from_reg)
    {
        assert(Proc.Proc);
-       auto res = Proc.Proc->read_Ci(arg);
+       auto res = Proc.Proc->read_ci(arg);
        if (res >= Proc.P.num_players())
            throw runtime_error("player id too large: " + to_string(res));
        return res;
@@ -341,7 +341,7 @@ void InputBase<T>::input_mixed(SubProcessor<T>& Proc, const ArgVector& args,
         X(IntInput<typename T::clear>) X(FixInput) X(FloatInput)
 #undef X
         default:
-            throw unknown_input_type(type);
+            throw UnknownInputType(type);
         }
         i += n_arg_tuple;
         last_type = type;
@@ -365,7 +365,7 @@ void InputBase<T>::input_mixed(SubProcessor<T>& Proc, const ArgVector& args,
         X(IntInput<typename T::clear>) X(FixInput) X(FloatInput)
 #undef X
         default:
-            throw unknown_input_type(type);
+            throw UnknownInputType(type);
         }
         i += n_arg_tuple;
     }

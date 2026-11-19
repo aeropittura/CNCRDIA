@@ -14,22 +14,22 @@ class DiscreteGauss
   /* This is the bound we use on for the NewHope approximation
    * to a discrete Gaussian with sigma=sqrt(B/2)
    */
-  int NewHopeB;
+  int new_hope_b;
 
   public:
 
   void set(double R);
 
-  void pack(octetStream& o) const { o.serialize(NewHopeB); }
-  void unpack(octetStream& o) { o.unserialize(NewHopeB); }
+  void pack(OctetStream& o) const { o.serialize(new_hope_b); }
+  void unpack(OctetStream& o) { o.unserialize(new_hope_b); }
 
   DiscreteGauss(double R) { set(R); }
 
   // Rely on default copy constructor/assignment
   
   int sample(PRNG& G, int stretch = 1) const;
-  double get_R() const { return sqrt(0.5 * NewHopeB); }
-  int get_NewHopeB() const { return NewHopeB; }
+  double get_R() const { return sqrt(0.5 * new_hope_b); }
+  int get_new_hope_b() const { return new_hope_b; }
 
   bool operator!=(const DiscreteGauss& other) const;
 };
@@ -57,7 +57,7 @@ public:
   void get(T& x) const  { this->G.get(x, n_bits, positive); }
 };
 
-template<class T = bigint>
+template<class T = Bigint>
 class GaussianGenerator : public RandomGenerator<T>
 {
   DiscreteGauss DG;

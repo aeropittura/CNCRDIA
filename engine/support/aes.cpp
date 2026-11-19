@@ -406,7 +406,7 @@ uint RC[] ={ 0x00000001, 0x00000002, 0x00000004, 0x00000008,
 
 
 
-void aes_schedule( int nb, int nr, const octet* k, uint* RK )
+void aes_schedule( int nb, int nr, const Octet* k, uint* RK )
 {
   for( int i =  0;        i < (       nb       ); i++ ) 
     { U8_TO_U32_LE( RK[ i ], k, 4*i ); }
@@ -432,7 +432,7 @@ void aes_schedule( int nb, int nr, const octet* k, uint* RK )
 }
 
 
-void aes_128_encrypt( octet* C, octet* M, uint* RK )
+void aes_128_encrypt( Octet* C, Octet* M, uint* RK )
 {
   uint t0, t1, t2, t3, t4, t5, t6, t7;
 
@@ -450,7 +450,7 @@ void aes_128_encrypt( octet* C, octet* M, uint* RK )
 }
 
 
-void aes_192_encrypt( octet* C, octet* M, uint* RK )
+void aes_192_encrypt( Octet* C, Octet* M, uint* RK )
 {
   uint t0, t1, t2, t3, t4, t5, t6, t7;
 
@@ -469,7 +469,7 @@ void aes_192_encrypt( octet* C, octet* M, uint* RK )
 }
 
 
-void aes_256_encrypt( octet* C, octet* M, uint* RK )
+void aes_256_encrypt( Octet* C, Octet* M, uint* RK )
 {
   uint t0, t1, t2, t3, t4, t5, t6, t7;
 

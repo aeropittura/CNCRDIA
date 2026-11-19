@@ -32,8 +32,8 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     HemiOptions::singleton = {opt, argc, argv};
-    DishonestMajorityFieldMachine<TemiShare, TemiShare, gf2n_short>(argc, argv,
+    DishonestMajorityFieldMachine<TemiShare, TemiShare, Gf2nShort>(argc, argv,
             opt);
 }

@@ -11,11 +11,11 @@
 
 // opening facility
 template<class T>
-class NoOutput : public MAC_Check_Base<T>
+class NoOutput : public MacCheckBase<T>
 {
 public:
-    NoOutput(const typename T::mac_key_type& mac_key, int = 0, int = 0) :
-            MAC_Check_Base<T>(mac_key)
+    NoOutput(const typename T::MacKeyType& mac_key, int = 0, int = 0) :
+            MacCheckBase<T>(mac_key)
     {
     }
 
@@ -45,7 +45,7 @@ public:
     }
 
     // prepare next round of multiplications
-    void init_mul()
+    void initialize_mult()
     {
     }
 
@@ -73,11 +73,11 @@ template<class T>
 class NoInput : public InputBase<T>
 {
 public:
-    NoInput(SubProcessor<T>&, typename T::MAC_Check&)
+    NoInput(SubProcessor<T>&, typename T::MacCheck&)
     {
     }
 
-    NoInput(typename T::MAC_Check&, Preprocessing<T>&, Player&)
+    NoInput(typename T::MacCheck&, Preprocessing<T>&, Player&)
     {
     }
 
@@ -91,7 +91,7 @@ public:
     }
 
     // schedule private input from me
-    void add_mine(const typename T::open_type&, int = -1)
+    void add_mine(const typename T::OpenType&, int = -1)
     {
         throw runtime_error("no input from me");
     }
@@ -115,7 +115,7 @@ public:
     }
 
     // construct share corresponding to someone else's input
-    void finalize_other(int, T&, octetStream&, int = -1)
+    void finalize_other(int, T&, OctetStream&, int = -1)
     {
         throw runtime_error("no finalizing of someone else's input");
     }

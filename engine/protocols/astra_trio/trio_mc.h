@@ -8,19 +8,19 @@
 #include "protocols/astra_trio/astra_mc.h"
 
 template<class T>
-class TrioMC : public AstraMC<T>
+class TrioOpener : public AstraOpener<T>
 {
 public:
-    TrioMC(typename T::mac_key_type = {}, int = 0, int = 0)
+    TrioOpener(typename T::MacKeyType = {}, int = 0, int = 0)
     {
     }
 
-    typename T::open_type prepare_summand(const T& secret, int my_num)
+    typename T::OpenType prepare_summand(const T& secret, int my_num)
     {
         return secret[my_num - 1];
     }
 
-    TrioMC& get_part_MC()
+    TrioOpener& get_part_opener()
     {
         return *this;
     }

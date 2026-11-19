@@ -13,7 +13,7 @@
 
 template<class T> class ReplicatedPrep;
 template<class T> class ReplicatedRingPrep;
-template<class T> class MaliciousShamirPO;
+template<class T> class MaliciousShamirPo;
 template<class T> class SpecificPrivateOutput;
 
 namespace GC
@@ -28,22 +28,22 @@ class ShamirShare : public T, public ShareInterface
 
 public:
     typedef T clear;
-    typedef T open_type;
-    typedef void sacri_type;
-    typedef This share_type;
+    typedef T OpenType;
+    typedef void SacriType;
+    typedef This ShareType;
 
     typedef Shamir<ShamirShare> Protocol;
-    typedef IndirectShamirMC<ShamirShare> MAC_Check;
-    typedef ShamirMC<ShamirShare> Direct_MC;
+    typedef IndirectShamirOpener<ShamirShare> MacCheck;
+    typedef ShamirOpener<ShamirShare> DirectOpener;
     typedef ShamirInput<ShamirShare> Input;
-    typedef MaliciousShamirPO<This> PO;
+    typedef MaliciousShamirPo<This> PO;
     typedef SpecificPrivateOutput<This> PrivateOutput;
     typedef ReplicatedPrep<ShamirShare> LivePrep;
     typedef ReplicatedRingPrep<ShamirShare> TriplePrep;
     typedef ShamirShare Honest;
 
 #ifndef NO_MIXED_CIRCUITS
-    typedef GC::CcdSecret<gf2n_<octet>> bit_type;
+    typedef GC::CcdSecret<Gf2n_<Octet>> BitType;
 #endif
 
     const static bool needs_ot = false;
@@ -82,7 +82,7 @@ public:
         return Protocol::get_rec_factor(i, n);
     }
 
-    static ShamirShare constant(T value, int, const mac_key_type& = {})
+    static ShamirShare constant(T value, int, const MacKeyType& = {})
     {
         return ShamirShare(value);
     }
@@ -113,7 +113,7 @@ public:
 
     void force_to_bit()
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
     ShamirShare get_bit(int)
@@ -121,15 +121,15 @@ public:
         throw runtime_error("never call this");
     }
 
-    void pack(octetStream& os, const T& rec_factor) const
+    void pack(OctetStream& os, const T& rec_factor) const
     {
         (*this * rec_factor).pack(os);
     }
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         T::pack(os);
     }
-    void unpack(octetStream& os, bool full = true)
+    void unpack(OctetStream& os, bool full = true)
     {
         assert(full);
         T::unpack(os);

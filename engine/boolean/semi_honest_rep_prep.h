@@ -19,7 +19,7 @@ public:
     {
     }
 
-    void buffer_triples() { throw not_implemented(); }
+    void buffer_triples() { throw NotImplemented(); }
 };
 
 } /* namespace GC */

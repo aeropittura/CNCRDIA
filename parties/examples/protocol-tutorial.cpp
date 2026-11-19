@@ -24,10 +24,10 @@ int main(int argc, char** argv)
     CryptoPlayer P(N);
 
     // correlated randomness for resharing
-    SeededPRNG G[2];
+    SeededPrng G[2];
 
     // synchronize with other parties
-    octetStream os;
+    OctetStream os;
     os.append(G[0].get_seed(), SEED_SIZE);
     P.pass_around(os, os, 1);
     G[1].SetSeed(os.consume(SEED_SIZE));

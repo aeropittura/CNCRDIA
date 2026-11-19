@@ -21,26 +21,26 @@
 
 int main(int argc, const char** argv)
 {
-    OnlineOptions& online_opts = OnlineOptions::singleton;
+    OnlineOptions& online_options = OnlineOptions::singleton;
     Names N;
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     RingOptions ring_opts(opt, argc, argv);
-    online_opts = {opt, argc, argv, FakeShare<SignedZ2<64>>()};
+    online_options = {opt, argc, argv, FakeShare<SignedZ2<64>>()};
     opt.syntax = string(argv[0]) + " <progname>";
-    online_opts.finalize(opt, argc, argv, false);
-    string& progname = online_opts.progname;
+    online_options.finalize(opt, argc, argv, false);
+    string& progname = online_options.progname;
 
 #ifdef ROUND_NEAREST_IN_EMULATION
     cerr << "Using nearest rounding instead of probabilistic truncation" << endl;
 #endif
 
-    int R = ring_opts.ring_size_from_opts_or_schedule(progname);
+    int R = ring_opts.ring_size_from_options_or_schedule(progname);
 
 #define X(L) \
     if (L == R) \
     { \
-        Machine<FakeShare<SignedZ2<L>>, FakeShare<gf2n>>( \
-                N, false, online_opts).run(progname); \
+        Machine<FakeShare<SignedZ2<L>>, FakeShare<Gf2n>>( \
+                N, false, online_options).run(progname); \
         return 0; \
     }
 

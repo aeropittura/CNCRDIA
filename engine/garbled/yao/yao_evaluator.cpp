@@ -21,7 +21,7 @@ YaoEvaluator::YaoEvaluator(int thread_num, YaoEvalMaster& master) :
 		YaoCommon<YaoEvalWire>(master),
 		master(master),
 		player(N, 0, "thread" + to_string(thread_num)),
-		ot_ext(OTExtensionWithMatrix::setup(player, {}, RECEIVER, true))
+		ot_ext(OtExtensionWithMatrix::setup(player, {}, RECEIVER, true))
 {
 	set_n_program_threads(master.machine.nthreads);
 	this->init(*this);
@@ -29,7 +29,7 @@ YaoEvaluator::YaoEvaluator(int thread_num, YaoEvalMaster& master) :
 
 void YaoEvaluator::pre_run()
 {
-	if (master.opts.cmd_private_output_file.empty())
+	if (master.opts.command_private_output_file.empty())
 		processor.out.activate(not continuous());
 	if (not continuous())
 		receive_to_store(*P);
@@ -57,7 +57,7 @@ void YaoEvaluator::run(GC::Program& program, Player& P)
 		{
 			next = program.execute(processor, master.memory, -1);
 		}
-		catch (needs_cleaning& e)
+		catch (NeedsCleaning& e)
 		{
 		}
 	}
@@ -101,7 +101,7 @@ void YaoEvaluator::receive_to_store(Player& P)
 	}
 }
 
-NamedCommStats YaoEvaluator::extra_comm()
+NamedCommunicationStatistics YaoEvaluator::extra_communication()
 {
-	return player.get_comm_stats();
+	return player.get_communication_statistics();
 }

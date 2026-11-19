@@ -55,14 +55,14 @@
     X(SHRCBI, C0 = PC1 >> IMM) \
     X(SHLCBI, C0 = PC1 << IMM) \
     X(LDBITS, S0.load_clear(REG1, int(IMM))) \
-    X(LDMSB, PROC.mem_op(SIZE, PROC.S, MMS, R0, IMM)) \
-    X(STMSB, PROC.mem_op(SIZE, MMS, PROC.S, IMM, R0)) \
-    X(LDMCB, PROC.mem_op(SIZE, PROC.C, MMC, R0, IMM)) \
-    X(STMCB, PROC.mem_op(SIZE, MMC, PROC.C, IMM, R0)) \
-    X(LDMSBI, PROC.indirect_mem_load(PROC.S, MMS, Ci, INST)) \
-    X(STMSBI, PROC.indirect_mem_store(MMS, PROC.S, Ci, INST)) \
-    X(LDMCBI, PROC.indirect_mem_load(PROC.C, MMC, Ci, INST)) \
-    X(STMCBI, PROC.indirect_mem_store(MMC, PROC.C, Ci, INST)) \
+    X(LDMSB, PROC.memory_op(SIZE, PROC.S, MMS, R0, IMM)) \
+    X(STMSB, PROC.memory_op(SIZE, MMS, PROC.S, IMM, R0)) \
+    X(LDMCB, PROC.memory_op(SIZE, PROC.C, MMC, R0, IMM)) \
+    X(STMCB, PROC.memory_op(SIZE, MMC, PROC.C, IMM, R0)) \
+    X(LDMSBI, PROC.indirect_memory_load(PROC.S, MMS, Ci, INST)) \
+    X(STMSBI, PROC.indirect_memory_store(MMS, PROC.S, Ci, INST)) \
+    X(LDMCBI, PROC.indirect_memory_load(PROC.C, MMC, Ci, INST)) \
+    X(STMCBI, PROC.indirect_memory_store(MMC, PROC.C, Ci, INST)) \
     X(MOVSB, PROC.movsb(INST)) \
     X(TRANS, T::trans(PROC.S, PROC.S, IMM, EXTRA)) \
     X(BITB, PROC.random_bit(S0)) \
@@ -85,14 +85,14 @@
 #define COMBI_INSTRUCTIONS BIT_INSTRUCTIONS \
     X(INPUTB, T::inputb(PROC, Proc, EXTRA)) \
     X(INPUTBVEC, T::inputbvec(PROC, Proc, EXTRA)) \
-    X(CONVSINT, S0.load_clear(IMM, Proc.read_Ci(REG1))) \
+    X(CONVSINT, S0.load_clear(IMM, Proc.read_ci(REG1))) \
     X(CONVCBIT, PROC.convcbit(instruction, Ci, &Proc.P)) \
     X(CONVCINTVEC, Proc.convcintvec(instruction)) \
-    X(CONVCBITVEC, Proc.Procb.convcbitvec(instruction, Proc.get_Ci(), &Proc.P)) \
+    X(CONVCBITVEC, Proc.procb.convcbitvec(instruction, Proc.get_ci(), &Proc.P)) \
     X(CONVCBIT2S, PROC.convcbit2s(instruction)) \
-    X(DABIT, Proc.dabit(INST)) \
-    X(EDABIT, Proc.edabit(INST)) \
-    X(SEDABIT, Proc.edabit(INST, true)) \
+    X(DABIT, Proc.Dabit(INST)) \
+    X(EDABIT, Proc.Edabit(INST)) \
+    X(SEDABIT, Proc.Edabit(INST, true)) \
     X(SPLIT, Proc.split(INST)) \
     X(UNSPLIT, Proc.unsplit(INST)) \
     X(CALL_ARG, ) \
@@ -129,10 +129,10 @@
     X(GTC, I0 = PI1 > PI2) \
     X(EQC, I0 = PI1 == PI2) \
     X(JMPI, PROC.PC += I0) \
-    X(LDMINT, PROC.mem_op(SIZE, PROC.I, MMI, R0, IMM)) \
-    X(STMINT, PROC.mem_op(SIZE, MMI, PROC.I, IMM, R0)) \
-    X(LDMINTI, PROC.mem_op(SIZE, PROC.I, MMI, R0, Ci[REG1])) \
-    X(STMINTI, PROC.mem_op(SIZE, MMI, PROC.I, Ci[REG1], R0)) \
+    X(LDMINT, PROC.memory_op(SIZE, PROC.I, MMI, R0, IMM)) \
+    X(STMINT, PROC.memory_op(SIZE, MMI, PROC.I, IMM, R0)) \
+    X(LDMINTI, PROC.memory_op(SIZE, PROC.I, MMI, R0, Ci[REG1])) \
+    X(STMINTI, PROC.memory_op(SIZE, MMI, PROC.I, Ci[REG1], R0)) \
     X(PUSHINT, PROC.pushi(I0.get())) \
     X(POPINT, PROC.popi(I0)) \
     X(MOVINT, I0 = PI1) \
@@ -156,7 +156,7 @@
     X(NPLAYERS, I0 = Thread<T>::s().P->num_players()) \
     X(THRESHOLD, I0 = T::threshold(Thread<T>::s().P->num_players())) \
     X(PLAYERID, I0 = Thread<T>::s().P->my_num()) \
-    X(CRASH, if (I0.get() and T::actual_inputs) throw crash_requested()) \
+    X(CRASH, if (I0.get() and T::actual_inputs) throw CrashRequested()) \
     X(ACTIVE, ) \
     X(LDTN, I0 = BaseMachine::thread_num) \
     X(CALL_TAPE, PROC.call_tape(INST, MD)) \

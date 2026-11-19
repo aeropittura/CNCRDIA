@@ -8,7 +8,7 @@
 using namespace std;
 
 int main(int argc, const char** argv) {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     opt.add(
           "128", // Default.
           0, // Required?
@@ -19,11 +19,11 @@ int main(int argc, const char** argv) {
           "--lgp" // Flag token.
     );
     opt.add(
-          to_string(gf2n::default_degree()).c_str(), // Default.
+          to_string(Gf2n::default_degree()).c_str(), // Default.
           0, // Required?
           1, // Number of args expected.
           0, // Delimiter if expecting multiple args.
-          ("Bit length of GF(2^n) field (default: " + to_string(gf2n::default_degree()) + ")").c_str(), // Help description.
+          ("Bit length of GF(2^n) field (default: " + to_string(Gf2n::default_degree()) + ")").c_str(), // Help description.
           "-lg2", // Flag token.
           "--lg2" // Flag token.
     );
@@ -80,7 +80,7 @@ int main(int argc, const char** argv) {
     opt.get("-N")->getInt(nparties);
     opt.get("-lgp")->getInt(lgp);
     opt.get("-lg2")->getInt(lg2);
-    gfp::init_default(lgp);
+    Gfp::initialize_default(lgp);
 
 	std::string input_name, output_name;
 	bool use_stdin = false;
@@ -108,9 +108,9 @@ int main(int argc, const char** argv) {
 
 	int n; *in >> n;
 	for (int i = 0; i < n; ++i) {
-		bigint a;
+		Bigint a;
 		*in >> a;
-		gfp b = a;
+		Gfp b = a;
 		b.output(*out, false);
 	}
 	if (in->fail())
@@ -126,7 +126,7 @@ int main(int argc, const char** argv) {
 	n = -(n % BUFFER_SIZE) + BUFFER_SIZE;
 	cerr << "Adding " << n << " zeros to match buffer size" << endl;
 	for (int i = 0; i < n; i++)
-		gfp(0).output(*out, false);
+		Gfp(0).output(*out, false);
 	cerr << "Output written to " << output_name
 			<< ", copy to Player-Data/Private-Input-<playerno>" << endl;
 

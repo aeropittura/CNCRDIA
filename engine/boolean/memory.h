@@ -46,7 +46,7 @@ inline void Memory<T>::check_index(Integer index) const
     {
         stringstream ss;
         ss << T::type_string() << " memory overflow: " << i << "/" << vector<T>::size();
-        throw Processor_Error(ss.str());
+        throw ProcessorError(ss.str());
     }
 #ifdef DEBUG_MEMORY
     cout << typeid(T).name() << " at " << this << " index " << i << ": "

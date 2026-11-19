@@ -39,7 +39,7 @@ public:
         return true;
     }
 
-    static void edabit_sacrifice_buckets(vector<edabit<T>>&, size_t, bool, int,
+    static void edabit_sacrifice_buckets(vector<Edabit<T>>&, size_t, bool, int,
             SubProcessor<T>&, int, int, const void* = 0)
     {
         throw runtime_error("no need for sacrifice");
@@ -53,7 +53,7 @@ public:
     {
     }
 
-    void get_dabit_no_count(T& a, typename T::bit_type& b)
+    void get_dabit_no_count(T& a, typename T::BitType& b)
     {
         this->get_one_no_count(DATA_BIT, a);
         b = a.get_share() & 1;

@@ -9,7 +9,7 @@
 #include "numeric/setup.h"
 
 class OnlineOptions;
-class bigint;
+class Bigint;
 class PRNG;
 
 class ValueInterface
@@ -30,21 +30,21 @@ public:
 
     template<class T>
     static void init(bool mont = true) { (void) mont; }
-    static void init_default(int, bool = true) {}
-    static void init_field(const bigint& = {}, bool = true) {}
+    static void initialize_default(int, bool = true) {}
+    static void initialize_field(const Bigint& = {}, bool = true) {}
 
     static void read_or_generate_setup(const string&, const OnlineOptions&) {}
     template<class T>
     static void generate_setup(string, int, int) {}
     template<class T>
-    static void write_setup(int nplayers) { get_prep_sub_dir<T>(nplayers, true); }
+    static void write_setup(int nplayers) { get_prep_sub_directory<T>(nplayers, true); }
     static void write_setup(string) {}
     static void check_setup(const string& directory);
-    static const char* fake_opts() { return ""; }
+    static const char* fake_options() { return ""; }
 
-    static bigint pr() { throw runtime_error("no prime modulus"); }
+    static Bigint pr() { throw runtime_error("no prime modulus"); }
 
     void normalize() {}
 
-    void randomize_part(PRNG&, int) { throw not_implemented(); }
+    void randomize_part(PRNG&, int) { throw NotImplemented(); }
 };

@@ -13,13 +13,13 @@
 template<class T>
 class PostSacrifice : public ProtocolBase<T>
 {
-    typedef typename T::prep_type prep_type;
+    typedef typename T::PrepType PrepType;
 
-    typename prep_type::Honest::Protocol internal;
+    typename PrepType::Honest::Protocol internal;
     typename T::Honest::Protocol randomizer;
 
-    vector<array<prep_type, 2>> operands;
-    vector<prep_type> results;
+    vector<array<PrepType, 2>> operands;
+    vector<PrepType> results;
 
 public:
     Player& P;
@@ -29,7 +29,7 @@ public:
 
     Player& branch();
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1);
     void exchange() { internal.exchange(); }
     T finalize_mul(int n = -1);

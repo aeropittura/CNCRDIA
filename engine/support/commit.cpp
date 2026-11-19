@@ -3,7 +3,7 @@
 #include "support/random.h"
 #include "support/int.h"
 
-void Commit(octetStream& comm,octetStream& open,const octetStream& message, int send_player)
+void Commit(OctetStream& comm,OctetStream& open,const OctetStream& message, int send_player)
 {
     open.store(send_player);
     open.append(message.get_data(), message.get_length());
@@ -11,9 +11,9 @@ void Commit(octetStream& comm,octetStream& open,const octetStream& message, int 
     comm = open.hash();
 }
 
-bool Open(octetStream& message,const octetStream& comm, octetStream& open, int send_player)
+bool Open(OctetStream& message,const OctetStream& comm, OctetStream& open, int send_player)
 {
-    octetStream h = open.hash();
+    OctetStream h = open.hash();
     // first 4 bytes are player no.
     int open_player;
     try
@@ -22,27 +22,27 @@ bool Open(octetStream& message,const octetStream& comm, octetStream& open, int s
     }
     catch (exception& e)
     {
-        throw invalid_commitment(send_player, e.what());
+        throw InvalidCommitment(send_player, e.what());
     }
 
     if (!(h.equals(comm) && open_player == send_player)
             or open.left() <= SEED_SIZE)
     {
-        throw invalid_commitment(send_player);
+        throw InvalidCommitment(send_player);
     }
     message.reset_write_head();
     message.append(open.consume(0), open.left() - SEED_SIZE);
     return true;
 }
 
-void Commitment::commit(const octetStream& message)
+void Commitment::commit(const OctetStream& message)
 {
     open.reset_write_head();
     open.append_random(SEED_SIZE);
     commit(message, open);
 }
 
-void Commitment::commit(const octetStream& message, const octetStream& open)
+void Commitment::commit(const OctetStream& message, const OctetStream& open)
 {
     Hash hash;
     hash.update(&send_player, sizeof(send_player));
@@ -51,52 +51,52 @@ void Commitment::commit(const octetStream& message, const octetStream& open)
     hash.final(comm);
 }
 
-void Commitment::check(const octetStream& message, const octetStream& comm,
-        const octetStream& open)
+void Commitment::check(const OctetStream& message, const OctetStream& comm,
+        const OctetStream& open)
 {
     if (open.empty())
-        throw invalid_commitment(send_player, "empty opening");
+        throw InvalidCommitment(send_player, "empty opening");
     commit(message, open);
     if (!(comm == this->comm))
-        throw invalid_commitment(send_player);
+        throw InvalidCommitment(send_player);
 }
 
-void AllCommitments::commit_and_open(const octetStream& message)
+void AllCommitments::commit_and_open(const OctetStream& message)
 {
     commit(message);
     open();
 }
 
-void AllCommitments::commit(const octetStream& message)
+void AllCommitments::commit(const OctetStream& message)
 {
     Commitment mine(P.my_num());
     mine.commit(message);
     comms[P.my_num()] = mine.comm;
     opens[P.my_num()] = mine.open;
-    P.Broadcast_Receive(comms);
+    P.broadcast_receive(comms);
 }
 
 void AllCommitments::open()
 {
-    P.Broadcast_Receive(opens);
+    P.broadcast_receive(opens);
 }
 
-void AllCommitments::open(const octetStream& message)
+void AllCommitments::open(const OctetStream& message)
 {
     messages.resize(P.num_players());
     messages[P.my_num()] = message;
-    P.Broadcast_Receive(messages);
+    P.broadcast_receive(messages);
     open();
     for (int i = 0; i != P.my_num(); i++)
         check(i, messages[i]);
 }
 
-void AllCommitments::check(int player, const octetStream& message)
+void AllCommitments::check(int player, const OctetStream& message)
 {
     Commitment(player).check(message, comms[player], opens[player]);
 }
 
-void AllCommitments::check_relative(int diff, const octetStream& message)
+void AllCommitments::check_relative(int diff, const OctetStream& message)
 {
     check((P.my_num() + P.num_players() - diff) % P.num_players(), message);
 }

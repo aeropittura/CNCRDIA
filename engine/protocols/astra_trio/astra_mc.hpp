@@ -10,7 +10,7 @@
 #include "protocols/semi/semi_mc.hpp"
 
 template<class T>
-typename T::open_type AstraMC<T>::prepare_summand(const T& secret, int my_num)
+typename T::OpenType AstraOpener<T>::prepare_summand(const T& secret, int my_num)
 {
     if (my_num == 1)
         return secret.m(my_num) - secret.lambda(my_num);
@@ -19,10 +19,10 @@ typename T::open_type AstraMC<T>::prepare_summand(const T& secret, int my_num)
 }
 
 template<class T>
-void AstraMC<T>::exchange(const Player& P)
+void AstraOpener<T>::exchange(const Player& P)
 {
-    DirectSemiMC<SemiShare<typename T::open_type>> opener;
-    opener.init_open(P, this->secrets.size());
+    DirectSemiOpener<SemiShare<typename T::OpenType>> opener;
+    opener.initialize_open(P, this->secrets.size());
     int my_num = P.my_num() + 1;
 
     for (auto& secret : this->secrets)

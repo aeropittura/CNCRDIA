@@ -11,7 +11,7 @@ template<class T>
 const int IntBase<T>::N_BITS;
 
 template<class T>
-inline void IntBase<T>::specification(octetStream& os)
+inline void IntBase<T>::specification(OctetStream& os)
 {
   os.store(sizeof(T));
 }
@@ -39,14 +39,14 @@ void Integer::reqbl(int n)
 {
   if ((int)n < 0 && size() * 8 != -(int)n)
     {
-      throw Processor_Error(
+      throw ProcessorError(
           "Program compiled for rings of length " + to_string(-(int)n)
           + " but VM supports only "
           + to_string(size() * 8));
     }
   else if ((int)n > 0)
     {
-      throw Processor_Error("Program compiled for fields not rings");
+      throw ProcessorError("Program compiled for fields not rings");
     }
 }
 

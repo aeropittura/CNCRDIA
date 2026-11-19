@@ -15,7 +15,7 @@ class DealerPrep : virtual public BitPrep<T>
 {
     friend class DealerMatrixPrep<T>;
 
-    DealerInput<typename T::bit_type>* bit_input_;
+    DealerInput<typename T::BitType>* bit_input_;
 
     template<int = 0>
     void buffer_inverses(true_type);
@@ -30,7 +30,7 @@ class DealerPrep : virtual public BitPrep<T>
     template<size_t N, bool RANDOM = false>
     void finalize(vector<array<T, N>>& items, size_t n_items);
 
-    DealerInput<typename T::bit_type>& get_bit_input();
+    DealerInput<typename T::BitType>& get_bit_input();
 
 public:
     DealerPrep(SubProcessor<T>* proc, DataPositions& usage) :

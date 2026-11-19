@@ -66,22 +66,22 @@ public:
         const Spdz2& spdz2 = setup_thread.spdz2;
         PlainPlayer P(spdz2.N, ((id + 1) << 8) + FD::T::type_char());
         EncCommit_<FD> EC(P, setup.pk, spdz2.covert, producer.required_randomness());
-        DistDecrypt<FD> dd(P, setup.sk, setup.pk, setup.FieldD);
-        MAC_Check<typename FD::T> MC(setup.alphai);
+        DistDecrypt<FD> dd(P, setup.sk, setup.pk, setup.field_d);
+        MacCheck<typename FD::T> MC(setup.alphai);
         string data_type = producer.data_type();
         transform(data_type.begin(), data_type.end(), data_type.begin(), ::tolower);
         cout << "Starting to produce " << FD::T::type_string() << " " << data_type << endl;
         int total = 0;
         Timer timer;
         timer.start();
-        vector<octetStream> os(P.num_players());
+        vector<OctetStream> os(P.num_players());
         while (true)
         {
             bool stop = spdz2.stop_requested or (spdz2.minimal and total > 0);
             // see if all happy to continue
             os[P.my_num()].reset_write_head();
             os[P.my_num()].store_int(stop, 1);
-            P.Broadcast_Receive(os);
+            P.broadcast_receive(os);
             for (auto& o : os)
                 if(o.get_int(1))
                     stop = true;
@@ -126,19 +126,19 @@ public:
     {
         PlainPlayer P(spdz2.N, FD::T::type_char());
         setup.generate_setup(P.num_players(), plaintext_length, spdz2.sec, 0, false);
-        Run_Gen_Protocol(setup.pk, setup.sk, P, spdz2.covert, false);
-        generate_mac_key(setup.alphai, setup.calpha, setup.FieldD, setup.pk, P, spdz2.covert);
+        run_gen_protocol(setup.pk, setup.sk, P, spdz2.covert, false);
+        generate_mac_key(setup.alphai, setup.calpha, setup.field_d, setup.pk, P, spdz2.covert);
         signal.lock();
         signal.broadcast();
         signal.unlock();
 
-        string dir = get_prep_sub_dir<Share<typename FD::T>>(P.num_players());
+        string dir = get_prep_sub_directory<Share<typename FD::T>>(P.num_players());
         Producer<FD>* producers[] =
         {
-            new TripleProducer_<FD>(setup.FieldD, P.my_num(), 0, true, dir),
-            new SquareProducer<FD>(setup.FieldD, P.my_num(), 0, true, dir),
-            new_bit_producer(setup.FieldD, P, setup.pk, spdz2.covert, true, 0, true, dir),
-            new InverseProducer<FD>(setup.FieldD, P.my_num(), 0, true, true, dir),
+            new TripleProducer_<FD>(setup.field_d, P.my_num(), 0, true, dir),
+            new SquareProducer<FD>(setup.field_d, P.my_num(), 0, true, dir),
+            new_bit_producer(setup.field_d, P, setup.pk, spdz2.covert, true, 0, true, dir),
+            new InverseProducer<FD>(setup.field_d, P.my_num(), 0, true, true, dir),
         };
         vector<Spdz2GeneratorThread<FD>*> generators;
         for (int i = 0; i < 4; i++)
@@ -188,7 +188,7 @@ void* handle_interrupt(void* spdz2)
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     opt.add(
             "2", // Default.
             0, // Required?
@@ -289,7 +289,7 @@ int main(int argc, const char** argv)
 
     Server* server = Server::start_networking(spdz2.N, my_num, nplayers,
             hostname, portnum_base);
-    Spdz2SetupThread<FFT_Data> thread_p(spdz2.prime_length, spdz2);
+    Spdz2SetupThread<FftData> thread_p(spdz2.prime_length, spdz2);
     Spdz2SetupThread<P2Data> thread_2(spdz2.gf2n_length, spdz2);
     pthread_t threads[2];
     if (spdz2.minimal)
@@ -301,7 +301,7 @@ int main(int argc, const char** argv)
     }
     else
     {
-        pthread_create(&threads[0], 0, run_setup<FFT_Data>, &thread_p);
+        pthread_create(&threads[0], 0, run_setup<FftData>, &thread_p);
         pthread_create(&threads[1], 0, run_setup<P2Data>, &thread_2);
     }
 
@@ -310,7 +310,7 @@ int main(int argc, const char** argv)
         thread_p.signal.wait();
     thread_p.setup.output(spdz2.N);
 
-    // gf2n is slower
+    // Gf2n is slower
     if (not spdz2.minimal)
         thread_2.signal.wait();
     thread_2.setup.output(spdz2.N);

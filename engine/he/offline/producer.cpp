@@ -54,7 +54,7 @@ void Producer<FD>::run_with_catch(const Player& P, const FHE_PK& pk,
 }
 
 template<class FD>
-int Producer<FD>::sacrifice_with_catch(const Player& P, MAC_Check<T>& MC)
+int Producer<FD>::sacrifice_with_catch(const Player& P, MacCheck<T>& MC)
 {
   try
     {
@@ -68,39 +68,39 @@ int Producer<FD>::sacrifice_with_catch(const Player& P, MAC_Check<T>& MC)
 }
 
 template <class T, class FD, class S>
-TripleProducer<T, FD, S>::TripleProducer(const FD& FieldD,
+TripleProducer<T, FD, S>::TripleProducer(const FD& field_d,
     int my_num, int output_thread, bool write_output, string dir) :
     Producer<FD>(output_thread, write_output),
-    i(FieldD.num_slots()), values{ FieldD, FieldD, FieldD },
-    macs{ FieldD, FieldD, FieldD }, ai(values[0]), bi(values[1]),
+    i(field_d.num_slots()), values{ field_d, field_d, field_d },
+    macs{ field_d, field_d, field_d }, ai(values[0]), bi(values[1]),
     ci(values[2]), gam_ai(macs[0]), gam_bi(macs[1]), gam_ci(macs[2])
 {
   this->dir = dir;
   for (auto& x : values)
-    x.allocate_slots(FieldD.get_prime());
+    x.allocate_slots(field_d.get_prime());
   // extra limb for addition
-  ci.allocate_slots(FieldD.get_prime() << limb_size<S>());
+  ci.allocate_slots(field_d.get_prime() << limb_size<S>());
   for (auto& x : macs)
-    x.allocate_slots(FieldD.get_prime() << limb_size<S>());
+    x.allocate_slots(field_d.get_prime() << limb_size<S>());
   if (write_output)
       this->clear_file(my_num, output_thread, false);
 }
 
 template <class FD>
-TupleProducer<FD>::TupleProducer(const FD& FieldD,
+TupleProducer<FD>::TupleProducer(const FD& field_d,
     int output_thread, bool write_output) :
     Producer<FD>(output_thread, write_output),
-    i(FieldD.num_slots()), values{ FieldD, FieldD },
-    macs{ FieldD, FieldD }
+    i(field_d.num_slots()), values{ field_d, field_d },
+    macs{ field_d, field_d }
 {
 }
 
 template <class FD>
-InverseProducer<FD>::InverseProducer(const FD& FieldD,
+InverseProducer<FD>::InverseProducer(const FD& field_d,
     int my_num, int output_thread, bool write_output, bool produce_triples,
     string dir) :
-    TupleProducer<FD>(FieldD, output_thread, write_output), ab(FieldD),
-    triple_producer(FieldD, 0, 0, false), produce_triples(produce_triples),
+    TupleProducer<FD>(field_d, output_thread, write_output), ab(field_d),
+    triple_producer(field_d, 0, 0, false), produce_triples(produce_triples),
     ai(this->values[0]), bi(this->values[1]),
     gam_ai(this->macs[0]), gam_bi(this->macs[1])
 {
@@ -110,9 +110,9 @@ InverseProducer<FD>::InverseProducer(const FD& FieldD,
 }
 
 template <class FD>
-SquareProducer<FD>::SquareProducer(const FD& FieldD,
+SquareProducer<FD>::SquareProducer(const FD& field_d,
     int my_num, int output_thread, bool write_output, string dir) :
-    TupleProducer<FD>(FieldD, output_thread, write_output),
+    TupleProducer<FD>(field_d, output_thread, write_output),
     ai(this->values[0]), bi(this->values[1]),
     gam_ai(this->macs[0]), gam_bi(this->macs[1])
 {
@@ -121,12 +121,12 @@ SquareProducer<FD>::SquareProducer(const FD& FieldD,
         this->clear_file(my_num, output_thread, false);
 }
 
-gfpBitProducer::gfpBitProducer(const FD& FieldD,
+GfpBitProducer::GfpBitProducer(const FD& field_d,
         int my_num, int output_thread, bool write_output, bool produce_squares,
         string dir) :
-        Producer<FFT_Data>(output_thread, write_output),
-        i(FieldD.num_slots()), vi(FieldD), gam_vi(FieldD),
-        square_producer(FieldD, 0, 0, false), produce_squares(produce_squares)
+        Producer<FftData>(output_thread, write_output),
+        i(field_d.num_slots()), vi(field_d), gam_vi(field_d),
+        square_producer(field_d, 0, 0, false), produce_squares(produce_squares)
 {
     this->dir = dir;
     if (write_output)
@@ -134,7 +134,7 @@ gfpBitProducer::gfpBitProducer(const FD& FieldD,
 }
 
 template<>
-Producer<FFT_Data>* new_bit_producer(const FFT_Data& FieldD, const Player& P,
+Producer<FftData>* new_bit_producer(const FftData& field_d, const Player& P,
         const FHE_PK& pk, int covert,
         bool produce_squares, int thread_num, bool write_output, string dir)
 {
@@ -143,7 +143,7 @@ Producer<FFT_Data>* new_bit_producer(const FFT_Data& FieldD, const Player& P,
     (void)covert;
     (void)thread_num;
     (void)write_output;
-    return new gfpBitProducer(FieldD, P.my_num(), thread_num, write_output,
+    return new GfpBitProducer(field_d, P.my_num(), thread_num, write_output,
             produce_squares, dir);
 }
 
@@ -154,7 +154,7 @@ void TripleProducer<T, FD, S>::run(const Player& P, const FHE_PK& pk,
 {
   (void)alphai;
 
-  const FHE_Params& params=pk.get_params();
+  const FheParameters& params=pk.get_parameters();
   map<string, Timer>& timers = this->timers;
 
   Ciphertext ca(params), cb(params);
@@ -240,11 +240,11 @@ void Producer<FD>::clear_file(int my_num, int thread_num, bool initial)
 }
 
 template <class T, class FD, class S>
-int TripleProducer<T,FD,S>::sacrifice(const Player& P, MAC_Check<T>& MC)
+int TripleProducer<T,FD,S>::sacrifice(const Player& P, MacCheck<T>& MC)
 {
     this->timers["Sacrificing"].start();
     int n_triples = ai.num_slots() / 2;
-    Triple_Checking(P, MC, n_triples, this->output_thread, *this,
+    triple_checking(P, MC, n_triples, this->output_thread, *this,
             this->write_output, false, this->dir);
     this->timers["Sacrificing"].stop();
     this->n_slots = n_triples;
@@ -252,11 +252,11 @@ int TripleProducer<T,FD,S>::sacrifice(const Player& P, MAC_Check<T>& MC)
 }
 
 template <class FD>
-int InverseProducer<FD>::sacrifice(const Player& P, MAC_Check<T>& MC)
+int InverseProducer<FD>::sacrifice(const Player& P, MacCheck<T>& MC)
 {
     this->timers["Sacrificing"].start();
     int n_triples = ai.num_slots();
-    Inverse_Checking(P, MC, n_triples, this->output_thread, triple_producer,
+    inverse_checking(P, MC, n_triples, this->output_thread, triple_producer,
             *this, this->write_output, false, this->dir);
     this->timers["Sacrificing"].stop();
     this->n_slots = n_triples;
@@ -264,22 +264,22 @@ int InverseProducer<FD>::sacrifice(const Player& P, MAC_Check<T>& MC)
 }
 
 template <class FD>
-int SquareProducer<FD>::sacrifice(const Player& P, MAC_Check<T>& MC)
+int SquareProducer<FD>::sacrifice(const Player& P, MacCheck<T>& MC)
 {
     this->timers["Sacrificing"].start();
     int n_triples = ai.num_slots() / 2;
-    Square_Checking(P, MC, n_triples, this->output_thread, *this,
+    square_checking(P, MC, n_triples, this->output_thread, *this,
             this->write_output, false, this->dir);
     this->timers["Sacrificing"].stop();
     this->n_slots = n_triples;
     return n_triples;
 }
 
-int gfpBitProducer::sacrifice(const Player& P, MAC_Check<gfp>& MC)
+int GfpBitProducer::sacrifice(const Player& P, MacCheck<Gfp>& MC)
 {
     timers["Sacrificing"].start();
     int n_triples = bits.size();
-    Bit_Checking(P, MC, n_triples, output_thread, square_producer, *this,
+    bit_checking(P, MC, n_triples, output_thread, square_producer, *this,
             this->write_output, false, this->dir);
     timers["Sacrificing"].stop();
     return n_triples;
@@ -329,7 +329,7 @@ void InverseProducer<FD>::get(Share<T>& a, Share<T>& b)
     b /= ab.element(i - 1);
 }
 
-void gfpBitProducer::get(Share<gfp>& a)
+void GfpBitProducer::get(Share<Gfp>& a)
 {
     if (i >= bits.size())
         throw overflow_error("ran out of values");
@@ -352,7 +352,7 @@ void InverseProducer<FD>::run(const Player& P, const FHE_PK& pk, const Ciphertex
     (void)P;
     (void)alphai;
 
-    const FHE_Params& params = pk.get_params();
+    const FheParameters& params = pk.get_parameters();
 
     // Steps a,b,c,d
     Ciphertext ca(pk), cb(pk);
@@ -376,7 +376,7 @@ void TupleProducer<FD>::compute_macs(const FHE_PK& pk, const Ciphertext& calpha,
         EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd, Ciphertext& ca,
         Ciphertext & cb)
 {
-    const FHE_Params& params = pk.get_params();
+    const FheParameters& params = pk.get_parameters();
 
    // Step g
     Ciphertext cgam_a(params),cgam_b(params);
@@ -410,24 +410,24 @@ void SquareProducer<FD>::run(const Player& P, const FHE_PK& pk,
     this->compute_macs(pk, calpha, EC, dd, ca, cb);
 }
 
-void gfpBitProducer::run(const Player& P, const FHE_PK& pk,
+void GfpBitProducer::run(const Player& P, const FHE_PK& pk,
         const Ciphertext& calpha, EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd,
-        const gfp& alphai)
+        const Gfp& alphai)
 {
-    const FHE_Params& params = pk.get_params();
+    const FheParameters& params = pk.get_parameters();
 
-    gfp one;
+    Gfp one;
     one.assign_one();
 
     // Steps a,b
-    Plaintext_<FFT_Data> ai(dd.f.get_field());
+    Plaintext_<FftData> ai(dd.f.get_field());
     Ciphertext ca(pk);
     EC.next(ai, ca);
 
     // Steps c and d
     Ciphertext caa(params);
     mul(caa, ca, ca, pk);
-    Plaintext_<FFT_Data>& s = dd.run(caa, true);
+    Plaintext_<FftData>& s = dd.run(caa, true);
 
     // Step e, f and g
     vector<int> marks(s.num_slots());
@@ -441,7 +441,7 @@ void gfpBitProducer::run(const Player& P, const FHE_PK& pk,
         else
         {
             marks[i] = 0;
-            s.set_element(i, s.element(i).sqrRoot().invert());
+            s.set_element(i, s.element(i).square_root().invert());
         }
     }
     Ciphertext cv(params);
@@ -457,11 +457,11 @@ void gfpBitProducer::run(const Player& P, const FHE_PK& pk,
     dd.reshare(gam_vi, cgam_v, EC);
 
     // Step j and k
-    Share<gfp> a;
-    gfp two_inv, zero;
-    two_inv = bigint((dd.f.get_field().get_prime() + 1) / 2);
+    Share<Gfp> a;
+    Gfp two_inverse, zero;
+    two_inverse = Bigint((dd.f.get_field().get_prime() + 1) / 2);
     zero.assign_zero();
-    auto shared_one = Share<gfp>::constant(1, P.my_num(), alphai);
+    auto shared_one = Share<Gfp>::constant(1, P.my_num(), alphai);
     bits.clear();
     for (unsigned int i = 0; i < vi.num_slots(); i++)
     {
@@ -471,7 +471,7 @@ void gfpBitProducer::run(const Player& P, const FHE_PK& pk,
             a.set_mac(gam_vi.element(i));
             // Form (1/2)*a+1
             a += shared_one;
-            a.mul(a, two_inv);
+            a.mul(a, two_inverse);
             bits.push_back(a);
         }
     }
@@ -483,42 +483,42 @@ void gfpBitProducer::run(const Player& P, const FHE_PK& pk,
     this->n_slots = bits.size();
 }
 
-gf2nBitProducer::gf2nBitProducer(const Player& P, const FHE_PK& pk, int covert,
+Gf2nBitProducer::Gf2nBitProducer(const Player& P, const FHE_PK& pk, int covert,
         int thread_num, bool write_output, string dir) :
         Producer<P2Data>(thread_num, write_output),
         write_output(write_output), ECB(P, pk, covert, Bits)
 {
     if (covert == 0)
-        throw not_implemented();
+        throw NotImplemented();
     this->dir = dir;
     if (write_output)
-        open_prep_file<gf2n_short>(outf, data_type(), P.my_num(), thread_num,
+        open_prep_file<Gf2nShort>(outf, data_type(), P.my_num(), thread_num,
                 false, true, dir);
 }
 
 template<>
-Producer<P2Data>* new_bit_producer(const P2Data& FieldD, const Player& P,
+Producer<P2Data>* new_bit_producer(const P2Data& field_d, const Player& P,
         const FHE_PK& pk, int covert,
         bool produce_squares, int thread_num, bool write_output, string dir)
 {
-    (void)FieldD;
+    (void)field_d;
     (void)produce_squares;
-    return new gf2nBitProducer(P, pk, covert, thread_num, write_output, dir);
+    return new Gf2nBitProducer(P, pk, covert, thread_num, write_output, dir);
 }
 
-void gf2nBitProducer::run(const Player& P, const FHE_PK& pk,
+void Gf2nBitProducer::run(const Player& P, const FHE_PK& pk,
         const Ciphertext& calpha, EncCommitBase_<FD>& EC, DistDecrypt<FD>& dd,
         const T& alphai)
 {
     (void)P;
     (void)alphai;
 
-    const FHE_Params& params = pk.get_params();
-    const P2Data& FieldD = dd.f.get_field();
+    const FheParameters& params = pk.get_parameters();
+    const P2Data& field_d = dd.f.get_field();
 
-    this->n_slots = FieldD.num_slots();
+    this->n_slots = field_d.num_slots();
 
-    Plaintext<gf2n_short,P2Data,int> ai(FieldD);
+    Plaintext<Gf2nShort,P2Data,int> ai(field_d);
     Ciphertext ca(pk);
 
     // Steps a,b,c,d
@@ -529,12 +529,12 @@ void gf2nBitProducer::run(const Player& P, const FHE_PK& pk,
     mul(cgam_a,calpha,ca,pk);
 
     // Step h
-    Plaintext<gf2n_short,P2Data,int> gam_ai(FieldD);
+    Plaintext<Gf2nShort,P2Data,int> gam_ai(field_d);
     Ciphertext dummy(params);
     dd.reshare(gam_ai, cgam_a, EC);
 
     // Step i
-    Share<gf2n_short> a;
+    Share<Gf2nShort> a;
     for (unsigned int i=0; i<ai.num_slots(); i++)
     {
         a.set_share(ai.element(i));
@@ -590,18 +590,18 @@ void InputProducer<FD>::run(const Player& P, const FHE_PK& pk,
     CODE_LOCATION
     (void)alphai;
 
-    const FHE_Params& params=pk.get_params();
+    const FheParameters& params=pk.get_parameters();
 
     PRNG G;
-    G.ReSeed();
+    G.re_seed();
 
     Ciphertext gama(params),dummyc(params),ca(params);
-    const FD& FieldD = dd.f.get_field();
-    Plaintext<T,FD,S> a(FieldD),ai(FieldD),gai(FieldD);
+    const FD& field_d = dd.f.get_field();
+    Plaintext<T,FD,S> a(field_d),ai(field_d),gai(field_d);
 
-    this->n_slots = FieldD.num_slots();
+    this->n_slots = field_d.num_slots();
 
-    Share<T> Sh;
+    Share<T> sh;
 
     inputs.resize(P.num_players());
 
@@ -619,19 +619,19 @@ void InputProducer<FD>::run(const Player& P, const FHE_PK& pk,
 
     map<string, Timer> timers;
     assert(EC.machine);
-    SimpleEncCommit_<FD> personal_EC(P, pk, FieldD, timers, *EC.machine, 0);
-    octetStream ciphertexts, cleartexts;
-    personal_EC.get_proof().set_session_id(P);
+    SimpleEncCommit_<FD> personal_ec(P, pk, field_d, timers, *EC.machine, 0);
+    OctetStream ciphertexts, cleartexts;
+    personal_ec.get_proof().set_session_id(P);
 
     for (int j = min; j < max; j++)
     {
         AddableVector<Ciphertext> C;
-        vector<Plaintext_<FD>> m(personal_EC.proof.U, FieldD);
+        vector<Plaintext_<FD>> m(personal_ec.proof.U, field_d);
         if (j == P.my_num())
         {
             for (auto& x : m)
                 x.randomize(G);
-            personal_EC.generate_proof(C, m, ciphertexts, cleartexts);
+            personal_ec.generate_proof(C, m, ciphertexts, cleartexts);
             P.send_all(ciphertexts);
             P.send_all(cleartexts);
         }
@@ -639,8 +639,8 @@ void InputProducer<FD>::run(const Player& P, const FHE_PK& pk,
         {
             P.receive_player(j, ciphertexts);
             P.receive_player(j, cleartexts);
-            C.resize(personal_EC.machine->sec, pk.get_params());
-            Verifier<FD>(personal_EC.proof, FieldD).NIZKPoK(C, ciphertexts,
+            C.resize(personal_ec.machine->sec, pk.get_parameters());
+            Verifier<FD>(personal_ec.proof, field_d).nizk_pok(C, ciphertexts,
                     cleartexts, pk, j);
         }
 
@@ -662,11 +662,11 @@ void InputProducer<FD>::run(const Player& P, const FHE_PK& pk,
 
             for (unsigned int i = 0; i < ai.num_slots(); i++)
             {
-                Sh.set_share(ai.element(i));
-                Sh.set_mac(gai.element(i));
+                sh.set_share(ai.element(i));
+                sh.set_mac(gai.element(i));
                 if (write_output)
                 {
-                    Sh.output(outf[j], false);
+                    sh.output(outf[j], false);
                     if (j == P.my_num())
                     {
                         a.element(i).output(outf[j], false);
@@ -674,7 +674,7 @@ void InputProducer<FD>::run(const Player& P, const FHE_PK& pk,
                 }
                 else
                 {
-                    inputs[j].push_back({Sh, {}});
+                    inputs[j].push_back({sh, {}});
                     if (j == P.my_num())
                         inputs[j].back().value = a.element(i);
                 }
@@ -684,7 +684,7 @@ void InputProducer<FD>::run(const Player& P, const FHE_PK& pk,
 }
 
 template<class FD>
-int InputProducer<FD>::sacrifice(const Player& P, MAC_Check<T>& MC)
+int InputProducer<FD>::sacrifice(const Player& P, MacCheck<T>& MC)
 {
     // nothing to do
     (void)P;
@@ -692,7 +692,7 @@ int InputProducer<FD>::sacrifice(const Player& P, MAC_Check<T>& MC)
     return this->num_slots();
 }
 
-int gf2nBitProducer::sacrifice(const Player& P, MAC_Check<T>& MC)
+int Gf2nBitProducer::sacrifice(const Player& P, MacCheck<T>& MC)
 {
     // nothing to do
     (void)P;
@@ -722,20 +722,20 @@ void InputProducer<FD>::clear_file(int my_num, int thread_num,
 }
 
 
-template class TripleProducer<gfp, FFT_Data, bigint>;
-template class TripleProducer<gf2n_short, P2Data, int>;
-template class Producer<FFT_Data>;
+template class TripleProducer<Gfp, FftData, Bigint>;
+template class TripleProducer<Gf2nShort, P2Data, int>;
+template class Producer<FftData>;
 template class Producer<P2Data>;
-template class TupleProducer<FFT_Data>;
+template class TupleProducer<FftData>;
 template class TupleProducer<P2Data>;
-template class SquareProducer<FFT_Data>;
+template class SquareProducer<FftData>;
 template class SquareProducer<P2Data>;
-template class InputProducer<FFT_Data>;
+template class InputProducer<FftData>;
 template class InputProducer<P2Data>;
-template class InverseProducer<FFT_Data>;
+template class InverseProducer<FftData>;
 template class InverseProducer<P2Data>;
 
-template string open_prep_file<gfp>(ofstream& outf, string data_type,
+template string open_prep_file<Gfp>(ofstream& outf, string data_type,
         int my_num, int thread_num, bool initial, bool clear, string dir);
-template string open_prep_file<gf2n_short>(ofstream& outf, string data_type,
+template string open_prep_file<Gf2nShort>(ofstream& outf, string data_type,
         int my_num, int thread_num, bool initial, bool clear, string dir);

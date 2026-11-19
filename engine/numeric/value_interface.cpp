@@ -17,7 +17,7 @@ void ValueInterface::check_setup(const string& directory)
 {
     struct stat sb;
     if (stat(directory.c_str(), &sb) != 0)
-        throw setup_error(directory + " does not exist");
+        throw SetupError(directory + " does not exist");
     if (not (sb.st_mode & S_IFDIR))
-        throw setup_error(directory + " is not a directory");
+        throw SetupError(directory + " is not a directory");
 }

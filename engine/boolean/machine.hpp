@@ -19,7 +19,7 @@ template <class T>
 Machine<T>::Machine()
 {
     use_encryption = false;
-    more_comm_less_comp = false;
+    more_communication_less_comp = false;
     start_timer();
 }
 
@@ -55,8 +55,8 @@ template <class T>
 template <class U>
 void Memories<T>::reset(const U& program)
 {
-    MS.resize_min(program.direct_mem(SBIT), "memory");
-    MC.resize_min(program.direct_mem(CBIT), "memory");
+    MS.resize_min(program.direct_memory(SBIT), "memory");
+    MC.resize_min(program.direct_memory(CBIT), "memory");
 }
 
 template <class T>
@@ -64,7 +64,7 @@ template <class U>
 void Machine<T>::reset(const U& program)
 {
     Memories<T>::reset(program);
-    MI.resize_min(program.direct_mem(INT), "memory");
+    MI.resize_min(program.direct_memory(INT), "memory");
 }
 
 template <class T>
@@ -72,9 +72,9 @@ template <class U, class V>
 void Machine<T>::reset(const U& program, V& MD)
 {
     reset(program);
-    MD.resize_min(program.direct_mem(DYN_SBIT), "dynamic memory");
+    MD.resize_min(program.direct_memory(DYN_SBIT), "dynamic memory");
 #ifdef DEBUG_MEMORY
-    cerr << "reset dynamic mem to " << program.direct_mem(DYN_SBIT) << endl;
+    cerr << "reset dynamic mem to " << program.direct_memory(DYN_SBIT) << endl;
 #endif
 }
 

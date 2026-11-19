@@ -26,8 +26,8 @@ void DealerPrep<T>::buffer_triples()
     input.reset(input.dealer_player());
     if (input.is_dealer())
     {
-        SeededPRNG G;
-        vector<typename T::open_type> to_share;
+        SeededPrng G;
+        vector<typename T::OpenType> to_share;
         to_share.reserve(3 * buffer_size);
         for (int i = 0; i < buffer_size; i++)
         {
@@ -89,7 +89,7 @@ template<class T>
 template<int>
 void DealerPrep<T>::buffer_inverses(false_type)
 {
-    throw not_implemented();
+    throw NotImplemented();
 }
 
 template<class T>
@@ -101,14 +101,14 @@ void DealerPrep<T>::buffer_inverses(true_type)
     auto& P = this->proc->P;
     vector<bool> senders(P.num_players());
     senders.back() = true;
-    octetStreams os(P), to_receive(P);
+    OctetStreams os(P), to_receive(P);
     int buffer_size = BaseMachine::batch_size<T>(DATA_INVERSE);
     auto& input = this->proc->input;
     input.reset(input.dealer_player());
     if (this->proc->input.is_dealer())
     {
-        SeededPRNG G;
-        vector<typename T::open_type> items;
+        SeededPrng G;
+        vector<typename T::OpenType> items;
         items.reserve(2 * buffer_size);
         for (int i = 0; i < buffer_size; i++)
         {
@@ -143,7 +143,7 @@ void DealerPrep<T>::buffer_bits()
     int buffer_size = BaseMachine::batch_size<T>(DATA_BIT);
     if (this->proc->input.is_dealer())
     {
-        SeededPRNG G;
+        SeededPrng G;
         vector<typename T::clear> bits;
         bits.reserve(buffer_size);
         for (int i = 0; i < buffer_size; i++)
@@ -178,7 +178,7 @@ void DealerPrep<T>::buffer_dabits(ThreadQueues*)
     int buffer_size = BaseMachine::batch_size<T>(DATA_DABIT);
     if (this->proc->input.is_dealer())
     {
-        SeededPRNG G;
+        SeededPrng G;
         vector<typename T::clear> values;
         for (int i = 0; i < buffer_size; i++)
         {
@@ -225,7 +225,7 @@ template<class T>
 template<int>
 void DealerPrep<T>::buffer_edabits(int, true_type)
 {
-    throw not_implemented();
+    throw NotImplemented();
 }
 
 template<class T>
@@ -238,23 +238,23 @@ void DealerPrep<T>::buffer_edabits(int length, false_type)
     auto& bit_input = get_bit_input();
     input.reset(input.dealer_player());
     bit_input.reset(input.dealer_player());
-    int n_vecs = DIV_CEIL(BaseMachine::edabit_batch_size<T>(length),
-            edabitvec<T>::MAX_SIZE);
+    int n_vectors = DIV_CEIL(BaseMachine::edabit_batch_size<T>(length),
+            Edabitvec<T>::MAX_SIZE);
     auto& buffer = this->edabits[{false, length}];
     if (this->proc->input.is_dealer())
     {
-        SeededPRNG G;
+        SeededPrng G;
         vector<typename T::clear> all_as;
-        vector<typename T::bit_type::part_type::clear> all_bs;
+        vector<typename T::BitType::part_type::clear> all_bs;
         vector<typename T::clear> as;
-        vector<typename T::bit_type::part_type::clear> bs;
-        for (int i = 0; i < n_vecs; i++)
+        vector<typename T::BitType::part_type::clear> bs;
+        for (int i = 0; i < n_vectors; i++)
         {
-            plain_edabits(as, bs, length, G, edabitvec<T>::MAX_SIZE);
+            plain_edabits(as, bs, length, G, Edabitvec<T>::MAX_SIZE);
             all_as.insert(all_as.end(), as.begin(), as.end());
             all_bs.insert(all_bs.end(), bs.begin(), bs.end());
             buffer.push_back({});
-            buffer.back().a.resize(edabitvec<T>::MAX_SIZE);
+            buffer.back().a.resize(Edabitvec<T>::MAX_SIZE);
             buffer.back().b.resize(length);
         }
         input.add_from_dealer(all_as);
@@ -262,8 +262,8 @@ void DealerPrep<T>::buffer_edabits(int length, false_type)
     }
     else
     {
-        input.add_n_from_dealer(edabitvec<T>::MAX_SIZE * n_vecs);
-        bit_input.add_n_from_dealer(length * n_vecs);
+        input.add_n_from_dealer(Edabitvec<T>::MAX_SIZE * n_vectors);
+        bit_input.add_n_from_dealer(length * n_vectors);
     }
 
     input.exchange();
@@ -271,10 +271,10 @@ void DealerPrep<T>::buffer_edabits(int length, false_type)
 
     if (not input.is_dealer())
     {
-        for (int i = 0; i < n_vecs; i++)
+        for (int i = 0; i < n_vectors; i++)
         {
             buffer.push_back({});
-            for (int j = 0; j < edabitvec<T>::MAX_SIZE; j++)
+            for (int j = 0; j < Edabitvec<T>::MAX_SIZE; j++)
                 buffer.back().a.push_back(input.finalize_from_dealer());
             for (int j = 0; j < length; j++)
                 buffer.back().b.push_back(bit_input.finalize_from_dealer());
@@ -283,12 +283,12 @@ void DealerPrep<T>::buffer_edabits(int length, false_type)
 }
 
 template<class T>
-DealerInput<typename T::bit_type>& DealerPrep<T>::get_bit_input()
+DealerInput<typename T::BitType>& DealerPrep<T>::get_bit_input()
 {
     assert(this->proc);
 
     if (not bit_input_)
-        bit_input_ = new DealerInput<typename T::bit_type>(this->proc->P);
+        bit_input_ = new DealerInput<typename T::BitType>(this->proc->P);
 
     return *bit_input_;
 }

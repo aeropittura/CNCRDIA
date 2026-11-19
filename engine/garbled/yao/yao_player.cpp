@@ -13,7 +13,7 @@
 
 YaoPlayer::YaoPlayer(int argc, const char** argv)
 {
-	ez::ezOptionParser opt;
+	ez::EzOptionParser opt;
 	opt.add(
 			"", // Default.
 			0, // Required?
@@ -41,25 +41,25 @@ YaoPlayer::YaoPlayer(int argc, const char** argv)
 	        "-b", // Flag token.
 	        "--batch-size" // Flag token.
 	);
-	auto& online_opts = OnlineOptions::singleton;
-	online_opts = {opt, argc, argv, false};
-	NetworkOptionsWithNumber network_opts(opt, argc, argv, 2, false);
-	online_opts.finalize(opt, argc, argv);
+	auto& online_options = OnlineOptions::singleton;
+	online_options = {opt, argc, argv, false};
+	NetworkOptionsWithNumber network_options(opt, argc, argv, 2, false);
+	online_options.finalize(opt, argc, argv);
 
-	int my_num = online_opts.playerno;
+	int my_num = online_options.playerno;
 	int threshold;
 	bool continuous = not opt.get("-O")->isSet;
 	opt.get("-t")->getInt(threshold);
-	opt.get("-b")->getInt(online_opts.batch_size);
-	progname = online_opts.progname;
+	opt.get("-b")->getInt(online_options.batch_size);
+	progname = online_options.progname;
 
 	GC::ThreadMasterBase* master;
 	if (my_num == 0)
-	    master = new YaoGarbleMaster(continuous, online_opts, threshold);
+	    master = new YaoGarbleMaster(continuous, online_options, threshold);
 	else
-	    master = new YaoEvalMaster(continuous, online_opts);
+	    master = new YaoEvalMaster(continuous, online_options);
 
-	network_opts.start_networking(master->N, my_num);
+	network_options.start_networking(master->N, my_num);
 	master->run(progname);
 
 	if (my_num == 1)

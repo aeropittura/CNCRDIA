@@ -35,7 +35,7 @@ void ReplicatedInput<T>::reset(int player)
 }
 
 template<class T>
-inline void ReplicatedInput<T>::add_mine(const typename T::open_type& input, int n_bits)
+inline void ReplicatedInput<T>::add_mine(const typename T::OpenType& input, int n_bits)
 {
     auto& shares = this->shares;
     T my_share;
@@ -58,7 +58,7 @@ void ReplicatedInput<T>::add_mine(const span<T>& shares,
 {
     assert(shares.size() == inputs.size());
     auto& o = os[1];
-    o.reserve(T::open_type::size() * inputs.size());
+    o.reserve(T::OpenType::size() * inputs.size());
     auto share = shares.begin();
     for (auto& input : inputs)
     {
@@ -66,7 +66,7 @@ void ReplicatedInput<T>::add_mine(const span<T>& shares,
         share++;
         my_share[0].randomize(protocol.shared_prngs[0]);
         my_share[1] = input - my_share[0];
-        o.append_no_resize((octet*) my_share[1].get_ptr(), T::open_type::size());
+        o.append_no_resize((Octet*) my_share[1].get_ptr(), T::OpenType::size());
     }
     this->values_input += inputs.size();
     to_send = &o;
@@ -95,7 +95,7 @@ void ReplicatedInput<T>::prepare(size_t n_inputs)
 
 template<class T>
 void ReplicatedInput<T>::add_mine_prepared(T& share,
-        const typename T::open_type& input)
+        const typename T::OpenType& input)
 {
     share[0].randomize(protocol.shared_prngs[0]);
     share[1] = input;
@@ -134,7 +134,7 @@ void ReplicatedInput<T>::exchange()
 
 template<class T>
 inline void ReplicatedInput<T>::finalize_other(int player, T& target,
-        octetStream&, int n_bits)
+        OctetStream&, int n_bits)
 {
     int offset = player - this->my_num;
     if (offset == 1 or offset == -2)
@@ -179,8 +179,8 @@ void ReplicatedInput<T>::finalize_vector_sum(const vector<int>& players,
 
     if (P.get_offset(players[0]) == 1 or P.get_offset(players[1]) == 1)
     {
-        auto values = new char[target.size() * sizeof(typename T::open_type)];
-        auto i_value = (typename T::open_type*) values;
+        auto values = new char[target.size() * sizeof(typename T::OpenType)];
+        auto i_value = (typename T::OpenType*) values;
         dest.unserialize(i_value, target.size());
         if (im_in)
             for (auto& x : target)
@@ -196,10 +196,10 @@ void ReplicatedInput<T>::finalize_vector_sum(const vector<int>& players,
         auto& G = protocol.shared_prngs[1];
         if (im_in)
             for (auto& x : target)
-                x[1] += G.template get<typename T::open_type>();
+                x[1] += G.template get<typename T::OpenType>();
         else
             for (auto& x : target)
-                x[1] = G.template get<typename T::open_type>();
+                x[1] = G.template get<typename T::OpenType>();
     }
 }
 

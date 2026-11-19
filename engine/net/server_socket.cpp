@@ -44,8 +44,8 @@ ServerSocket::ServerSocket(int Portnum) : portnum(Portnum), thread(0)
   fl= setsockopt(main_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&one,sizeof(int));
   if (fl<0) { error("set_up_socket:setsockopt");  }
 
-  octet my_name[512];
-  memset(my_name,0,512*sizeof(octet));
+  Octet my_name[512];
+  memset(my_name,0,512*sizeof(Octet));
   gethostname((char*)my_name,512);
 
   /* bind serv information to mysocket
@@ -115,11 +115,11 @@ void ServerSocket::wait_for_client_id(int socket, struct sockaddr dest)
   (void) dest;
   try
     {
-      octetStream client_id;
+      OctetStream client_id;
       client_id.Receive(socket);
       process_connection(socket, client_id.str());
     }
-  catch (closed_connection&)
+  catch (ClosedConnection&)
     {
       if (OnlineOptions::singleton.has_option("debug_networking"))
         {
@@ -159,7 +159,7 @@ void ServerSocket::accept_clients()
           error("set non-blocking on server");
 #endif
 
-      octetStream client_id;
+      OctetStream client_id;
       char buf[1];
       if (recv(consocket, buf, 1, MSG_PEEK | MSG_DONTWAIT) > 0)
         {
@@ -200,7 +200,7 @@ int ServerSocket::get_connection_socket(const string& id)
     {
       stringstream ss;
       ss << "Connection id " << hex << id << " already used";
-      throw IO_Error(ss.str());
+      throw IoError(ss.str());
     }
 
   while (clients.find(id) == clients.end())
@@ -211,10 +211,10 @@ int ServerSocket::get_connection_socket(const string& id)
                   "for details on networking.");
   }
 
-  int client_socket = clients[id];
+  int ClientSocket = clients[id];
   used.insert(id);
   data_signal.unlock();
-  return client_socket;
+  return ClientSocket;
 }
 
 void* anonymous_accept_thread(void* server_socket)
@@ -250,9 +250,9 @@ int AnonymousServerSocket::get_connection_socket(string& client_id)
 
   client_id = client_connection_queue.front();
   client_connection_queue.pop();
-  int client_socket = clients[client_id];
+  int ClientSocket = clients[client_id];
   data_signal.unlock();
-  return client_socket;
+  return ClientSocket;
 }
 
 void AnonymousServerSocket::remove_client(const string& client_id)

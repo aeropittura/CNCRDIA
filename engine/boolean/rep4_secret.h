@@ -16,25 +16,25 @@ class Rep4Prep;
 
 class Rep4Secret : public RepSecretBase<Rep4Secret, 3>
 {
-    typedef RepSecretBase<Rep4Secret, 3> super;
+    typedef RepSecretBase<Rep4Secret, 3> Super;
     typedef Rep4Secret This;
 
 public:
     typedef Rep4Prep LivePrep;
     typedef Rep4<This> Protocol;
-    typedef Rep4MC<This> MC;
-    typedef MC MAC_Check;
+    typedef Rep4Opener<This> MC;
+    typedef MC MacCheck;
     typedef Rep4Input<This> Input;
 
     static const bool expensive_triples = false;
     static const bool malicious = true;
 
-    static MC* new_mc(typename super::mac_key_type) { return new MC; }
+    static MC* new_opener(typename Super::MacKeyType) { return new MC; }
 
-    static This constant(const typename super::clear& constant, int my_num,
-            typename super::mac_key_type = {}, int = -1)
+    static This constant(const typename Super::clear& constant, int my_num,
+            typename Super::MacKeyType = {}, int = -1)
     {
-        return Rep4Share<typename super::clear>::constant(constant, my_num);
+        return Rep4Share<typename Super::clear>::constant(constant, my_num);
     }
 
     Rep4Secret()
@@ -42,7 +42,7 @@ public:
     }
     template <class T>
     Rep4Secret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 

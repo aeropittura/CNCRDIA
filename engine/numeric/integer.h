@@ -38,7 +38,7 @@ public:
   static int length() { return N_BITS; }
   static string type_string() { return "integer"; }
 
-  static void specification(octetStream& os);
+  static void specification(OctetStream& os);
 
   static bool allows(Dtype type) { return type <= DATA_BIT; }
 
@@ -107,8 +107,8 @@ public:
   void output(ostream& s, bool human, bool signed_ = true) const;
   void input(istream& s,bool human);
 
-  void pack(octetStream& os) const { os.store_int(a, sizeof(a)); }
-  void unpack(octetStream& os) { a = os.get_int(sizeof(a)); }
+  void pack(OctetStream& os) const { os.store_int(a, sizeof(a)); }
+  void unpack(OctetStream& os) { a = os.get_int(sizeof(a)); }
 };
 
 // Wrapper class for integer
@@ -127,28 +127,28 @@ class Integer : public IntBase<long>
   static const bool invertible = false;
 
   template<int X, int L>
-  static Integer convert_unsigned(const gfp_<X, L>& other);
+  static Integer convert_unsigned(const Gfp_<X, L>& other);
   template<int K>
   static Integer convert_unsigned(const Z2<K>& other);
 
   Integer()                 { a = 0; }
   Integer(long a) : IntBase(a) {}
-  Integer(const bigint& x)  { *this = (x > 0) ? x.get_ui() : -x.get_ui(); }
+  Integer(const Bigint& x)  { *this = (x > 0) ? x.get_ui() : -x.get_ui(); }
   template<int K>
   Integer(const Z2<K>& x) : Integer(x.get_limb(0)) {}
   template<int K>
   Integer(const SignedZ2<K>& x);
   template<int X, int L>
-  Integer(const gfp_<X, L>& x);
-  Integer(int128 x) : Integer(x.get_lower()) {}
+  Integer(const Gfp_<X, L>& x);
+  Integer(Int128 x) : Integer(x.get_lower()) {}
   template<class T>
   Integer(const IntBase<T>& x) : Integer(x.get()) {}
   template<class T>
-  Integer(const gf2n_<T>& x) : Integer(x.get()) {}
+  Integer(const Gf2n_<T>& x) : Integer(x.get()) {}
 
   Integer(const Integer& x, int n_bits);
 
-  void convert_destroy(bigint& other) { *this = other.get_si(); }
+  void convert_destroy(Bigint& other) { *this = other.get_si(); }
 
   long operator+(const Integer& other) const { return a + other.a; }
   long operator-(const Integer& other) const { return a - other.a; }
@@ -191,17 +191,17 @@ inline void IntBase<unsigned char>::randomize(PRNG& G)
 }
 
 template<int X, int L>
-Integer::Integer(const gfp_<X, L>& x)
+Integer::Integer(const Gfp_<X, L>& x)
 {
-  to_signed_bigint(bigint::tmp, x);
-  *this = bigint::tmp;
+  to_signed_bigint(Bigint::tmp, x);
+  *this = Bigint::tmp;
 }
 
 template<int X, int L>
-Integer Integer::convert_unsigned(const gfp_<X, L>& other)
+Integer Integer::convert_unsigned(const Gfp_<X, L>& other)
 {
-  to_bigint(bigint::tmp, other);
-  return bigint::tmp;
+  to_bigint(Bigint::tmp, other);
+  return Bigint::tmp;
 }
 
 template<int K>
@@ -211,7 +211,7 @@ Integer Integer::convert_unsigned(const Z2<K>& other)
 }
 
 // slight misnomer
-inline void to_gfp(Integer& res, const bigint& x)
+inline void to_gfp(Integer& res, const Bigint& x)
 {
   res = x.get_si();
 }

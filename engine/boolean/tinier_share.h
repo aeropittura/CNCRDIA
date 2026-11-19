@@ -10,23 +10,23 @@
 #include "numeric/bit.h"
 
 #ifdef LONG_BIT_MAC_KEY
-class gf2n_mac_key : public gf2n_long
+class Gf2nMacKey : public Gf2nLong
 {
-    typedef gf2n_long super;
+    typedef Gf2nLong Super;
 #else
-class gf2n_mac_key : public gf2n_short
+class Gf2nMacKey : public Gf2nShort
 {
-    typedef gf2n_short super;
+    typedef Gf2nShort Super;
 #endif
 
 public:
-    gf2n_mac_key()
+    Gf2nMacKey()
     {
     }
 
     template<class T>
-    gf2n_mac_key(const T& other) :
-            super(other)
+    Gf2nMacKey(const T& other) :
+            Super(other)
     {
     }
 };
@@ -44,29 +44,29 @@ class TinierShare: public Share_<SemiShare<Bit>, SemiShare<T>>,
     typedef TinierShare This;
 
 public:
-    typedef Share_<SemiShare<Bit>, SemiShare<T>> super;
+    typedef Share_<SemiShare<Bit>, SemiShare<T>> Super;
 
-    typedef T mac_key_type;
-    typedef T mac_type;
-    typedef T sacri_type;
-    typedef Share<T> input_check_type;
-    typedef This prep_type;
-    typedef This prep_check_type;
-    typedef This bit_prep_type;
+    typedef T MacKeyType;
+    typedef T MacType;
+    typedef T SacriType;
+    typedef Share<T> InputCheckType;
+    typedef This PrepType;
+    typedef This PrepCheckType;
+    typedef This BitPrepType;
 
-    typedef MAC_Check_<This> MAC_Check;
-    typedef Direct_MAC_Check<This> Direct_MC;
+    typedef MacCheck_<This> MacCheck;
+    typedef DirectMacCheck<This> DirectOpener;
     typedef TinierSharePrep<This> LivePrep;
     typedef ::Input<This> Input;
     typedef Beaver<This> Protocol;
     typedef NPartyTripleGenerator<TinierSecret<T>> TripleGenerator;
 
     typedef void DynamicMemory;
-    typedef SwitchableOutput out_type;
+    typedef SwitchableOutput OutType;
 
-    typedef This small_type;
+    typedef This SmallType;
 
-    typedef TinierSecret<T> whole_type;
+    typedef TinierSecret<T> WholeType;
 
     static const int default_length = 1;
     static const bool expensive_triples = true;
@@ -91,20 +91,20 @@ public:
         return ShareThread<TinierSecret<T>>::s();
     }
 
-    static MAC_Check* new_mc(mac_key_type mac_key)
+    static MacCheck* new_opener(MacKeyType mac_key)
     {
-        return new MAC_Check(mac_key);
+        return new MacCheck(mac_key);
     }
 
     TinierShare()
     {
     }
-    TinierShare(const super& other) :
-            super(other)
+    TinierShare(const Super& other) :
+            Super(other)
     {
     }
-    TinierShare(const typename super::share_type& share, const typename super::mac_type& mac) :
-            super(share, mac)
+    TinierShare(const typename Super::ShareType& share, const typename Super::MacType& mac) :
+            Super(share, mac)
     {
     }
     TinierShare(const TinierSecret<T>& other);
@@ -128,7 +128,7 @@ public:
     void public_input(bool input)
     {
         auto& party = get_party();
-        *this = super::constant(input, party.P->my_num(),
+        *this = Super::constant(input, party.P->my_num(),
                 party.MC->get_alphai());
     }
 

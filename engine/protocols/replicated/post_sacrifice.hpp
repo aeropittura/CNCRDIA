@@ -27,13 +27,13 @@ Player& PostSacrifice<T>::branch()
 }
 
 template<class T>
-void PostSacrifice<T>::init_mul()
+void PostSacrifice<T>::initialize_mult()
 {
     // throw away unused operands
     operands.resize(results.size());
     if ((int) results.size() >= OnlineOptions::singleton.batch_size)
         check();
-    internal.init_mul();
+    internal.initialize_mult();
 }
 
 template<class T>
@@ -61,10 +61,10 @@ void PostSacrifice<T>::check()
         return;
 
     CODE_LOCATION
-    vector<array<prep_type, 5>> tuples;
+    vector<array<PrepType, 5>> tuples;
     tuples.reserve(buffer_size);
-    auto& honest_prot = internal;
-    honest_prot.init_mul();
+    auto& honest_protocol = internal;
+    honest_protocol.initialize_mult();
     for (int i = 0; i < buffer_size; i++)
     {
         tuples.push_back({});
@@ -73,14 +73,14 @@ void PostSacrifice<T>::check()
         tuple[2] = operands[i][1];
         tuple[3] = results[i];
         tuple[1] = randomizer.get_random();
-        honest_prot.prepare_mul(tuple[1], tuple[2]);
+        honest_protocol.prepare_mul(tuple[1], tuple[2]);
     }
-    honest_prot.exchange();
+    honest_protocol.exchange();
     for (int i = 0; i < buffer_size; i++)
     {
-        tuples[i][4] = honest_prot.finalize_mul();
+        tuples[i][4] = honest_protocol.finalize_mul();
     }
-    sacrifice<prep_type, typename T::random_type>(tuples, P);
+    sacrifice<PrepType, typename T::random_type>(tuples, P);
     operands.erase(operands.begin(), operands.begin() + buffer_size);
     results.clear();
 }

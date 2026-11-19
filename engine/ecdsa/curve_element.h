@@ -12,7 +12,7 @@
 class CurveElement : public ValueInterface
 {
 public:
-    typedef gfp_<2, 4> Scalar;
+    typedef Gfp_<2, 4> Scalar;
 
 private:
     static unsigned char zero[crypto_core_ristretto255_BYTES];
@@ -50,10 +50,10 @@ public:
     void assign_zero() { *this = 0; }
     bool is_zero() { return *this == 0; }
 
-    void pack(octetStream& os) const;
-    void unpack(octetStream& os);
+    void pack(OctetStream& os) const;
+    void unpack(OctetStream& os);
 
-    octetStream hash(size_t n_bytes) const;
+    OctetStream hash(size_t n_bytes) const;
 };
 
 ostream& operator<<(ostream& s, const CurveElement& x);

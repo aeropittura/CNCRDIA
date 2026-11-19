@@ -8,25 +8,25 @@
 #include "protocols/dealer/dealer_mc.h"
 
 template<class T>
-DealerMC<T>::DealerMC(typename T::mac_key_type, int, int) :
-        DealerMC(*(new internal_type))
+DealerOpener<T>::DealerOpener(typename T::MacKeyType, int, int) :
+        DealerOpener(*(new InternalType))
 {
 }
 
 template<class T>
-DirectDealerMC<T>::DirectDealerMC(typename T::mac_key_type) :
-        DealerMC<T>(*(new DirectSemiMC<SemiShare<typename T::clear>>))
+DirectDealerOpener<T>::DirectDealerOpener(typename T::MacKeyType) :
+        DealerOpener<T>(*(new DirectSemiOpener<SemiShare<typename T::clear>>))
 {
 }
 
 template<class T>
-DealerMC<T>::DealerMC(internal_type& internal) :
+DealerOpener<T>::DealerOpener(InternalType& internal) :
         internal(internal), sub_player(0)
 {
 }
 
 template<class T>
-DealerMC<T>::~DealerMC()
+DealerOpener<T>::~DealerOpener()
 {
     delete &internal;
     if (sub_player)
@@ -34,18 +34,18 @@ DealerMC<T>::~DealerMC()
 }
 
 template<class T>
-void DealerMC<T>::init_open(const Player& P, int n)
+void DealerOpener<T>::initialize_open(const Player& P, int n)
 {
     if (P.my_num() != P.num_players() - 1)
     {
         if (not sub_player)
             sub_player = new AllButLastPlayer(P);
-        internal.init_open(P, n);
+        internal.initialize_open(P, n);
     }
 }
 
 template<class T>
-void DealerMC<T>::prepare_open(const T& secret, int n_bits)
+void DealerOpener<T>::prepare_open(const T& secret, int n_bits)
 {
     if (sub_player)
         internal.prepare_open(secret, n_bits);
@@ -57,7 +57,7 @@ void DealerMC<T>::prepare_open(const T& secret, int n_bits)
 }
 
 template<class T>
-void DealerMC<T>::exchange(const Player&)
+void DealerOpener<T>::exchange(const Player&)
 {
     CODE_LOCATION
     if (sub_player)
@@ -65,7 +65,7 @@ void DealerMC<T>::exchange(const Player&)
 }
 
 template<class T>
-typename T::open_type DealerMC<T>::finalize_raw()
+typename T::OpenType DealerOpener<T>::finalize_raw()
 {
     if (sub_player)
         return internal.finalize_raw();
@@ -74,7 +74,7 @@ typename T::open_type DealerMC<T>::finalize_raw()
 }
 
 template<class T>
-array<typename T::open_type*, 2> DealerMC<T>::finalize_several(size_t n)
+array<typename T::OpenType*, 2> DealerOpener<T>::finalize_several(size_t n)
 {
     assert(sub_player);
     return internal.finalize_several(n);

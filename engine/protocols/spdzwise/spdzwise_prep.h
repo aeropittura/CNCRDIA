@@ -15,7 +15,7 @@ template<class T> class MaliciousShamirShare;
 template<class T>
 class SpdzWisePrep : public MaliciousRingPrep<T>
 {
-    typedef MaliciousRingPrep<T> super;
+    typedef MaliciousRingPrep<T> Super;
 
     void buffer_triples();
     void buffer_squares();
@@ -30,7 +30,7 @@ class SpdzWisePrep : public MaliciousRingPrep<T>
     void buffer_bits(false_type, false_type, true_type);
 
 public:
-    static typename T::mac_key_type get_mac_key(Player& P, bool = false);
+    static typename T::MacKeyType get_mac_key(Player& P, bool = false);
 
     SpdzWisePrep(SubProcessor<T>* proc, DataPositions& usage) :
         BufferPrep<T>(usage),

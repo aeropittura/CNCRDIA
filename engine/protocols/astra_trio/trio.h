@@ -13,25 +13,25 @@ class Trio : public AstraOnlineBase<T>
 {
     friend class TrioShare<typename T::clear>;
 
-    typedef AstraOnlineBase<T> super;
+    typedef AstraOnlineBase<T> Super;
 
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
     typedef typename T::clear clear;
-    typedef pair<T, typename T::open_type> pre_tuple;
+    typedef pair<T, typename T::OpenType> PreTuple;
 
-    IteratorVector<pre_tuple> results;
-    octetStream prep, os[2];
+    IteratorVector<PreTuple> results;
+    OctetStream prep, os[2];
 
     size_t n_mults();
 
     template<int>
-    pre_tuple pre_mul(const T& x, const T& y);
+    PreTuple pre_mult(const T& x, const T& y);
     template<int>
-    pre_tuple pre_dot(const open_type& input);
-    pre_tuple pre_common(const open_type& input);
+    PreTuple pre_dot(const OpenType& input);
+    PreTuple pre_common(const OpenType& input);
 
-    void init_reduced_mul(size_t n_mul);
-    void exchange_reduced_mul(size_t n_mul);
+    void initialize_reduced_mult(size_t n_mult);
+    void exchange_reduced_mult(size_t n_mult);
 
 public:
     Trio(Player& P) :
@@ -42,26 +42,26 @@ public:
     void exchange();
 
     T finalize_mul(int = -1) final;
-    T finalize_mul_fast()
+    T finalize_mult_fast()
     {
         return finalize_mul();
     }
 
     void unsplit1(StackedVector<T>& dest,
-            StackedVector<typename T::bit_type>& source,
+            StackedVector<typename T::BitType>& source,
             const Instruction& instruction);
 };
 
 template<class T>
 class TrioPrepProtocol : public AstraPrepProtocol<T>
 {
-    typedef AstraPrepProtocol<T> super;
+    typedef AstraPrepProtocol<T> Super;
 
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
 
-    octetStream os, prep_os;
+    OctetStream os, prep_os;
 
-    void pre_P0(open_type& r01, const open_type& input);
+    void pre_p0(OpenType& r01, const OpenType& input);
 
 public:
     TrioPrepProtocol(Player& P) :
@@ -69,7 +69,7 @@ public:
     {
     }
 
-    bool local_mul_for(int player)
+    bool local_mult_for(int player)
     {
             return player == this->my_astra_num() and player == 0;
     }

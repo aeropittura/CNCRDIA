@@ -15,16 +15,16 @@
 template<class T>
 class SpdzWiseRing : public SpdzWise<T>
 {
-    typedef typename T::part_type check_type;
-    typedef PostSacriRepRingShare<T::LENGTH + T::SECURITY, T::SECURITY> zero_check_type;
+    typedef typename T::part_type CheckType;
+    typedef PostSacriRepRingShare<T::LENGTH + T::SECURITY, T::SECURITY> ZeroCheckType;
 
     DataPositions zero_usage;
-    MaliciousBitOnlyRepPrep<zero_check_type> zero_prep;
-    typename zero_check_type::MAC_Check zero_output;
-    SubProcessor<zero_check_type> zero_proc;
+    MaliciousBitOnlyRepPrep<ZeroCheckType> zero_prep;
+    typename ZeroCheckType::MacCheck zero_output;
+    SubProcessor<ZeroCheckType> zero_processor;
 
 public:
     SpdzWiseRing(Player &P);
 
-    void zero_check(check_type t);
+    void zero_check(CheckType t);
 };

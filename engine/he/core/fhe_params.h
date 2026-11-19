@@ -2,7 +2,7 @@
 
 /* Class to hold the FHE Parameters 
  *
- * The idea is that there is a single global FHE_Params structure
+ * The idea is that there is a single global FheParameters structure
  * called params; which holds all the data
  *
  * Likewise initialising params sets up all the data for other
@@ -17,21 +17,21 @@
 /**
  * Cryptosystem parameters
  */
-class FHE_Params
+class FheParameters
 {
   protected:
   // Pair of moduli in FFTData[0] and FFTData[1] for the levels
-  vector<FFT_Data> FFTData;
+  vector<FftData> fft_data;
 
   // Random generator for Multivariate Gaussian Distribution etc
   mutable DiscreteGauss Chi;
 
   // Data for distributed decryption
   int sec_p;
-  bigint Bval;
-  int matrix_dim;
+  Bigint bval;
+  int matrix_dimension;
 
-  FFT_Data fd;
+  FftData fd;
 
   public:
 
@@ -40,41 +40,41 @@ class FHE_Params
    * @param n_mults number of ciphertext multiplications (0/1)
    * @param drown_sec parameter for function privacy (default 40)
    */
-  FHE_Params(int n_mults = 1, int drown_sec = DEFAULT_SECURITY);
+  FheParameters(int n_mults = 1, int drown_sec = DEFAULT_SECURITY);
 
-  int n_mults() const { return FFTData.size() - 1; }
+  int n_mults() const { return fft_data.size() - 1; }
 
-  void set(const Ring& R,const vector<bigint>& primes);
-  void set(const vector<bigint>& primes);
+  void set(const Ring& R,const vector<Bigint>& primes);
+  void set(const vector<Bigint>& primes);
   void set_sec(int sec);
   void set_min_sec(int sec);
 
-  void set_matrix_dim(int matrix_dim);
-  void set_matrix_dim_from_options();
-  int get_matrix_dim() const         { return matrix_dim; }
+  void set_matrix_dimension(int matrix_dimension);
+  void set_matrix_dimension_from_options();
+  int get_matrix_dimension() const         { return matrix_dimension; }
 
-  const vector<FFT_Data>& FFTD() const { return FFTData; }
+  const vector<FftData>& FFTD() const { return fft_data; }
 
-  const bigint& p0() const           { return FFTData[0].get_prime(); }
-  const bigint& p1() const           { return FFTData[1].get_prime(); }
-  bigint Q() const;
+  const Bigint& p0() const           { return fft_data[0].get_prime(); }
+  const Bigint& p1() const           { return fft_data[1].get_prime(); }
+  Bigint Q() const;
 
   int secp() const                   { return sec_p;        }
-  const bigint& B() const            { return Bval;         }
+  const Bigint& B() const            { return bval;         }
   double get_R() const               { return Chi.get_R();  }
-  void set_R(double R) const         { return Chi.set(R); }
-  DiscreteGauss get_DG() const       { return Chi; }
+  void set_r(double R) const         { return Chi.set(R); }
+  DiscreteGauss get_dg() const       { return Chi; }
 
-  int phi_m() const                  { return FFTData[0].phi_m(); }
-  const Ring& get_ring()             { return FFTData[0].get_R(); }
+  int phi_m() const                  { return fft_data[0].phi_m(); }
+  const Ring& get_ring()             { return fft_data[0].get_R(); }
 
   /// Append to buffer
-  void pack(octetStream& o) const;
+  void pack(OctetStream& o) const;
 
   /// Read from buffer
-  void unpack(octetStream& o);
+  void unpack(OctetStream& o);
 
-  bool operator!=(const FHE_Params& other) const;
+  bool operator!=(const FheParameters& other) const;
 
   /**
    * Generate parameter for computation modulo a prime
@@ -85,5 +85,5 @@ class FHE_Params
   template<class FD>
   const FD& get_plaintext_field_data() const;
 
-  bigint get_plaintext_modulus() const;
+  Bigint get_plaintext_modulus() const;
 };

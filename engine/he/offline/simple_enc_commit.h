@@ -67,9 +67,9 @@ public:
 				       const MachineBase& machine, bool diagonal = false);
     virtual ~NonInteractiveProofSimpleEncCommit() {}
     size_t generate_proof(AddableVector<Ciphertext>& c,
-            vector<Plaintext_<FD> >& m, octetStream& ciphertexts,
-            octetStream& cleartexts);
-    size_t create_more(octetStream& my_ciphertext, octetStream& my_cleartext);
+            vector<Plaintext_<FD> >& m, OctetStream& ciphertexts,
+            OctetStream& cleartexts);
+    size_t create_more(OctetStream& my_ciphertext, OctetStream& my_cleartext);
     virtual size_t report_size(ReportType type);
     using SimpleEncCommitBase_<FD>::report_size;
     Proof& get_proof() { return proof; }

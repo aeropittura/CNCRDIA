@@ -12,7 +12,7 @@
 
 class OnlineOptions
 {
-    void finalize_with_error(ez::ezOptionParser& opt);
+    void finalize_with_error(ez::EzOptionParser& opt);
 
     bool have_warned_about_comp_sec;
 
@@ -22,7 +22,7 @@ public:
     bool interactive;
     int lgp;
     int lg2;
-    bigint prime;
+    Bigint prime;
     bool live_prep;
     int playerno;
     std::string progname;
@@ -33,8 +33,8 @@ public:
     int bucket_size;
     int security_parameter;
     bool use_security_parameter;
-    std::string cmd_private_input_file;
-    std::string cmd_private_output_file;
+    std::string command_private_input_file;
+    std::string command_private_output_file;
     bool verbose;
     bool file_prep_per_thread;
     int trunc_error;
@@ -48,33 +48,33 @@ public:
     bool semi_honest;
 
     OnlineOptions();
-    OnlineOptions(ez::ezOptionParser& opt, int argc, const char** argv,
+    OnlineOptions(ez::EzOptionParser& opt, int argc, const char** argv,
             bool security);
-    OnlineOptions(ez::ezOptionParser& opt, int argc, const char** argv,
+    OnlineOptions(ez::EzOptionParser& opt, int argc, const char** argv,
             int default_batch_size = 0, bool default_live_prep = true,
             bool variable_prime_length = false, bool security = true);
-    template<class T, class V = gf2n>
-    OnlineOptions(ez::ezOptionParser& opt, int argc, const char** argv, T,
+    template<class T, class V = Gf2n>
+    OnlineOptions(ez::EzOptionParser& opt, int argc, const char** argv, T,
             bool default_live_prep = true, V = {});
     template<class T>
     OnlineOptions(T);
     ~OnlineOptions() {}
 
-    void finalize(ez::ezOptionParser& opt, int argc, const char** argv,
+    void finalize(ez::EzOptionParser& opt, int argc, const char** argv,
             bool networking = true);
 
-    void set_trunc_error(ez::ezOptionParser& opt);
+    void set_trunc_error(ez::EzOptionParser& opt);
 
     int prime_length();
     int prime_limbs();
 
     template<class T>
-    string prep_dir_prefix(int nplayers)
+    string prep_directory_prefix(int nplayers)
     {
         int lgp = this->lgp;
         if (prime)
-            lgp = numBits(prime);
-        return get_prep_sub_dir<T>(PREP_DIR, nplayers, lgp);
+            lgp = num_bits(prime);
+        return get_prep_sub_directory<T>(PREP_DIR, nplayers, lgp);
     }
 
     bool has_option(const string& option)
@@ -82,8 +82,8 @@ public:
         return find(options.begin(), options.end(), option) != options.end();
     }
 
-    bool has_param(const string& param);
-    int get_param(const string& param);
+    bool has_parameter(const string& param);
+    int get_parameter(const string& param);
 
     int comp_sec();
 };

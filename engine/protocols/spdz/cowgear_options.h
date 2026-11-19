@@ -17,7 +17,7 @@ public:
     int covert_security;
 
     CowGearOptions(bool covert = true);
-    CowGearOptions(ez::ezOptionParser& opt, int argc, const char** argv,
+    CowGearOptions(ez::EzOptionParser& opt, int argc, const char** argv,
             bool covert = true);
 
     bool top_gear()

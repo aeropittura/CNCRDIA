@@ -20,26 +20,26 @@ template<class T>
 PairwiseKeyInput<T>::PairwiseKeyInput(SubProcessor<T>* proc, PlayerBase& P) :
         PrepLessInput<T>(proc)
 {
-    maybe_init(P);
+    maybe_initialize(P);
 }
 
 template<class T>
-void PairwiseKeyInput<T>::maybe_init(PlayerBase& P)
+void PairwiseKeyInput<T>::maybe_initialize(PlayerBase& P)
 {
     if (send_prngs.size() > 0)
         return;
 
-    vector<octetStream> to_send(P.num_players()), to_receive;
+    vector<OctetStream> to_send(P.num_players()), to_receive;
     for (int i = 0; i < P.num_players(); i++)
     {
         send_prngs.push_back({});
         to_send[i].append(send_prngs.back().get_seed(), SEED_SIZE);
     }
     P.send_receive_all(to_send, to_receive);
-    recv_prngs.resize(P.num_players());
+    receive_prngs.resize(P.num_players());
     for (int i = 0; i < P.num_players(); i++)
         if (i != P.my_num())
-            recv_prngs[i].SetSeed(to_receive[i].consume(SEED_SIZE));
+            receive_prngs[i].SetSeed(to_receive[i].consume(SEED_SIZE));
 }
 
 template<class T>
@@ -52,13 +52,13 @@ void SemiInput<T>::reset(int player)
 template<class T>
 void SemiInput<T>::add_mine(const typename T::clear& input, int)
 {
-	this->maybe_init(P);
+	this->maybe_initialize(P);
 	auto& P = this->P;
-	typename T::open_type sum, share;
+	typename T::OpenType sum, share;
 	for (int i = 0; i < P.num_players(); i++)
 	{
 	    if (i != P.my_num())
-	        sum += this->send_prngs[i].template get<typename T::open_type>();
+	        sum += this->send_prngs[i].template get<typename T::OpenType>();
 	}
 	this->shares.push_back(input - sum);
 }
@@ -66,7 +66,7 @@ void SemiInput<T>::add_mine(const typename T::clear& input, int)
 template<class T>
 void SemiInput<T>::add_other(int, int)
 {
-    this->maybe_init(P);
+    this->maybe_initialize(P);
 }
 
 template<class T>
@@ -76,8 +76,8 @@ void SemiInput<T>::exchange()
 }
 
 template<class T>
-void SemiInput<T>::finalize_other(int player, T& target, octetStream&,
+void SemiInput<T>::finalize_other(int player, T& target, OctetStream&,
         int)
 {
-    target = this->recv_prngs.at(player).template get<T>();
+    target = this->receive_prngs.at(player).template get<T>();
 }

@@ -10,7 +10,7 @@
 template<class T>
 DealerMatrixPrep<T>::DealerMatrixPrep(int n_rows, int n_inner, int n_cols,
         typename T::LivePrep& prep, DataPositions& usage) :
-        super(usage), n_rows(n_rows), n_inner(n_inner), n_cols(n_cols),
+        Super(usage), n_rows(n_rows), n_inner(n_inner), n_cols(n_cols),
         prep(&prep)
 {
     assert(prep.proc);
@@ -51,7 +51,7 @@ void DealerMatrixPrep<T>::buffer_triples()
     size_t n_values = batch_size * C.entries.size();
     if (input.is_dealer())
     {
-        SeededPRNG G;
+        SeededPrng G;
         vector<typename T::clear> values;
         values.reserve(n_values);
         for (int i = 0; i < batch_size; i++)

@@ -21,12 +21,12 @@ public:
 		my_keys[1] = 0;
 	}
 
-	void pack(octetStream& os) const
+	void pack(OctetStream& os) const
 	{
 		mask.pack(os);
 		os.serialize(my_keys);
 	}
-	void unpack(octetStream& os, size_t wanted_size)
+	void unpack(OctetStream& os, size_t wanted_size)
 	{
 		(void)wanted_size;
 		mask.unpack(os);
@@ -34,4 +34,4 @@ public:
 	}
 };
 
-typedef DualWire<Share<gf2n_long>> SpdzWire;
+typedef DualWire<Share<Gf2nLong>> SpdzWire;

@@ -14,11 +14,11 @@ namespace GC
 class AtlasSecret : public VectorSecret<AtlasShare>
 {
     typedef AtlasSecret This;
-    typedef VectorSecret<AtlasShare> super;
+    typedef VectorSecret<AtlasShare> Super;
 
 public:
-    typedef TinyMC<This> MC;
-    typedef MC MAC_Check;
+    typedef TinyOpener<This> MC;
+    typedef MC MacCheck;
     typedef VectorProtocol<This> Protocol;
     typedef VectorInput<This> Input;
     typedef CcdPrep<This> LivePrep;
@@ -28,7 +28,7 @@ public:
         return "atlas";
     }
 
-    static MC* new_mc(typename super::mac_key_type);
+    static MC* new_opener(typename Super::MacKeyType);
 
     AtlasSecret()
     {
@@ -36,7 +36,7 @@ public:
 
     template<class T>
     AtlasSecret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 };

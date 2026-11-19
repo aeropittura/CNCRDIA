@@ -1154,7 +1154,7 @@ argument to change that.
 Creating fake offline data for SPDZ2k requires to call
 `Fake-Offline.x` directly instead of via `setup-online.sh`:
 
-`./Fake-Offline.x <nparties> -Z <bit length k for SPDZ2k> -S <security parameter>`
+`./Fake-Offline.x <nparties> -Z <bit length k for Spdz2k> -S <security parameter>`
 
 You will need to run `spdz2k-party.x -F` in order to use the data from storage.
 

@@ -10,7 +10,7 @@
 template<class T>
 class FakePrep : public BufferPrep<T>
 {
-    SeededPRNG G;
+    SeededPrng G;
 
 public:
     FakePrep(SubProcessor<T>*, DataPositions& usage) :
@@ -78,7 +78,7 @@ public:
         }
     }
 
-    void get_dabit_no_count(T& a, typename T::bit_type& b)
+    void get_dabit_no_count(T& a, typename T::BitType& b)
     {
         auto bit = G.get_bit();
         a = bit;

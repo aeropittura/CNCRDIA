@@ -40,7 +40,7 @@ T ProcessorBase::get_input(istream& input_file, const string& input_filename,
 {
     T res;
     if (input_file.peek() == EOF)
-        throw IO_Error("not enough inputs in " + input_filename);
+        throw IoError("not enough inputs in " + input_filename);
     res.read(input_file, params);
     if (input_file.fail())
     {

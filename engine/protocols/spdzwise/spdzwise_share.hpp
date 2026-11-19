@@ -19,7 +19,7 @@ void SpdzWiseShare<T>::read_or_generate_mac_key(string directory, Player& P, T& 
     {
         read_mac_key(directory, P.N, mac_key);
     }
-    catch (mac_key_error&)
+    catch (MacKeyError&)
     {
         fresh = true;
     }
@@ -27,12 +27,12 @@ void SpdzWiseShare<T>::read_or_generate_mac_key(string directory, Player& P, T& 
     try
     {
         // validate MAC key
-        typename open_part_type::MAC_Check MC;
+        typename OpenPartType::MacCheck MC;
         auto masked = typename T::Honest::Protocol(P).get_random() + mac_key;
         MC.open(masked, P);
         MC.Check(P);
     }
-    catch (mac_fail&)
+    catch (MacFail&)
     {
         fresh = true;
         cerr << "Invalid " << type_string() << " MAC key, generating fresh one" << endl;
@@ -41,17 +41,17 @@ void SpdzWiseShare<T>::read_or_generate_mac_key(string directory, Player& P, T& 
     if (fresh)
         mac_key = typename T::Honest::Protocol(P).get_random();
 
-    super::set_mac_key(mac_key);
+    Super::set_mac_key(mac_key);
 }
 
 template<class T>
-void SpdzWiseShare<T>::pack(octetStream& os, bool full) const
+void SpdzWiseShare<T>::pack(OctetStream& os, bool full) const
 {
-    super::pack(os, full);
+    Super::pack(os, full);
 }
 
 template<class T>
-void SpdzWiseShare<T>::pack(octetStream& os, open_type factor) const
+void SpdzWiseShare<T>::pack(OctetStream& os, OpenType factor) const
 {
     this->get_share().pack(os, factor);
 }

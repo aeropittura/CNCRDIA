@@ -38,11 +38,11 @@ protected:
     { throw runtime_error("implement finalize_mine()"); }
     // Store share for next input from ``player`` from buffer ``o``
     // in ``target`` (not generally available)
-    virtual void finalize_other(int, T&, octetStream&, int = -1)
-    { throw not_implemented(); }
+    virtual void finalize_other(int, T&, OctetStream&, int = -1)
+    { throw NotImplemented(); }
 
 public:
-    vector<octetStream> os;
+    vector<OctetStream> os;
     int values_input;
 
     template<class U>
@@ -70,11 +70,11 @@ public:
     void reset_all(PlayerBase& P);
 
     /// Schedule input from me
-    virtual void add_mine(const typename T::open_type& input, int n_bits = -1) = 0;
+    virtual void add_mine(const typename T::OpenType& input, int n_bits = -1) = 0;
     /// Schedule input from other player
     virtual void add_other(int player, int n_bits = -1) = 0;
     /// Schedule input from all players
-    void add_from_all(const typename T::open_type& input, int n_bits = -1);
+    void add_from_all(const typename T::OpenType& input, int n_bits = -1);
 
     /// Run input protocol for all players
     virtual void exchange();
@@ -88,30 +88,30 @@ public:
 template<class T>
 class Input : public InputBase<T>
 {
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
     typedef typename T::clear clear;
-    typedef typename T::MAC_Check MAC_Check;
+    typedef typename T::MacCheck MacCheck;
 
     SubProcessor<T>* proc;
-    MAC_Check& MC;
+    MacCheck& MC;
     Preprocessing<T>& prep;
     Player& P;
     vector< PointerVector<T> > shares;
-    open_type rr, t, xi;
+    OpenType rr, t, xi;
 
 public:
     Input(SubProcessor<T>& proc);
-    Input(SubProcessor<T>& proc, MAC_Check& mc);
+    Input(SubProcessor<T>& proc, MacCheck& mc);
     Input(SubProcessor<T>* proc, Player& P);
-    Input(MAC_Check& MC, Preprocessing<T>& prep, Player& P);
+    Input(MacCheck& MC, Preprocessing<T>& prep, Player& P);
 
     void reset(int player);
 
-    void add_mine(const open_type& input, int n_bits = -1);
+    void add_mine(const OpenType& input, int n_bits = -1);
     void add_other(int player, int n_bits = -1);
 
     void send_mine();
 
     T finalize_mine();
-    void finalize_other(int player, T& target, octetStream& o, int n_bits = -1);
+    void finalize_other(int player, T& target, OctetStream& o, int n_bits = -1);
 };

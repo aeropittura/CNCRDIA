@@ -29,7 +29,7 @@
 #include <atomic>
 using namespace std;
 
-template<class sint, class sgf2n = NoShare<gf2n>>
+template<class Sint, class Sgf2n = NoShare<Gf2n>>
 class Machine : public BaseMachine
 {
   /* The mutex's lock the C-threads and then only release
@@ -38,14 +38,14 @@ class Machine : public BaseMachine
    * MPC thread releases the mutex
    */
 
-  vector<thread_info<sint, sgf2n>> tinfo;
+  vector<thread_info<Sint, Sgf2n>> tinfo;
   vector<pthread_t> threads;
 
   int my_number;
   Names& N;
-  typename sint::mac_key_type alphapi;
-  typename sgf2n::mac_key_type alpha2i;
-  typename sint::bit_type::mac_key_type alphabi;
+  typename Sint::MacKeyType alphapi;
+  typename Sgf2n::MacKeyType alpha2i;
+  typename Sint::BitType::MacKeyType alphabi;
 
   Player* P;
 
@@ -64,10 +64,10 @@ class Machine : public BaseMachine
 
   public:
 
-  Memory<sgf2n> M2;
-  Memory<sint> Mp;
-  Memory<Integer> Mi;
-  GC::Memories<typename sint::bit_type> bit_memories;
+  Memory<Sgf2n> M2;
+  Memory<Sint> Mp;
+  Memory<Integer> mi;
+  GC::Memories<typename Sint::BitType> bit_memories;
 
   vector<Timer> join_timer;
   Timer finish_timer;
@@ -77,30 +77,30 @@ class Machine : public BaseMachine
 
   OnlineOptions opts;
 
-  ExecutionStats stats;
+  ExecutionStats statistics;
 
   ExternalClients external_clients;
 
-  typename sint::Protocol::Shuffler::store_type shuffle_store;
+  typename Sint::Protocol::Shuffler::StoreType shuffle_store;
 
-  static void init_binary_domains(int security_parameter, int lg2);
+  static void initialize_binary_domains(int security_parameter, int lg2);
 
-  Machine(Names& playerNames, bool use_encryption = true,
-          const OnlineOptions opts = sint());
+  Machine(Names& player_names, bool use_encryption = true,
+          const OnlineOptions opts = Sint());
   ~Machine();
 
   const Names& get_N() { return N; }
 
   DataPositions run_tapes(const ArgVector& args,
-      Data_Files<sint, sgf2n>& DataF);
+      DataFiles<Sint, Sgf2n>& DataF);
   void fill_buffers(int thread_number, int tape_number,
-      Preprocessing<sint> *prep,
-      Preprocessing<typename sint::bit_type> *bit_prep);
+      Preprocessing<Sint> *prep,
+      Preprocessing<typename Sint::BitType> *bit_prep);
   template<int = 0>
   void fill_matmul(int thread_numbber, int tape_number,
-      Preprocessing<sint> *prep, true_type);
+      Preprocessing<Sint> *prep, true_type);
   template<int = 0>
-  void fill_matmul(int, int, Preprocessing<sint>*, false_type) {}
+  void fill_matmul(int, int, Preprocessing<Sint>*, false_type) {}
   DataPositions run_tape(int thread_number, int tape_number, int arg,
       const DataPositions& pos);
   DataPositions join_tape(int thread_number);
@@ -108,7 +108,7 @@ class Machine : public BaseMachine
   void run(const string& progname);
 
   void run_step(const string& progname);
-  pair<DataPositions, NamedCommStats> stop_threads();
+  pair<DataPositions, NamedCommunicationStatistics> stop_threads();
 
   void run_function(const string& name, FunctionArgument& result,
       vector<FunctionArgument>& arguments);
@@ -116,14 +116,14 @@ class Machine : public BaseMachine
   string memory_filename();
 
   template<class T>
-  string prep_dir_prefix();
+  string prep_directory_prefix();
 
   void reqbl(int n);
   void active(int n);
 
-  typename sint::bit_type::mac_key_type get_bit_mac_key() const
+  typename Sint::BitType::MacKeyType get_bit_mac_key() const
   { return alphabi; }
-  typename sint::mac_key_type get_sint_mac_key() const { return alphapi; }
+  typename Sint::MacKeyType get_sint_mac_key() const { return alphapi; }
 
   Player& get_player() { return *P; }
 

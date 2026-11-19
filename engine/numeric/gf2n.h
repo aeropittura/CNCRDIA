@@ -12,16 +12,16 @@ using namespace std;
 #include "numeric/bigint.h"
 #include "numeric/value_interface.h"
 
-class gf2n_short;
+class Gf2nShort;
 class P2Data;
 class Bit;
-class int128;
+class Int128;
 template<class T> class IntBase;
 template<class T> class Square;
-typedef Square<gf2n_short> gf2n_short_square;
+typedef Square<Gf2nShort> Gf2nShortSquare;
 
-void expand_byte(gf2n_short& a,int b);
-void collapse_byte(int& b,const gf2n_short& a);
+void expand_byte(Gf2nShort& a,int b);
+void collapse_byte(int& b,const Gf2nShort& a);
 
 /* This interface compatible with the gfp interface
  * which then allows us to template the Share
@@ -34,10 +34,10 @@ void collapse_byte(int& b,const gf2n_short& a);
 */
 
 template<class U>
-class gf2n_ : public ValueInterface
+class Gf2n_ : public ValueInterface
 {
 protected:
-  friend class gf2n_long;
+  friend class Gf2nLong;
 
   U a;
 
@@ -45,27 +45,27 @@ protected:
   static int t[4], l[4];
   static U mask;
   static U uppermask, lowermask;
-  static bool useC;
+  static bool use_c;
 
-  static octet mult_table[256][256];
+  static Octet mult_table[256][256];
 
-  static void init_tables();
-  static void init_multiplication();
+  static void initialize_tables();
+  static void initialize_multiplication();
 
   template<class T>
   T invert(T a) const;
 
   public:
 
-  typedef U internal_type;
-  typedef gf2n_ Scalar;
+  typedef U InternalType;
+  typedef Gf2n_ Scalar;
 
   static const int N_BYTES = sizeof(a);
   static const int MAX_N_BITS = 8 * N_BYTES;
 
-  static void init_field(int nn = 0);
-  static void init_default(int, bool = false) { init_field(); }
-  static void init_minimum(int lower);
+  static void initialize_field(int nn = 0);
+  static void initialize_default(int, bool = false) { initialize_field(); }
+  static void initialize_minimum(int lower);
 
   static void reset() { n = 0; }
   static int degree() { return n; }
@@ -77,7 +77,7 @@ protected:
   static string type_short() { return "2"; }
   static string type_string() { return "gf2n_"; }
 
-  static void specification(octetStream& os);
+  static void specification(OctetStream& os);
 
   static int size() { return sizeof(a); }
   static int size_in_bits() { return sizeof(a) * 8; }
@@ -88,7 +88,7 @@ protected:
 
   static string options();
 
-  static string fake_opts() { return " -lg2 " + to_string(length()); }
+  static string fake_options() { return " -lg2 " + to_string(length()); }
 
   static void check_setup(string) {}
 
@@ -96,7 +96,7 @@ protected:
   static const true_type characteristic_two;
   static const true_type optimized_packing;
 
-  static gf2n_ Mul(gf2n_ a, gf2n_ b) { return a * b; }
+  static Gf2n_ Mul(Gf2n_ a, Gf2n_ b) { return a * b; }
 
   U get() const { return a; }
 
@@ -121,61 +121,61 @@ protected:
       { a &= ~(1UL<<i); }
   }
   
-  gf2n_() : a(0)       {}
-  gf2n_(bool a) : a(a) {}
-  gf2n_(U a) : a(a & mask) {}
-  gf2n_(long a) : gf2n_(U(a)) {}
-  gf2n_(int a) : gf2n_(U(unsigned(a))) {}
-  gf2n_(long long a) : gf2n_(U(a)) {}
+  Gf2n_() : a(0)       {}
+  Gf2n_(bool a) : a(a) {}
+  Gf2n_(U a) : a(a & mask) {}
+  Gf2n_(long a) : Gf2n_(U(a)) {}
+  Gf2n_(int a) : Gf2n_(U(unsigned(a))) {}
+  Gf2n_(long long a) : Gf2n_(U(a)) {}
   template<class T>
-  gf2n_(IntBase<T> a) : a(a.get()) {}
+  Gf2n_(IntBase<T> a) : a(a.get()) {}
 
-  gf2n_(PRNG& G);
+  Gf2n_(PRNG& G);
 
   int is_zero() const            { return (a==0); }
   int is_one()  const            { return (a==1); }
-  bool operator==(const gf2n_& y) const { return a==y.a; }
-  bool operator!=(const gf2n_& y) const { return a!=y.a; }
+  bool operator==(const Gf2n_& y) const { return a==y.a; }
+  bool operator!=(const Gf2n_& y) const { return a!=y.a; }
 
   // x+y
-  void add(const gf2n_& x,const gf2n_& y)
+  void add(const Gf2n_& x,const Gf2n_& y)
     { a=x.a^y.a; }  
-  void sub(const gf2n_& x,const gf2n_& y)
+  void sub(const Gf2n_& x,const Gf2n_& y)
     { a=x.a^y.a; }
   // = x * y
-  gf2n_& mul(const gf2n_& x,const gf2n_& y);
+  Gf2n_& mul(const Gf2n_& x,const Gf2n_& y);
 
-  gf2n_ lazy_add(const gf2n_& x) const { return *this + x; }
-  gf2n_ lazy_mul(const gf2n_& x) const { return *this * x; }
+  Gf2n_ lazy_add(const Gf2n_& x) const { return *this + x; }
+  Gf2n_ lazy_mult(const Gf2n_& x) const { return *this * x; }
 
-  gf2n_ operator+(const gf2n_& x) const { gf2n_ res; res.add(*this, x); return res; }
-  gf2n_ operator*(const gf2n_& x) const { gf2n_ res; res.mul(*this, x); return res; }
-  gf2n_& operator+=(const gf2n_& x) { add(*this, x); return *this; }
-  gf2n_& operator*=(const gf2n_& x) { mul(*this, x); return *this; }
-  gf2n_ operator-(const gf2n_& x) const { gf2n_ res; res.add(*this, x); return res; }
-  gf2n_& operator-=(const gf2n_& x) { sub(*this, x); return *this; }
-  gf2n_ operator/(const gf2n_& x) const { return *this * x.invert(); }
+  Gf2n_ operator+(const Gf2n_& x) const { Gf2n_ res; res.add(*this, x); return res; }
+  Gf2n_ operator*(const Gf2n_& x) const { Gf2n_ res; res.mul(*this, x); return res; }
+  Gf2n_& operator+=(const Gf2n_& x) { add(*this, x); return *this; }
+  Gf2n_& operator*=(const Gf2n_& x) { mul(*this, x); return *this; }
+  Gf2n_ operator-(const Gf2n_& x) const { Gf2n_ res; res.add(*this, x); return res; }
+  Gf2n_& operator-=(const Gf2n_& x) { sub(*this, x); return *this; }
+  Gf2n_ operator/(const Gf2n_& x) const { return *this * x.invert(); }
 
-  gf2n_ operator*(const Bit& x) const;
-  gf2n_ operator*(int x) const { return *this * gf2n_(x); }
+  Gf2n_ operator*(const Bit& x) const;
+  Gf2n_ operator*(int x) const { return *this * Gf2n_(x); }
 
-  gf2n_ invert() const;
+  Gf2n_ invert() const;
 
-  gf2n_ operator-() const { return *this; }
+  Gf2n_ operator-() const { return *this; }
   void negate() { return; }
 
   /* Bitwise Ops */
-  gf2n_ operator&(const gf2n_& x) const { return a & x.a; }
-  gf2n_ operator^(const gf2n_& x) const { return a ^ x.a; }
-  gf2n_ operator|(const gf2n_& x) const { return a | x.a; }
-  gf2n_ operator~() const { return ~a; }
-  gf2n_ operator<<(int i) const;
-  gf2n_ operator>>(int i) const;
+  Gf2n_ operator&(const Gf2n_& x) const { return a & x.a; }
+  Gf2n_ operator^(const Gf2n_& x) const { return a ^ x.a; }
+  Gf2n_ operator|(const Gf2n_& x) const { return a | x.a; }
+  Gf2n_ operator~() const { return ~a; }
+  Gf2n_ operator<<(int i) const;
+  Gf2n_ operator>>(int i) const;
 
-  gf2n_& operator&=(const gf2n_& x) { *this = *this & x; return *this; }
-  gf2n_& operator^=(const gf2n_& x) { *this = *this ^ x; return *this; }
-  gf2n_& operator>>=(int i) { *this = *this >> i; return *this; }
-  gf2n_& operator<<=(int i) { *this = *this << i; return *this; }
+  Gf2n_& operator&=(const Gf2n_& x) { *this = *this & x; return *this; }
+  Gf2n_& operator^=(const Gf2n_& x) { *this = *this ^ x; return *this; }
+  Gf2n_& operator>>=(int i) { *this = *this >> i; return *this; }
+  Gf2n_& operator<<=(int i) { *this = *this << i; return *this; }
 
   /* Crap RNG */
   void randomize(PRNG& G, int n = -1);
@@ -187,12 +187,12 @@ protected:
   void output(ostream& s,bool human) const;
   void input(istream& s,bool human);
 
-  friend ostream& operator<<(ostream& s,const gf2n_& x)
+  friend ostream& operator<<(ostream& s,const Gf2n_& x)
     {
       x.output(s, true);
       return s;
     }
-  friend istream& operator>>(istream& s,gf2n_& x)
+  friend istream& operator>>(istream& s,Gf2n_& x)
     {
       x.input(s, true);
       return s;
@@ -202,83 +202,83 @@ protected:
   // Pack and unpack in native format
   //   i.e. Dont care about conversion to human readable form
   template<int LL = sizeof(U)>
-  void pack(octetStream& o, int n = -1) const
-    { (void) n; o.append((octet*) &a, LL); }
+  void pack(OctetStream& o, int n = -1) const
+    { (void) n; o.append((Octet*) &a, LL); }
   template<int LL = sizeof(U)>
-  void unpack(octetStream& o, int n = -1)
-    { (void) n; o.consume((octet*) &a, LL); }
+  void unpack(OctetStream& o, int n = -1)
+    { (void) n; o.consume((Octet*) &a, LL); }
 };
 
-class gf2n_short : public gf2n_<word>
+class Gf2nShort : public Gf2n_<word>
 {
-  typedef gf2n_<word> super;
+  typedef Gf2n_<word> Super;
 
 public:
-  typedef gf2n_short value_type;
-  typedef gf2n_short next;
-  typedef ::Square<gf2n_short> Square;
+  typedef Gf2nShort value_type;
+  typedef Gf2nShort next;
+  typedef ::Square<Gf2nShort> Square;
   typedef P2Data FD;
-  typedef gf2n_short Scalar;
+  typedef Gf2nShort Scalar;
 
   static const int DEFAULT_LENGTH = 40;
 
   static int length()         { return n == 0 ? DEFAULT_LENGTH : n; }
   static int default_degree() { return DEFAULT_LENGTH; }
 
-  static void init_field(int nn = 0);
+  static void initialize_field(int nn = 0);
 
-  static gf2n_short cut(int128 x);
+  static Gf2nShort cut(Int128 x);
 
-  gf2n_short() {}
+  Gf2nShort() {}
   template<class T>
-  gf2n_short(const T& other) : super(other) {}
-  gf2n_short(const int128& a);
+  Gf2nShort(const T& other) : Super(other) {}
+  Gf2nShort(const Int128& a);
 
   word get_word() const { return a; }
 };
 
 #include "numeric/gf2nlong.h"
 
-class gf2n_long;
+class Gf2nLong;
 
 #ifdef USE_GF2N_LONG
-typedef gf2n_long gf2n;
+typedef Gf2nLong Gf2n;
 #else
-typedef gf2n_short gf2n;
+typedef Gf2nShort Gf2n;
 #endif
 
 template<class U>
-const true_type gf2n_<U>::characteristic_two;
+const true_type Gf2n_<U>::characteristic_two;
 template<class U>
-const true_type gf2n_<U>::invertible;
+const true_type Gf2n_<U>::invertible;
 template<class U>
-const true_type gf2n_<U>::optimized_packing;
+const true_type Gf2n_<U>::optimized_packing;
 
 template<class U>
-int gf2n_<U>::n = 0;
+int Gf2n_<U>::n = 0;
 template<class U>
-U gf2n_<U>::mask;
+U Gf2n_<U>::mask;
 template<class U>
-int gf2n_<U>::nterms;
+int Gf2n_<U>::nterms;
 template<class U>
-int gf2n_<U>::t[4];
+int Gf2n_<U>::t[4];
 
 template<class U>
-U gf2n_<U>::uppermask;
+U Gf2n_<U>::uppermask;
 template<class U>
-U gf2n_<U>::lowermask;
+U Gf2n_<U>::lowermask;
 
 template<class U>
-octet gf2n_<U>::mult_table[256][256];
+Octet Gf2n_<U>::mult_table[256][256];
 
 template<>
-inline gf2n_<octet>& gf2n_<octet>::mul(const gf2n_<octet>& x, const gf2n_<octet>& y)
+inline Gf2n_<Octet>& Gf2n_<Octet>::mul(const Gf2n_<Octet>& x, const Gf2n_<Octet>& y)
 {
-  return *this = mult_table[octet(x.a)][octet(y.a)];
+  return *this = mult_table[Octet(x.a)][Octet(y.a)];
 }
 
 template<class U>
-gf2n_<U>::gf2n_(PRNG& G)
+Gf2n_<U>::Gf2n_(PRNG& G)
 {
   randomize(G);
 }

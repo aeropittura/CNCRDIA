@@ -15,5 +15,5 @@ public:
     bool shuffle;
 
     MalRepRingOptions();
-    MalRepRingOptions(ez::ezOptionParser& opt, int argc, const char** argv);
+    MalRepRingOptions(ez::EzOptionParser& opt, int argc, const char** argv);
 };

@@ -5,14 +5,14 @@
 
 #include "ot/bit_diagonal.h"
 
-void BitDiagonal::pack(octetStream& os) const
+void BitDiagonal::pack(OctetStream& os) const
 {
     for (int i = 0; i < N_ROWS; i++)
         os.store_bit(rows[i].get_bit(i));
     os.append(0);
 }
 
-void BitDiagonal::unpack(octetStream& os)
+void BitDiagonal::unpack(OctetStream& os)
 {
     *this = {};
     for (int i = 0; i < N_ROWS; i++)

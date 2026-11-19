@@ -26,7 +26,7 @@ ThreadMaster<T>& ThreadMaster<T>::s()
     if (singleton)
         return *singleton;
     else
-        throw no_singleton("no singleton, maybe threads not supported");
+        throw NoSingleton("no singleton, maybe threads not supported");
 }
 
 template<class T>
@@ -108,35 +108,35 @@ void ThreadMaster<T>::run_with_error()
         thread->finish();
 
     // synchronize
-    vector<octetStream> os(P->num_players());
-    P->Broadcast_Receive(os);
+    vector<OctetStream> os(P->num_players());
+    P->broadcast_receive(os);
 
     post_run();
 
     if (opts.verbose)
         machine.queues.print_breakdown();
 
-    NamedCommStats stats = P->total_comm();
-    ExecutionStats exe_stats;
+    NamedCommunicationStatistics statistics = P->total_communication();
+    ExecutionStats exe_statistics;
     for (auto thread : threads)
     {
-        stats += thread->P->total_comm();
-        stats += thread->extra_comm();
-        exe_stats += thread->processor.stats;
+        statistics += thread->P->total_communication();
+        statistics += thread->extra_communication();
+        exe_statistics += thread->processor.statistics;
         delete thread;
     }
 
     machine.queues.clear();
 
-    if (not exe_stats.empty() and opts.verbose)
-        exe_stats.print();
+    if (not exe_statistics.empty() and opts.verbose)
+        exe_statistics.print();
 
     if (opts.verbose)
-        stats.print();
+        statistics.print();
 
     machine.print_timers();
 
-    machine.print_comm(*P, stats);
+    machine.print_communication(*P, statistics);
 
     delete P;
 }

@@ -24,7 +24,7 @@ SpdzWiseInput<T>::SpdzWiseInput(SubProcessor<T>& proc, Player& P) :
 }
 
 template<class T>
-SpdzWiseInput<T>::SpdzWiseInput(SubProcessor<T>& proc, typename T::MAC_Check&) :
+SpdzWiseInput<T>::SpdzWiseInput(SubProcessor<T>& proc, typename T::MacCheck&) :
         SpdzWiseInput<T>(&proc, proc.P)
 {
 }
@@ -43,7 +43,7 @@ void SpdzWiseInput<T>::reset(int player)
 }
 
 template<class T>
-void SpdzWiseInput<T>::add_mine(const typename T::open_type& input, int n_bits)
+void SpdzWiseInput<T>::add_mine(const typename T::OpenType& input, int n_bits)
 {
     part_input.add_mine(input, n_bits);
     counters[P.my_num()]++;
@@ -61,7 +61,7 @@ void SpdzWiseInput<T>::exchange()
 {
     CODE_LOCATION
     part_input.exchange();
-    honest_mult.init_mul();
+    honest_mult.initialize_mult();
     for (int i = 0; i < P.num_players(); i++)
     {
         shares[i].clear();

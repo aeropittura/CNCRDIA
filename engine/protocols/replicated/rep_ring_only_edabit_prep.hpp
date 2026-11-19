@@ -14,7 +14,7 @@ void RepRingOnlyEdabitPrep<T>::buffer_edabits(int n_bits, ThreadQueues*)
 {
     CODE_LOCATION
     assert(this->proc);
-    int dl = T::bit_type::default_length;
+    int dl = T::BitType::default_length;
     int buffer_size = DIV_CEIL(BaseMachine::edabit_batch_size<T>(n_bits, this->buffer_size), dl) * dl;
     StackedVector<T> swholes;
     swholes.resize(buffer_size);
@@ -29,7 +29,7 @@ void RepRingOnlyEdabitPrep<T>::buffer_edabits(int n_bits, ThreadQueues*)
     ArgVector regs(P.num_players() * n_bits);
     for (size_t i = 0; i < regs.size(); i++)
         regs[i] = i * buffer_size / dl;
-    typedef typename T::bit_type bt;
+    typedef typename T::BitType bt;
     StackedVector<bt> bits(n_bits * P.num_players() * buffer_size);
     T::split(bits, regs, n_bits, wholes.data(), wholes.size(),
             *GC::ShareThread < bt > ::s().protocol);
@@ -49,9 +49,9 @@ void RepRingOnlyEdabitPrep<T>::buffer_edabits(int n_bits, ThreadQueues*)
         }
     }
     vector<vector<bt>> sums(buffer_size / dl);
-    auto &party = GC::ShareThread<typename T::bit_type>::s();
-    SubProcessor<bt> bit_proc(party.MC->get_part_MC(), this->proc->bit_prep, P);
-    bit_adder.multi_add(sums, summands, 0, buffer_size / dl, bit_proc, dl, 0);
+    auto &party = GC::ShareThread<typename T::BitType>::s();
+    SubProcessor<bt> bit_processor(party.MC->get_part_opener(), this->proc->bit_prep, P);
+    bit_adder.multi_add(sums, summands, 0, buffer_size / dl, bit_processor, dl, 0);
 
     this->push_edabits(this->edabits[{false, n_bits}], wholes, sums);
 }

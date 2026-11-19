@@ -85,12 +85,12 @@ public:
             a = (G.get_bit() << 1) + G.get_bit();
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         os.store_int(a, 1);
     }
 
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
         a = os.get_int(1);
     }
@@ -108,7 +108,7 @@ class F3VectorBitWiseView;
 
 class F3Vector : public vector<F3>, public ValueInterface
 {
-    typedef vector<F3> super;
+    typedef vector<F3> Super;
 
     thread_local static vector<array<F3, 5>> randomness_table;
 
@@ -117,16 +117,16 @@ class F3Vector : public vector<F3>, public ValueInterface
 
 public:
     typedef F3Vector next;
-    typedef F3Vector plain_type;
+    typedef F3Vector PlainType;
 
     F3Vector() = default;
 
     F3Vector(size_t size) :
-            super(size)
+            Super(size)
     {
     }
 
-    F3Vector(const super& other) : super(other)
+    F3Vector(const Super& other) : Super(other)
     {
     }
 
@@ -161,7 +161,7 @@ public:
         return res;
     }
 
-    void add_mul(F3 c, const F3Vector& other)
+    void add_mult(F3 c, const F3Vector& other)
     {
         assert(size() == other.size());
         if (c.get() == 1)
@@ -197,13 +197,13 @@ public:
         randomize_to_size(G, size());
     }
 
-    void pack(octetStream& os, int = -1) const
+    void pack(OctetStream& os, int = -1) const
     {
         for (auto& x : *this)
             x.pack(os);
     }
 
-    void unpack(octetStream& os, int = -1)
+    void unpack(OctetStream& os, int = -1)
     {
         for (auto& x : *this)
             x.unpack(os);
@@ -232,7 +232,7 @@ class F3VectorBitWiseView
     }
 
 public:
-    typedef F3VectorBitWise owner_type;
+    typedef F3VectorBitWise OwnerType;
 
     size_t storage_size() const
     {
@@ -335,7 +335,7 @@ public:
         return res;
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         for (auto& x : bits)
             x.pack(os);
@@ -349,15 +349,15 @@ template<class T> class RowMatrix;
 
 class F3VectorBitWise : public F3VectorBitWiseView
 {
-    typedef F3VectorBitWiseView super;
+    typedef F3VectorBitWiseView Super;
 
     friend class F3Vector;
-    friend super;
+    friend Super;
 
-    union matrix32x8
+    union Matrix32x8
     {
         __m256i whole;
-        octet rows[32];
+        Octet rows[32];
     };
 
     static void build_randomness_table();
@@ -367,8 +367,8 @@ class F3VectorBitWise : public F3VectorBitWiseView
     array<BitVector, 2> bits;
 
 public:
-    typedef F3Vector plain_type;
-    typedef F3VectorBitWiseView view_type;
+    typedef F3Vector PlainType;
+    typedef F3VectorBitWiseView ViewType;
 
     static GC::RowMatrix<F3VectorBitWise> transpose(
             const GC::RowMatrix<F3VectorBitWise>& matrix);
@@ -422,7 +422,7 @@ public:
         size_t i;
         for (i = 0; i + 31 < size(); i += 32)
         {
-            matrix32x8 tmp;
+            Matrix32x8 tmp;
             for (size_t j = 0; j < 32; j++)
             {
                 tmp.rows[j] = other[i + j].get();
@@ -452,7 +452,7 @@ public:
         for (auto& bit: bits)
             bit.resize(storage_size());
         for (int k = 0; k < 2; k++)
-            super::bits[k] = bits[k];
+            Super::bits[k] = bits[k];
     }
 
     F3 at(size_t i) const
@@ -487,7 +487,7 @@ public:
             bits[k].resize(old_size);
             bits[k].append(other.bits[k], other.size());
             bits[k].resize(storage_size());
-            super::bits[k] = bits[k];
+            Super::bits[k] = bits[k];
         }
     }
 
@@ -497,7 +497,7 @@ public:
         return res += other;
     }
 
-    void add_mul(F3 c, const F3VectorBitWiseView& other)
+    void add_mult(F3 c, const F3VectorBitWiseView& other)
     {
         if (c.get() == 1)
             *this += other;
@@ -533,7 +533,7 @@ public:
 
     void randomize(PRNG& G);
 
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
         for (auto& x : bits)
         {

@@ -54,12 +54,12 @@ void MemoryPart<T>::indirect_write(const Instruction& inst,
 }
 
 template<class T>
-void Memory<T>::minimum_size(RegType secret_type, RegType clear_type,
+void Memory<T>::minimum_size(RegType SecretType, RegType clear_type,
     const Program &program, const string& threadname)
 {
   (void) threadname;
-  MS.minimum_size(program.direct_mem(secret_type));
-  MC.minimum_size(program.direct_mem(clear_type));
+  MS.minimum_size(program.direct_memory(SecretType));
+  MC.minimum_size(program.direct_memory(clear_type));
 }
 
 template<class T>
@@ -75,7 +75,7 @@ void MemoryPart<T>::minimum_size(size_t size)
   }
   catch (bad_alloc&)
   {
-      throw insufficient_memory(size, T::type_string());
+      throw InsufficientMemory(size, T::type_string());
   }
 }
 

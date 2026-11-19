@@ -71,7 +71,7 @@ void BufferBase::try_rewind()
     string type;
     if (field_type.size() and data_type.size())
         type = (string)" of " + field_type + " " + data_type;
-    throw not_enough_to_buffer(type, filename);
+    throw NotEnoughToBuffer(type, filename);
 #endif
     file->clear(); // unset EOF flag
     file->seekg(header_length);
@@ -100,8 +100,8 @@ void BufferBase::prune()
 #ifdef VERBOSE
         cerr << "Pruning " << filename << endl;
 #endif
-        string tmp_name = filename + ".new";
-        ofstream tmp(tmp_name.c_str());
+        string temp_name = filename + ".new";
+        ofstream tmp(temp_name.c_str());
         size_t start = file->tellg();
         start -= element_length() * (BUFFER_SIZE - next);
         char* buf = new char[header_length];
@@ -112,11 +112,11 @@ void BufferBase::prune()
         tmp << file->rdbuf();
         if (tmp.fail())
             throw runtime_error(
-                    "problem writing to " + tmp_name + " from "
+                    "problem writing to " + temp_name + " from "
                             + to_string(start) + " of " + filename);
         tmp.close();
         file->close();
-        rename(tmp_name.c_str(), filename.c_str());
+        rename(temp_name.c_str(), filename.c_str());
         file->open(filename.c_str(), ios::in | ios::binary);
         delete[] buf;
     }
@@ -159,5 +159,5 @@ void BufferBase::purge()
 void BufferBase::check_tuple_length(int tuple_length)
 {
     if (tuple_length != this->tuple_length)
-        throw Processor_Error("inconsistent tuple length");
+        throw ProcessorError("inconsistent tuple length");
 }

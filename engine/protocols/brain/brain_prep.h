@@ -11,7 +11,7 @@
 template<class T>
 class BrainPrep : public MaliciousRingPrep<T>
 {
-    typedef gfp_<2, (T::Z_BITS + 66) / 64> gfp2;
+    typedef Gfp_<2, (T::Z_BITS + 66) / 64> Gfp2;
 
 public:
     static void basic_setup(Player&);

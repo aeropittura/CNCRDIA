@@ -57,8 +57,8 @@ int ExternalClients::get_client_connection(int portnum_base)
       client);
   client_id = stoi(client);
   if (ctx == 0)
-    ctx = new client_ctx("P" + to_string(get_party_num()));
-  external_client_sockets[client_id] = new client_socket(io_service, *ctx, socket,
+    ctx = new ClientContext("P" + to_string(get_party_num()));
+  external_client_sockets[client_id] = new ClientSocket(io_service, *ctx, socket,
       "C" + to_string(client_id), "P" + to_string(get_party_num()), false);
   client_ports[client_id] = portnum_base;
   if (OnlineOptions::singleton.verbose)
@@ -68,21 +68,21 @@ int ExternalClients::get_client_connection(int portnum_base)
   return client_id;
 }
 
-int ExternalClients::init_client_connection(const string& host, int portnum,
+int ExternalClients::initialize_client_connection(const string& host, int portnum,
     int my_client_id)
 {
   ScopeLock _(lock);
   int plain_socket;
   set_up_client_socket(plain_socket, host.c_str(), portnum);
-  octetStream(to_string(my_client_id)).Send(plain_socket);
+  OctetStream(to_string(my_client_id)).Send(plain_socket);
   string my_client_name = "C" + to_string(my_client_id);
   if (peer_ctxs.find(my_client_id) == peer_ctxs.end())
-    peer_ctxs[my_client_id] = new client_ctx(my_client_name);
-  auto socket = new client_socket(io_service, *peer_ctxs[my_client_id],
+    peer_ctxs[my_client_id] = new ClientContext(my_client_name);
+  auto socket = new ClientSocket(io_service, *peer_ctxs[my_client_id],
       plain_socket, "P" + to_string(party_num), "C" + to_string(my_client_id),
       true);
     {
-      octetStream specification;
+      OctetStream specification;
       specification.Receive(socket);
     }
   int id = -1;
@@ -109,7 +109,7 @@ int ExternalClients::get_party_num()
   return party_num;
 }
 
-client_socket* ExternalClients::get_socket(int id)
+ClientSocket* ExternalClients::get_socket(int id)
 {
   ScopeLock _(lock);
   if (external_client_sockets.find(id) == external_client_sockets.end())

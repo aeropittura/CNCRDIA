@@ -12,9 +12,9 @@ const false_type ValueInterface::prime_field;
 const false_type ValueInterface::invertible;
 
 template<class U>
-int gf2n_<U>::l[4];
+int Gf2n_<U>::l[4];
 template<class U>
-bool gf2n_<U>::useC;
+bool Gf2n_<U>::use_c;
 
 word gf2n_short_table[256][256];
 
@@ -45,7 +45,7 @@ int fields_2[num_2_fields][4] =
 };
 
 template<class U>
-string gf2n_<U>::options()
+string Gf2n_<U>::options()
 {
     string res = to_string(fields_2[0][0]);
     for (int i = 1; i < num_2_fields; i++)
@@ -58,11 +58,11 @@ string gf2n_<U>::options()
 }
 
 template<class U>
-void gf2n_<U>::init_tables()
+void Gf2n_<U>::initialize_tables()
 {
   if (sizeof(word)!=8)
     { cout << "Word size is wrong" << endl; 
-      throw not_implemented();
+      throw NotImplemented();
     }
   int i,j;
   for (i=0; i<256; i++)
@@ -79,7 +79,7 @@ void gf2n_<U>::init_tables()
 }
 
 template<class U>
-void gf2n_<U>::init_minimum(int lower)
+void Gf2n_<U>::initialize_minimum(int lower)
 {
   if (lower <= n)
     return;
@@ -88,18 +88,18 @@ void gf2n_<U>::init_minimum(int lower)
     {
       int n = fields_2[i][0];
       if (lower <= n and n <= MAX_N_BITS)
-        return init_field(n);
+        return initialize_field(n);
     }
   throw runtime_error("no suitable field for minimum degree " + to_string(lower));
 }
 
-void gf2n_short::init_field(int nn)
+void Gf2nShort::initialize_field(int nn)
 {
-  super::init_field(nn == 0 ? DEFAULT_LENGTH : nn);
+  Super::initialize_field(nn == 0 ? DEFAULT_LENGTH : nn);
 }
 
 template<class U>
-void gf2n_<U>::init_field(int nn)
+void Gf2n_<U>::initialize_field(int nn)
 {
   if (nn == 0)
     {
@@ -114,7 +114,7 @@ void gf2n_<U>::init_field(int nn)
 
   assert(n == 0);
 
-  init_tables();
+  initialize_tables();
   int i,j=-1;
   for (i=0; i<num_2_fields && j==-1; i++)
     { if (nn==fields_2[i][0]) { j=i; } }
@@ -126,7 +126,7 @@ void gf2n_<U>::init_field(int nn)
 
   if (j==-1)
     {
-      throw gf2n_not_supported(nn, options());
+      throw Gf2nNotSupported(nn, options());
     }
 
   n=nn;
@@ -145,18 +145,18 @@ void gf2n_<U>::init_field(int nn)
   uppermask = U(~U()) << (MAX_N_BITS - t[1]);
   lowermask = ~uppermask;
 
-  init_multiplication();
+  initialize_multiplication();
 
 #ifdef __PCLMUL__
-  useC = not cpu_has_pclmul();
+  use_c = not cpu_has_pclmul();
 #else
-  useC = true;
+  use_c = true;
 #endif
 }
 
 
 template<class U>
-void gf2n_<U>::init_multiplication()
+void Gf2n_<U>::initialize_multiplication()
 {
   if (n <= 8)
     {
@@ -184,7 +184,7 @@ void gf2n_<U>::init_multiplication()
 
 
 template<class U>
-void gf2n_<U>::specification(octetStream& os)
+void Gf2n_<U>::specification(OctetStream& os)
 {
   os.store(sizeof(U));
   os.store(degree());
@@ -195,9 +195,9 @@ void gf2n_<U>::specification(octetStream& os)
       ans = (c1<<8)^c0
    where c1 and c0 are 8 bit
 */
-void mul(octet x, octet y, octet& c0, octet& c1)
+void mul(Octet x, Octet y, Octet& c0, Octet& c1)
 {
-  auto full = gf2n_short_table[octet(x)][octet(y)];
+  auto full = gf2n_short_table[Octet(x)][Octet(y)];
   c0 = full;
   c1 = full >> 8;
 }
@@ -235,7 +235,7 @@ inline word mul16(word x,word y)
 
 
 template<class U>
-void gf2n_<U>::reduce(U xh, U xl)
+void Gf2n_<U>::reduce(U xh, U xl)
 {
   if (n == 0)
     throw runtime_error("gf2n not initialized");
@@ -318,28 +318,28 @@ word to_word(word x)
   return x;
 }
 
-word to_word(int128 x)
+word to_word(Int128 x)
 {
   return x.get_lower();
 }
 
 template<class U>
-gf2n_<U>& gf2n_<U>::mul(const gf2n_& x,const gf2n_& y)
+Gf2n_<U>& Gf2n_<U>::mul(const Gf2n_& x,const Gf2n_& y)
 {
   U hi,lo;
 
   if (n <= 8)
     {
-      *this = mult_table[octet(to_word(x.a))][octet(to_word(y.a))];
+      *this = mult_table[Octet(to_word(x.a))][Octet(to_word(y.a))];
       return *this;
     }
-  else if (useC or n > 64)
+  else if (use_c or n > 64)
     {
       ::mul(x.a, y.a, lo, hi);
     }
   else
     {
-      int128 res = clmul<0>(int128(x.a).a, int128(y.a).a);
+      Int128 res = clmul<0>(Int128(x.a).a, Int128(y.a).a);
 
       if (MAX_N_BITS <= 64)
         {
@@ -358,42 +358,42 @@ gf2n_<U>& gf2n_<U>::mul(const gf2n_& x,const gf2n_& y)
 }
 
 template<class U>
-gf2n_<U> gf2n_<U>::operator*(const Bit& x) const
+Gf2n_<U> Gf2n_<U>::operator*(const Bit& x) const
 {
   return x.get() ? a : 0;
 }
 
 
 template<class U>
-gf2n_<U> gf2n_<U>::invert() const
+Gf2n_<U> Gf2n_<U>::invert() const
 {
   if (n < 64)
     return U(invert<word>(a));
   else
     {
-      gf2n_ res;
-      res.a = invert<int128>(a).get_lower();
+      Gf2n_ res;
+      res.a = invert<Int128>(a).get_lower();
       return res;
     }
 }
 
 template<>
-gf2n_<int128> gf2n_<int128>::invert() const
+Gf2n_<Int128> Gf2n_<Int128>::invert() const
 {
   if (n < 64)
-    return int128(invert<word>(a.get_lower()));
+    return Int128(invert<word>(a.get_lower()));
   if (n < 128)
-    return invert<int128>(a);
+    return invert<Int128>(a);
   else
-    return invert<bit_plus<int128>>(a).get_lower();
+    return invert<BitPlus<Int128>>(a).get_lower();
 }
 
 template<class U>
 template<class T>
-T gf2n_<U>::invert(T a) const
+T Gf2n_<U>::invert(T a) const
 {
   if (is_one())  { return a; }
-  if (is_zero()) { throw division_by_zero(); }
+  if (is_zero()) { throw DivisionByZero(); }
 
   T u,v=a,B=0,D=1,mod=1;
 
@@ -424,7 +424,7 @@ T gf2n_<U>::invert(T a) const
 
 
 template<class U>
-gf2n_<U> gf2n_<U>::operator <<(int i) const
+Gf2n_<U> Gf2n_<U>::operator <<(int i) const
 {
   if (i < 0)
     throw runtime_error("cannot shift by negative");
@@ -435,7 +435,7 @@ gf2n_<U> gf2n_<U>::operator <<(int i) const
 }
 
 template<class U>
-gf2n_<U> gf2n_<U>::operator >>(int i) const
+Gf2n_<U> Gf2n_<U>::operator >>(int i) const
 {
   if (i < 0)
     throw runtime_error("cannot shift by negative");
@@ -447,7 +447,7 @@ gf2n_<U> gf2n_<U>::operator >>(int i) const
 
 
 template<class U>
-void gf2n_<U>::randomize(PRNG& G, int n)
+void Gf2n_<U>::randomize(PRNG& G, int n)
 {
   (void) n;
   a=G.get<U>();
@@ -455,7 +455,7 @@ void gf2n_<U>::randomize(PRNG& G, int n)
 }
 
 template<class U>
-void gf2n_<U>::output(ostream& s,bool human) const
+void Gf2n_<U>::output(ostream& s,bool human) const
 {
   if (human)
     {
@@ -469,14 +469,14 @@ void gf2n_<U>::output(ostream& s,bool human) const
 }
 
 template<class U>
-void gf2n_<U>::input(istream& s,bool human)
+void Gf2n_<U>::input(istream& s,bool human)
 {
   if (s.peek() == EOF)
     { if (s.tellg() == 0)
         { cout << "IO problem. Empty file?" << endl;
           throw file_error("gf2n input");
         }
-      throw end_of_file("gf2n");
+      throw EndOfFile("gf2n");
     }
 
   if (human)
@@ -496,22 +496,22 @@ void gf2n_<U>::input(istream& s,bool human)
   a &= mask;
 }
 
-gf2n_short gf2n_short::cut(int128 x)
+Gf2nShort Gf2nShort::cut(Int128 x)
 {
   return x.get_lower();
 }
 
-gf2n_short::gf2n_short(const int128& a)
+Gf2nShort::Gf2nShort(const Int128& a)
 {
   reduce(a.get_upper(), a.get_lower());
 }
 
 
 // Expansion is by x=y^5+1 (as we embed GF(256) into GF(2^40)
-void expand_byte(gf2n_short& a,int b)
+void expand_byte(Gf2nShort& a,int b)
 {
-  gf2n_short::init_field(40);
-  gf2n_short x,xp;
+  Gf2nShort::initialize_field(40);
+  Gf2nShort x,xp;
   x = (32+1);
   xp.assign_one();
   a.assign_zero();
@@ -526,7 +526,7 @@ void expand_byte(gf2n_short& a,int b)
 
 
 // Have previously worked out the linear equations we need to solve
-void collapse_byte(int& b,const gf2n_short& aa)
+void collapse_byte(int& b,const Gf2nShort& aa)
 {
   word w=aa.get();
   int e35=(w>>35)&1;
@@ -554,6 +554,6 @@ void collapse_byte(int& b,const gf2n_short& aa)
     }
 }
 
-template class gf2n_<word>;
-template class gf2n_<octet>;
-template class gf2n_<int128> ;
+template class Gf2n_<word>;
+template class Gf2n_<Octet>;
+template class Gf2n_<Int128> ;

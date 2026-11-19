@@ -10,13 +10,13 @@
 #include <assert.h>
 
 template<class T>
-MaliciousRepPO<T>::MaliciousRepPO(Player& P) : P(P)
+MaliciousRepPo<T>::MaliciousRepPo(Player& P) : P(P)
 {
     assert(P.num_players() == 3);
 }
 
 template<class T>
-void MaliciousRepPO<T>::prepare_sending(const T& secret, int player)
+void MaliciousRepPo<T>::prepare_sending(const T& secret, int player)
 {
     if (player == P.my_num())
         secrets.push_back(secret);
@@ -25,7 +25,7 @@ void MaliciousRepPO<T>::prepare_sending(const T& secret, int player)
 }
 
 template<class T>
-void MaliciousRepPO<T>::send(int player)
+void MaliciousRepPo<T>::send(int player)
 {
     if (P.get_offset(player) == 2)
         P.send_to(player, to_send);
@@ -34,22 +34,22 @@ void MaliciousRepPO<T>::send(int player)
 }
 
 template<class T>
-void MaliciousRepPO<T>::receive()
+void MaliciousRepPo<T>::receive()
 {
     for (int i = 0; i < 2; i++)
         P.receive_relative(i + 1, to_receive[i]);
     if (to_receive[0].hash() != to_receive[1])
-        throw mac_fail("mismatch in private output");
+        throw MacFail("mismatch in private output");
 }
 
 template<class T>
-typename T::clear MaliciousRepPO<T>::finalize(const T& secret)
+typename T::clear MaliciousRepPo<T>::finalize(const T& secret)
 {
-    return secret.sum() + to_receive[0].template get<typename T::open_type>();
+    return secret.sum() + to_receive[0].template get<typename T::OpenType>();
 }
 
 template<class T>
-typename T::clear MaliciousRepPO<T>::finalize()
+typename T::clear MaliciousRepPo<T>::finalize()
 {
     return finalize(secrets.next());
 }

@@ -25,21 +25,21 @@
 using namespace std;
 
 
-template<class sint, class sgf2n>
+template<class Sint, class Sgf2n>
 template<class T>
-void thread_info<sint, sgf2n>::print_usage(ostream &o,
+void thread_info<Sint, Sgf2n>::print_usage(ostream &o,
         const vector<T>& regs, const char* name)
 {
   ::print_usage(o, name, regs.capacity());
 }
 
-template<class sint, class sgf2n>
-void thread_info<sint, sgf2n>::Sub_Main_Func()
+template<class Sint, class Sgf2n>
+void thread_info<Sint, Sgf2n>::sub_main_func()
 {
-  bigint::init_thread();
+  Bigint::initialize_thread();
 
   auto tinfo = this;
-  Machine<sint, sgf2n>& machine=*(tinfo->machine);
+  Machine<Sint, Sgf2n>& machine=*(tinfo->machine);
   vector<Program>& progs                = machine.progs;
 
   int num=tinfo->thread_num;
@@ -60,59 +60,59 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
 #ifdef VERBOSE_OPTIONS
       cerr << "Using encrypted single-threaded communication" << endl;
 #endif
-      player = new CryptoPlayer(*(tinfo->Nms), id);
+      player = new CryptoPlayer(*(tinfo->nms), id);
     }
   else if (!opts.receive_threads or opts.direct)
     {
 #ifdef VERBOSE_OPTIONS
       cerr << "Using single-threaded receiving" << endl;
 #endif
-      player = new PlainPlayer(*(tinfo->Nms), id);
+      player = new PlainPlayer(*(tinfo->nms), id);
     }
   else
     {
 #ifdef VERBOSE_OPTIONS
       cerr << "Using player-specific threads for receiving" << endl;
 #endif
-      player = new ThreadPlayer(*(tinfo->Nms), id);
+      player = new ThreadPlayer(*(tinfo->nms), id);
     }
   Player& P = *player;
 #ifdef DEBUG_THREADS
   fprintf(stderr, "\tSet up player in thread %d\n",num);
 #endif
 
-  typename sgf2n::MAC_Check* MC2;
-  typename sint::MAC_Check*  MCp;
+  typename Sgf2n::MacCheck* MC2;
+  typename Sint::MacCheck*  MCp;
 
   if (opts.direct)
     {
 #ifdef VERBOSE_OPTIONS
       cerr << "Using direct communication." << endl;
 #endif
-      MC2 = new typename sgf2n::Direct_MC(*(tinfo->alpha2i));
-      MCp = new typename sint::Direct_MC(*(tinfo->alphapi));
+      MC2 = new typename Sgf2n::DirectOpener(*(tinfo->alpha2i));
+      MCp = new typename Sint::DirectOpener(*(tinfo->alphapi));
     }
   else
     {
 #ifdef VERBOSE_OPTIONS
       cerr << "Using indirect communication." << endl;
 #endif
-      MC2 = new typename sgf2n::MAC_Check(*(tinfo->alpha2i), opts.opening_sum, opts.max_broadcast);
-      MCp = new typename sint::MAC_Check(*(tinfo->alphapi), opts.opening_sum, opts.max_broadcast);
+      MC2 = new typename Sgf2n::MacCheck(*(tinfo->alpha2i), opts.opening_sum, opts.max_broadcast);
+      MCp = new typename Sint::MacCheck(*(tinfo->alphapi), opts.opening_sum, opts.max_broadcast);
     }
 
   // Allocate memory for first program before starting the clock
-  processor = new Processor<sint, sgf2n>(tinfo->thread_num,P,*MC2,*MCp,machine,progs.at(thread_num > 0));
+  processor = new Processor<Sint, Sgf2n>(tinfo->thread_num,P,*MC2,*MCp,machine,progs.at(thread_num > 0));
   auto& Proc = *processor;
 
   // don't count communication for initialization
-  P.reset_stats();
+  P.reset_statistics();
 
   bool flag=true;
   int program=-3; 
   // int exec=0;
 
-  typedef typename sint::bit_type::part_type BT;
+  typedef typename Sint::BitType::part_type BT;
 
   // synchronize
 #ifdef DEBUG_THREADS
@@ -142,75 +142,75 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
         }
       else if (job.type == BITADD_JOB)
         {
-          auto& party = GC::ShareThread<typename sint::bit_type>::s();
+          auto& party = GC::ShareThread<typename Sint::BitType>::s();
           if (job.arg < 0)
             {
-              SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+              SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
                   Proc.Procp.bit_prep, P);
               BitAdder().add(*(vector<vector<BT>>*) job.output,
                   *(vector<vector<vector<BT>>>*) job.input, job.begin, job.end,
-                  bit_proc, job.length, -1, job.supply);
+                  bit_processor, job.length, -1, job.supply);
             }
           else
             {
               // too late for preprocessing for security reasons
               assert(job.supply);
               LimitedPrep<BT> limited_prep;
-              SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+              SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
                   limited_prep, P);
               BitAdder().add(*(vector<vector<BT>>*) job.output,
                   *(vector<vector<vector<BT>>>*) job.input, job.begin, job.end,
-                  bit_proc, job.length, -1, job.supply);
+                  bit_processor, job.length, -1, job.supply);
             }
           queues->finished(job);
         }
       else if (job.type == DABIT_JOB)
         {
-          dynamic_cast<RingPrep<sint>&>(Proc.DataF.DataFp).template
+          dynamic_cast<RingPrep<Sint>&>(Proc.DataF.data_fp).template
                   buffer_dabits_without_check<0>(
-              *(vector<dabit<sint>>*) job.output, job.begin, job.end,
+              *(vector<Dabit<Sint>>*) job.output, job.begin, job.end,
               Proc.Procp.bit_prep);
           queues->finished(job);
         }
       else if (job.type == MULT_JOB)
         {
-          Proc.Procp.protocol.multiply(*(PointerVector<sint>*) job.output,
-              *(vector<pair<sint, sint>>*) job.input, job.begin, job.end,
+          Proc.Procp.protocol.multiply(*(PointerVector<Sint>*) job.output,
+              *(vector<pair<Sint, Sint>>*) job.input, job.begin, job.end,
               Proc.Procp);
           queues->finished(job);
         }
       else if (job.type == EDABIT_JOB)
         {
-          dynamic_cast<RingPrep<sint>&>(Proc.DataF.DataFp).template
+          dynamic_cast<RingPrep<Sint>&>(Proc.DataF.data_fp).template
                   buffer_edabits_without_check<0>(
-              job.length, *(vector<sint>*) job.output,
+              job.length, *(vector<Sint>*) job.output,
               *(vector<vector<BT>>*) job.output2, job.begin, job.end);
           queues->finished(job);
         }
       else if (job.type == PERSONAL_JOB)
         {
-          auto &party = GC::ShareThread<typename sint::bit_type>::s();
-          SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+          auto &party = GC::ShareThread<typename Sint::BitType>::s();
+          SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
               Proc.Procp.bit_prep, P);
-          dynamic_cast<RingPrep<sint>&>(Proc.DataF.DataFp).template
+          dynamic_cast<RingPrep<Sint>&>(Proc.DataF.data_fp).template
                   buffer_personal_edabits_without_check<0>(
-              job.length, *(vector<sint>*) job.output,
-              *(vector<vector<BT>>*) job.output2, bit_proc,
+              job.length, *(vector<Sint>*) job.output,
+              *(vector<vector<BT>>*) job.output2, bit_processor,
               job.arg, job.begin, job.end);
           queues->finished(job);
         }
       else if (job.type == SANITIZE_JOB)
         {
-          dynamic_cast<RingPrep<sint>&>(Proc.DataF.DataFp).template
+          dynamic_cast<RingPrep<Sint>&>(Proc.DataF.data_fp).template
                   sanitize<0>(
-              *(vector<edabit<sint>>*) job.output, job.length, job.arg,
+              *(vector<Edabit<Sint>>*) job.output, job.length, job.arg,
               job.begin, job.end);
           queues->finished(job);
         }
       else if (job.type == EDABIT_SACRIFICE_JOB)
         {
-          sint::LivePrep::edabit_sacrifice_buckets(
-              *(vector<edabit<sint>>*) job.output, job.length, job.prognum,
+          Sint::LivePrep::edabit_sacrifice_buckets(
+              *(vector<Edabit<Sint>>*) job.output, job.length, job.prognum,
               job.arg, Proc.Procp,
               job.begin, job.end, job.supply);
 #ifdef DEBUG_THREADS
@@ -221,8 +221,8 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
         }
       else if (job.type == PERSONAL_TRIPLE_JOB)
         {
-          auto &party = GC::ShareThread<typename sint::bit_type>::s();
-          SubProcessor<BT> bit_proc(party.MC->get_part_MC(),
+          auto &party = GC::ShareThread<typename Sint::BitType>::s();
+          SubProcessor<BT> bit_processor(party.MC->get_part_opener(),
               *Proc.Procp.personal_bit_preps.at(job.arg), P);
           Proc.Procp.personal_bit_preps.at(job.arg)->buffer_personal_triples(
               *(vector<array<BT, 3>>*) job.output, job.begin, job.end);
@@ -230,7 +230,7 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
         }
       else if (job.type == TRIPLE_SACRIFICE_JOB)
         {
-          typedef typename sint::bit_type B;
+          typedef typename Sint::BitType B;
           auto &party = GC::ShareThread<B>::s();
           TripleShuffleSacrifice<B>(job.arg).triple_sacrifice(
               *(vector<array<B, 3>>*) job.output,
@@ -246,19 +246,19 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
       else if (job.type == FFT_JOB)
         {
           for (int i = job.begin; i < job.end; i++)
-            FFT_Iter2_body(*(vector<modp>*) job.output,
+            fft_iter2_body(*(vector<modp>*) job.output,
                 *(vector<modp>*) job.input, i, job.length,
-                *(Zp_Data*) job.supply);
+                *(ZpData*) job.supply);
           queues->finished(job);
         }
       else if (job.type == CIPHER_PLAIN_MULT_JOB)
         {
-          cipher_plain_mult(job, sint::triple_matmul);
+          cipher_plain_mult(job, Sint::triple_matmul);
           queues->finished(job);
         }
       else if (job.type == MATRX_RAND_MULT_JOB)
         {
-          matrix_rand_mult(job, sint::triple_matmul);
+          matrix_random_mult(job, Sint::triple_matmul);
           queues->finished(job);
         }
       else if (job.type == SHUFFLE_JOB)
@@ -266,9 +266,9 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
           assert(job.output);
           assert(job.output2);
           assert(job.supply);
-          ((typename sint::Protocol::Shuffler*) job.output)->shuffle_job(
-              *(StackedVector<sint>*) job.output2,
-              *(const vector<ShuffleTuple<typename sint::Protocol::Shuffler::shuffle_type>>*)
+          ((typename Sint::Protocol::Shuffler*) job.output)->shuffle_job(
+              *(StackedVector<Sint>*) job.output2,
+              *(const vector<ShuffleTuple<typename Sint::Protocol::Shuffler::ShuffleType>>*)
               job.supply, job.begin,
               job.end, P, &machine.queues);
           queues->finished(job);
@@ -278,7 +278,7 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
           assert(job.output);
           assert(job.input);
           Proc.Procp.protocol.get_ot_extension().bit_extension(
-                  *(OTExtensionWithMatrix::OtBits*) job.output,
+                  *(OtExtensionWithMatrix::OtBits*) job.output,
                   *(const BitVector*) job.input, job.begin, job.end);
           queues->finished(job);
         }
@@ -318,7 +318,7 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
               "in thread %d\n", program, num);
 #endif
           queues->stop_online(P, Proc.prep_time());
-          queues->finished(job, {P.total_comm(), Proc.stats});
+          queues->finished(job, {P.total_communication(), Proc.statistics});
        }  
       else
         throw runtime_error("unknown job type " + to_string(job.type));
@@ -347,13 +347,13 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
   cerr << "Thread " << num << " wait timer: " << wait_timer.elapsed() << endl;
 
   cerr << "Register usage: ";
-  print_usage(cerr, Proc.Procp.get_S(), "sint");
-  print_usage(cerr, Proc.Procp.get_C(), "cint");
-  print_usage(cerr, Proc.Proc2.get_S(), "sgf2n");
-  print_usage(cerr, Proc.Proc2.get_C(), "cgf2n");
-  print_usage(cerr, Proc.Procb.S, "sbits");
-  print_usage(cerr, Proc.Procb.C, "cbits");
-  print_usage(cerr, Proc.get_Ci(), "regint");
+  print_usage(cerr, Proc.Procp.get_s(), "sint");
+  print_usage(cerr, Proc.Procp.get_c(), "cint");
+  print_usage(cerr, Proc.Proc2.get_s(), "sgf2n");
+  print_usage(cerr, Proc.Proc2.get_c(), "cgf2n");
+  print_usage(cerr, Proc.procb.S, "sbits");
+  print_usage(cerr, Proc.procb.C, "cbits");
+  print_usage(cerr, Proc.get_ci(), "regint");
   cerr << endl;
 #endif
 
@@ -361,16 +361,16 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
       and machine.queues.size() > 1)
     {
       cerr << "Main thread communication:" << endl;
-      P.total_comm().print();
+      P.total_communication().print();
     }
 
   // wind down thread by thread
 
-  if (not Proc.stats.empty() and
+  if (not Proc.statistics.empty() and
       OnlineOptions::singleton.verbose)
     {
       cerr << "Thread " << thread_num << endl;
-      Proc.stats.print();
+      Proc.statistics.print();
     }
 
   assert(Proc.share_thread.protocol);
@@ -378,25 +378,25 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
       + Proc.Proc2.protocol.randomness_time()
       + Proc.share_thread.protocol->randomness_time();
 
-  NamedStats stats;
-  stats["integer multiplications"] = Proc.Procp.protocol.counter;
-  stats["integer multiplication rounds"] = Proc.Procp.protocol.rounds;
-  stats["integer dot products"] = Proc.Procp.protocol.dot_counter;
-  stats["probabilistic truncations"] = Proc.Procp.protocol.trunc_pr_counter;
-  stats["probabilistic truncations (big gap)"] = Proc.Procp.protocol.trunc_pr_big_counter;
-  stats["probabilistic truncation rounds"] = Proc.Procp.protocol.trunc_rounds;
-  stats["ANDs"] = Proc.share_thread.protocol->bit_counter;
-  stats["AND rounds"] = Proc.share_thread.protocol->rounds;
-  stats["integer openings"] = MCp->values_opened;
-  stats["integer inputs"] = Proc.Procp.input.values_input;
-  for (auto x : Proc.Procp.shuffler.stats)
-    stats["shuffles of length " + to_string(x.first)] = x.second;
+  NamedStatistics statistics;
+  statistics["integer multiplications"] = Proc.Procp.protocol.counter;
+  statistics["integer multiplication rounds"] = Proc.Procp.protocol.rounds;
+  statistics["integer dot products"] = Proc.Procp.protocol.dot_counter;
+  statistics["probabilistic truncations"] = Proc.Procp.protocol.trunc_pr_counter;
+  statistics["probabilistic truncations (big gap)"] = Proc.Procp.protocol.trunc_pr_big_counter;
+  statistics["probabilistic truncation rounds"] = Proc.Procp.protocol.trunc_rounds;
+  statistics["ANDs"] = Proc.share_thread.protocol->bit_counter;
+  statistics["AND rounds"] = Proc.share_thread.protocol->rounds;
+  statistics["integer openings"] = MCp->values_opened;
+  statistics["integer inputs"] = Proc.Procp.input.values_input;
+  for (auto x : Proc.Procp.shuffler.statistics)
+    statistics["shuffles of length " + to_string(x.first)] = x.second;
 
   try
   {
-      auto proc = dynamic_cast<RingPrep<sint>&>(Proc.DataF.DataFp).bit_part_proc;
+      auto proc = dynamic_cast<RingPrep<Sint>&>(Proc.DataF.data_fp).bit_part_processor;
       if (proc)
-        stats["ANDs in preprocessing"] = proc->protocol.bit_counter;
+        statistics["ANDs in preprocessing"] = proc->protocol.bit_counter;
   }
   catch (...)
   {
@@ -404,9 +404,9 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
 
   try
   {
-      auto protocol = dynamic_cast<BitPrep<sint>&>(Proc.DataF.DataFp).protocol;
+      auto protocol = dynamic_cast<BitPrep<Sint>&>(Proc.DataF.data_fp).protocol;
       if (protocol)
-        stats["integer multiplications in preprocessing"] = protocol->counter;
+        statistics["integer multiplications in preprocessing"] = protocol->counter;
   }
   catch (...)
   {
@@ -414,10 +414,10 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
 
   // prevent faulty usage message
   Proc.DataF.set_usage(actual_usage);
-  auto exe_stats = Proc.stats;
+  auto exe_statistics = Proc.statistics;
   delete processor;
 
-  queues->finished(actual_usage, {P.total_comm(), exe_stats}, stats);
+  queues->finished(actual_usage, {P.total_communication(), exe_statistics}, statistics);
 
   delete MC2;
   delete MCp;
@@ -429,17 +429,17 @@ void thread_info<sint, sgf2n>::Sub_Main_Func()
 }
 
 
-template<class sint, class sgf2n>
-void* thread_info<sint, sgf2n>::Main_Func(void* ptr)
+template<class Sint, class Sgf2n>
+void* thread_info<Sint, Sgf2n>::main_func(void* ptr)
 {
-  auto& ti = *(thread_info<sint, sgf2n>*)(ptr);
+  auto& ti = *(thread_info<Sint, Sgf2n>*)(ptr);
   if (OnlineOptions::singleton.has_option("throw_exceptions"))
-    ti.Main_Func_With_Purge();
+    ti.main_func_with_purge();
   else
     {
       try
       {
-          ti.Main_Func_With_Purge();
+          ti.main_func_with_purge();
       }
       catch (exception& e)
       {
@@ -450,21 +450,21 @@ void* thread_info<sint, sgf2n>::Main_Func(void* ptr)
   return 0;
 }
 
-template<class sint, class sgf2n>
-void thread_info<sint, sgf2n>::Main_Func_With_Purge()
+template<class Sint, class Sgf2n>
+void thread_info<Sint, Sgf2n>::main_func_with_purge()
 {
   auto& ti = *this;
 #ifdef INSECURE
-  ti.Sub_Main_Func();
+  ti.sub_main_func();
 #else
   if (ti.machine->opts.live_prep)
-    ti.Sub_Main_Func();
+    ti.sub_main_func();
   else
     try
     {
-      ti.Sub_Main_Func();
+      ti.sub_main_func();
     }
-    catch (setup_error&)
+    catch (SetupError&)
     {
       throw;
     }
@@ -477,20 +477,20 @@ void thread_info<sint, sgf2n>::Main_Func_With_Purge()
 }
 
 
-template<class sint, class sgf2n>
-void thread_info<sint, sgf2n>::purge_preprocessing(const Names& N, int thread_num)
+template<class Sint, class Sgf2n>
+void thread_info<Sint, Sgf2n>::purge_preprocessing(const Names& N, int thread_num)
 {
   cerr << "Purging preprocessed data because something is wrong" << endl;
   try
   {
-      Data_Files<sint, sgf2n> df(N, thread_num);
+      DataFiles<Sint, Sgf2n> df(N, thread_num);
       df.purge();
       DataPositions pos;
-      Sub_Data_Files<typename sint::bit_type> bit_df(N, pos, thread_num);
+      SubDataFiles<typename Sint::BitType> bit_df(N, pos, thread_num);
       bit_df.get_part();
       bit_df.purge();
   }
-  catch(setup_error&)
+  catch(SetupError&)
   {
   }
   catch(exception& e)

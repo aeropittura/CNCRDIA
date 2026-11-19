@@ -18,20 +18,20 @@ class CcdShare : public ShamirShare<T>, public ShareSecret<CcdSecret<T>>
     typedef CcdShare This;
 
 public:
-    typedef ShamirShare<T> super;
+    typedef ShamirShare<T> Super;
 
     typedef Bit clear;
 
     typedef ReplicatedPrep<This> LivePrep;
     typedef ShamirInput<This> Input;
 
-    typedef IndirectShamirMC<This> MAC_Check;
-    typedef ShamirMC<This> Direct_MC;
+    typedef IndirectShamirOpener<This> MacCheck;
+    typedef ShamirOpener<This> DirectOpener;
     typedef Shamir<This> Protocol;
 
-    typedef This small_type;
+    typedef This SmallType;
 
-    typedef NoShare bit_type;
+    typedef NoShare BitType;
 
     static const int default_length = 1;
 
@@ -40,9 +40,9 @@ public:
         return "CCD";
     }
 
-    static MAC_Check* new_mc(typename super::mac_key_type)
+    static MacCheck* new_opener(typename Super::MacKeyType)
     {
-        return new MAC_Check;
+        return new MacCheck;
     }
 
     CcdShare()
@@ -50,13 +50,13 @@ public:
     }
 
     CcdShare(const CcdSecret<T>& other) :
-            super(other.get_bit(0))
+            Super(other.get_bit(0))
     {
     }
 
     template<class U>
     CcdShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 

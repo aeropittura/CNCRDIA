@@ -55,9 +55,9 @@ public:
     void join_tape();
     void finish();
 
-    virtual NamedCommStats extra_comm() { return {}; }
+    virtual NamedCommunicationStatistics extra_communication() { return {}; }
 
-    virtual TimerWithComm prep_time() { return {} ; }
+    virtual TimerWithCommunication prep_time() { return {} ; }
 };
 
 template<class T>

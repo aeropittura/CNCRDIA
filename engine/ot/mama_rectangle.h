@@ -60,7 +60,7 @@ public:
 
     void bit_sub(const BitVector&, int)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
     void randomize(int row, PRNG& G)
@@ -69,13 +69,13 @@ public:
                 row % T::Square::n_rows(), G);
     }
 
-    void pack(octetStream& os) const
+    void pack(OctetStream& os) const
     {
         for (int i = 0; i < N; i++)
             squares[i].pack(os);
     }
 
-    void unpack(octetStream& os)
+    void unpack(OctetStream& os)
     {
         for (int i = 0; i < N; i++)
             squares[i].unpack(os);

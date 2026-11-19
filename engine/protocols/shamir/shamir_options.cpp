@@ -20,7 +20,7 @@ ShamirOptions::ShamirOptions(int nparties, int threshold) :
 {
 }
 
-ShamirOptions::ShamirOptions(ez::ezOptionParser& opt, int argc, const char** argv)
+ShamirOptions::ShamirOptions(ez::EzOptionParser& opt, int argc, const char** argv)
 {
     opt.add(
             "3", // Default.
@@ -49,10 +49,10 @@ ShamirOptions::ShamirOptions(ez::ezOptionParser& opt, int argc, const char** arg
         exit(1);
     }
     set_threshold(opt);
-    opt.resetArgs();
+    opt.reset_args();
 }
 
-void ShamirOptions::set_threshold(ez::ezOptionParser& opt)
+void ShamirOptions::set_threshold(ez::EzOptionParser& opt)
 {
     if (opt.isSet("-T"))
         opt.get("-T")->getInt(threshold);

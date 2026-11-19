@@ -15,7 +15,7 @@ namespace GC
 template<class T>
 class SemiSecureStateBase
 {
-    WaitQueue<const void*> job_queue, res_queue;
+    WaitQueue<const void*> job_queue, result_queue;
 
     pthread_t thread;
 
@@ -33,8 +33,8 @@ public:
     Player& P;
 
     osuCrypto::BitVector base_bits;
-    array<vector<array<PRNG, 2>>, 2> G_sender;
-    array<vector<PRNG>, 2> G_receiver;
+    array<vector<array<PRNG, 2>>, 2> g_sender;
+    array<vector<PRNG>, 2> g_receiver;
 
     SemiSecureStateBase(Player& P);
     ~SemiSecureStateBase();
@@ -54,18 +54,18 @@ public:
 class SemiSecureShuffleState : public SemiSecureStateBase<SemiSecureShuffleState>
 {
 public:
-    typedef const vector<SemiSecurePerm*> shuffle_gen_type;
-    typedef pair<size_t, shuffle_gen_type> job_type;
+    typedef const vector<SemiSecurePermutation*> ShuffleGeneratorType;
+    typedef pair<size_t, ShuffleGeneratorType> JobType;
 
-    void generate_role(job_type& job, int role);
+    void generate_role(JobType& job, int role);
 };
 
 class SemiSecureTripleState : public SemiSecureStateBase<SemiSecureTripleState>
 {
 public:
-    typedef pair<int, array<vector<array<SemiSecret, 3>>, 2>> job_type;
+    typedef pair<int, array<vector<array<SemiSecret, 3>>, 2>> JobType;
 
-    void generate_role(job_type& job, int role);
+    void generate_role(JobType& job, int role);
 };
 
 }

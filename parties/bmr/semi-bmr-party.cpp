@@ -8,5 +8,5 @@
 
 int main(int argc, const char** argv)
 {
-    RealProgramParty<SemiShare<gf2n_long>>(argc, argv);
+    RealProgramParty<SemiShare<Gf2nLong>>(argc, argv);
 }

@@ -28,38 +28,38 @@ class Proof
 
   bool diagonal;
 
-  octetStream session_id;
+  OctetStream session_id;
 
   Proof();   // Private to avoid default 
 
   public:
 
-  typedef AddableVector< Int_Random_Coins > Randomness;
-  typedef typename FFT_Data::poly_type bound_type;
+  typedef AddableVector< IntRandomCoins > Randomness;
+  typedef typename FftData::poly_type BoundType;
 
   class Preimages
   {
-    typedef Int_Random_Coins::value_type::value_type r_type;
+    typedef IntRandomCoins::value_type::value_type RType;
 
-    bound_type m_tmp;
-    AddableVector<r_type> r_tmp;
+    BoundType m_temp;
+    AddableVector<RType> r_temp;
 
   public:
-    Preimages(int size, const FHE_PK& pk, const bigint& p, int n_players);
-    AddableMatrix<bound_type> m;
+    Preimages(int size, const FHE_PK& pk, const Bigint& p, int n_players);
+    AddableMatrix<BoundType> m;
     Randomness r;
-    void add(octetStream& os);
-    void pack(octetStream& os);
-    void unpack(octetStream& os);
+    void add(OctetStream& os);
+    void pack(OctetStream& os);
+    void unpack(OctetStream& os);
     void check_sizes();
     size_t report_size(ReportType type) { return m.report_size(type) + r.report_size(type); }
   };
 
-  bigint tau,rho;
+  Bigint tau,rho;
 
   unsigned int phim;
-  int B_plain_length, B_rand_length;
-  bigint plain_check, rand_check;
+  int b_plain_length, b_random_length;
+  Bigint plain_check, random_check;
   unsigned int V;
   unsigned int U;
 
@@ -74,18 +74,18 @@ class Proof
   static double dist;
 
   protected:
-    typedef AddableVector<bound_type> T;
-    typedef AddableMatrix<typename Int_Random_Coins::rand_type> X;
+    typedef AddableVector<BoundType> T;
+    typedef AddableMatrix<typename IntRandomCoins::rand_type> X;
 
-    Proof(int sc, const bigint& Tau, const bigint& Rho, const FHE_PK& pk,
+    Proof(int sc, const Bigint& Tau, const Bigint& Rho, const FHE_PK& pk,
             int n_proofs = 1, bool diagonal = false) :
               diagonal(diagonal),
-              B_plain_length(0), B_rand_length(0), pk(&pk), n_proofs(n_proofs)
+              b_plain_length(0), b_random_length(0), pk(&pk), n_proofs(n_proofs)
     { sec=sc;
       assert(sec > 0);
       tau=Tau; rho=Rho;
 
-      phim=(pk.get_params()).phi_m();
+      phim=(pk.get_parameters()).phi_m();
 
       top_gear = use_top_gear(pk);
       if (top_gear)
@@ -102,13 +102,13 @@ class Proof
 
   Proof(int sec, const FHE_PK& pk, int n_proofs = 1, bool diagonal = false) :
       Proof(sec, pk.p() / 2,
-          pk.get_params().get_DG().get_NewHopeB(), pk,
+          pk.get_parameters().get_dg().get_new_hope_b(), pk,
           n_proofs, diagonal) {}
 
   virtual ~Proof() {}
 
   public:
-  static bigint slack(int slack, int sec, int phim);
+  static Bigint slack(int slack, int sec, int phim);
 
   bool use_top_gear(const FHE_PK& pk)
   {
@@ -128,7 +128,7 @@ class Proof
   }
 
   void set_session_id(const PlayerBase& P);
-  void set_challenge(const octetStream& ciphertexts, int prover,
+  void set_challenge(const OctetStream& ciphertexts, int prover,
       const FHE_PK& pk);
   void set_challenge(PRNG& G);
   void generate_challenge(const Player& P);
@@ -142,7 +142,7 @@ class Proof
       {
         for (unsigned j = 0; j < this->U; j++)
           if (W[i][j] >= 0)
-            output += input[j].mul_by_X_i(W[i][j], pk);
+            output += input[j].mult_by_x_i(W[i][j], pk);
       }
     else
       for (unsigned k = 0; k < sec; k++)
@@ -158,8 +158,8 @@ class Proof
     if (OnlineOptions::singleton.has_option("verbose_he"))
       {
         cerr << "Using " << U << " ciphertexts per proof" << endl;
-        cerr << "Plaintext bound check bit length: " << B_plain_length << endl;
-        cerr << "Randomness bound check bit length: " << B_rand_length << endl;
+        cerr << "Plaintext bound check bit length: " << b_plain_length << endl;
+        cerr << "Randomness bound check bit length: " << b_random_length << endl;
       }
   }
 };
@@ -170,21 +170,21 @@ public:
   // sec = 0 used for protocols without proofs
   static int comp_sec(int sec);
 
-  bigint static slack(int sec, int phim)
-  { sec = comp_sec(sec); return bigint(phim * sec * sec) << (sec / 2 + 8); }
+  Bigint static slack(int sec, int phim)
+  { sec = comp_sec(sec); return Bigint(phim * sec * sec) << (sec / 2 + 8); }
 
   NonInteractiveProof(int sec, const FHE_PK& pk,
       int extra_slack, bool diagonal = false) :
       Proof(comp_sec(sec), pk, 1, diagonal)
   {
     sec = this->sec;
-    bigint B;
+    Bigint B;
     B=128*sec*sec;
     B <<= extra_slack;
-    B_plain_length = numBits(B*phim*tau);
-    B_rand_length = numBits(B*3*phim*rho);
-    plain_check = (bigint(1) << B_plain_length) - sec * tau;
-    rand_check = (bigint(1) << B_rand_length) - sec * rho;
+    b_plain_length = num_bits(B*phim*tau);
+    b_random_length = num_bits(B*3*phim*rho);
+    plain_check = (Bigint(1) << b_plain_length) - sec * tau;
+    random_check = (Bigint(1) << b_random_length) - sec * rho;
     debugging();
   }
 };
@@ -192,20 +192,20 @@ public:
 class InteractiveProof : public Proof
 {
 public:
-  bigint static slack(int sec, int phim)
+  Bigint static slack(int sec, int phim)
   { (void)phim; return pow(2, 1.5 * sec + 1); }
 
   InteractiveProof(int sec, const FHE_PK& pk,
       int n_proofs = 1, bool diagonal = false) :
       Proof(sec, pk, n_proofs, diagonal)
   {
-    bigint B;
-    B = bigint(1) << sec;
-    B_plain_length = numBits(B * tau);
-    B_rand_length = numBits(B * rho);
+    Bigint B;
+    B = Bigint(1) << sec;
+    b_plain_length = num_bits(B * tau);
+    b_random_length = num_bits(B * rho);
     // leeway for completeness
-    plain_check = (bigint(2) << B_plain_length);
-    rand_check = (bigint(2) << B_rand_length);
+    plain_check = (Bigint(2) << b_plain_length);
+    random_check = (Bigint(2) << b_random_length);
     debugging();
   }
 };

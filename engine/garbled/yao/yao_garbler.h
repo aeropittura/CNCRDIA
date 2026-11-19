@@ -23,7 +23,7 @@ class YaoGarbler: public GC::Thread<GC::Secret<YaoGarbleWire>>,
 	friend class YaoGarbleWire;
 	friend class YaoCommon<YaoGarbleWire>;
 
-	typedef GC::Thread<GC::Secret<YaoGarbleWire>> super;
+	typedef GC::Thread<GC::Secret<YaoGarbleWire>> Super;
 
 protected:
 	static thread_local YaoGarbler* singleton;
@@ -33,7 +33,7 @@ protected:
 	SendBuffer gates;
 
 	Timer and_timer;
-	Timer and_proc_timer;
+	Timer and_processor_timer;
 	Timer and_main_thread_timer;
 	DoubleTimer and_prepare_timer;
 	DoubleTimer and_wait_timer;
@@ -46,7 +46,7 @@ public:
 	map<string, Timer> timers;
 
 	RealTwoPartyPlayer player;
-	OTExtensionWithMatrix ot_ext;
+	OtExtensionWithMatrix ot_ext;
 
 	deque<vector<Key>> receiver_input_keys;
 
@@ -71,7 +71,7 @@ public:
 
 	long get_gate_id() { return gate_id(thread_num); }
 
-    NamedCommStats extra_comm();
+    NamedCommunicationStatistics extra_communication();
 };
 
 inline YaoGarbler& YaoGarbler::s()

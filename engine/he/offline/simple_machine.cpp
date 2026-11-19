@@ -105,14 +105,14 @@ void MachineBase::parse_options(int argc, const char** argv)
 MultiplicativeMachine::MultiplicativeMachine() :
         P(N, "machine-coordinator")
 {
-    Share<gfp>::MAC_Check::setup(P);
-    Share<gf2n_short>::MAC_Check::setup(P);
+    Share<Gfp>::MacCheck::setup(P);
+    Share<Gf2nShort>::MacCheck::setup(P);
 }
 
 MultiplicativeMachine::~MultiplicativeMachine()
 {
-    Share<gfp>::MAC_Check::teardown();
-    Share<gf2n_short>::MAC_Check::teardown();
+    Share<Gfp>::MacCheck::teardown();
+    Share<Gf2nShort>::MacCheck::teardown();
 }
 
 void MultiplicativeMachine::parse_options(int argc, const char** argv)
@@ -198,12 +198,12 @@ SimpleMachine::SimpleMachine(int argc, const char** argv)
             if (use_gf2n)
                 generators.push_back(new_generator<SummingEncCommit, P2Data>(i));
             else
-                generators.push_back(new_generator<SummingEncCommit, FFT_Data>(i));
+                generators.push_back(new_generator<SummingEncCommit, FftData>(i));
         else
             if (use_gf2n)
                 generators.push_back(new_generator<SimpleEncCommit_, P2Data>(i));
             else
-                generators.push_back(new_generator<SimpleEncCommit_, FFT_Data>(i));
+                generators.push_back(new_generator<SimpleEncCommit_, FftData>(i));
 }
 
 template <template <class FD> class EC, class FD>
@@ -217,12 +217,12 @@ void MultiplicativeMachine::generate_setup(int slack)
 {
     if (use_gf2n)
     {
-        gf2n_short::init_field(field_size);
+        Gf2nShort::initialize_field(field_size);
         fake_keys<P2Data>(slack);
     }
     else
     {
-        fake_keys<FFT_Data>(slack);
+        fake_keys<FftData>(slack);
     }
 }
 
@@ -230,7 +230,7 @@ template <class FD>
 void MultiplicativeMachine::fake_keys(int slack)
 {
     PlainPlayer P(N, "fake");
-    octetStream os;
+    OctetStream os;
     PartSetup<FD>& part_setup = setup.part<FD>();
     if (P.my_num() == 0)
     {
@@ -253,10 +253,10 @@ void MultiplicativeMachine::fake_keys(int slack)
     part_setup.unpack(os);
     part_setup.check();
 
-    SeededPRNG G;
+    SeededPrng G;
     part_setup.alphai.randomize(G);
     Share<typename FD::T>::set_mac_key(part_setup.alphai);
-    Plaintext_<FD> m(part_setup.FieldD);
+    Plaintext_<FD> m(part_setup.field_d);
     m.assign_constant(part_setup.alphai);
     vector<Ciphertext> C({part_setup.pk.encrypt(m)});
     TreeSum<Ciphertext>().run(C, P);
@@ -368,22 +368,22 @@ string MachineBase::tradeoff()
 void MachineBase::mult_performance()
 {
     int n = 1e7;
-    bigint pr = 1;
+    Bigint pr = 1;
     int bl = MAX_MOD_SZ > 5 ? 300 : (MAX_MOD_SZ) * 64 - 1;
     pr=(pr<<bl)+1;
-    while (!probPrime(pr)) { pr=pr+2; }
+    while (!prob_prime(pr)) { pr=pr+2; }
 
-    Zp_Data prM(pr,true);
+    ZpData pr_m(pr,true);
     modp a,b;
     PRNG G;
-    G.ReSeed();
-    a.randomize(G, prM);
-    b.randomize(G, prM);
+    G.re_seed();
+    a.randomize(G, pr_m);
+    b.randomize(G, pr_m);
 
     Timer timer;
     timer.start();
     for (int i = 0; i < 1e7; i++)
-        Mul(a, a, b, prM);
+        Mul(a, a, b, pr_m);
     cout << bl << "-bit Montgomery multiplication performance: "
             << n / timer.elapsed() << endl;
 }

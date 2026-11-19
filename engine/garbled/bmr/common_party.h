@@ -41,9 +41,9 @@ protected:
     friend class Register;
 
 #ifdef N_PARTIES
-    const party_id_t _N = N_PARTIES;
+    const PartyId _N = N_PARTIES;
 #else
-    party_id_t _N;
+    PartyId _N;
 #endif
     int gate_counter, gate_counter2;
     int garbled_tbl_size;
@@ -52,10 +52,10 @@ protected:
     Timer timers[2];
     Timer timer;
 
-    gf2n_long mac_key;
+    Gf2nLong mac_key;
 
     LocalBuffer wires;
-    ReceivedMsgStore wire_storage;
+    ReceivedMessageStore wire_storage;
 
     template<class T>
     GC::BreakType first_phase(GC::Program& program, GC::Processor<T>& processor,
@@ -83,12 +83,12 @@ public:
 
     virtual void reset();
 
-    gate_id_t new_gate();
+    GateId new_gate();
     void next_gate(GarbledGate& gate);
-    gate_id_t next_gate(int skip) { return gate_counter2 += skip; }
+    GateId next_gate(int skip) { return gate_counter2 += skip; }
     size_t get_garbled_tbl_size() { return garbled_tbl_size; }
 
-    gf2n_long get_mac_key() { return mac_key; }
+    Gf2nLong get_mac_key() { return mac_key; }
 };
 
 class CommonFakeParty : virtual public CommonParty, public NodeUpdatable

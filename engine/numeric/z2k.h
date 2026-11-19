@@ -16,7 +16,7 @@ using namespace std;
 #include "numeric/value_interface.h"
 
 template<class T> class IntBase;
-template<int L> class fixint;
+template<int L> class Fixint;
 
 /**
  * Type for values in the ring defined by the integers modulo ``2^K``
@@ -31,15 +31,15 @@ class Z2 : public ValueInterface
 protected:
 	template <int L>
 	friend class Z2;
-	friend class bigint;
+	friend class Bigint;
 
-	typedef typename conditional<K <= 32, uint32_t, mp_limb_t>::type limb_type;
+	typedef typename conditional<K <= 32, uint32_t, mp_limb_t>::type LimbType;
 
 	static const int N_WORDS = ((K + 7) / 8 + sizeof(mp_limb_t) - 1)
 			/ sizeof(mp_limb_t);
-	static const int N_LIMB_BITS = 8 * sizeof(limb_type);
+	static const int N_LIMB_BITS = 8 * sizeof(LimbType);
 
-	limb_type a[N_WORDS];
+	LimbType a[N_WORDS];
 
 
 public:
@@ -72,11 +72,11 @@ public:
 	static void reqbl(int n);
 	static bool allows(Dtype dtype);
 
-	static void specification(octetStream& os);
+	static void specification(OctetStream& os);
 
 	static Z2 power_of_two(bool bit, int exp) { return Z2(bit) << exp; }
 
-	static string fake_opts() { return " -lgp " + to_string(K); }
+	static string fake_options() { return " -lgp " + to_string(K); }
 
 	typedef Z2 next;
 	typedef Z2 Scalar;
@@ -96,7 +96,7 @@ public:
 	/**
 	 * Convert from unrestricted integer.
 	 */
-	Z2(const bigint& x);
+	Z2(const Bigint& x);
 	Z2(const void* buffer) : Z2() { assign(buffer); }
 	/**
 	 * Convert from different domain via the canonical integer representation.
@@ -124,9 +124,9 @@ public:
 	bool get_bit(int i) const;
 
 	const void* get_ptr() const { return a; }
-	const limb_type* get() const { return a; }
+	const LimbType* get() const { return a; }
 
-	void convert_destroy(bigint& a) { *this = a; }
+	void convert_destroy(Bigint& a) { *this = a; }
 	
 	int bit_length() const;
 
@@ -141,7 +141,7 @@ public:
 	Z2<K> operator*(bool other) const { return other ? *this : Z2<K>(); }
 	Z2<K> operator*(int other) const { return *this * Z2<K>(other); }
 
-	Z2<K> operator/(const Z2& other) const { (void) other; throw division_by_zero(); }
+	Z2<K> operator/(const Z2& other) const { (void) other; throw DivisionByZero(); }
 
 	Z2<K> operator&(const Z2& other) const;
 	Z2<K> operator^(const Z2& other) const;
@@ -166,7 +166,7 @@ public:
 	bool operator!=(const Z2<K>& other) const { return not (*this == other); }
 
 	Z2 lazy_add(const Z2& x) const;
-	Z2 lazy_mul(const Z2& x) const;
+	Z2 lazy_mult(const Z2& x) const;
 
 	Z2 invert() const;
 
@@ -174,7 +174,7 @@ public:
 	 * Deterministic square root for values with least significate bit 1.
 	 * Raises an exception otherwise.
 	 */
-	Z2 sqrRoot();
+	Z2 square_root();
 
 	bool is_zero() const { return *this == Z2<K>(); }
 	bool is_one() const { return *this == 1; }
@@ -183,7 +183,7 @@ public:
 	bool msb() const
 	{
         return this->a[this->N_WORDS - 1]
-                & 1ll << ((K - 1) % (8 * sizeof(limb_type)));
+                & 1ll << ((K - 1) % (8 * sizeof(LimbType)));
 	}
 
 	/**
@@ -195,7 +195,7 @@ public:
 	void randomize_part(PRNG& G, int n);
 	void almost_randomize(PRNG& G) { randomize(G); }
 
-	void from_random(const int128& other);
+	void from_random(const Int128& other);
 
 	void force_to_bit() { throw runtime_error("impossible"); }
 
@@ -204,13 +204,13 @@ public:
 	 * @param o buffer
 	 * @param n (unused)
 	 */
-	void pack(octetStream& o, int = -1) const;
+	void pack(OctetStream& o, int = -1) const;
 	/**
 	 * Read from buffer in native format
 	 * @param o buffer
 	 * @param n (unused)
 	 */
-	void unpack(octetStream& o, int n = -1);
+	void unpack(OctetStream& o, int n = -1);
 
 	void input(istream& s, bool human=true);
 	void output(ostream& s, bool human=true) const;
@@ -266,13 +266,13 @@ public:
     }
 
     template<int L>
-    SignedZ2(const fixint<L>& other) :
+    SignedZ2(const Fixint<L>& other) :
             Z2<K>(other)
     {
         extend(other);
     }
 
-    void to(bigint& res) const
+    void to(Bigint& res) const
     {
         res = *this;
     }
@@ -399,7 +399,7 @@ template <int L, int M, bool LAZY>
 inline Z2<K> Z2<K>::Mul(const Z2<L>& x, const Z2<M>& y)
 {
 	Z2<K> res;
-	mpn_mul_fixed_<N_WORDS, Z2<L>::N_WORDS, Z2<M>::N_WORDS>(res.a, x.a, y.a);
+	mpn_mult_fixed_<N_WORDS, Z2<L>::N_WORDS, Z2<M>::N_WORDS>(res.a, x.a, y.a);
 	if (not LAZY)
 		res.normalize();
 	return res;
@@ -413,7 +413,7 @@ inline Z2<(K > L) ? K : L> Z2<K>::operator*(const Z2<L>& other) const
 }
 
 template <int K>
-inline Z2<K> Z2<K>::lazy_mul(const Z2<K>& other) const
+inline Z2<K> Z2<K>::lazy_mult(const Z2<K>& other) const
 {
 	return Z2<K>::Mul<K, K, true>(*this, other);
 }
@@ -430,7 +430,7 @@ Z2<K> Z2<K>::operator<<(unsigned long i) const
 	    res.a[0] <<= n_inside_shift;
 	else
 	    if (n_inside_shift > 0)
-	        mpn_lshift_fixed<limb_type, N_WORDS>(res.a, res.a, n_inside_shift);
+	        mpn_lshift_fixed<LimbType, N_WORDS>(res.a, res.a, n_inside_shift);
 	res.a[N_WORDS - 1] &= UPPER_MASK;
 	return res;
 }
@@ -455,7 +455,7 @@ Z2<K> Z2<K>::operator>>(unsigned long i) const
 	if (N_WORDS == 1)
 		res.a[0] >>= n_inside_shift;
 	else if (n_inside_shift > 0)
-		mpn_rshift_fixed<limb_type, N_WORDS>(res.a, res.a, n_inside_shift);
+		mpn_rshift_fixed<LimbType, N_WORDS>(res.a, res.a, n_inside_shift);
 	return res;
 }
 
@@ -478,7 +478,7 @@ template<int K>
 void Z2<K>::randomize(PRNG& G, int n)
 {
 	(void) n;
-	G.get_octets<N_BYTES>((octet*)a);
+	G.get_octets<N_BYTES>((Octet*)a);
 	normalize_byte();
 }
 
@@ -492,22 +492,22 @@ void Z2<K>::randomize_part(PRNG& G, int n)
 	}
 
 	*this = {};
-	G.get_octets((octet*)a, DIV_CEIL(n, 8));
+	G.get_octets((Octet*)a, DIV_CEIL(n, 8));
 	a[DIV_CEIL(n, 64) - 1] &= mp_limb_t(-1LL) >> (N_LIMB_BITS - 1 - (n - 1) % N_LIMB_BITS);
 }
 
 template<int K>
-void Z2<K>::pack(octetStream& o, int n) const
+void Z2<K>::pack(OctetStream& o, int n) const
 {
 	(void) n;
-	o.append((octet*)a, N_BYTES);
+	o.append((Octet*)a, N_BYTES);
 }
 
 template<int K>
-void Z2<K>::unpack(octetStream& o, int n)
+void Z2<K>::unpack(OctetStream& o, int n)
 {
 	(void) n;
-	o.consume((octet*)a, N_BYTES);
+	o.consume((Octet*)a, N_BYTES);
 }
 
 template<int K>
@@ -526,8 +526,8 @@ void SignedZ2<K>::output(ostream& s, bool human, bool signed_) const
     {
         if (signed_)
         {
-            bigint::tmp = *this;
-            s << bigint::tmp;
+            Bigint::tmp = *this;
+            s << Bigint::tmp;
         }
         else
             Z2<K>::output(s, human);

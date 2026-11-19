@@ -8,45 +8,45 @@
 #include "net/ssl_sockets.h"
 
 #ifdef NO_CLIENT_TLS
-class client_ctx
+class ClientContext
 {
 public:
-    client_ctx(string)
+    ClientContext(string)
     {
     }
 };
 
-class client_socket
+class ClientSocket
 {
 public:
     int socket;
 
-    client_socket(ssl_service&,
-            client_ctx&, int plaintext_socket, string,
+    ClientSocket(SslService&,
+            ClientContext&, int plaintext_socket, string,
             string, bool) : socket(plaintext_socket)
     {
     }
 
-    ~client_socket()
+    ~ClientSocket()
     {
         close(socket);
     }
 };
 
-inline void send(client_socket* socket, octet* data, size_t len)
+inline void send(ClientSocket* socket, Octet* data, size_t len)
 {
     send(socket->socket, data, len);
 }
 
-inline void receive(client_socket* socket, octet* data, size_t len)
+inline void receive(ClientSocket* socket, Octet* data, size_t len)
 {
     receive(socket->socket, data, len);
 }
 
 #else
 
-typedef ssl_ctx client_ctx;
-typedef ssl_socket client_socket;
+typedef SslContext ClientContext;
+typedef SslSocket ClientSocket;
 
 #endif
 
@@ -56,19 +56,19 @@ typedef ssl_socket client_socket;
 class Client
 {
     vector<int> plain_sockets;
-    client_ctx ctx;
-    ssl_service io_service;
+    ClientContext ctx;
+    SslService io_service;
 
 public:
     /**
      * Sockets for cleartext communication
      */
-    vector<client_socket*> sockets;
+    vector<ClientSocket*> sockets;
 
     /**
      * Specification of computation domain
      */
-    octetStream specification;
+    OctetStream specification;
 
     /**
      * Start a new set of connections to computing parties.

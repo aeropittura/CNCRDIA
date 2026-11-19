@@ -23,14 +23,14 @@
 #include <pthread.h>
 using namespace std;
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::init_binary_domains(int security_parameter, int lg2)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::initialize_binary_domains(int security_parameter, int lg2)
 {
-  sgf2n::clear::init_field(lg2);
+  Sgf2n::clear::initialize_field(lg2);
 
-  if (not is_same<typename sgf2n::mac_key_type, GC::NoValue>())
+  if (not is_same<typename Sgf2n::MacKeyType, GC::NoValue>())
     {
-      if (sgf2n::mac_key_type::length() < security_parameter)
+      if (Sgf2n::MacKeyType::length() < security_parameter)
         {
           cerr << "Security parameter needs to be at most n in GF(2^n)."
               << endl;
@@ -40,29 +40,29 @@ void Machine<sint, sgf2n>::init_binary_domains(int security_parameter, int lg2)
         }
     }
 
-  if (not is_same<typename sint::bit_type::mac_key_type, GC::NoValue>())
+  if (not is_same<typename Sint::BitType::MacKeyType, GC::NoValue>())
     {
-      sint::bit_type::mac_key_type::init_minimum(security_parameter);
+      Sint::BitType::MacKeyType::initialize_minimum(security_parameter);
     }
   else
     {
       // Initialize field for CCD
-      sint::bit_type::part_type::open_type::init_field();
+      Sint::BitType::part_type::OpenType::initialize_field();
     }
 }
 
-template<class sint, class sgf2n>
-Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
+template<class Sint, class Sgf2n>
+Machine<Sint, Sgf2n>::Machine(Names& player_names, bool use_encryption,
     const OnlineOptions opts)
-  : my_number(playerNames.my_num()), N(playerNames),
+  : my_number(player_names.my_num()), N(player_names),
     max_trunc_size(0),
     use_encryption(use_encryption), live_prep(opts.live_prep), opts(opts),
     external_clients(my_number)
 {
   OnlineOptions::singleton = opts;
 
-  int min_players = 3 - sint::dishonest_majority;
-  if (sint::is_real)
+  int min_players = 3 - Sint::dishonest_majority;
+  if (Sint::is_real)
     {
       if (N.num_players() == 1)
         {
@@ -80,9 +80,9 @@ Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
 
   // Set the prime modulus from command line or program if applicable
   if (opts.prime)
-    sint::clear::init_field(opts.prime);
+    Sint::clear::initialize_field(opts.prime);
 
-  init_binary_domains(opts.security_parameter, opts.lg2);
+  initialize_binary_domains(opts.security_parameter, opts.lg2);
 
   // make directory for outputs if necessary
   mkdir_p(PREP_DIR);
@@ -95,37 +95,37 @@ Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
 
   if (opts.live_prep)
     {
-      sint::LivePrep::basic_setup(*P);
+      Sint::LivePrep::basic_setup(*P);
     }
 
   // Set the prime modulus if not done earlier
-  if (not sint::clear::length())
-    sint::clear::read_or_generate_setup(prep_dir_prefix<sint>(), opts);
+  if (not Sint::clear::length())
+    Sint::clear::read_or_generate_setup(prep_directory_prefix<Sint>(), opts);
 
-  sint::MAC_Check::setup(*P);
-  sint::bit_type::MAC_Check::setup(*P);
-  sgf2n::MAC_Check::setup(*P);
+  Sint::MacCheck::setup(*P);
+  Sint::BitType::MacCheck::setup(*P);
+  Sgf2n::MacCheck::setup(*P);
 
   // for OT-based preprocessing
-  sint::clear::next::template init<typename sint::clear>(false);
+  Sint::clear::next::template init<typename Sint::clear>(false);
 
   if (opts.live_prep)
     {
-      alphapi = sint::LivePrep::get_mac_key(*P);
-      alpha2i = sgf2n::LivePrep::get_mac_key(*P, true);
-      alphabi = sint::bit_type::LivePrep::get_mac_key(*P);
+      alphapi = Sint::LivePrep::get_mac_key(*P);
+      alpha2i = Sgf2n::LivePrep::get_mac_key(*P, true);
+      alphabi = Sint::BitType::LivePrep::get_mac_key(*P);
     }
   else
     {
       // check for directory
-      Sub_Data_Files<sint>::check_setup(N);
+      SubDataFiles<Sint>::check_setup(N);
       // require existing MAC keys
-      if (sint::has_mac)
-        maybe_read_mac_key<sint>(N, alphapi);
-      if (sgf2n::has_mac)
-        maybe_read_mac_key<sgf2n>(N, alpha2i);
-      if (sint::bit_type::part_type::has_mac)
-        maybe_read_mac_key<typename sint::bit_type::part_type>(N, alphabi);
+      if (Sint::has_mac)
+        maybe_read_mac_key<Sint>(N, alphapi);
+      if (Sgf2n::has_mac)
+        maybe_read_mac_key<Sgf2n>(N, alpha2i);
+      if (Sint::BitType::part_type::has_mac)
+        maybe_read_mac_key<typename Sint::BitType::part_type>(N, alphabi);
     }
 
 #ifdef DEBUG_MAC
@@ -137,12 +137,12 @@ Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
   auto memtype = opts.memtype;
   if (memtype.compare("old")==0)
      {
-       if (sint::real_shares(*P))
+       if (Sint::real_shares(*P))
          {
            ifstream inpf;
            inpf.open(memory_filename(), ios::in | ios::binary);
            if (inpf.fail()) { throw file_error(memory_filename()); }
-           inpf >> M2 >> Mp >> Mi;
+           inpf >> M2 >> Mp >> mi;
            if (inpf.get() != 'M')
            {
                cerr << "Invalid memory file. Run with '-m empty'." << endl;
@@ -157,8 +157,8 @@ Machine<sint, sgf2n>::Machine(Names& playerNames, bool use_encryption,
      }
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::prepare(const string& progname_str)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::prepare(const string& progname_str)
 {
   int old_n_threads = nthreads;
   progs.clear();
@@ -177,9 +177,9 @@ void Machine<sint, sgf2n>::prepare(const string& progname_str)
     {
       if (prog.writes_persistence)
         {
-          Binary_File_IO<sint>::reset(my_number);
-          Binary_File_IO<sgf2n>::reset(my_number);
-          Binary_File_IO<typename sint::clear>::reset(my_number);
+          BinaryFileIo<Sint>::reset(my_number);
+          BinaryFileIo<Sgf2n>::reset(my_number);
+          BinaryFileIo<typename Sint::clear>::reset(my_number);
           break;
         }
     }
@@ -200,13 +200,13 @@ void Machine<sint, sgf2n>::prepare(const string& progname_str)
       // stand-in for initialization
       queues[i]->schedule({});
       tinfo[i].thread_num=i;
-      tinfo[i].Nms=&N;
+      tinfo[i].nms=&N;
       tinfo[i].alphapi=&alphapi;
       tinfo[i].alpha2i=&alpha2i;
       tinfo[i].machine=this;
       pthread_t thread;
       int res = pthread_create(&thread, NULL,
-          thread_info<sint, sgf2n>::Main_Func, &tinfo[i]);
+          thread_info<Sint, Sgf2n>::main_func, &tinfo[i]);
 
       if (res == 0)
         threads.push_back(thread);
@@ -220,23 +220,23 @@ void Machine<sint, sgf2n>::prepare(const string& progname_str)
   assert(queues.size() == threads.size());
 }
 
-template<class sint, class sgf2n>
-Machine<sint, sgf2n>::~Machine()
+template<class Sint, class Sgf2n>
+Machine<Sint, Sgf2n>::~Machine()
 {
   stop_threads();
 
-  sint::LivePrep::teardown();
-  sgf2n::LivePrep::teardown();
+  Sint::LivePrep::teardown();
+  Sgf2n::LivePrep::teardown();
 
-  sint::MAC_Check::teardown();
-  sint::bit_type::MAC_Check::teardown();
-  sgf2n::MAC_Check::teardown();
+  Sint::MacCheck::teardown();
+  Sint::BitType::MacCheck::teardown();
+  Sgf2n::MacCheck::teardown();
 
   delete P;
 }
 
-template<class sint, class sgf2n>
-size_t Machine<sint, sgf2n>::load_program(const string& threadname,
+template<class Sint, class Sgf2n>
+size_t Machine<Sint, Sgf2n>::load_program(const string& threadname,
     const string& filename)
 {
   progs.push_back(N.num_players());
@@ -244,20 +244,20 @@ size_t Machine<sint, sgf2n>::load_program(const string& threadname,
   progs[i].parse(filename);
   M2.minimum_size(SGF2N, CGF2N, progs[i], threadname);
   Mp.minimum_size(SINT, CINT, progs[i], threadname);
-  Mi.minimum_size(NONE, INT, progs[i], threadname);
+  mi.minimum_size(NONE, INT, progs[i], threadname);
   bit_memories.reset(progs[i]);
   return progs.back().size();
 }
 
-template<class sint, class sgf2n>
-DataPositions Machine<sint, sgf2n>::run_tapes(const ArgVector& args,
-    Data_Files<sint, sgf2n>& DataF)
+template<class Sint, class Sgf2n>
+DataPositions Machine<Sint, Sgf2n>::run_tapes(const ArgVector& args,
+    DataFiles<Sint, Sgf2n>& DataF)
 {
   assert(args.size() % 3 == 0);
   size_t max_thread = 0;
   for (unsigned i = 0; i < args.size(); i += 3)
   {
-    fill_buffers(args[i], args[i + 1], &DataF.DataFp, &DataF.DataFb);
+    fill_buffers(args[i], args[i + 1], &DataF.data_fp, &DataF.data_fb);
     if (max_thread < args[i])
       max_thread = args[i];
   }
@@ -271,35 +271,35 @@ DataPositions Machine<sint, sgf2n>::run_tapes(const ArgVector& args,
   return res;
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::fill_buffers(int thread_number, int tape_number,
-    Preprocessing<sint>* prep,
-    Preprocessing<typename sint::bit_type>* bit_prep)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::fill_buffers(int thread_number, int tape_number,
+    Preprocessing<Sint>* prep,
+    Preprocessing<typename Sint::BitType>* bit_prep)
 {
   // central preprocessing
   auto usage = progs[tape_number].get_offline_data_used();
-  if (sint::expensive and prep != 0 and OnlineOptions::singleton.bucket_size == 3)
+  if (Sint::expensive and prep != 0 and OnlineOptions::singleton.bucket_size == 3)
     {
       try
       {
-          auto& source = *dynamic_cast<BufferPrep<sint>*>(prep);
+          auto& source = *dynamic_cast<BufferPrep<Sint>*>(prep);
           auto& dest =
-              dynamic_cast<BufferPrep<sint>&>(tinfo[thread_number].processor->DataF.DataFp);
+              dynamic_cast<BufferPrep<Sint>&>(tinfo[thread_number].processor->DataF.data_fp);
           for (auto it = usage.edabits.begin(); it != usage.edabits.end(); it++)
             {
               bool strict = it->first.first;
               int n_bits = it->first.second;
               size_t required = DIV_CEIL(it->second,
-                  sint::bit_type::part_type::default_length);
-              auto& dest_buffer = dest.edabits[it->first];
+                  Sint::BitType::part_type::default_length);
+              auto& destination_buffer = dest.edabits[it->first];
               auto& source_buffer = source.edabits[it->first];
-              while (dest_buffer.size() < required)
+              while (destination_buffer.size() < required)
                 {
                   if (source_buffer.empty())
                     source.buffer_edabits(strict, n_bits, &queues);
                   size_t n = min(source_buffer.size(),
-                      required - dest_buffer.size());
-                  dest_buffer.insert(dest_buffer.end(), source_buffer.end() - n,
+                      required - destination_buffer.size());
+                  destination_buffer.insert(destination_buffer.end(), source_buffer.end() - n,
                       source_buffer.end());
                   source_buffer.erase(source_buffer.end() - n,
                       source_buffer.end());
@@ -314,17 +314,17 @@ void Machine<sint, sgf2n>::fill_buffers(int thread_number, int tape_number,
       }
     }
 
-  typedef typename sint::bit_type bit_type;
-  if (bit_type::expensive_triples and bit_prep and OnlineOptions::singleton.bucket_size == 3)
+  typedef typename Sint::BitType BitType;
+  if (BitType::expensive_triples and bit_prep and OnlineOptions::singleton.bucket_size == 3)
     {
       try
       {
-          auto& source = *dynamic_cast<BufferPrep<bit_type>*>(bit_prep);
+          auto& source = *dynamic_cast<BufferPrep<BitType>*>(bit_prep);
           auto &dest =
-              dynamic_cast<BufferPrep<bit_type>&>(tinfo[thread_number].processor->share_thread.DataF);
+              dynamic_cast<BufferPrep<BitType>&>(tinfo[thread_number].processor->share_thread.DataF);
           for (int i = 0; i < DIV_CEIL(usage.files[DATA_GF2][DATA_TRIPLE],
-                                        bit_type::default_length); i++)
-            dest.push_triple(source.get_triple_no_count(bit_type::default_length));
+                                        BitType::default_length); i++)
+            dest.push_triple(source.get_triple_no_count(BitType::default_length));
       }
       catch (bad_cast& e)
       {
@@ -335,38 +335,38 @@ void Machine<sint, sgf2n>::fill_buffers(int thread_number, int tape_number,
     }
 
   if (not HemiOptions::singleton.plain_matmul)
-    fill_matmul(thread_number, tape_number, prep, sint::triple_matmul);
+    fill_matmul(thread_number, tape_number, prep, Sint::triple_matmul);
 }
 
-template<class sint, class sgf2n>
+template<class Sint, class Sgf2n>
 template<int>
-void Machine<sint, sgf2n>::fill_matmul(int thread_number, int tape_number,
-    Preprocessing<sint>* prep, true_type)
+void Machine<Sint, Sgf2n>::fill_matmul(int thread_number, int tape_number,
+    Preprocessing<Sint>* prep, true_type)
 {
   auto usage = progs[tape_number].get_offline_data_used();
   for (auto it = usage.matmuls.begin(); it != usage.matmuls.end(); it++)
     {
       try
       {
-          auto& source_proc = *dynamic_cast<BufferPrep<sint>&>(*prep).proc;
+          auto& source_processor = *dynamic_cast<BufferPrep<Sint>&>(*prep).proc;
           int max_inner = opts.batch_size;
-          int max_cols = opts.batch_size;
+          int max_columns = opts.batch_size;
           for (int j = 0; j < it->first[1]; j += max_inner)
             {
-              for (int k = 0; k < it->first[2]; k += max_cols)
+              for (int k = 0; k < it->first[2]; k += max_columns)
                 {
                   auto subdim = it->first;
                   subdim[1] = min(subdim[1] - j, max_inner);
-                  subdim[2] = min(subdim[2] - k, max_cols);
-                  auto& source_proto = dynamic_cast<Hemi<sint>&>(source_proc.protocol);
-                  auto& source = source_proto.get_matrix_prep(
-                          subdim, source_proc);
+                  subdim[2] = min(subdim[2] - k, max_columns);
+                  auto& source_protocol = dynamic_cast<Hemi<Sint>&>(source_processor.protocol);
+                  auto& source = source_protocol.get_matrix_prep(
+                          subdim, source_processor);
                   auto& dest =
-                      dynamic_cast<Hemi<sint>&>(tinfo[thread_number].processor->Procp.protocol).get_matrix_prep(
+                      dynamic_cast<Hemi<Sint>&>(tinfo[thread_number].processor->Procp.protocol).get_matrix_prep(
                           subdim, tinfo[thread_number].processor->Procp);
-                  if (not source_proto.use_plain_matmul(subdim, source_proc))
+                  if (not source_protocol.use_plain_matmul(subdim, source_processor))
                     for (int i = 0; i < it->second; i++)
-                      dynamic_cast<BufferPrep<ShareMatrix<sint>>&>(dest).push_triple(
+                      dynamic_cast<BufferPrep<ShareMatrix<Sint>>&>(dest).push_triple(
                           source.get_triple_no_count(-1));
                 }
             }
@@ -380,8 +380,8 @@ void Machine<sint, sgf2n>::fill_matmul(int thread_number, int tape_number,
     }
 }
 
-template<class sint, class sgf2n>
-DataPositions Machine<sint, sgf2n>::run_tape(int thread_number, int tape_number,
+template<class Sint, class Sgf2n>
+DataPositions Machine<Sint, Sgf2n>::run_tape(int thread_number, int tape_number,
     int arg, const DataPositions& pos)
 {
   if (size_t(thread_number) >= tinfo.size())
@@ -412,8 +412,8 @@ DataPositions Machine<sint, sgf2n>::run_tape(int thread_number, int tape_number,
     }
 }
 
-template<class sint, class sgf2n>
-DataPositions Machine<sint, sgf2n>::join_tape(int i)
+template<class Sint, class Sgf2n>
+DataPositions Machine<Sint, Sgf2n>::join_tape(int i)
 {
   join_timer[i].start();
   //printf("Waiting for client to terminate\n");
@@ -428,16 +428,16 @@ DataPositions Machine<sint, sgf2n>::join_tape(int i)
   return pos;
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::run_step(const string& progname)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::run_step(const string& progname)
 {
   prepare(progname);
   run_tape(0, 0, 0, N.num_players());
   join_tape(0);
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::run_function(const string& name,
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::run_function(const string& name,
         FunctionArgument& result, vector<FunctionArgument>& arguments)
 {
   ifstream file;
@@ -447,15 +447,15 @@ void Machine<sint, sgf2n>::run_function(const string& name,
   int tape_number, return_reg;
   file >> progname >> tape_number >> return_type >> return_reg;
 
-  result.check_type(return_type);
+  result.CheckType(return_type);
 
-  vector<int> arg_regs(arguments.size());
-  vector<int> address_regs(arguments.size());
+  vector<int> arg_registers(arguments.size());
+  vector<int> address_registers(arguments.size());
   for (size_t i = 0; i < arguments.size(); i++)
     {
-      file >> arg_regs.at(i);
+      file >> arg_registers.at(i);
       if (arguments[i].get_memory())
-        file >> address_regs.at(i);
+        file >> address_registers.at(i);
     }
 
   if (not file.good())
@@ -471,27 +471,27 @@ void Machine<sint, sgf2n>::run_function(const string& name,
         if (arguments[i].get_n_bits())
           {
             size_t n_limbs = DIV_CEIL(arguments[i].get_n_bits(),
-                sint::bit_type::default_length);
+                Sint::BitType::default_length);
             for (size_t k = 0; k < n_limbs; k++)
-              bit_memories.MS[arg_regs.at(i) + j * n_limbs + k] =
-                  arguments[i].get_value<vector<typename sint::bit_type>>(j).at(
+              bit_memories.MS[arg_registers.at(i) + j * n_limbs + k] =
+                  arguments[i].get_value<vector<typename Sint::BitType>>(j).at(
                       k);
           }
         else if (arguments[i].has_reg_type("s"))
           {
-            auto& value = arguments[i].get_value<sint>(j);
+            auto& value = arguments[i].get_value<Sint>(j);
             if (arguments[i].get_memory())
-              Mp.MS[arg_regs.at(i) + j] = value;
+              Mp.MS[arg_registers.at(i) + j] = value;
             else
-              processor.Procp.get_S()[arg_regs.at(i) + j] = value;
+              processor.Procp.get_s()[arg_registers.at(i) + j] = value;
           }
         else
           {
             assert(arguments[i].has_reg_type("ci"));
-            processor.write_Ci(arg_regs.at(i) + j, arguments[i].get_value<long>(j));
+            processor.write_ci(arg_registers.at(i) + j, arguments[i].get_value<long>(j));
           }
         if (arguments[i].get_memory())
-          processor.write_Ci(address_regs.at(i), arg_regs.at(i));
+          processor.write_ci(address_registers.at(i), arg_registers.at(i));
       }
 
   run_tape(0, tape_number, 0, N.num_players());
@@ -499,7 +499,7 @@ void Machine<sint, sgf2n>::run_function(const string& name,
 
   assert(result.has_reg_type("s"));
   for (size_t j = 0; j < result.get_size(); j++)
-    result.get_value<sint>(j) = processor.Procp.get_S()[return_reg + j];
+    result.get_value<Sint>(j) = processor.Procp.get_s()[return_reg + j];
 
   for (size_t i = 0; i < arguments.size(); i++)
     if (arguments[i].get_memory())
@@ -508,18 +508,18 @@ void Machine<sint, sgf2n>::run_function(const string& name,
           if (arguments[i].get_n_bits())
             {
               size_t n_limbs = DIV_CEIL(arguments[i].get_n_bits(),
-                  sint::bit_type::default_length);
+                  Sint::BitType::default_length);
               for (size_t k = 0; k < n_limbs; k++)
-                arguments[i].get_value<vector<typename sint::bit_type>>(j).at(k) =
-                    bit_memories.MS[arg_regs.at(i) + j * n_limbs + k];
+                arguments[i].get_value<vector<typename Sint::BitType>>(j).at(k) =
+                    bit_memories.MS[arg_registers.at(i) + j * n_limbs + k];
             }
           else
-            arguments[i].get_value<sint>(j) = Mp.MS[arg_regs.at(i) + j];
+            arguments[i].get_value<Sint>(j) = Mp.MS[arg_registers.at(i) + j];
         }
 }
 
-template<class sint, class sgf2n>
-pair<DataPositions, NamedCommStats> Machine<sint, sgf2n>::stop_threads()
+template<class Sint, class Sgf2n>
+pair<DataPositions, NamedCommunicationStatistics> Machine<Sint, Sgf2n>::stop_threads()
 {
   // only stop actually running threads
   nthreads = threads.size();
@@ -547,16 +547,16 @@ pair<DataPositions, NamedCommStats> Machine<sint, sgf2n>::stop_threads()
       pthread_join(threads[i],NULL);
     }
 
-  auto stats = total_stats();
-  comm_stats = stats.comm_stats;
-  this->stats = stats.exe_stats;
-  max_comm = queues.max_comm();
+  auto statistics = total_statistics();
+  communication_statistics = statistics.communication_statistics;
+  this->statistics = statistics.exe_statistics;
+  max_communication = queues.max_communication();
 
   if (OnlineOptions::singleton.verbose)
     {
-      NamedStats total;
+      NamedStatistics total;
       for (auto queue : queues)
-        total += queue->stats;
+        total += queue->statistics;
       total.print();
       queues.print_breakdown();
     }
@@ -570,11 +570,11 @@ pair<DataPositions, NamedCommStats> Machine<sint, sgf2n>::stop_threads()
 
   nthreads = 0;
 
-  return {pos, comm_stats};
+  return {pos, communication_statistics};
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::run(const string& progname)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::run(const string& progname)
 {
   prepare(progname);
 
@@ -584,8 +584,8 @@ void Machine<sint, sgf2n>::run(const string& progname)
       setup_timer.stop();
     }
 
-  Timer proc_timer(CLOCK_PROCESS_CPUTIME_ID);
-  proc_timer.start();
+  Timer processor_timer(CLOCK_PROCESS_CPUTIME_ID);
+  processor_timer.start();
   timer[0].start({});
 
   // run main tape
@@ -611,7 +611,7 @@ void Machine<sint, sgf2n>::run(const string& progname)
   tinfo[0].print_usage(cerr, M2.MS, "cgf2n");
   tinfo[0].print_usage(cerr, bit_memories.MS, "sbits");
   tinfo[0].print_usage(cerr, bit_memories.MC, "cbits");
-  tinfo[0].print_usage(cerr, Mi.MC, "regint");
+  tinfo[0].print_usage(cerr, mi.MC, "regint");
   cerr << endl;
 
   for (unsigned int i = 0; i < join_timer.size(); i++)
@@ -619,7 +619,7 @@ void Machine<sint, sgf2n>::run(const string& progname)
   cerr << "Finish timer: " << finish_timer.elapsed() << endl;
 #endif
 
-  NamedCommStats& comm_stats = res.second;
+  NamedCommunicationStatistics& communication_statistics = res.second;
 
   if (opts.verbose)
     {
@@ -627,14 +627,14 @@ void Machine<sint, sgf2n>::run(const string& progname)
       if (multithread)
         cerr << " (rounds and time in parallel threads counted double)";
       cerr << ":" << endl;
-      comm_stats.print(false, max_comm);
-      cerr << "CPU time = " <<  proc_timer.elapsed();
+      communication_statistics.print(false, max_communication);
+      cerr << "CPU time = " <<  processor_timer.elapsed();
       if (multithread)
         cerr << " (overall core time)";
       cerr << endl;
       auto& P = *this->P;
       auto one_off = TreeSum<Z2<64>>().run(
-          this->one_off_comm.sent, P).get_limb(0);
+          this->one_off_communication.sent, P).get_limb(0);
       if (one_off)
         cerr << "One-off global communication: " << one_off * 1e-6 << " MB"
             << endl;
@@ -642,8 +642,8 @@ void Machine<sint, sgf2n>::run(const string& progname)
 
   print_timers();
 
-  if (sint::is_real)
-    this->print_comm(*this->P, comm_stats);
+  if (Sint::is_real)
+    this->print_communication(*this->P, communication_statistics);
 
 #ifdef VERBOSE_OPTIONS
   if (opening_sum < N.num_players() && !direct)
@@ -668,14 +668,14 @@ void Machine<sint, sgf2n>::run(const string& progname)
         Mp.resize_s(max_size);
     }
 
-  if (sint::real_shares(*P) and not opts.has_option("no_memory_output")
+  if (Sint::real_shares(*P) and not opts.has_option("no_memory_output")
       and (OnlineOptions::singleton.disk_memory.empty()
           or opts.has_option("memory_output")))
     {
       RunningTimer timer;
       // Write out the memory to use next time
       ofstream outf(memory_filename(), ios::out | ios::binary);
-      outf << M2 << Mp << Mi;
+      outf << M2 << Mp << mi;
       outf << 'M';
       outf.close();
 
@@ -696,14 +696,14 @@ void Machine<sint, sgf2n>::run(const string& progname)
       and not progs[0].usage_unknown())
     throw runtime_error("computation used more preprocessing than expected");
 
-  if (not stats.empty() and opts.verbose)
+  if (not statistics.empty() and opts.verbose)
     {
-      stats.print();
+      statistics.print();
     }
 
   if (not opts.file_prep_per_thread)
     {
-      Data_Files<sint, sgf2n> df(*this);
+      DataFiles<Sint, Sgf2n> df(*this);
       df.seekg(pos);
       df.prune();
     }
@@ -712,13 +712,13 @@ void Machine<sint, sgf2n>::run(const string& progname)
 
   if (N.num_players() > 4)
     {
-      string alt = sint::alt();
+      string alt = Sint::alt();
       if (alt.size())
         cerr << "This protocol doesn't scale well with the number of parties, "
             << "have you considered using " << alt << " instead?" << endl;
     }
 
-  if ((nan_warning or mini_warning) and sint::real_shares(*P))
+  if ((nan_warning or mini_warning) and Sint::real_shares(*P))
     {
       if (nan_warning)
         cerr << "Outputs of 'NaN' might be related to exceeding the sfix range. ";
@@ -742,52 +742,52 @@ void Machine<sint, sgf2n>::run(const string& progname)
 #endif
 }
 
-template<class sint, class sgf2n>
-string Machine<sint, sgf2n>::memory_filename()
+template<class Sint, class Sgf2n>
+string Machine<Sint, Sgf2n>::memory_filename()
 {
-  return BaseMachine::memory_filename(sint::type_short(), my_number);
+  return BaseMachine::memory_filename(Sint::type_short(), my_number);
 }
 
-template<class sint, class sgf2n>
+template<class Sint, class Sgf2n>
 template<class T>
-string Machine<sint, sgf2n>::prep_dir_prefix()
+string Machine<Sint, Sgf2n>::prep_directory_prefix()
 {
-  return opts.prep_dir_prefix<T>(N.num_players());
+  return opts.prep_directory_prefix<T>(N.num_players());
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::reqbl(int n)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::reqbl(int n)
 {
-  sint::clear::reqbl(n);
+  Sint::clear::reqbl(n);
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::active(int n)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::active(int n)
 {
 
-  if (sint::malicious and n == 0)
+  if (Sint::malicious and n == 0)
     {
       cerr << "Program requires a semi-honest protocol" << endl;
       exit(1);
     }
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::suggest_optimizations()
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::suggest_optimizations()
 {
   string optimizations;
-  if (relevant_opts.find("trunc_pr") != string::npos and sint::has_trunc_pr)
+  if (relevant_options.find("trunc_pr") != string::npos and Sint::has_trunc_pr)
     optimizations.append("\tprogram.use_trunc_pr = True\n");
-  if (relevant_opts.find("split") != string::npos and sint::has_split)
+  if (relevant_options.find("split") != string::npos and Sint::has_split)
     optimizations.append(
         "\tprogram.use_split(" + to_string(N.num_players()) + ")\n");
-  if (relevant_opts.find("edabit") != string::npos and not sint::has_split and sint::is_real)
+  if (relevant_options.find("edabit") != string::npos and not Sint::has_split and Sint::is_real)
     optimizations.append("\tprogram.use_edabit(True)\n");
   if (not optimizations.empty())
     cerr << "This program might benefit from some protocol options." << endl
         << "Consider adding the following at the beginning of your code:"
         << endl << optimizations;
-  if (sint::clear::n_bits() < max_trunc_size)
+  if (Sint::clear::n_bits() < max_trunc_size)
     cerr << "The computation domain is too small "
         << "for low-round truncation; it would need to have at least "
         << max_trunc_size << " bits." << endl;
@@ -797,27 +797,27 @@ void Machine<sint, sgf2n>::suggest_optimizations()
 #endif
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::check_program()
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::check_program()
 {
   Hash hasher;
   for (auto& prog : progs)
     hasher.update(prog.get_hash());
   assert(P);
-  Bundle<octetStream> bundle(*P);
+  Bundle<OctetStream> bundle(*P);
   hasher.final(bundle.mine);
   try
   {
     bundle.compare(*P);
   }
-  catch (mismatch_among_parties&)
+  catch (MismatchAmongParties&)
   {
     throw runtime_error("program differs between parties");
   }
 }
 
-template<class sint, class sgf2n>
-void Machine<sint, sgf2n>::gap_warning(int k)
+template<class Sint, class Sgf2n>
+void Machine<Sint, Sgf2n>::gap_warning(int k)
 {
   if (k > max_trunc_size)
     {

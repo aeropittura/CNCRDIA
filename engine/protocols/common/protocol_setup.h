@@ -13,7 +13,7 @@
 template<class T>
 class ProtocolSetup
 {
-    typename T::mac_key_type mac_key;
+    typename T::MacKeyType mac_key;
 
 public:
     /**
@@ -27,14 +27,14 @@ public:
         if (prime_length == 0)
             prime_length = T::clear::MAX_N_BITS;
 
-        T::clear::init_default(prime_length);
-        T::clear::next::init_default(prime_length, false);
+        T::clear::initialize_default(prime_length);
+        T::clear::next::initialize_default(prime_length, false);
 
         // must initialize MAC key for security of some protocols
         mac_key = T::LivePrep::get_mac_key(P);
         (void) directory;
 
-        T::MAC_Check::setup(P);
+        T::MacCheck::setup(P);
     }
 
     /**
@@ -42,27 +42,27 @@ public:
      * @param P communication instance (used for MAC generation if needed)
      * @param directory location to read MAC if needed
      */
-    ProtocolSetup(bigint prime, Player& P, string directory = "")
+    ProtocolSetup(Bigint prime, Player& P, string directory = "")
     {
         static_assert(T::clear::prime_field, "must use computation modulo a prime");
 
-        T::clear::init_field(prime);
-        T::clear::next::init_field(prime, false);
+        T::clear::initialize_field(prime);
+        T::clear::next::initialize_field(prime, false);
 
         // must initialize MAC key for security of some protocols
         mac_key = T::LivePrep::get_mac_key(P);
         (void) directory;
 
-        T::MAC_Check::setup(P);
+        T::MacCheck::setup(P);
     }
 
     ~ProtocolSetup()
     {
         T::LivePrep::teardown();
-        T::MAC_Check::teardown();
+        T::MacCheck::teardown();
     }
 
-    typename T::mac_key_type get_mac_key() const
+    typename T::MacKeyType get_mac_key() const
     {
         return mac_key;
     }
@@ -82,7 +82,7 @@ public:
 template<class T>
 class BinaryProtocolSetup
 {
-    typename T::mac_key_type mac_key;
+    typename T::MacKeyType mac_key;
 
 public:
     /**
@@ -91,20 +91,20 @@ public:
      */
     BinaryProtocolSetup(Player& P, string directory = "")
     {
-        T::part_type::open_type::init_field();
-        T::mac_key_type::init_field();
+        T::part_type::OpenType::initialize_field();
+        T::MacKeyType::initialize_field();
         mac_key = T::part_type::LivePrep::get_mac_key(P);
         (void) directory;
 
-        T::MAC_Check::setup(P);
+        T::MacCheck::setup(P);
     }
 
     ~BinaryProtocolSetup()
     {
-        T::MAC_Check::teardown();
+        T::MacCheck::teardown();
     }
 
-    typename T::mac_key_type get_mac_key() const
+    typename T::MacKeyType get_mac_key() const
     {
         return mac_key;
     }
@@ -117,7 +117,7 @@ template<class T>
 class MixedProtocolSetup : public ProtocolSetup<T>
 {
 public:
-    BinaryProtocolSetup<typename T::bit_type> binary;
+    BinaryProtocolSetup<typename T::BitType> binary;
 
     /**
      * @param P communication instance (used for MAC generation if needed)

@@ -59,7 +59,7 @@ void AstraPrepPrep<T>::set_protocol(typename T::Protocol& protocol)
             and OnlineOptions::singleton.has_option("rep3_prep"))
     {
         assert(not rep3_set);
-        rep3_set = new MixedProtocolSet<rep3_type>(protocol.P, {}, {});
+        rep3_set = new MixedProtocolSet<Rep3Type>(protocol.P, {}, {});
     }
 }
 
@@ -83,7 +83,7 @@ void AstraPrep<T>::buffer_dabits(ThreadQueues* queues)
     if (use_rep3_prep)
     {
         assert(this->protocol);
-        octetStream os;
+        OctetStream os;
         this->protocol->read(os);
         os.get(this->dabits);
     }
@@ -99,16 +99,16 @@ void AstraPrepPrep<T>::buffer_dabits(ThreadQueues* queues)
 {
     if (rep3_set)
     {
-        for (int i = 0; i < T::bit_type::default_length; i++)
+        for (int i = 0; i < T::BitType::default_length; i++)
         {
-            rep3_type a;
-            typename rep3_type::bit_type b;
+            Rep3Type a;
+            typename Rep3Type::BitType b;
             rep3_set->preprocessing.get_dabit(a, b);
             this->dabits.push_back({this->protocol->from_rep3(a),
                 this->protocol->from_rep3(b)});
         }
         assert(this->protocol);
-        octetStream os;
+        OctetStream os;
         os.store(this->dabits);
         this->protocol->store(os);
     }
@@ -125,7 +125,7 @@ void AstraPrep<T>::buffer_edabits_with_queues(bool strict, int n_bits)
     if (use_rep3_prep)
     {
         assert(this->protocol);
-        octetStream os;
+        OctetStream os;
         this->protocol->read(os);
         os.get(this->edabits[{strict, n_bits}]);
     }
@@ -147,7 +147,7 @@ void AstraPrepPrep<T>::buffer_edabits_with_queues(bool strict,
             tmp.a.push_back(this->protocol->from_rep3(x));
         for (auto& x : rep3.b)
             tmp.b.push_back(this->protocol->from_rep3(x));
-        octetStream os;
+        OctetStream os;
         os.store(this->edabits[{strict, n_bits}]);
         this->protocol->store(os);
     }

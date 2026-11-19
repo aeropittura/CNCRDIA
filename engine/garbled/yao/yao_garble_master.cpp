@@ -16,10 +16,10 @@
 #include "garbled/yao/yao_wire.hpp"
 
 YaoGarbleMaster::YaoGarbleMaster(bool continuous, OnlineOptions& opts, int threshold) :
-        super(opts), continuous(continuous), threshold(threshold)
+        Super(opts), continuous(continuous), threshold(threshold)
 {
     PRNG G;
-    G.ReSeed();
+    G.re_seed();
     delta = G.get_doubleword();
     delta.set_signal(1);
 }

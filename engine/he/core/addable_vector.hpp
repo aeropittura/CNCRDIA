@@ -11,11 +11,11 @@
 #include "he/core/p2_data.h"
 
 template<class T>
-AddableVector<T> AddableVector<T>::mul_by_X_i(int j,
+AddableVector<T> AddableVector<T>::mult_by_x_i(int j,
         const FHE_PK& pk) const
 {
     int phi_m = this->size();
-    assert(phi_m == pk.get_params().phi_m());
+    assert(phi_m == pk.get_parameters().phi_m());
     AddableVector res(phi_m);
     for (int i = 0; i < phi_m; i++)
     {

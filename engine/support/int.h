@@ -6,7 +6,7 @@
 #pragma once
 
 
-typedef unsigned char octet;
+typedef unsigned char Octet;
 
 // Assumes word is a 64 bit value
 #ifdef WIN32
@@ -50,7 +50,7 @@ inline long long multiple_minimum(long long n, long long k)
     return DIV_CEIL(n, k) * k;
 }
 
-inline void INT_TO_BYTES(octet *buff, int x)
+inline void INT_TO_BYTES(Octet *buff, int x)
 {
     buff[0] = x&255;
     buff[1] = (x>>8)&255;
@@ -58,7 +58,7 @@ inline void INT_TO_BYTES(octet *buff, int x)
     buff[3] = (x>>24)&255;
 }
 
-inline int BYTES_TO_INT(octet *buff)
+inline int BYTES_TO_INT(Octet *buff)
 {
     return buff[0] + 256*buff[1] + 65536*buff[2] + 16777216*buff[3];
 }

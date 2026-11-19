@@ -15,7 +15,7 @@ class CipherPlainMultJob : public ThreadJob
 public:
     CipherPlainMultJob(vector<Ciphertext>& products,
             const vector<Ciphertext>& multiplicands,
-            const vector<Plaintext_<FFT_Data>>& multiplicands2, bool add)
+            const vector<Plaintext_<FftData>>& multiplicands2, bool add)
     {
         type = CIPHER_PLAIN_MULT_JOB;
         output = &products;
@@ -35,7 +35,7 @@ inline void cipher_plain_mult(ThreadJob job, true_type)
     for (int i = job.begin; i < job.end; i++)
     {
         auto prod = ((vector<Ciphertext>*) job.input)->at(i)
-                * ((vector<Plaintext_<FFT_Data>>*) job.supply)->at(i);
+                * ((vector<Plaintext_<FftData>>*) job.supply)->at(i);
         auto& results = *((vector<Ciphertext>*) job.output);
 
         if (job.length)
@@ -48,31 +48,31 @@ inline void cipher_plain_mult(ThreadJob job, true_type)
 
 inline void cipher_plain_mult(ThreadJob, false_type)
 {
-    throw not_implemented();
+    throw NotImplemented();
 }
 
-class MatrixRandMultJob : public ThreadJob
+class MatrixRandomMultJob : public ThreadJob
 {
 public:
-    MatrixRandMultJob(vector<ValueMatrix<gfpvar>>& C,
-            const vector<ValueMatrix<gfpvar>>& A,
-            vector<ValueMatrix<gfpvar>>& B,
-            bool local_mul)
+    MatrixRandomMultJob(vector<ValueMatrix<Gfpvar>>& C,
+            const vector<ValueMatrix<Gfpvar>>& A,
+            vector<ValueMatrix<Gfpvar>>& B,
+            bool local_mult)
     {
         type = MATRX_RAND_MULT_JOB;
         output = &C;
         input = &A;
         supply = &B;
-        length = local_mul;
+        length = local_mult;
     }
 };
 
-inline void matrix_rand_mult(ThreadJob job, true_type = {})
+inline void matrix_random_mult(ThreadJob job, true_type = {})
 {
-    auto& C = *(vector<ValueMatrix<gfpvar>>*) job.output;
-    auto& A = *(vector<ValueMatrix<gfpvar>>*) job.input;
-    auto& B = *(vector<ValueMatrix<gfpvar>>*) job.supply;
-    SeededPRNG G;
+    auto& C = *(vector<ValueMatrix<Gfpvar>>*) job.output;
+    auto& A = *(vector<ValueMatrix<Gfpvar>>*) job.input;
+    auto& B = *(vector<ValueMatrix<Gfpvar>>*) job.supply;
+    SeededPrng G;
 
     for (int i = job.begin; i < job.end; i++)
     {
@@ -83,16 +83,16 @@ inline void matrix_rand_mult(ThreadJob job, true_type = {})
     }
 }
 
-inline void matrix_rand_mult(ThreadJob, false_type)
+inline void matrix_random_mult(ThreadJob, false_type)
 {
-    throw not_implemented();
+    throw NotImplemented();
 }
 
 template<class T>
 int HemiMatrixPrep<T>::minimum_batch()
 {
     assert(prep);
-    return prep->get_FTD().num_slots() / n_rows;
+    return prep->get_ftd().num_slots() / n_rows;
 }
 
 template<class T>
@@ -101,7 +101,7 @@ void HemiMatrixPrep<T>::buffer_triples()
     CODE_LOCATION
     assert(prep);
     auto& multipliers = prep->get_multipliers();
-    auto& FTD = prep->get_FTD();
+    auto& FTD = prep->get_ftd();
     auto& pk = prep->get_pk();
     int n_matrices = minimum_batch();
     bool verbose = OnlineOptions::singleton.has_option("verbose_he");
@@ -114,11 +114,11 @@ void HemiMatrixPrep<T>::buffer_triples()
     }
 
     RunningTimer timer;
-    AddableVector<ValueMatrix<gfpvar>> A(n_matrices, {n_rows, n_inner}),
+    AddableVector<ValueMatrix<Gfpvar>> A(n_matrices, {n_rows, n_inner}),
             B(n_matrices, {n_inner, n_cols});
-    SeededPRNG G;
-    AddableVector<ValueMatrix<gfpvar>> C(n_matrices);
-    MatrixRandMultJob job(C, A, B, T::local_mul);
+    SeededPrng G;
+    AddableVector<ValueMatrix<Gfpvar>> C(n_matrices);
+    MatrixRandomMultJob job(C, A, B, T::local_mult);
 
     if (BaseMachine::thread_num == 0 and BaseMachine::has_singleton())
     {
@@ -126,7 +126,7 @@ void HemiMatrixPrep<T>::buffer_triples()
         int start = queues.distribute(job, n_matrices);
         job.begin = start;
         job.end = n_matrices;
-        matrix_rand_mult(job);
+        matrix_random_mult(job);
         if (start)
             queues.wrap_up(job);
     }
@@ -134,7 +134,7 @@ void HemiMatrixPrep<T>::buffer_triples()
     {
         job.begin = 0;
         job.end = n_matrices;
-        matrix_rand_mult(job);
+        matrix_random_mult(job);
     }
 
 #ifdef VERBOSE_HE
@@ -144,13 +144,13 @@ void HemiMatrixPrep<T>::buffer_triples()
 
     Diagonalizer diag(A, FTD, pk);
 
-    vector<Plaintext_<FFT_Data>> products(n_cols, FTD);
+    vector<Plaintext_<FftData>> products(n_cols, FTD);
     assert(prep->proc);
     auto& P = prep->proc->P;
 
     vector<vector<Ciphertext>> others_ct;
 
-    if (T::local_mul or OnlineOptions::singleton.direct)
+    if (T::local_mult or OnlineOptions::singleton.direct)
     {
         if (verbose)
         {
@@ -159,7 +159,7 @@ void HemiMatrixPrep<T>::buffer_triples()
             fflush(stderr);
         }
 
-        Bundle<octetStream> bundle(P);
+        Bundle<OctetStream> bundle(P);
         bundle.mine.store(diag.ciphertexts);
         P.unchecked_broadcast(bundle);
         for (auto& os : bundle)
@@ -195,7 +195,7 @@ void HemiMatrixPrep<T>::buffer_triples()
             {
                 auto& queues = BaseMachine::s().queues;
                 vector<Ciphertext> products(n_inner, pk);
-                vector<Plaintext_<FFT_Data>> multiplicands2;
+                vector<Plaintext_<FftData>> multiplicands2;
                 for (int i = 0; i < n_inner; i++)
                     multiplicands2.push_back(diag.get_plaintext(B, i, j));
                 CipherPlainMultJob job(products, multiplicands, multiplicands2, true);
@@ -227,7 +227,7 @@ void HemiMatrixPrep<T>::buffer_triples()
             m->add(products[j], C, BOTH, n_inner);
         }
 
-    if (T::local_mul)
+    if (T::local_mult)
         C += diag.dediag(products, n_matrices);
     else
         C = diag.dediag(products, n_matrices);

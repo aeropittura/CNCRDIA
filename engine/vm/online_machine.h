@@ -14,20 +14,20 @@ class OnlineMachine
 protected:
     int argc;
     const char** argv;
-    OnlineOptions& online_opts;
+    OnlineOptions& online_options;
 
-    Names playerNames;
+    Names player_names;
 
     bool use_encryption;
 
-    ez::ezOptionParser& opt;
+    ez::EzOptionParser& opt;
 
     int nplayers;
 
 public:
-    template<class V = gf2n>
-    OnlineMachine(int argc, const char** argv, ez::ezOptionParser& opt,
-            OnlineOptions& online_opts, int nplayers = 0, V = {});
+    template<class V = Gf2n>
+    OnlineMachine(int argc, const char** argv, ez::EzOptionParser& opt,
+            OnlineOptions& online_options, int nplayers = 0, V = {});
 
     void start_networking();
 
@@ -40,7 +40,7 @@ public:
 
     int get_lg2()
     {
-        return online_opts.lg2;
+        return online_options.lg2;
     }
 };
 
@@ -49,8 +49,8 @@ class DishonestMajorityMachine : public OnlineMachine
 public:
     template<class V>
     DishonestMajorityMachine(int argc, const char** argv,
-            ez::ezOptionParser& opt, OnlineOptions& online_opts, V,
+            ez::EzOptionParser& opt, OnlineOptions& online_options, V,
             int nplayers = 0);
     DishonestMajorityMachine(int argc, const char** argv,
-            ez::ezOptionParser& opt, OnlineOptions& online_opts, int nplayers);
+            ez::EzOptionParser& opt, OnlineOptions& online_options, int nplayers);
 };

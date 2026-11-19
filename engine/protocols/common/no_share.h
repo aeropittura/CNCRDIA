@@ -20,18 +20,18 @@ class NoShare : public ShareInterface
     typedef NoShare This;
 
 public:
-    typedef This share_type;
+    typedef This ShareType;
 
     // type for clear values in relevant domain
     typedef T clear;
-    typedef clear open_type;
+    typedef clear OpenType;
 
     // disable binary computation
-    typedef GC::NoShare bit_type;
+    typedef GC::NoShare BitType;
 
     // opening facility
-    typedef NoOutput<NoShare> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef NoOutput<NoShare> MacCheck;
+    typedef MacCheck DirectOpener;
 
     // multiplication protocol
     typedef NoProtocol<NoShare> Protocol;
@@ -79,13 +79,13 @@ public:
     }
 
     // serialize computation domain for client communication
-    static void specification(octetStream& os)
+    static void specification(OctetStream& os)
     {
         T::specification(os);
     }
 
     // constant secret sharing
-    static This constant(const clear&, int, const mac_key_type&)
+    static This constant(const clear&, int, const MacKeyType&)
     {
         throw runtime_error("no constant sharing");
         return {};
@@ -149,7 +149,7 @@ public:
 
     // serialization
     // must use the number of bytes given by size()
-    void pack(octetStream& os, bool = false) const
+    void pack(OctetStream& os, bool = false) const
     {
         // works only if purely on the stack
         // skip one byte for ShareInterface
@@ -158,7 +158,7 @@ public:
 
     // serialization
     // must use the number of bytes given by size()
-    void unpack(octetStream& os, bool = false)
+    void unpack(OctetStream& os, bool = false)
     {
         assign((char*)os.consume(size()));
     }
@@ -186,7 +186,7 @@ public:
             throw runtime_error("no human-readable output");
         else
         {
-            octetStream buf;
+            OctetStream buf;
             pack(buf);
             os.write((char*)buf.get_data(), size());
         }

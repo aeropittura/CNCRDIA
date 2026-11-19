@@ -21,8 +21,8 @@ class Semi2kShare : public SemiShare<SignedZ2<K>>
     typedef Semi2kShare This;
 
 public:
-    typedef SemiMC<Semi2kShare> MAC_Check;
-    typedef DirectSemiMC<Semi2kShare> Direct_MC;
+    typedef SemiOpener<Semi2kShare> MacCheck;
+    typedef DirectSemiOpener<Semi2kShare> DirectOpener;
     typedef SemiInput<Semi2kShare> Input;
     typedef ::PrivateOutput<Semi2kShare> PrivateOutput;
     typedef Semi<Semi2kShare> BasicProtocol;
@@ -30,9 +30,9 @@ public:
     typedef MaybeHemi<This> Protocol;
     typedef DummyMatrixPrep<This> MatrixPrep;
 
-    typedef Semi2kShare prep_type;
+    typedef Semi2kShare PrepType;
     typedef SemiMultiplier<Semi2kShare> Multiplier;
-    typedef OTTripleGenerator<prep_type> TripleGenerator;
+    typedef OtTripleGenerator<PrepType> TripleGenerator;
     typedef Z2kSquare<K> Rectangle;
 
     static const bool has_split = true;
@@ -71,7 +71,7 @@ public:
                     for (int j = 0; j < n; j++)
                         dest.at(regs.at(n * i + j) + k) = {};
 
-                square64 square;
+                Square64 square;
 
                 for (int j = 0; j < m; j++)
                     square.rows[j] = source[j + start].get_limb(l / unit);
@@ -80,9 +80,9 @@ public:
 
                 for (int j = 0; j < n_left; j++)
                 {
-                    auto& dest_reg = dest.at(
+                    auto& destination_reg = dest.at(
                             regs.at(n * (base + j) + my_num) + k);
-                    dest_reg = square.rows[j];
+                    destination_reg = square.rows[j];
                 }
             }
         }

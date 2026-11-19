@@ -6,4 +6,4 @@
 
 template class FieldMachine<Share, Share, DishonestMajorityMachine>;
 
-template class Machine<Share<gfp_<0, 2>>, Share<gf2n>>;
+template class Machine<Share<Gfp_<0, 2>>, Share<Gf2n>>;

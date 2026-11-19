@@ -73,7 +73,7 @@ void YaoEvalWire::and_singlethread(GC::Processor<GC::Secret<YaoEvalWire> >& proc
 	YaoGate* gate = (YaoGate*) party.gates.consume(total_ands * sizeof(YaoGate));
 	long counter = party.get_gate_id();
 	map<string, Timer> timers;
-	SeededPRNG prng;
+	SeededPrng prng;
 	and_(processor.S, args, 0, n_args, total_ands, gate, counter,
 			prng, timers, repeat, party);
 	party.counter += counter - party.get_gate_id();
@@ -99,7 +99,7 @@ void YaoEvalWire::and_(StackedVector<GC::Secret<YaoEvalWire> >& S,
 					gate_id);
 			mmo.hash<YaoGate::N_EVAL_HASHES>(hash, label);
 			auto& out = S[*(it + 1)];
-			out.resize_regs(1);
+			out.resize_registers(1);
 			YaoGate& gate = *gates;
 			gates++;
 			gate.eval(out.get_reg(0), hash, S[*(it + 2)].get_reg(0),
@@ -114,7 +114,7 @@ void YaoEvalWire::and_(StackedVector<GC::Secret<YaoEvalWire> >& S,
 				auto& right = S[*(it + 3) + (repeat ? 0 : j)];
 				auto& out = S[*(it + 1) + j];
 				int n = min(dl, *it - j * dl);
-				out.resize_regs(n);
+				out.resize_registers(n);
 				for (int k = 0; k < n; k++)
 				{
 					Key label[YaoGate::N_EVAL_HASHES];
@@ -155,7 +155,7 @@ void YaoEvalWire::finalize_input(T& inputter, int from, int n_bits)
 		auto& i_bit = inputter.i_bit;
 		Key key;
 		inputter.os.unserialize(key);
-		set(key ^ inputter.evaluator.ot_ext.receiverOutputMatrix[i_bit],
+		set(key ^ inputter.evaluator.ot_ext.receiver_output_matrix[i_bit],
 				inputter.inputs.get_bit(i_bit));
 		i_bit++;
 	}
@@ -216,13 +216,13 @@ void YaoEvalWire::set(Key key, bool external)
 
 void YaoEvalWire::sync(vector<Integer>& values, Player*)
 {
-	octetStream os;
+	OctetStream os;
 	os.store(values);
 	auto &evaluator = YaoEvaluator::s();
 	if (not evaluator.continuous())
 	{
 		evaluator.P->send_to(0, os);
-		throw needs_cleaning();
+		throw NeedsCleaning();
 	}
 }
 
@@ -232,7 +232,7 @@ void YaoEvalWire::reveal_inst(Processor& processor, const ArgVector& args)
 	auto &evaluator = YaoEvaluator::s();
 	if (evaluator.continuous())
 	{
-		octetStream buffer;
+		OctetStream buffer;
 		for (size_t j = 0; j < args.size(); j += 3)
 		{
 			int n = args[j];
@@ -241,19 +241,19 @@ void YaoEvalWire::reveal_inst(Processor& processor, const ArgVector& args)
 				processor.C[r0 + i].pack(buffer);
 		}
 		YaoEvaluator::s().P->send_to(0, buffer);
-		throw needs_cleaning();
+		throw NeedsCleaning();
 	}
 }
 
-void YaoEvalWire::convcbit2s(GC::Processor<whole_type>& processor,
+void YaoEvalWire::convcbit2s(GC::Processor<WholeType>& processor,
 		const BaseInstruction& instruction)
 {
 	int unit = GC::Clear::N_BITS;
 	for (int i = 0; i < DIV_CEIL(instruction.get_n(), unit); i++)
 	{
 		auto& dest = processor.S[instruction.get_r(0) + i];
-		dest.resize_regs(min(size_t(unit), instruction.get_n() - i * unit));
-		for (auto& reg : dest.get_regs())
+		dest.resize_registers(min(size_t(unit), instruction.get_n() - i * unit));
+		for (auto& reg : dest.get_registers())
 			reg.set(0);
 	}
 }

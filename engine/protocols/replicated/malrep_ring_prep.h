@@ -15,8 +15,8 @@
 template<class T>
 class MalRepRingPrep : public virtual BufferPrep<T>
 {
-    DataPositions dummy_pos;
-    MaliciousRepPrep<typename T::prep_type> prep;
+    DataPositions dummy_position;
+    MaliciousRepPrep<typename T::PrepType> prep;
 
 public:
     MalRepRingPrep(SubProcessor<T>* proc, DataPositions& usage);
@@ -41,10 +41,10 @@ template<class T>
 class RingOnlyBitsFromSquaresPrep : public virtual BufferPrep<T>
 {
     typedef typename T::SquareToBitShare BitShare;
-    DataPositions dummy_pos;
+    DataPositions dummy_position;
     typename BitShare::SquarePrep prep;
-    SubProcessor<BitShare>* bit_proc;
-    typename BitShare::MAC_Check* bit_MC;
+    SubProcessor<BitShare>* bit_processor;
+    typename BitShare::MacCheck* bit_opener;
 
 public:
     RingOnlyBitsFromSquaresPrep(SubProcessor<T>* proc, DataPositions& usage);
@@ -75,7 +75,7 @@ public:
         RingOnlyBitsFromSquaresPrep<T>::buffer_bits();
     }
 
-    void get_dabit_no_count(T& a, typename T::bit_type& b)
+    void get_dabit_no_count(T& a, typename T::BitType& b)
     {
         this->get_one_no_count(DATA_BIT, a);
         b = a & 1;

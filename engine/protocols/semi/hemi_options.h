@@ -20,7 +20,7 @@ public:
     {
     }
 
-    HemiOptions(ez::ezOptionParser& opt, int argc,
+    HemiOptions(ez::EzOptionParser& opt, int argc,
             const char** argv)
     {
         opt.add("", // Default.
@@ -34,6 +34,6 @@ public:
 
         opt.parse(argc, argv);
         plain_matmul = opt.isSet("-M");
-        opt.resetArgs();
+        opt.reset_args();
     }
 };

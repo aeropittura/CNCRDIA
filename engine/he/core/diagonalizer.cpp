@@ -6,7 +6,7 @@
 #include "he/core/diagonalizer.h"
 
 Diagonalizer::Diagonalizer(const MatrixVector& matrices,
-        const FFT_Data& FTD, const FHE_PK& pk) :
+        const FftData& FTD, const FHE_PK& pk) :
         FTD(FTD)
 {
     CODE_LOCATION_NO_SCOPE
@@ -23,7 +23,7 @@ Diagonalizer::Diagonalizer(const MatrixVector& matrices,
     assert(n_rows * matrices.size() <= size_t(FTD.num_slots()));
     for (size_t i = 0; i < n_cols; i++)
     {
-        Plaintext_<FFT_Data> plaintext(FTD, Evaluation);
+        Plaintext_<FftData> plaintext(FTD, Evaluation);
         for (size_t k = 0; k < matrices.size(); k++)
         {
             for (size_t j = 0; j < n_rows; j++)
@@ -36,33 +36,33 @@ Diagonalizer::Diagonalizer(const MatrixVector& matrices,
     }
 }
 
-Plaintext_<FFT_Data> Diagonalizer::get_plaintext(
-        const MatrixVector& matrices, int left_col,
-        int right_col)
+Plaintext_<FftData> Diagonalizer::get_plaintext(
+        const MatrixVector& matrices, int left_column,
+        int right_column)
 {
-    Plaintext_<FFT_Data> plaintext(FTD, Evaluation);
+    Plaintext_<FftData> plaintext(FTD, Evaluation);
     for (size_t k = 0; k < matrices.size(); k++)
         for (size_t j = 0; j < n_rows; j++)
             plaintext.set_element(k * n_rows + j,
-                    matrices.at(k)[{(left_col + j) % n_cols, right_col}]);
+                    matrices.at(k)[{(left_column + j) % n_cols, right_column}]);
     return plaintext;
 }
 
 Diagonalizer::MatrixVector Diagonalizer::decrypt(
         const vector<Ciphertext>& products, int n_matrices, FHE_SK& sk)
 {
-    vector<Plaintext_<FFT_Data>> plaintexts;
+    vector<Plaintext_<FftData>> plaintexts;
     for (auto& x : products)
         plaintexts.push_back(sk.decrypt(x, FTD));
     return dediag(plaintexts, n_matrices);
 }
 
 Diagonalizer::MatrixVector Diagonalizer::dediag(
-        const vector<Plaintext_<FFT_Data>>& products, int n_matrices)
+        const vector<Plaintext_<FftData>>& products, int n_matrices)
 {
-    int n_cols_out = products.size();
-    MatrixVector res(n_matrices, {int(n_rows), n_cols_out});
-    for (int i = 0; i < n_cols_out; i++)
+    int n_columns_out = products.size();
+    MatrixVector res(n_matrices, {int(n_rows), n_columns_out});
+    for (int i = 0; i < n_columns_out; i++)
     {
         auto& c = products.at(i);
         for (int j = 0; j < n_matrices; j++)

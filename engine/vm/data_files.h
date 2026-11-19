@@ -21,7 +21,7 @@
 #include <map>
 using namespace std;
 
-template<class T> class dabit;
+template<class T> class Dabit;
 
 namespace GC
 {
@@ -94,9 +94,9 @@ public:
   long long triples_for_matmul();
 };
 
-template<class sint, class sgf2n> class Processor;
-template<class sint, class sgf2n> class Data_Files;
-template<class sint, class sgf2n> class Machine;
+template<class Sint, class Sgf2n> class Processor;
+template<class Sint, class Sgf2n> class DataFiles;
+template<class Sint, class Sgf2n> class Machine;
 template<class T> class SubProcessor;
 template<class T> class NoFilePrep;
 
@@ -121,13 +121,13 @@ protected:
 
   template<int>
   void get_edabits(bool strict, size_t size, T* a,
-      StackedVector<typename T::bit_type>& Sb, const ArgVector& regs, false_type);
+      StackedVector<typename T::BitType>& Sb, const ArgVector& regs, false_type);
   template<int>
-  void get_edabits(bool, size_t, T*, StackedVector<typename T::bit_type>&,
+  void get_edabits(bool, size_t, T*, StackedVector<typename T::BitType>&,
       const ArgVector&, true_type)
-  { throw not_implemented(); }
+  { throw NotImplemented(); }
 
-  void fill(edabitvec<T>& res, bool strict, int n_bits);
+  void fill(Edabitvec<T>& res, bool strict, int n_bits);
 
   T get_random_from_inputs(int nplayers);
 
@@ -137,11 +137,11 @@ public:
   /// Key-independent setup if necessary (cryptosystem parameters)
   static void basic_setup(Player&) {}
   /// Generate keys if necessary
-  static void setup(Player&, typename T::mac_key_type) {}
+  static void setup(Player&, typename T::MacKeyType) {}
   /// Free memory of global cryptosystem parameters
   static void teardown() {}
 
-  static void edabit_sacrifice_buckets(vector<edabit<T>>&, size_t, bool, int,
+  static void edabit_sacrifice_buckets(vector<Edabit<T>>&, size_t, bool, int,
           SubProcessor<T>&, int, int, const void* = 0)
   {
     throw runtime_error("sacrifice not available");
@@ -161,26 +161,26 @@ public:
   virtual ~Preprocessing() {}
 
   virtual void set_protocol(typename T::Protocol&) {};
-  virtual void set_proc(SubProcessor<T>* proc) { (void) proc; }
+  virtual void set_processor(SubProcessor<T>* proc) { (void) proc; }
 
   virtual void seekg(DataPositions& pos) { (void) pos; }
   virtual void prune() {}
   virtual void purge() {}
 
   virtual void get_three_no_count(Dtype, T&, T&, T&)
-  { throw not_implemented(); }
-  virtual void get_two_no_count(Dtype, T&, T&) { throw not_implemented(); }
-  virtual void get_one_no_count(Dtype, T&) { throw not_implemented(); }
-  virtual void get_input_no_count(T&, typename T::open_type&, int)
-  { throw not_implemented() ; }
+  { throw NotImplemented(); }
+  virtual void get_two_no_count(Dtype, T&, T&) { throw NotImplemented(); }
+  virtual void get_one_no_count(Dtype, T&) { throw NotImplemented(); }
+  virtual void get_input_no_count(T&, typename T::OpenType&, int)
+  { throw NotImplemented() ; }
   virtual void get_no_count(StackedVector<T>&, DataTag, const ArgVector&, int)
-  { throw not_implemented(); }
+  { throw NotImplemented(); }
 
   void get(Dtype dtype, T* a);
   void get_three(Dtype dtype, T& a, T& b, T& c);
   void get_two(Dtype dtype, T& a, T& b);
   void get_one(Dtype dtype, T& a);
-  void get_input(T& a, typename T::open_type& x, int i);
+  void get_input(T& a, typename T::OpenType& x, int i);
   void get(StackedVector<T>& S, DataTag tag, const ArgVector& regs, int vector_size);
 
   /// Get fresh random multiplication triple
@@ -193,15 +193,15 @@ public:
   virtual T get_random_for_open();
   virtual T get_random_no_count();
   /// Store fresh daBit in ``a`` (arithmetic part) and ``b`` (binary part)
-  virtual void get_dabit(T& a, typename T::bit_type& b);
-  virtual void get_dabit_no_count(T&, typename T::bit_type&) { throw runtime_error("no daBit"); }
+  virtual void get_dabit(T& a, typename T::BitType& b);
+  virtual void get_dabit_no_count(T&, typename T::BitType&) { throw runtime_error("no daBit"); }
   virtual void get_edabits(bool strict, size_t size, T* a,
-          StackedVector<typename T::bit_type>& Sb, const ArgVector& regs)
+          StackedVector<typename T::BitType>& Sb, const ArgVector& regs)
   { get_edabits<0>(strict, size, a, Sb, regs, T::clear::characteristic_two); }
-  virtual void get_edabit_no_count(bool, int, edabit<T>&)
+  virtual void get_edabit_no_count(bool, int, Edabit<T>&)
   { throw runtime_error("no edaBits"); }
   /// Get fresh edaBit chunk
-  virtual edabitvec<T> get_edabitvec(bool, int)
+  virtual Edabitvec<T> get_edabitvec(bool, int)
   { throw runtime_error("no edabitvec"); }
 
   virtual void push_triples(const vector<array<T, 3>>&)
@@ -214,16 +214,16 @@ public:
 
   virtual int minimum_batch() { return 0; }
 
-  TimerWithComm total_time();
+  TimerWithCommunication total_time();
 };
 
 template<class T>
-class Sub_Data_Files : public Preprocessing<T>
+class SubDataFiles : public Preprocessing<T>
 {
-  template<class U> friend class Sub_Data_Files;
+  template<class U> friend class SubDataFiles;
 
   typedef typename conditional<T::LivePrep::use_part,
-      Sub_Data_Files<typename T::part_type>, NoFilePrep<typename T::part_type>>::type part_type;
+      SubDataFiles<typename T::part_type>, NoFilePrep<typename T::part_type>>::type part_type;
 
   static int tuple_length(int dtype);
 
@@ -231,13 +231,13 @@ class Sub_Data_Files : public Preprocessing<T>
   vector<PrepBuffer<T>> input_buffers;
   PrepBuffer<InputTuple<T>, RefInputTuple<T>, T> my_input_buffers;
   map<DataTag, PrepBuffer<T> > extended;
-  PrepBuffer<dabit<T>, dabit<T>, T> dabit_buffer;
+  PrepBuffer<Dabit<T>, Dabit<T>, T> dabit_buffer;
   map<int, EdabitBuffer<T>> edabit_buffers;
-  map<int, edabitvec<T>> my_edabits;
+  map<int, Edabitvec<T>> my_edabits;
 
   int my_num,num_players;
 
-  const string prep_data_dir;
+  const string prep_data_directory;
   int thread_num;
 
   part_type* part;
@@ -245,8 +245,8 @@ class Sub_Data_Files : public Preprocessing<T>
   EdabitBuffer<T>& get_edabit_buffer(int n_bits);
 
   /// Get fresh edaBit chunk
-  edabitvec<T> get_edabitvec(bool strict, int n_bits);
-  void get_edabit_no_count(bool strict, int n_bits, edabit<T>& eb);
+  Edabitvec<T> get_edabitvec(bool strict, int n_bits);
+  void get_edabit_no_count(bool strict, int n_bits, Edabit<T>& eb);
 
 public:
   static string get_filename(const Names& N, Dtype type, int thread_num = -1);
@@ -257,19 +257,19 @@ public:
 
   static long additional_inputs(const DataPositions& usage);
 
-  static string get_prep_dir(const Names& N);
+  static string get_prep_directory(const Names& N);
   static void check_setup(const Names& N);
-  static void check_setup(int num_players, const string& prep_dir);
+  static void check_setup(int num_players, const string& prep_directory);
 
-  Sub_Data_Files(int my_num, int num_players, const string& prep_data_dir,
+  SubDataFiles(int my_num, int num_players, const string& prep_data_directory,
       DataPositions& usage, int thread_num = -1);
-  Sub_Data_Files(const Names& N, DataPositions& usage, int thread_num = -1);
-  Sub_Data_Files(const Names& N, const string& prep_data_dir,
+  SubDataFiles(const Names& N, DataPositions& usage, int thread_num = -1);
+  SubDataFiles(const Names& N, const string& prep_data_directory,
       DataPositions& usage, int thread_num = -1) :
-      Sub_Data_Files(N.my_num(), N.num_players(), prep_data_dir, usage, thread_num)
+      SubDataFiles(N.my_num(), N.num_players(), prep_data_directory, usage, thread_num)
   {
   }
-  ~Sub_Data_Files();
+  ~SubDataFiles();
 
   void set_protocol(typename T::Protocol& protocol) { (void) protocol; }
 
@@ -300,7 +300,7 @@ public:
     buffers[dtype].input(a);
   }
 
-  void get_input_no_count(T& a,typename T::open_type& x,int i)
+  void get_input_no_count(T& a,typename T::OpenType& x,int i)
   {
     RefInputTuple<T> tuple(a, x);
     if (i==my_num)
@@ -311,28 +311,28 @@ public:
 
   void setup_extended(const DataTag& tag, int tuple_size = 0);
   void get_no_count(StackedVector<T>& S, DataTag tag, const ArgVector& regs, int vector_size);
-  void get_dabit_no_count(T& a, typename T::bit_type& b);
+  void get_dabit_no_count(T& a, typename T::BitType& b);
 
   part_type& get_part();
 };
 
-template<class sint, class sgf2n>
-class Data_Files
+template<class Sint, class Sgf2n>
+class DataFiles
 {
-  friend class Processor<sint, sgf2n>;
+  friend class Processor<Sint, Sgf2n>;
 
   DataPositions usage, skipped;
 
   public:
 
-  Preprocessing<sint>& DataFp;
-  Preprocessing<sgf2n>& DataF2;
-  Preprocessing<typename sint::bit_type>& DataFb;
+  Preprocessing<Sint>& data_fp;
+  Preprocessing<Sgf2n>& data_f2;
+  Preprocessing<typename Sint::BitType>& data_fb;
 
-  Data_Files(Machine<sint, sgf2n>& machine, SubProcessor<sint>* procp = 0,
-      SubProcessor<sgf2n>* proc2 = 0);
-  Data_Files(const Names& N, int thread_num = -1);
-  ~Data_Files();
+  DataFiles(Machine<Sint, Sgf2n>& machine, SubProcessor<Sint>* procp = 0,
+      SubProcessor<Sgf2n>* proc2 = 0);
+  DataFiles(const Names& N, int thread_num = -1);
+  ~DataFiles();
 
   DataPositions tellg() { return usage; }
   void seekg(DataPositions& pos);
@@ -349,15 +349,15 @@ class Data_Files
 
   void set_usage(const DataPositions& pos) { usage = pos; }
 
-  TimerWithComm total_time();
+  TimerWithCommunication total_time();
 };
 
 template<class T> inline
-bool Sub_Data_Files<T>::eof(Dtype dtype)
+bool SubDataFiles<T>::eof(Dtype dtype)
   { return buffers[dtype].eof; }
 
 template<class T> inline
-bool Sub_Data_Files<T>::input_eof(int player)
+bool SubDataFiles<T>::input_eof(int player)
 {
   if (player == my_num)
     return my_input_buffers.eof;
@@ -366,7 +366,7 @@ bool Sub_Data_Files<T>::input_eof(int player)
 }
 
 template<class T>
-inline void Sub_Data_Files<T>::get_no_count(Dtype dtype, T* a)
+inline void SubDataFiles<T>::get_no_count(Dtype dtype, T* a)
 {
   for (int i = 0; i < DataPositions::tuple_size[dtype]; i++)
     buffers[dtype].input(a[i]);
@@ -416,7 +416,7 @@ inline void Preprocessing<T>::get_one(Dtype dtype, T& a)
 }
 
 template<class T>
-inline void Preprocessing<T>::get_input(T& a, typename T::open_type& x, int i)
+inline void Preprocessing<T>::get_input(T& a, typename T::OpenType& x, int i)
 {
   count_input(i);
   get_input_no_count(a, x, i);
@@ -481,10 +481,10 @@ T Preprocessing<T>::get_random_no_count()
   return get_random_from_inputs(usage.inputs.size());
 }
 
-template<class sint, class sgf2n>
-inline void Data_Files<sint, sgf2n>::purge()
+template<class Sint, class Sgf2n>
+inline void DataFiles<Sint, Sgf2n>::purge()
 {
-  DataFp.purge();
-  DataF2.purge();
-  DataFb.purge();
+  data_fp.purge();
+  data_f2.purge();
+  data_fb.purge();
 }

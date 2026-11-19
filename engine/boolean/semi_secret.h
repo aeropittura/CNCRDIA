@@ -24,7 +24,7 @@ class SemiSecureShuffle;
 template<class T, class V>
 class SemiSecretBase : public V, public ShareSecret<T>
 {
-    typedef V super;
+    typedef V Super;
 
 public:
     typedef Memory<T> DynamicMemory;
@@ -32,7 +32,7 @@ public:
     typedef Beaver<T> Protocol;
 
     typedef T part_type;
-    typedef T small_type;
+    typedef T SmallType;
 
     static const bool is_real = true;
 
@@ -100,18 +100,18 @@ class SemiSecret: public SemiSecretBase<SemiSecret, SemiShare<BitVec>>
     typedef SemiSecret This;
 
 public:
-    typedef SemiSecretBase<SemiSecret, SemiShare<BitVec>> super;
+    typedef SemiSecretBase<SemiSecret, SemiShare<BitVec>> Super;
 
-    typedef SemiMC<This> MC;
-    typedef DirectSemiMC<This> Direct_MC;
-    typedef MC MAC_Check;
+    typedef SemiOpener<This> MC;
+    typedef DirectSemiOpener<This> DirectOpener;
+    typedef MC MacCheck;
     typedef SemiInput<This> Input;
     typedef SemiPrep LivePrep;
     typedef Semi Protocol;
 
     typedef SemiSecureShuffle Shuffler;
 
-    static MC* new_mc(typename SemiShare<BitVec>::mac_key_type);
+    static MC* new_opener(typename SemiShare<BitVec>::MacKeyType);
 
     static void andrsvec(Processor<SemiSecret>& processor,
             const ArgVector& args);
@@ -122,7 +122,7 @@ public:
 
     template<class T>
     SemiSecret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 };
@@ -132,15 +132,15 @@ class DealerSecret : public SemiSecretBase<DealerSecret, DealerShare<BitVec>>
     typedef DealerSecret This;
 
 public:
-    typedef SemiSecretBase<DealerSecret, DealerShare<BitVec>> super;
+    typedef SemiSecretBase<DealerSecret, DealerShare<BitVec>> Super;
 
-    typedef DealerMC<This> MC;
-    typedef DirectDealerMC<This> Direct_MC;
-    typedef MC MAC_Check;
+    typedef DealerOpener<This> MC;
+    typedef DirectDealerOpener<This> DirectOpener;
+    typedef MC MacCheck;
     typedef DealerInput<This> Input;
     typedef DealerPrep LivePrep;
 
-    static MC* new_mc(typename super::mac_key_type);
+    static MC* new_opener(typename Super::MacKeyType);
 
     DealerSecret()
     {
@@ -148,7 +148,7 @@ public:
 
     template<class T>
     DealerSecret(const T& other) :
-            super(other)
+            Super(other)
     {
     }
 };

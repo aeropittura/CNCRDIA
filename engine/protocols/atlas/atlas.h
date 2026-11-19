@@ -18,18 +18,18 @@ class Atlas : public ProtocolBase<T>
 {
     Shamir<T> shamir, shamir2;
 
-    Bundle<octetStream> oss, oss2;
+    Bundle<OctetStream> oss, oss2;
     PointerVector<T> masks;
 
     vector<array<T, 2>> double_sharings;
 
-    vector<typename T::open_type> reconstruction;
+    vector<typename T::OpenType> reconstruction;
 
     int next_king, base_king;
 
     ShamirInput<T> resharing;
 
-    typename T::open_type dotprod_share;
+    typename T::OpenType dotprod_share;
 
     array<T, 2> get_double_sharing();
 
@@ -57,13 +57,13 @@ public:
         return shamir.get_n_relevant_players();
     }
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1);
-    void prepare(const typename T::open_type& product);
+    void prepare(const typename T::OpenType& product);
     void exchange();
     T finalize_mul(int n = -1);
 
-    void init_dotprod();
+    void initialize_dotprod();
     void prepare_dotprod(const T& x, const T& y);
     void next_dotprod();
     T finalize_dotprod(int length);

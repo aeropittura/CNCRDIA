@@ -29,13 +29,13 @@ namespace BIU
 {
 
 Client::Client(endpoint_t* endpoints, int numservers, ClientUpdatable* updatable, unsigned int max_message_size)
-	:_max_msg_sz(max_message_size),
+	:_max_message_size(max_message_size),
 	 _numservers(numservers),
 	 _updatable(updatable)
 	 {
 	_sockets = new int[_numservers](); // 0 initialized
 	_servers = new struct sockaddr_in[_numservers];
-	_msg_queues = new WaitQueue< shared_ptr<SendBuffer> >[_numservers];
+	_message_queues = new WaitQueue< shared_ptr<SendBuffer> >[_numservers];
 
 	memset(_servers, 0, sizeof(*_servers));
 
@@ -57,7 +57,7 @@ Client::~Client() {
 		close(_sockets[i]);
 	delete[] _sockets;
 	delete[] _servers;
-	delete[] _msg_queues;
+	delete[] _message_queues;
 #ifdef DEBUG_COMM
 	printf("Client:: Client deleted\n");
 #endif
@@ -71,7 +71,7 @@ void Client::Connect() {
 
 void Client::Stop() {
 	for (int i=0; i<_numservers; i++)
-		_msg_queues[i].stop();
+		_message_queues[i].stop();
 	threads.join_all();
 	for (int i=0; i<_numservers; i++)
 		shutdown(_sockets[i], SHUT_RDWR);
@@ -88,7 +88,7 @@ void Client::_connect() {
 //		usleep(rand()%50000); // prevent too much collisions... TODO: remove
 	}
 	tg.join_all();
-	_updatable->ConnectedToServers();
+	_updatable->connected_to_servers();
 }
 
 void Client::_connect_to_server(int i) {
@@ -132,7 +132,7 @@ void Client::Send(int id, SendBuffer& buffer) {
     	SendBuffer* tmp = new SendBuffer;
     	*tmp = buffer;
     	shared_ptr<SendBuffer> new_msg(tmp);
-        _msg_queues[id].push(new_msg);
+        _message_queues[id].push(new_msg);
     }
 }
 
@@ -145,11 +145,11 @@ void Client::Broadcast(SendBuffer& buffer) {
 	*tmp = buffer;
 	shared_ptr<SendBuffer> new_msg(tmp);
 	for(int i=0;i<_numservers; i++) {
-        _msg_queues[i].push(new_msg);
+        _message_queues[i].push(new_msg);
 	}
 }
 
-void Client::Broadcast2(SendBuffer& buffer) {
+void Client::broadcast2(SendBuffer& buffer) {
 #ifdef DEBUG_COMM
 	printf ("Client:: queued %u bytes to broadcast to all but the server\n", buffer.size());
 	phex(buffer.data(), 4);
@@ -159,13 +159,13 @@ void Client::Broadcast2(SendBuffer& buffer) {
 	shared_ptr<SendBuffer> new_msg(tmp);
 	// first server is always the trusted party so we start with i=1
 	for(int i=1;i<_numservers; i++) {
-        _msg_queues[i].push(new_msg);
+        _message_queues[i].push(new_msg);
 	}
 }
 
 void Client::_send_thread(int i) {
 	shared_ptr<SendBuffer> msg;
-	while(_msg_queues[i].pop_dont_stop(msg))
+	while(_message_queues[i].pop_dont_stop(msg))
 		_send_blocking(*msg, i);
 #ifdef DEBUG_COMM
 	printf("Shutting down sender thread %d\n", i);
@@ -182,23 +182,23 @@ void Client::_send_blocking(SendBuffer& msg, int id) {
 	phex(msg.data(), 4);
 #endif
 #endif
-	int cur_sent = 0;
+	int current_sent = 0;
 	size_t len = msg.size();
-	cur_sent = send(_sockets[id], &len, sizeof(len), 0);
-	if(sizeof(len) == cur_sent) {
+	current_sent = send(_sockets[id], &len, sizeof(len), 0);
+	if(sizeof(len) == current_sent) {
 		unsigned int total_sent = 0;
 		unsigned int remaining = 0;
 		while(total_sent != msg.size()) {
-			remaining = (msg.size()-total_sent)>_max_msg_sz ? _max_msg_sz : (msg.size()-total_sent);
-			cur_sent = send(_sockets[id], msg.data()+total_sent, remaining, 0);
-			//printf("Client:: msg.len=%u, remaining=%u, total_sent=%u, cur_sent = %d\n",msg.len, remaining, total_sent,cur_sent);
-			if(cur_sent == -1) {
+			remaining = (msg.size()-total_sent)>_max_message_size ? _max_message_size : (msg.size()-total_sent);
+			current_sent = send(_sockets[id], msg.data()+total_sent, remaining, 0);
+			//printf("Client:: msg.len=%u, remaining=%u, total_sent=%u, current_sent = %d\n",msg.len, remaining, total_sent,current_sent);
+			if(current_sent == -1) {
 				fprintf(stderr,"Client:: Error: send msg failed: %s\n",strerror(errno));
-				assert(cur_sent != -1);
+				assert(current_sent != -1);
 			}
-			total_sent += cur_sent;
+			total_sent += current_sent;
 		}
-	} else if (-1 == cur_sent){
+	} else if (-1 == current_sent){
 		fprintf(stderr,"Client:: Error: send header failed: %s\n",strerror(errno));
 	}
 #ifdef DEBUG_COMM

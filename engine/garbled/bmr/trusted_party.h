@@ -15,16 +15,16 @@
 
 class BaseTrustedParty : virtual public CommonFakeParty {
 public:
-	vector<ReceivedMsg> prf_outputs;
-	vector<SendBuffer> msg_input_masks;
+	vector<ReceivedMessage> prf_outputs;
+	vector<SendBuffer> message_input_masks;
 
 	BaseTrustedParty();
 	virtual ~BaseTrustedParty();
 
 	/* From NodeUpdatable class */
-	virtual void NodeReady();
-	void NewMessage(int from, ReceivedMsg& msg);
-	void NodeAborted(struct sockaddr_in* from) { (void)from; }
+	virtual void node_ready();
+	void NewMessage(int from, ReceivedMessage& msg);
+	void node_aborted(struct sockaddr_in* from) { (void)from; }
 
 	void Start();
 
@@ -35,7 +35,7 @@ protected:
 	std::atomic_uint _received_gc_received;
 	std::atomic_uint n_received;
 
-	vector<SendBuffer> msg_keys;
+	vector<SendBuffer> message_keys;
 
 	int randomfd;
 
@@ -48,7 +48,7 @@ protected:
 
 	void prepare_randomness();
 	void send_randomness();
-	virtual void send_input_masks(party_id_t pid) = 0;
+	virtual void send_input_masks(PartyId pid) = 0;
 	virtual void send_output_masks() = 0;
 	virtual void garble() = 0;
 
@@ -57,12 +57,12 @@ protected:
 
 class TrustedProgramParty : public BaseTrustedParty {
 public:
-    SendBuffer msg_output_masks;
+    SendBuffer message_output_masks;
 
 	TrustedProgramParty(int argc, char** argv);
 	~TrustedProgramParty();
 
-	void NodeReady();
+	void node_ready();
 
 	void store_spdz_wire(SpdzOp op, const Register& reg);
 
@@ -88,15 +88,15 @@ private:
 
 	KeyVector deltas;
 
-	vector<octetStream> spdz_wires[SPDZ_OP_N];
-	vector< Share<gf2n_long> > mask_shares;
+	vector<OctetStream> spdz_wires[SPDZ_OP_N];
+	vector< Share<Gf2nLong> > mask_shares;
 
 	Timer random_timer;
 
 	bool _fill_keys();
 	void _launch_online();
 
-	void send_input_masks(party_id_t pid);
+	void send_input_masks(PartyId pid);
 	void send_output_masks();
 	void garble();
 
@@ -106,14 +106,14 @@ private:
 inline void BaseTrustedParty::add_keys(const Register& reg)
 {
 	for(int p = 0; p < get_n_parties(); p++)
-		reg.keys.serialize(msg_keys[p], p + 1);
+		reg.keys.serialize(message_keys[p], p + 1);
 }
 
 inline void TrustedProgramParty::add_all_keys(const Register& reg, bool external)
 {
 	for(int p = 0; p < get_n_parties(); p++)
 		for (int i = 0; i < get_n_parties(); i++)
-			reg.keys[external][i].serialize(msg_keys[p]);
+			reg.keys[external][i].serialize(message_keys[p]);
 }
 
 inline TrustedProgramParty& TrustedProgramParty::s()

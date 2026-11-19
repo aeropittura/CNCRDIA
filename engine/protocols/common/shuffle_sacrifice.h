@@ -67,45 +67,45 @@ public:
 
     void triple_sacrifice(vector<array<T, 3>>& triples,
             vector<array<T, 3>>& check_triples, Player& P,
-            typename T::MAC_Check& MC, ThreadQueues* queues = 0);
+            typename T::MacCheck& MC, ThreadQueues* queues = 0);
     void triple_sacrifice(vector<array<T, 3>>& triples,
             vector<array<T, 3>>& check_triples, Player& P,
-            typename T::MAC_Check& MC, int begin, int end);
+            typename T::MacCheck& MC, int begin, int end);
 
     void triple_combine(vector<array<T, 3>>& triples,
             vector<array<T, 3>>& to_combine, Player& P,
-            typename T::MAC_Check& MC);
+            typename T::MacCheck& MC);
 };
 
 template<class T>
 class DabitShuffleSacrifice : public ShuffleSacrifice
 {
 public:
-    void dabit_sacrifice(vector<dabit<T>>& dabits,
-            vector<dabit<T>>& check_dabits, SubProcessor<T>& proc,
+    void dabit_sacrifice(vector<Dabit<T>>& dabits,
+            vector<Dabit<T>>& check_dabits, SubProcessor<T>& proc,
             ThreadQueues* queues = 0);
 };
 
 template<class T>
 class EdabitShuffleSacrifice : public ShuffleSacrifice
 {
-  typedef typename T::bit_type::part_type BT;
+  typedef typename T::BitType::part_type BT;
 
     size_t n_bits;
 
 public:
     EdabitShuffleSacrifice(int n_bits);
 
-    void edabit_sacrifice(vector<edabit<T>>& output, vector<T>& sums,
-            vector<vector<typename T::bit_type::part_type>>& bits,
+    void edabit_sacrifice(vector<Edabit<T>>& output, vector<T>& sums,
+            vector<vector<typename T::BitType::part_type>>& bits,
             SubProcessor<T>& proc, bool strict = false, int player = -1,
             ThreadQueues* = 0);
 
-    void edabit_sacrifice_buckets(vector<edabit<T>>& to_check,
+    void edabit_sacrifice_buckets(vector<Edabit<T>>& to_check,
             bool strict, int player, SubProcessor<T>& proc, int begin, int end,
             const void* supply = 0);
 
-    void edabit_sacrifice_buckets(vector<edabit<T>>& to_check,
+    void edabit_sacrifice_buckets(vector<Edabit<T>>& to_check,
             bool strict, int player, SubProcessor<T>& proc, int begin, int end,
             LimitedPrep<BT>& personal_prep, const void* supply = 0);
 };

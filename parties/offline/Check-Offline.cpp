@@ -36,10 +36,10 @@ using namespace std;
 string PREP_DATA_PREFIX;
 
 template<class T>
-void check_mult_triples(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>& dataF)
+void check_mult_triples(const KeySetup<T>& key_setup,int N,vector<SubDataFiles<T>*>& dataF)
 {
   typename T::clear a,b,c;
-  typename T::mac_type mac;
+  typename T::MacType mac;
   vector<T> Sa(N),Sb(N),Sc(N);
   int n = 0;
 
@@ -59,7 +59,7 @@ void check_mult_triples(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files
           if (a * b != c)
             {
               cout << n << ": " << c << " != " << a << " * " << b << endl;
-              throw bad_value();
+              throw BadValue();
             }
           n++;
         }
@@ -81,7 +81,7 @@ void check_square(const T& a, const T& b, int n)
   if (a * a != b)
     {
       cout << n << ": " << b << " != " << a << "^2" << endl;
-      throw bad_value();
+      throw BadValue();
     }
 }
 
@@ -91,7 +91,7 @@ void check_inverse(const T& a, const T& b, int n)
   if (!(a * b).is_one())
     {
       cout << n << ": " << b << " != " << a << "^-1" << endl;
-      throw bad_value();
+      throw BadValue();
     }
 }
 
@@ -107,10 +107,10 @@ void check_tuple(const T& a, const T& b, int n, Dtype type)
 }
 
 template<class T>
-void check_tuples(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>& dataF, Dtype type)
+void check_tuples(const KeySetup<T>& key_setup,int N,vector<SubDataFiles<T>*>& dataF, Dtype type)
 {
   typename T::clear a,b,c,res;
-  typename T::mac_type mac;
+  typename T::MacType mac;
   vector<T> Sa(N),Sb(N),Sc(N);
   int n = 0;
 
@@ -139,10 +139,10 @@ void check_tuples(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>&
 }
 
 template<class T>
-void check_bits(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>& dataF)
+void check_bits(const KeySetup<T>& key_setup,int N,vector<SubDataFiles<T>*>& dataF)
 {
   typename T::clear a,b,c,res;
-  typename T::mac_type mac;
+  typename T::MacType mac;
   vector<T> Sa(N),Sb(N),Sc(N);
   int n = 0;
 
@@ -159,7 +159,7 @@ void check_bits(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>& d
           if (!(a.is_zero() || a.is_one()))
           {
               cout << n << ": " << a << " neither 0 or 1" << endl;
-              throw bad_value();
+              throw BadValue();
           }
           n++;
       }
@@ -173,10 +173,10 @@ void check_bits(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>& d
 }
 
 template<class T>
-void check_inputs(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>& dataF)
+void check_inputs(const KeySetup<T>& key_setup,int N,vector<SubDataFiles<T>*>& dataF)
 {
   typename T::clear a, x;
-  typename T::mac_type mac;
+  typename T::MacType mac;
   vector<T> Sa(N);
 
   for (int player = 0; player < N; player++)
@@ -192,7 +192,7 @@ void check_inputs(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>&
                 }
               check_share(Sa, a, mac, N, key_setup.key);
               if (a != (x))
-                  throw bad_value();
+                  throw BadValue();
               n++;
           }
           cout << n << " input masks for player " << player << " of type " << T::type_string() << endl;
@@ -206,14 +206,14 @@ void check_inputs(const KeySetup<T>& key_setup,int N,vector<Sub_Data_Files<T>*>&
 }
 
 template<class T>
-vector<Sub_Data_Files<T>*> setup(int N,
+vector<SubDataFiles<T>*> setup(int N,
     DataPositions& usage, int thread_num = -1)
 {
-  vector<Sub_Data_Files<T>*> dataF(N);
+  vector<SubDataFiles<T>*> dataF(N);
   for (int i = 0; i < N; i++)
     {
-      dataF[i] = new Sub_Data_Files<T>(i, N,
-          get_prep_sub_dir<T>(PREP_DATA_PREFIX, N), usage, thread_num);
+      dataF[i] = new SubDataFiles<T>(i, N,
+          get_prep_sub_directory<T>(PREP_DATA_PREFIX, N), usage, thread_num);
     }
   return dataF;
 }
@@ -222,7 +222,7 @@ template<class T>
 void check_with_error(int N, bool only_bits = false)
 {
   auto key_setup = read_global_mac_key<T>(
-      get_prep_sub_dir<T>(PREP_DATA_PREFIX, N), N);
+      get_prep_sub_directory<T>(PREP_DATA_PREFIX, N), N);
   DataPositions usage(N);
   auto dataF = setup<T>(N, usage);
   check_bits(key_setup, N, dataF);
@@ -251,7 +251,7 @@ void check(int N, bool only_bits = false)
 
 int main(int argc, const char** argv)
 {
-  ez::ezOptionParser opt;
+  ez::EzOptionParser opt;
 
   opt.syntax = "./Check-Offline.x <nparties> [OPTIONS]\n";
   opt.example = "./Check-Offline.x 3 -lgp 64 -lg2 128\n";
@@ -266,11 +266,11 @@ int main(int argc, const char** argv)
         "--lgp" // Flag token.
   );
   opt.add(
-        to_string(gf2n::default_degree()).c_str(), // Default.
+        to_string(Gf2n::default_degree()).c_str(), // Default.
         0, // Required?
         1, // Number of args expected.
         0, // Delimiter if expecting multiple args.
-        ("Bit length of GF(2^n) field (default: " + to_string(gf2n::default_degree()) + ")").c_str(), // Help description.
+        ("Bit length of GF(2^n) field (default: " + to_string(Gf2n::default_degree()) + ")").c_str(), // Help description.
         "-lg2", // Flag token.
         "--lg2" // Flag token.
   );
@@ -302,10 +302,10 @@ int main(int argc, const char** argv)
   if (opt.isSet("--usemont"))
         use_montgomery = true;
 
-  if (opt.firstArgs.size() == 2)
-      nparties = atoi(opt.firstArgs[1]->c_str());
-  else if (opt.lastArgs.size() == 1)
-      nparties = atoi(opt.lastArgs[0]->c_str());
+  if (opt.first_args.size() == 2)
+      nparties = atoi(opt.first_args[1]->c_str());
+  else if (opt.last_args.size() == 1)
+      nparties = atoi(opt.last_args[0]->c_str());
   else
   {
       cerr << "ERROR: invalid number of arguments\n";
@@ -322,11 +322,11 @@ int main(int argc, const char** argv)
   else
     PREP_DATA_PREFIX = PREP_DIR;
 
-  string prep_dir = get_prep_sub_dir<Share<gfp>>(PREP_DATA_PREFIX, nparties, lgp);
+  string prep_directory = get_prep_sub_directory<Share<Gfp>>(PREP_DATA_PREFIX, nparties, lgp);
 
   try
     {
-      read_setup(prep_dir);
+      read_setup(prep_directory);
     }
   catch (exception& e)
     {
@@ -336,9 +336,9 @@ int main(int argc, const char** argv)
   if (!use_montgomery)
   {
     // no montgomery
-    auto pr = gfp::pr();
-    gfp::reset();
-    gfp::init_field(pr, false);
+    auto pr = Gfp::pr();
+    Gfp::reset();
+    Gfp::initialize_field(pr, false);
   }
 
   OnlineOptions::singleton.options.push_back("debug_file_signature");
@@ -347,7 +347,7 @@ int main(int argc, const char** argv)
 
   try
     {
-      check<Share<gfp>>(N);
+      check<Share<Gfp>>(N);
     }
   catch (exception& e)
     {
@@ -356,12 +356,12 @@ int main(int argc, const char** argv)
 
   if (lg2 > 64)
     {
-      gf2n_long::init_field(lg2);
-      check<Share<gf2n_long>>(N);
+      Gf2nLong::initialize_field(lg2);
+      check<Share<Gf2nLong>>(N);
     }
   else
     {
-      gf2n_short::init_field(lg2);
-      check<Share<gf2n_short>>(N);
+      Gf2nShort::initialize_field(lg2);
+      check<Share<Gf2nShort>>(N);
     }
 }

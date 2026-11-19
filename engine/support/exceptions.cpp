@@ -16,7 +16,7 @@ void exit_error(const string& message)
     exit(1);
 }
 
-IO_Error::IO_Error(const string& m) :
+IoError::IoError(const string& m) :
         ans(m)
 {
 }
@@ -26,17 +26,17 @@ file_error::file_error(const string& m) :
 {
 }
 
-Processor_Error::Processor_Error(const string& m) :
+ProcessorError::ProcessorError(const string& m) :
         msg(m)
 {
 }
 
-Processor_Error::Processor_Error(const char* m) :
-        Processor_Error(string(m))
+ProcessorError::ProcessorError(const char* m) :
+        ProcessorError(string(m))
 {
 }
 
-wrong_gfp_size::wrong_gfp_size(const char* name, const bigint& p,
+WrongGfpSize::WrongGfpSize(const char* name, const Bigint& p,
         const char* symbol, int n_limbs) :
         runtime_error(
                 string() + name + " wrong size for modulus " + to_string(p)
@@ -54,12 +54,12 @@ overflow::overflow(const string& name, size_t i, size_t n) :
 {
 }
 
-unknown_input_type::unknown_input_type(int type) :
+UnknownInputType::UnknownInputType(int type) :
         runtime_error("unkown type: " + to_string(type))
 {
 }
 
-invalid_opcode::invalid_opcode(int opcode) :
+InvalidOpcode::InvalidOpcode(int opcode) :
         runtime_error("invalid opcode: " + to_string(opcode))
 {
 }
@@ -75,21 +75,21 @@ input_error::input_error(const char* name, const string& filename,
             + to_string(input_counter);
 }
 
-signature_mismatch::signature_mismatch(const string& filename, bool has_mac) :
+SignatureMismatch::SignatureMismatch(const string& filename, bool has_mac) :
         runtime_error("Signature in " + filename + " doesn't match protocol. " +
                 "Maybe re-run preprocessing"
                         + (has_mac ? " or check for MAC mismatch" : ""))
 {
 }
 
-insufficient_memory::insufficient_memory(size_t size, const string& type) :
+InsufficientMemory::InsufficientMemory(size_t size, const string& type) :
         runtime_error(
                 "program requires too much " + type + " memory: "
                         + to_string(size))
 {
 }
 
-not_enough_to_buffer::not_enough_to_buffer(const string& type, const string& filename)  :
+NotEnoughToBuffer::NotEnoughToBuffer(const string& type, const string& filename)  :
         runtime_error(
                 "Not enough data available for buffer"
                         + (filename.empty() ? "" : (" in " + filename)) + ". "
@@ -99,37 +99,37 @@ not_enough_to_buffer::not_enough_to_buffer(const string& type, const string& fil
 {
 }
 
-gf2n_not_supported::gf2n_not_supported(int n, string options) :
+Gf2nNotSupported::Gf2nNotSupported(int n, string options) :
         runtime_error(
                 "GF(2^" + to_string(n) + ") not supported"
                         + (options.empty() ? "" : ", options are " + options))
 {
 }
 
-setup_error::setup_error(const string& error) :
+SetupError::SetupError(const string& error) :
         runtime_error(error)
 {
 }
 
-prep_setup_error::prep_setup_error(const string& error, int nplayers,
-        const string& fake_opts) :
-        setup_error(
+PrepSetupError::PrepSetupError(const string& error, int nplayers,
+        const string& fake_options) :
+        SetupError(
                 "Something is wrong with the preprocessing data on disk: "
                         + error
                         + "\nHave you run the right program for generating it, "
                                 "such as './Fake-Offline.x "
-                        + to_string(nplayers) + " " + fake_opts + "'?")
+                        + to_string(nplayers) + " " + fake_options + "'?")
 {
 }
 
-insufficient_shares::insufficient_shares(int expected, int actual, exception& e) :
+InsufficientShares::InsufficientShares(int expected, int actual, exception& e) :
         runtime_error(
                 "expected " + to_string(expected) + " shares but only got "
                         + to_string(actual) + " (" + e.what() + ")")
 {
 }
 
-persistence_error::persistence_error(const string& error) :
+PersistenceError::PersistenceError(const string& error) :
         runtime_error(
                 "Error while reading from persistence file. "
                 "You need to write to it first. "
@@ -138,19 +138,19 @@ persistence_error::persistence_error(const string& error) :
 {
 }
 
-bytecode_error::bytecode_error(const string& error) :
+BytecodeError::BytecodeError(const string& error) :
         runtime_error(error)
 {
 }
 
-no_dynamic_memory::no_dynamic_memory() :
+NoDynamicMemory::NoDynamicMemory() :
         runtime_error("this functionality is only implemented "
                 "for online-only BMR, see "
                 "https://github.com/data61/MP-SPDZ?tab=readme-ov-file#bmr-1")
 {
 }
 
-field_too_small::field_too_small(int length, int security) :
+FieldTooSmall::FieldTooSmall(int length, int security) :
         runtime_error(
                 "Field too small (" + to_string(length)
                         + " bits) for chosen security (" + to_string(security)
@@ -159,7 +159,7 @@ field_too_small::field_too_small(int length, int security) :
 {
 }
 
-invalid_commitment::invalid_commitment(int player, const char* message) :
+InvalidCommitment::InvalidCommitment(int player, const char* message) :
         runtime_error(
                 "invalid commitment"
                         + (player < 0 ?

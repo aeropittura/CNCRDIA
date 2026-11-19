@@ -17,9 +17,9 @@
 
 int main(int argc, const char** argv)
 {
-    gf2n_<octet>::init_field(8);
-    ez::ezOptionParser opt;
+    Gf2n_<Octet>::initialize_field(8);
+    ez::EzOptionParser opt;
     ShamirOptions::singleton = {opt, argc, argv};
-    assert(ShamirOptions::singleton.nparties < (1 << gf2n_<char>::length()));
-    GC::ShareParty<GC::CcdSecret<gf2n_<octet>>>(argc, argv, opt);
+    assert(ShamirOptions::singleton.nparties < (1 << Gf2n_<char>::length()));
+    GC::ShareParty<GC::CcdSecret<Gf2n_<Octet>>>(argc, argv, opt);
 }

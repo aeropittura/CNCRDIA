@@ -35,7 +35,7 @@ void YaoGarbleWire::and_(GC::Processor<GC::Secret<YaoGarbleWire> >& processor,
 {
 #ifdef YAO_TIMINGS
 	auto& garbler = YaoGarbler::s();
-	TimeScope ts(garbler.and_timer), ts2(garbler.and_proc_timer),
+	TimeScope ts(garbler.and_timer), ts2(garbler.and_processor_timer),
 			ts3(garbler.and_main_thread_timer);
 #endif
 	and_multithread(processor, args, repeat);
@@ -118,7 +118,7 @@ void YaoGarbleWire::and_(StackedVector<GC::Secret<YaoGarbleWire> >& S,
 					counter);
 			mmo.hash<4>(hashes, labels);
 			auto& out = S[*(it + 1)];
-			out.resize_regs(1);
+			out.resize_registers(1);
 			YaoGate::randomize(out.get_reg(0), prng);
 			(gate++)->and_garble(out.get_reg(0), hashes,
 					S[*(it + 2)].get_reg(0),
@@ -131,7 +131,7 @@ void YaoGarbleWire::and_(StackedVector<GC::Secret<YaoGarbleWire> >& S,
 			{
 				auto& out = S[*(it + 1) + j];
 				int left = min(dl, *it - j * dl);
-				out.resize_regs(left);
+				out.resize_registers(left);
 				for (int k = 0; k < left; k++)
 				{
 					auto& left_wire = S[*(it + 2) + j].get_reg(k);
@@ -202,7 +202,7 @@ void YaoGarbleWire::sync(vector<Integer>& values, Player*)
 	if (not garbler.continuous())
 	{
 		garbler.untaint();
-		octetStream os;
+		OctetStream os;
 		garbler.P->receive_player(1, os);
 		os.get(values);
 	}
@@ -216,7 +216,7 @@ void YaoGarbleWire::reveal_inst(Processor& processor, const ArgVector& args)
 		if (garbler.is_tainted())
 			processor.reveal(args);
 		garbler.untaint();
-		octetStream buffer;
+		OctetStream buffer;
 		garbler.P->receive_player(1, buffer);
 		for (size_t j = 0; j < args.size(); j += 3)
 		{
@@ -231,7 +231,7 @@ void YaoGarbleWire::reveal_inst(Processor& processor, const ArgVector& args)
 		processor.reveal(args);
 }
 
-void YaoGarbleWire::convcbit2s(GC::Processor<whole_type>& processor,
+void YaoGarbleWire::convcbit2s(GC::Processor<WholeType>& processor,
 		const BaseInstruction& instruction)
 {
 	int unit = GC::Clear::N_BITS;
@@ -239,7 +239,7 @@ void YaoGarbleWire::convcbit2s(GC::Processor<whole_type>& processor,
 	{
 		auto& dest = processor.S[instruction.get_r(0) + i];
 		int n = min(size_t(unit), instruction.get_n() - i * unit);
-		dest.resize_regs(n);
+		dest.resize_registers(n);
 		for (int j = 0; j < n; j++)
 			dest.get_reg(j).public_input(
 					processor.C[instruction.get_r(1) + i].get_bit(j));

@@ -11,7 +11,7 @@
 
 template<class T> class MaliciousRepPrepWithBits;
 template<class T> class MaliciousRepPrep;
-template<class T> class MaliciousShamirPO;
+template<class T> class MaliciousShamirPo;
 template<class T> class SpecificPrivateOutput;
 
 namespace GC
@@ -22,15 +22,15 @@ template<class T> class MaliciousCcdSecret;
 template<class T>
 class MaliciousShamirShare : public ShamirShare<T>
 {
-    typedef ShamirShare<T> super;
+    typedef ShamirShare<T> Super;
     typedef MaliciousShamirShare This;
 
 public:
     typedef Beaver<MaliciousShamirShare<T>> BasicProtocol;
-    typedef MaliciousShamirMC<MaliciousShamirShare> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef MaliciousShamirOpener<MaliciousShamirShare> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ShamirInput<MaliciousShamirShare> Input;
-    typedef MaliciousShamirPO<MaliciousShamirShare> PO;
+    typedef MaliciousShamirPo<MaliciousShamirShare> PO;
     typedef SpecificPrivateOutput<This> PrivateOutput;
     typedef ShamirShare<T> Honest;
     typedef MaliciousRepPrepWithBits<MaliciousShamirShare> LivePrep;
@@ -40,17 +40,17 @@ public:
     typedef DummyMatrixPrep<This> MatrixPrep;
 
     // indicate security relevance of field size
-    typedef T mac_key_type;
+    typedef T MacKeyType;
 
 #ifndef NO_MIXED_CIRCUITS
-    typedef GC::MaliciousCcdSecret<gf2n_short> bit_type;
+    typedef GC::MaliciousCcdSecret<Gf2nShort> BitType;
 #endif
 
     static const bool malicious = true;
 
     static string type_short()
     {
-        return "M" + super::type_short();
+        return "M" + Super::type_short();
     }
 
     static string alt()
@@ -62,7 +62,7 @@ public:
     {
     }
     template<class U>
-    MaliciousShamirShare(const U& other) : super(other)
+    MaliciousShamirShare(const U& other) : Super(other)
     {
     }
 };

@@ -32,7 +32,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
-    DishonestMajorityFieldMachine<SohoShare, SohoShare, gf2n_short>(argc, argv,
+    ez::EzOptionParser opt;
+    DishonestMajorityFieldMachine<SohoShare, SohoShare, Gf2nShort>(argc, argv,
             opt);
 }

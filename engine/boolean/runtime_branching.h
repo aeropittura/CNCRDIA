@@ -25,7 +25,7 @@ public:
         bool was_tainted = tainted;
         tainted = false;
         if (was_tainted)
-            throw needs_cleaning();
+            throw NeedsCleaning();
         else
             taint();
     }

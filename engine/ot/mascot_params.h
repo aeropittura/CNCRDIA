@@ -7,21 +7,21 @@
 
 #include "support/offline_machine_base.h"
 
-class MascotParams : virtual public OfflineParams
+class MascotParameters : virtual public OfflineParameters
 {
 public:
-    string prep_data_dir;
-    bool generateMACs;
+    string prep_data_directory;
+    bool generate_macs;
     bool amplify;
     bool check;
     bool correlation_check;
-    bool generateBits;
+    bool generate_bits;
     bool use_extension;
     bool fewer_rounds;
     bool fiat_shamir;
     struct timeval start, stop;
 
-    MascotParams();
+    MascotParameters();
 
     void set_passive();
 };

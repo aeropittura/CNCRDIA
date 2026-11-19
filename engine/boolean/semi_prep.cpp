@@ -72,7 +72,7 @@ void SemiPrep::buffer_triples()
         if (not state)
             state = new SemiSecureTripleState(*P);
 
-        SemiSecureTripleState::job_type job;
+        SemiSecureTripleState::JobType job;
         job.first = batch_size + 64;
 
         if (one_way)
@@ -112,7 +112,7 @@ void SemiPrep::buffer_triples()
         auto base_count = triple_generator.baseCount(prng);
         int n_base = max(base_count.mSendCount, base_count.mRecvChoice.size());
         VirtualTwoPartyPlayer player(*P, 1 - P->my_num());
-        OTExtensionWithMatrix ot_ext(&player);//, P->my_num() ? RECEIVER : SENDER);
+        OtExtensionWithMatrix ot_ext(&player);//, P->my_num() ? RECEIVER : SENDER);
         ot_ext.init(BaseMachine::fresh_ot_setup(*P), 0);
         BitVector bits(base_count.mRecvChoice.data(), base_count.mRecvChoice.size());
         bits.resize(n_base);
@@ -124,10 +124,10 @@ void SemiPrep::buffer_triples()
             int i_square = i / 128;
             int i_part = i % 128;
             if (P->my_num())
-                sent.push_back({ot_ext.senderOutputMatrices[0].squares.at(i_square).rows[i_part],
-                ot_ext.senderOutputMatrices[1].squares.at(i_square).rows[i_part]});
+                sent.push_back({ot_ext.sender_output_matrices[0].squares.at(i_square).rows[i_part],
+                ot_ext.sender_output_matrices[1].squares.at(i_square).rows[i_part]});
             else
-                received.push_back(ot_ext.receiverOutputMatrix.squares.at(i_square).rows[i_part]);
+                received.push_back(ot_ext.receiver_output_matrix.squares.at(i_square).rows[i_part]);
         }
         triple_generator.setBaseOts(sent, received);
         size_t n = DIV_CEIL(triple_generator.mN, 256);
@@ -138,7 +138,7 @@ void SemiPrep::buffer_triples()
         macoro::sync_wait(socket.flush());
         for (size_t i = 0; i < n; i++)
         {
-            int128 a(A[i]), b(B[i]), c(C[i]);
+            Int128 a(A[i]), b(B[i]), c(C[i]);
             this->triples.push_back({a.get_lower(), b.get_lower(), c.get_lower()});
             this->triples.push_back({a.get_upper(), b.get_upper(), c.get_upper()});
         }
@@ -152,8 +152,8 @@ void SemiPrep::buffer_triples()
         assert(SemiSecret::default_length == 64);
         batch_size = multiple_minimum(batch_size, 128);
         if (not rot_ext)
-            rot_ext = new OTExtensionWithMatrix(*P, true);
-        SeededPRNG G;
+            rot_ext = new OtExtensionWithMatrix(*P, true);
+        SeededPrng G;
         BitVector a_bits(batch_size);
         a_bits.randomize(G);
         auto bits = rot_ext->bit_extension(a_bits);
@@ -174,8 +174,8 @@ void SemiPrep::buffer_triples()
 
     assert(this->triple_generator);
     this->triple_generator->set_batch_size(DIV_CEIL(batch_size, 64));
-    this->triple_generator->generatePlainTriples();
-    for (auto& x : this->triple_generator->plainTriples)
+    this->triple_generator->generate_plain_triples();
+    for (auto& x : this->triple_generator->plain_triples)
     {
         this->triples.push_back({{x[0], x[1], x[2]}});
     }
@@ -219,7 +219,7 @@ array<SemiSecret, 3> SemiPrep::get_mixed_triple(int n)
         this->triple_generator->set_batch_size(
                 BaseMachine::batch_size<SemiSecret>(DATA_MIXED,
                         this->buffer_size));
-        this->triple_generator->generateMixedTriples();
+        this->triple_generator->generate_mixed_triples();
         for (auto& x : this->triple_generator->mixedTriples)
         {
             this->mixed_triples.push_back({{x[0], x[1], x[2]}});

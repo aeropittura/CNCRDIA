@@ -118,7 +118,7 @@ value. Lastly, we open and check the array:
     }
 
 The :cpp:class:`Opener` class is convenience that is bound to a
-communication instance (unlike :cpp:class:`MAC_Check_Base` instances,
+communication instance (unlike :cpp:class:`MacCheckBase` instances,
 which require the communication instance in several function calls).
 
 You can run the example as follows:
@@ -215,7 +215,7 @@ The C++ calling code looks as follows:
 
 This inputs the values 1 to 10 as 16-bit numbers. Note the nested
 vectors for the inputs. This is due to the fact
-``share_type::bit_type`` can only hold up to 64 bits, so for longer
+``ShareType::bit_type`` can only hold up to 64 bits, so for longer
 bit lengths several entries have to be used.
 
 Lastly, :download:`../examples/export-a2b.py` covers the other

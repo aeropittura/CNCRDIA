@@ -19,7 +19,7 @@ class Hemi : public T::BasicProtocol
     map<array<int, 3>, matrix_prep*> matrix_preps;
     DataPositions matrix_usage;
 
-    MatrixMC<T>* mc;
+    MatrixOpener<T>* mc;
 
     bool warned = false;
 
@@ -43,5 +43,5 @@ public:
             const Instruction& instruction);
     void conv2ds(SubProcessor<T>& processor, const Instruction& instruction);
 
-    TimerWithComm prep_time();
+    TimerWithCommunication prep_time();
 };

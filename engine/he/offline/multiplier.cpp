@@ -25,7 +25,7 @@ Multiplier<FD>::Multiplier(int offset, PairwiseMachine& machine, Player& P,
     key_index((my_num + num_players - offset) % num_players),
     timers(timers),
     C(machine.pk), mask(machine.pk),
-    product_share(machine.setup<FD>().FieldD), rc(machine.pk),
+    product_share(machine.setup<FD>().field_d), rc(machine.pk),
     volatile_capacity(0)
 {
     product_share.allocate_slots(machine.pk.p() << 64);
@@ -35,14 +35,14 @@ template <class FD>
 void Multiplier<FD>::multiply_and_add(Plaintext_<FD>& res,
         const Ciphertext& enc_a, const Plaintext_<FD>& b)
 {
-    Rq_Element bb(enc_a.get_params(), evaluation, evaluation);
+    RqElement bb(enc_a.get_parameters(), evaluation, evaluation);
     bb.from(b.get_iterator());
     multiply_and_add(res, enc_a, bb);
 }
 
 template <class FD>
 void Multiplier<FD>::multiply_and_add(Plaintext_<FD>& res,
-        const Ciphertext& enc_a, const Rq_Element& b, OT_ROLE role)
+        const Ciphertext& enc_a, const RqElement& b, OT_ROLE role)
 {
     if (role & SENDER)
     {
@@ -66,7 +66,7 @@ void Multiplier<FD>::add(Plaintext_<FD>& res, const Ciphertext& c,
     if (role & SENDER)
     {
         PRNG G;
-        G.ReSeed();
+        G.re_seed();
         timers["Mask randomization"].start();
         product_share.randomize(G);
         mask = c;
@@ -103,7 +103,7 @@ void Multiplier<FD>::add(Plaintext_<FD>& res, const Ciphertext& c,
 
 template <class FD>
 void Multiplier<FD>::multiply_alpha_and_add(Plaintext_<FD>& res,
-        const Rq_Element& b, OT_ROLE role)
+        const RqElement& b, OT_ROLE role)
 {
     auto& other_enc_alpha = machine.enc_alphas.at(key_index);
     multiply_and_add(res, other_enc_alpha, b, role);
@@ -131,5 +131,5 @@ const vector<Ciphertext>& Multiplier<FD>::get_multiplicands(
 }
 
 
-template class Multiplier<FFT_Data>;
+template class Multiplier<FftData>;
 template class Multiplier<P2Data>;

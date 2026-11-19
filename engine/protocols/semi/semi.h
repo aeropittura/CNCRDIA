@@ -15,11 +15,11 @@
 template<class T>
 class Semi : public Beaver<T>
 {
-    typedef Beaver<T> super;
+    typedef Beaver<T> Super;
 
-    SeededPRNG G;
+    SeededPrng G;
 
-    OTExtensionWithMatrix* ot_ext;
+    OtExtensionWithMatrix* ot_ext;
 
 public:
     Semi(Player& P) :
@@ -33,10 +33,10 @@ public:
             delete ot_ext;
     }
 
-    OTExtensionWithMatrix& get_ot_extension()
+    OtExtensionWithMatrix& get_ot_extension()
     {
         if (not ot_ext)
-            ot_ext = new OTExtensionWithMatrix(this->P, true);
+            ot_ext = new OtExtensionWithMatrix(this->P, true);
 
         return *ot_ext;
     }
@@ -49,7 +49,7 @@ public:
     template<int = 0>
     void trunc_pr(const vector<int>&, int, SubProcessor<T>&, true_type)
     {
-        throw not_implemented();
+        throw NotImplemented();
     }
 
     template<int = 0>
@@ -62,9 +62,9 @@ public:
 
         assert(regs.size() % 4 == 0);
         this->trunc_pr_big_counter += size * regs.size() / 4;
-        typedef typename T::open_type open_type;
+        typedef typename T::OpenType OpenType;
 
-        vector<TruncPrTupleWithGap<open_type>> infos;
+        vector<TruncPrTupleWithGap<OpenType>> infos;
         for (size_t i = 0; i < regs.size(); i += 4)
             infos.push_back({regs, i});
 
@@ -87,13 +87,13 @@ public:
             }
             if (this->P.my_num())
                 for (int i = 0; i < size; i++)
-                    proc.get_S_ref(info.dest_base + i) =
-                            proc.get_S()[info.source_base + i].signed_rshift(
+                    proc.get_s_ref(info.destination_base + i) =
+                            proc.get_s()[info.source_base + i].signed_rshift(
                                     info.m);
             else
                 for (int i = 0; i < size; i++)
-                    proc.get_S_ref(info.dest_base + i) =
-                            proc.get_S()[info.source_base + i].signed_rshift(info.m);
+                    proc.get_s_ref(info.destination_base + i) =
+                            proc.get_s()[info.source_base + i].signed_rshift(info.m);
         }
     }
 
@@ -112,8 +112,8 @@ public:
     {
         if (T::prime_field)
         {
-            bigint::tmp.from_signed(typename T::clear(share));
-            return bigint::tmp.get_ui() & 1;
+            Bigint::tmp.from_signed(typename T::clear(share));
+            return Bigint::tmp.get_ui() & 1;
         }
         else
             return share.get_bit(0);
@@ -129,11 +129,11 @@ public:
         {
             assert(T::N_BITS <= 128);
             if (not ot_ext)
-                ot_ext = new OTExtensionWithMatrix(P, false);
+                ot_ext = new OtExtensionWithMatrix(P, false);
             auto& ext = get_ot_extension();
             BitVector bits;
-            octetStream os, os2;
-            SeededPRNG G;
+            OctetStream os, os2;
+            SeededPrng G;
             size_t budget = OnlineOptions::singleton.batch_size * T::length();
 
             for (size_t base = 0; base < multiplicands.size(); base += budget)
@@ -149,7 +149,7 @@ public:
                 {
                     auto& x = multiplicands[base + i];
                     os.store_bit(corrected_lsb(x.second) ^ bits.get_bit(i));
-                    products[base + i].from_random(ext.receiverOutputMatrix[i]);
+                    products[base + i].from_random(ext.receiver_output_matrix[i]);
                 }
 
                 os.append(0);
@@ -163,7 +163,7 @@ public:
                     auto d = os.get_bit();
                     T m[2];
                     for (int j = 0; j < 2; j++)
-                        m[j].from_random(ext.senderOutputMatrices[j ^ d][i]);
+                        m[j].from_random(ext.sender_output_matrices[j ^ d][i]);
                     auto r = m[0] - (sk * fk);
                     auto v1 = sk * (1 ^ fk) + r;
                     (v1 - m[1]).pack(os2);

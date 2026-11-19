@@ -12,21 +12,21 @@ template<class T>
 class DealerInput : public InputBase<T>
 {
     Player& P;
-    SeededPRNG G;
+    SeededPrng G;
     bool from_dealer;
     AllButLastPlayer sub_player;
     SemiInput<SemiShare<typename T::clear>>* internal;
     int king;
-    vector<SeededPRNG> dealer_prngs;
+    vector<SeededPrng> dealer_prngs;
     vector<PRNG> dealer_random_prngs;
     PRNG non_dealer_prng, non_dealer_random_prng;
-    octetStream os;
+    OctetStream os;
     IteratorVector<T> shares, random_shares;
     int my_num;
 
 public:
-    DealerInput(SubProcessor<T>& proc, typename T::MAC_Check&);
-    DealerInput(typename T::MAC_Check&, Preprocessing<T>&, Player& P,
+    DealerInput(SubProcessor<T>& proc, typename T::MacCheck&);
+    DealerInput(typename T::MacCheck&, Preprocessing<T>&, Player& P,
             typename T::Protocol* = 0);
     DealerInput(Player& P);
     DealerInput(SubProcessor<T>*, Player& P);
@@ -37,13 +37,13 @@ public:
     bool is_king();
 
     void reset(int player);
-    void add_mine(const typename T::open_type& input, int n_bits = -1);
+    void add_mine(const typename T::OpenType& input, int n_bits = -1);
     void add_other(int player, int n_bits = -1);
-    void add_from_dealer(const typename T::open_type& input);
-    void add_from_dealer(const vector<typename T::open_type>& input);
-    void add_from_dealer(span<const typename T::open_type> input);
+    void add_from_dealer(const typename T::OpenType& input);
+    void add_from_dealer(const vector<typename T::OpenType>& input);
+    void add_from_dealer(span<const typename T::OpenType> input);
     void add_n_from_dealer(size_t n_inputs, bool random = false);
-    typename T::open_type random_for_dealer();
+    typename T::OpenType random_for_dealer();
     void exchange();
     T finalize(int player, int n_bits = -1);
     T finalize_from_dealer();

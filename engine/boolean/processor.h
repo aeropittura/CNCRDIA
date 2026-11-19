@@ -24,7 +24,7 @@ namespace GC
 template <class T>
 class Processor : public ::ProcessorBase, public GC::RuntimeBranching
 {
-    map<int, typename T::Shuffler::shuffle_type> shuffle_store;
+    map<int, typename T::Shuffler::ShuffleType> shuffle_store;
     typename T::Shuffler shuffler;
 
 public:
@@ -36,7 +36,7 @@ public:
     Machine<T>* machine;
     Memories<T>& memories;
 
-    unsigned int PC, last_PC;
+    unsigned int PC, last_pc;
     unsigned int time;
 
     // rough measure for the memory usage
@@ -48,7 +48,7 @@ public:
 
     Timer xor_timer;
 
-    typename T::out_type out;
+    typename T::OutType out;
 
     Processor(Machine<T>& machine);
     Processor(Memories<T>& memories, Machine<T>* machine = 0);
@@ -83,15 +83,15 @@ public:
     void store_clear_in_dynamic(const ArgVector& args, U& dynamic_memory);
 
     template<class U, class V>
-    void mem_op(int n, U& dest, const V& source,
-            Integer dest_address, Integer source_address);
+    void memory_op(int n, U& dest, const V& source,
+            Integer destination_address, Integer source_address);
 
     template<class U, class V>
-    void indirect_mem_load(U& dest, const V& source,
+    void indirect_memory_load(U& dest, const V& source,
             const StackedVector<Integer>& Ci,
             const BaseInstruction& instruction);
     template<class U, class V>
-    void indirect_mem_store(U& dest, const V& source,
+    void indirect_memory_store(U& dest, const V& source,
             const StackedVector<Integer>& Ci,
             const BaseInstruction& instruction);
 

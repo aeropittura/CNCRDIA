@@ -84,8 +84,8 @@ inline ReplicatedBase::ReplicatedBase(Player& P) : P(P)
 	if (not P.is_encrypted())
 		insecure("unencrypted communication", false);
 
-	shared_prngs[0].ReSeed();
-	octetStream os;
+	shared_prngs[0].re_seed();
+	OctetStream os;
 	os.append(shared_prngs[0].get_seed(), SEED_SIZE);
 	P.pass_around(os, 1);
 	shared_prngs[1].SetSeed(os.get_data());
@@ -144,7 +144,7 @@ void ProtocolBase<T>::multiply(vector<T>& products,
 
     assert(products.size() == multiplicands.size());
     init(proc.DataF, proc.MC);
-    init_mul();
+    initialize_mult();
     for (int i = begin; i < end; i++)
         prepare_mul(multiplicands[i].first, multiplicands[i].second);
     exchange();
@@ -162,7 +162,7 @@ void ProtocolBase<T>::multiply_mixed(vector<T>&, vector<pair<T, T> >&,
 template<class T>
 T ProtocolBase<T>::mul(const T& x, const T& y)
 {
-    init_mul();
+    initialize_mult();
     prepare_mul(x, y);
     exchange();
     return finalize_mul();
@@ -217,7 +217,7 @@ vector<int> ProtocolBase<T>::get_relevant_players()
 }
 
 template<class T>
-void Replicated<T>::init_mul()
+void Replicated<T>::initialize_mult()
 {
     if (os[1].left() or add_shares.left())
         throw runtime_error("unused data in Rep3");
@@ -237,7 +237,7 @@ template<class T>
 void Replicated<T>::prepare_mul(const T& x,
         const T& y, int n)
 {
-    typename T::value_type add_share = x.local_mul(y);
+    typename T::value_type add_share = x.local_mult(y);
     if (not T::clear::binary or fast_mode)
         add_shares.push_back(add_share);
     else
@@ -245,10 +245,10 @@ void Replicated<T>::prepare_mul(const T& x,
 }
 
 template<class T>
-void Replicated<T>::prepare_mul_fast(const T& x,
+void Replicated<T>::prepare_mult_fast(const T& x,
         const T& y)
 {
-    add_shares.push_back(x.local_mul(y));
+    add_shares.push_back(x.local_mult(y));
 }
 
 template<class T>
@@ -278,7 +278,7 @@ void Replicated<T>::prepare_exchange()
         {
             add_share += shared_prngs[0];
             add_share -= shared_prngs[1];
-            os[0].append_no_resize((octet*) add_share.get_ptr(),
+            os[0].append_no_resize((Octet*) add_share.get_ptr(),
                     add_share.size());
         }
     }
@@ -322,7 +322,7 @@ void Replicated<T>::check_received()
 }
 
 template<class T>
-void ProtocolBase<T>::add_mul(int n)
+void ProtocolBase<T>::add_mult(int n)
 {
     // counted in SubProcessor
     // this->counter++;
@@ -333,7 +333,7 @@ void ProtocolBase<T>::add_mul(int n)
 template<class T>
 inline T Replicated<T>::finalize_mul(int n)
 {
-    this->add_mul(n);
+    this->add_mult(n);
     T result;
     result[0] = add_shares.next();
     if (T::clear::binary and not fast_mode)
@@ -344,9 +344,9 @@ inline T Replicated<T>::finalize_mul(int n)
 }
 
 template<class T>
-T Replicated<T>::finalize_mul_fast()
+T Replicated<T>::finalize_mult_fast()
 {
-    this->add_mul(-1);
+    this->add_mult(-1);
     T result;
     result[0] = add_shares.next();
     result[1].assign(os[1].consume_no_check(T::clear::size()));
@@ -354,16 +354,16 @@ T Replicated<T>::finalize_mul_fast()
 }
 
 template<class T>
-inline void Replicated<T>::init_dotprod()
+inline void Replicated<T>::initialize_dotprod()
 {
-    init_mul();
+    initialize_mult();
     dotprod_share.assign_zero();
 }
 
 template<class T>
 inline void Replicated<T>::prepare_dotprod(const T& x, const T& y)
 {
-    dotprod_share = dotprod_share.lazy_add(x.local_mul(y));
+    dotprod_share = dotprod_share.lazy_add(x.local_mult(y));
 }
 
 template<class T>
@@ -385,7 +385,7 @@ inline T Replicated<T>::finalize_dotprod(int length)
 template<class T>
 T Replicated<T>::get_random()
 {
-    return ReplicatedBase::get_random<typename T::open_type>();
+    return ReplicatedBase::get_random<typename T::OpenType>();
 }
 
 template<class T>
@@ -440,10 +440,10 @@ void Replicated<T>::trunc_pr(const ArgVector& regs, int size, U& proc,
     assert(proc.Proc != 0);
     bool generate = P.my_num() == gen_player;
     bool compute = P.my_num() == comp_player;
-    auto& S = proc.get_S();
+    auto& S = proc.get_s();
     TruncPrTupleList<T> infos(regs, S, size);
 
-    octetStream cs;
+    OctetStream cs;
 
     auto& input = get_helper_input();
     input.reset_all(P);
@@ -464,16 +464,16 @@ void Replicated<T>::trunc_pr(const ArgVector& regs, int size, U& proc,
 
     if (generate)
     {
-        SeededPRNG G;
+        SeededPrng G;
         for (auto info : infos)
         {
             if (info.big_gap())
             {
-                auto dest_it = info.dest_range.begin();
+                auto destination_it = info.destination_range.begin();
                 cs.reserve(size * value_type::size());
                 for (auto& x : info.source_range)
                 {
-                    auto& y = *dest_it++;
+                    auto& y = *destination_it++;
                     auto r = this->shared_prngs[0].template get<value_type>();
                     y[1] = x.sum().signed_rshift(info.m) - r;
                     cs.store_no_resize(y[1]);
@@ -501,13 +501,13 @@ void Replicated<T>::trunc_pr(const ArgVector& regs, int size, U& proc,
                 }
             else
             {
-                auto dest_it = info.dest_range.begin();
+                auto destination_it = info.destination_range.begin();
                 if (cs.left() < size_t(value_type::size() * size))
                     throw runtime_error("insufficient data in trunc_pr");
 
                 for (auto& x: info.source_range)
                 {
-                    auto& y = *dest_it++;
+                    auto& y = *destination_it++;
                     y[0] = cs.get_no_check<value_type>();
                     y[1] = x[1].signed_rshift(info.m);
                 }
@@ -522,7 +522,7 @@ void Replicated<T>::trunc_pr(const ArgVector& regs, int size, U& proc,
                 for (int i = 0; i < size; i++)
                 {
                     auto& x = S[info.source_base + i];
-                    auto& y = S[info.dest_base + i];
+                    auto& y = S[info.destination_base + i];
                     y[0] = x[0].signed_rshift(info.m);
                     y[1] = this->shared_prngs[1].template get<value_type>();
                 }
@@ -549,7 +549,7 @@ void Replicated<T>::trunc_pr_finish(TruncPrTupleList<T>& infos,
             if (info.small_gap())
             {
                 auto it = info.source_range.begin();
-                for (auto& y : info.dest_range)
+                for (auto& y : info.destination_range)
                 {
                     const int comp_offset = comp_player - MY_NUM;
                     auto c_prime = input.finalize_offset(comp_offset);
@@ -562,7 +562,7 @@ void Replicated<T>::trunc_pr_finish(TruncPrTupleList<T>& infos,
                         auto r = (*it++)[index];
                         r_prime[index] = r >> info.m;
                         r_msb[index] = r.msb();
-                        input2.add_mine(r_msb.local_mul(c_dprime));
+                        input2.add_mine(r_msb.local_mult(c_dprime));
                     }
 
                     y = c_prime + r_prime;
@@ -576,7 +576,7 @@ void Replicated<T>::trunc_pr_finish(TruncPrTupleList<T>& infos,
 
         for (auto info : infos)
             if (info.small_gap())
-                for (auto &y : info.dest_range)
+                for (auto &y : info.destination_range)
                     y += info.correction_shift(input2.finalize_offset(2 - MY_NUM)
                             + input2.finalize_offset(0 - MY_NUM))
                             - T::constant(info.subtract_after() - 1, MY_NUM);
@@ -604,7 +604,7 @@ void Replicated<T>::trunc_pr(const ArgVector& regs, int size,
 template<class T>
 template<int>
 void Replicated<T>::unsplit(StackedVector<T>& dest,
-        StackedVector<typename T::bit_type>& source,
+        StackedVector<typename T::BitType>& source,
         const Instruction& instruction)
 {
     CODE_LOCATION
@@ -620,11 +620,11 @@ void Replicated<T>::unsplit(StackedVector<T>& dest,
     {
         auto range = BlockRange(source, instruction.get_r(0), n_bits);
         input.prepare(n_bits);
-        auto dest_it = dest.iterator_for_size(instruction.get_start()[0],
+        auto destination_it = dest.iterator_for_size(instruction.get_start()[0],
                 n_bits);
         for (auto& x : range)
             for (auto bit : BitLeftRange(x.sum(), x, range))
-                input.add_mine_prepared(*dest_it++, bit);
+                input.add_mine_prepared(*destination_it++, bit);
     }
     else
         input.add_other(0);
@@ -637,7 +637,7 @@ void Replicated<T>::unsplit(StackedVector<T>& dest,
 template<class T>
 template<int MY_NUM>
 void Replicated<T>::unsplit_finish(StackedVector<T>& dest,
-        StackedVector<typename T::bit_type>& source,
+        StackedVector<typename T::BitType>& source,
         const Instruction& instruction)
 {
     int n_bits = instruction.get_size();
@@ -658,10 +658,10 @@ void Replicated<T>::unsplit_finish(StackedVector<T>& dest,
                 it.second = {};
             }
 
-            auto dest_it = dest.iterator_for_size(instruction.get_start()[1], n_bits);
+            auto destination_it = dest.iterator_for_size(instruction.get_start()[1], n_bits);
             for (auto& x : range)
                 for (auto bit : BitLeftRange(x[MY_NUM - 1], x, range))
-                    (*dest_it++)[MY_NUM - 1] = bit;
+                    (*destination_it++)[MY_NUM - 1] = bit;
         }
     }
     else
@@ -671,7 +671,7 @@ void Replicated<T>::unsplit_finish(StackedVector<T>& dest,
 
         if (MY_NUM != 0)
         {
-            auto dest_it = dest.iterator_for_size(instruction.get_start()[0],
+            auto destination_it = dest.iterator_for_size(instruction.get_start()[0],
                     n_bits);
             input2.prepare(n_bits);
             for (auto& x : range)
@@ -680,8 +680,8 @@ void Replicated<T>::unsplit_finish(StackedVector<T>& dest,
                     T a, c;
                     a[MY_NUM - 1] = bit;
                     T b = input.finalize_offset(-MY_NUM);
-                    input2.add_mine_prepared(c, a.local_mul(b));
-                    (*dest_it++) = a + b - 2 * c;
+                    input2.add_mine_prepared(c, a.local_mult(b));
+                    (*destination_it++) = a + b - 2 * c;
                 }
         }
 
@@ -689,9 +689,9 @@ void Replicated<T>::unsplit_finish(StackedVector<T>& dest,
         input2.add_other(2);
         input2.exchange();
 
-        auto dest_range = Range(dest, instruction.get_start()[0], n_bits);
+        auto destination_range = Range(dest, instruction.get_start()[0], n_bits);
         if (MY_NUM == 0)
-            for (auto& x : dest_range)
+            for (auto& x : destination_range)
             {
                 x -= 2
                         * (input2.finalize_offset(1 - MY_NUM)
@@ -699,7 +699,7 @@ void Replicated<T>::unsplit_finish(StackedVector<T>& dest,
             }
         else
         {
-            for (auto& x : dest_range)
+            for (auto& x : destination_range)
                 x -= 2 * input2.finalize_offset(MY_NUM == 1 ? 1 : -1);
         }
     }

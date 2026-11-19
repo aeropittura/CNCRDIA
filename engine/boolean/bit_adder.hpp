@@ -101,7 +101,7 @@ void BitAdder::add(vector<vector<T> >& res,
             b[j] = summands[i][1][input_begin + j];
         }
 
-        protocol.init_mul();
+        protocol.initialize_mult();
         for (size_t j = 0; j < n_items; j++)
         {
             res[begin + j][i] = a[j] + b[j] + carries[j];
@@ -147,14 +147,14 @@ void BitAdder::multi_add(vector<vector<T> >& res,
             x.insert(x.begin(), y, y + n_items);
         }
 
-    vector<vector<T>> my_res(n_items);
+    vector<vector<T>> my_result(n_items);
     for (size_t k = 2; k < summands.at(0).size(); k++)
     {
-        add(my_res, my_summands, 0, n_items, proc, length);
+        add(my_result, my_summands, 0, n_items, proc, length);
 
         for (size_t i = 0; i < my_summands.size(); i++)
             for (size_t j = 0; j < n_items; j++)
-                my_summands[i][0][j] = my_res[j][i];
+                my_summands[i][0][j] = my_result[j][i];
 
         for (size_t i = 0; i < summands.size(); i++)
         {

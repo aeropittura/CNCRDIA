@@ -9,26 +9,26 @@ Ring::Ring(int m) :
     init(*this, m);
 }
 
-void Ring::pack(octetStream& o) const
+void Ring::pack(OctetStream& o) const
 {
   o.store(mm);
   if (((mm - 1) & mm) != 0)
     {
       o.store(phim);
       o.store(pi);
-      o.store(pi_inv);
+      o.store(pi_inverse);
       o.store(poly);
     }
 }
 
-void Ring::unpack(octetStream& o)
+void Ring::unpack(OctetStream& o)
 {
   o.get(mm);
   if (((mm - 1) & mm) != 0)
     {
       o.get(phim);
       o.get(pi);
-      o.get(pi_inv);
+      o.get(pi_inverse);
       o.get(poly);
     }
   else if (mm != 0)
@@ -38,7 +38,7 @@ void Ring::unpack(octetStream& o)
 bool Ring::operator !=(const Ring& other) const
 {
   if (mm != other.mm or phim != other.phim or pi != other.pi
-      or pi_inv != other.pi_inv or poly != other.poly)
+      or pi_inverse != other.pi_inverse or poly != other.poly)
     return true;
   else
     return false;

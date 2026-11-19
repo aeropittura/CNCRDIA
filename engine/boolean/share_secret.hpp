@@ -168,7 +168,7 @@ void Processor<T>::inputb(typename T::Input& input, ProcessorBase& input_process
     {
         if (input.is_me(x.from, my_num))
         {
-            bigint whole_input = get_long_input<bigint>(x.params,
+            Bigint whole_input = get_long_input<Bigint>(x.params,
                     input_processor, interactive);
             for (int i = 0; i < DIV_CEIL(x.n_bits, dl); i++)
             {
@@ -209,7 +209,7 @@ void Processor<T>::inputbvec(typename T::Input& input, ProcessorBase& input_proc
         const ArgVector& args, PlayerBase& P)
 {
     int my_num = P.my_num();
-    InputVecArgList a(args);
+    InputVectorArgList a(args);
     complexity += a.n_input_bits();
     bool interactive = T::actual_inputs
             && a.n_interactive_inputs_from_me(my_num) > 0;
@@ -221,12 +221,12 @@ void Processor<T>::inputbvec(typename T::Input& input, ProcessorBase& input_proc
 
         if (input.is_me(x.from, my_num))
         {
-            bigint whole_input = get_long_input<bigint>(x.params,
+            Bigint whole_input = get_long_input<Bigint>(x.params,
                     input_processor, interactive);
             for (size_t i = 0; i < x.n_bits; i++)
             {
                 auto& res = S[x.dest[i]];
-                res.my_input(input, bigint(whole_input >> (i)).get_si() & 1, 1);
+                res.my_input(input, Bigint(whole_input >> (i)).get_si() & 1, 1);
             }
         }
         else
@@ -273,7 +273,7 @@ void ShareSecret<U>::reveal_inst(Processor<U>& processor,
         }
     }
     assert(party.MC);
-    PointerVector<typename U::open_type> opened;
+    PointerVector<typename U::OpenType> opened;
     party.MC->POpen(opened, shares, *party.P);
     for (size_t i = 0; i < args.size(); i += 3)
     {
@@ -288,7 +288,7 @@ void ShareSecret<U>::reveal_inst(Processor<U>& processor,
 }
 
 template<class U>
-BitVec ReplicatedSecret<U>::local_mul(const ReplicatedSecret& other) const
+BitVec ReplicatedSecret<U>::local_mult(const ReplicatedSecret& other) const
 {
     return (*this)[0] * other.sum() + (*this)[1] * other[0];
 }
@@ -317,11 +317,11 @@ template<class U, int L>
 void RepSecretBase<U, L>::trans(StackedVector<U>& dest,
         const StackedVector<U>& source, int n_outputs, const ArgVector& args)
 {
-    vec_trans(dest, source, n_outputs, args);
+    vector_trans(dest, source, n_outputs, args);
 }
 
 template<class U>
-void vec_trans(StackedVector<U>& dest, const StackedVector<U>& source,
+void vector_trans(StackedVector<U>& dest, const StackedVector<U>& source,
         int n_outputs, const ArgVector& args)
 {
     int N_BITS = U::default_length;
@@ -331,7 +331,7 @@ void vec_trans(StackedVector<U>& dest, const StackedVector<U>& source,
         for (int j = 0; j < DIV_CEIL(n_outputs, N_BITS); j++)
             for (int l = 0; l < DIV_CEIL(args.size() - n_outputs, N_BITS); l++)
             {
-                square64 square;
+                Square64 square;
                 size_t input_base = n_outputs + l * N_BITS;
                 for (size_t i = input_base; i < min(input_base + N_BITS, args.size()); i++)
                     square.rows[i - input_base] = source[args[i] + j][k].get();
@@ -355,7 +355,7 @@ void ReplicatedSecret<U>::reveal(size_t n_bits, Clear& x)
     vector<BitVec> opened;
     auto& party = ShareThread<U>::s();
     party.MC->POpen(opened, {share}, *party.P);
-    x = BitVec::super(opened[0]);
+    x = BitVec::Super(opened[0]);
 }
 
 template<class U>

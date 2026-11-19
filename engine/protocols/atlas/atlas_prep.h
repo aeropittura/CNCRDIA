@@ -28,11 +28,11 @@ public:
     {
         assert(this->protocol and this->proc);
         int batch_size = OnlineOptions::singleton.batch_size;
-        typename T::MAC_Check MC;
+        typename T::MacCheck MC;
         vector<T> shares;
         for (int i = 0; i < batch_size; i++)
             shares.push_back(this->protocol->get_random());
-        vector<typename T::open_type> opened;
+        vector<typename T::OpenType> opened;
         this->proc->MC.POpen(opened, shares, this->proc->P);
         for (int i = 0; i < batch_size; i++)
             this->inputs.at(player).push_back({shares[i], opened[i]});

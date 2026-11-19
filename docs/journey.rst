@@ -183,7 +183,7 @@ with Rep3 modulo :math:`2^{64}`. The main function in
 4. :func:`Machine<sint, sgf2n>::run` calls :func:`Machine<sint,
    sgf2n>::run_tape`, which signals the thread which code to run.
 5. The computation thread waits for a signal in
-   :func:`thread_info<sint, sgf2n>::Sub_Main_Func`. Once received, it
+   :func:`thread_info<sint, sgf2n>::sub_main_func`. Once received, it
    calls :func:`Program::execute` in
    :download:`engine/vm/instruction.hpp <../engine/vm/instruction.hpp>`.
 6. :func:`Program::execute` runs the main loop over the
@@ -204,10 +204,10 @@ with Rep3 modulo :math:`2^{64}`. The main function in
    <../engine/vm/instruction.hpp>`, where :func:`SubProcessor::POpen`
    in :download:`engine/vm/processor.hpp <../engine/vm/processor.hpp>`
    is called. This is turn uses the four-step interface of
-   :class:`MAC_Check_Base` with an instance of
-   :class:`ReplicatedMC`. The communication happens in
-   :func:`ReplicatedMC::exchange`, and the reconstruction (summation)
-   happens :func:`ReplicatedMC::finalize`, both in
+   :class:`MacCheckBase` with an instance of
+   :class:`ReplicatedOpener`. The communication happens in
+   :func:`ReplicatedOpener::exchange`, and the reconstruction (summation)
+   happens :func:`ReplicatedOpener::finalize`, both in
    :download:`engine/protocols/replicated/replicated_mc.hpp
    <../engine/protocols/replicated/replicated_mc.hpp>`. The remaining functions mainly
    handle copying data and serialization.
@@ -227,7 +227,7 @@ with Rep3 modulo :math:`2^{64}`. The main function in
 11. The remaining instructions are executed similarly but not do have
     a relevant effect.
 12. When :func:`Program::execute` is done, control returns to
-    :func:`thread_info<sint, sgf2n>::Sub_Main_Func`, which signals
+    :func:`thread_info<sint, sgf2n>::sub_main_func`, which signals
     completion to the main thread.
 13. After receiving the signal, :func:`Machine<sint, sgf2n>::run`
     completes and outputs the various statistics and exits

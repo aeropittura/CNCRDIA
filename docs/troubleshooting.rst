@@ -316,7 +316,7 @@ Performance can be further increased when compiling MP-SPDZ yourself:
 See also `this issue <https://github.com/data61/MP-SPDZ/issues/557>`_ for a discussion.
 
 
-``mac_fail``
+``MacFail``
 ~~~~~~~~~~~~
 
 This is a catch-all failure in protocols with malicious protocols that

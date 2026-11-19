@@ -12,7 +12,7 @@
 
 class YaoGarbleMaster : public GC::ThreadMaster<GC::Secret<YaoGarbleWire>>
 {
-    typedef GC::ThreadMaster<GC::Secret<YaoGarbleWire>> super;
+    typedef GC::ThreadMaster<GC::Secret<YaoGarbleWire>> Super;
 
     Key delta;
 

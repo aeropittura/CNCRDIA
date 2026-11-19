@@ -1,8 +1,8 @@
 #pragma once
 
 /* The procedure for the Reshare protocol 
- *   Input is a ciphertext cm and a flag NewCiphertext
- *   Output is a Ring_Element and possibly a ciphertext cc
+ *   Input is a ciphertext cm and a flag new_ciphertext
+ *   Output is a RingElement and possibly a ciphertext cc
  */
 
 #include "he/core/ciphertext.h"
@@ -13,12 +13,12 @@ template <class FD> class DistDecrypt;
 
 template<class T,class FD,class S>
 void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
-             const Ciphertext& cm,bool NewCiphertext,
+             const Ciphertext& cm,bool new_ciphertext,
              const Player& P,EncCommitBase<T,FD,S>& EC,
              const FHE_PK& pk,const FHE_SK& share);
 
 template<class T,class FD,class S>
 void Reshare(Plaintext<T,FD,S>& m,Ciphertext& cc,
-             const Ciphertext& cm,bool NewCiphertext,
+             const Ciphertext& cm,bool new_ciphertext,
              const Player& P,EncCommitBase<T,FD,S>& EC,
              const FHE_PK& pk,DistDecrypt<FD>& dd);

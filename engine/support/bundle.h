@@ -10,10 +10,10 @@
 #include <vector>
 using namespace std;
 
-class mismatch_among_parties : public runtime_error
+class MismatchAmongParties : public runtime_error
 {
 public:
-    mismatch_among_parties() :
+    MismatchAmongParties() :
             runtime_error("mismatch among parties")
     {
     }
@@ -43,7 +43,7 @@ public:
         P.unchecked_broadcast(*this);
         for (auto& os : *this)
             if (os != mine)
-                throw mismatch_among_parties();
+                throw MismatchAmongParties();
     }
 
     void reset()

@@ -8,11 +8,11 @@
 
 int main(int argc, char** argv)
 {
-    int lgp = gfp0::size_in_bits();
+    int lgp = Gfp0::size_in_bits();
     if (argc > 1)
         lgp = atoi(argv[1]);
     if (argc > 2)
         cout << generate_prime(lgp, 1 << abs(atoi(argv[2])), atoi(argv[2]) <= 0) << endl;
     else
-        cout << SPDZ_Data_Setup_Primes(lgp) << endl;
+        cout << spdz_data_setup_primes(lgp) << endl;
 }

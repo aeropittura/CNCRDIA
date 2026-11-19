@@ -22,7 +22,7 @@
 
 class ClientUpdatable {
 public:
-	virtual void ConnectedToServers()=0;
+	virtual void connected_to_servers()=0;
 };
 
 
@@ -38,16 +38,16 @@ public:
 	void Connect();
 	void Send(int id, SendBuffer& new_msg);
 	void Broadcast(SendBuffer& new_msg);
-	void Broadcast2(SendBuffer& new_msg);
+	void broadcast2(SendBuffer& new_msg);
 	void Stop();
 
 private:
 
-	WaitQueue< shared_ptr<SendBuffer> >* _msg_queues;
-//	std::queue<Msg>* _msg_queues;
+	WaitQueue< shared_ptr<SendBuffer> >* _message_queues;
+//	std::queue<Msg>* _message_queues;
 //	boost::mutex* _msg_mux;
 //	boost::mutex* _thd_mux;
-	unsigned int _max_msg_sz;
+	unsigned int _max_message_size;
 	void _send_thread(int i);
 	void _send_blocking(SendBuffer& msg, int id);
 

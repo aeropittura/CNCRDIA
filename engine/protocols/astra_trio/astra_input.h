@@ -13,21 +13,21 @@ template<class T>
 class AstraInput : public InputBase<T>
 {
 protected:
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
 
-    octetStream send_os, recv_os;
+    OctetStream send_os, recv_os;
     AstraOnlineBase<T>& protocol;
     IteratorVector<T> results, my_results;
-    CheckVector<typename T::open_type> inputs;
+    CheckVector<typename T::OpenType> inputs;
 
 public:
-    AstraInput(SubProcessor<T>& proc, MAC_Check_Base<T>& MC);
+    AstraInput(SubProcessor<T>& proc, MacCheckBase<T>& MC);
     AstraInput(SubProcessor<T>* proc, Player& P);
-    AstraInput(MAC_Check_Base<T>& MC, Preprocessing<T>&, Player& P,
+    AstraInput(MacCheckBase<T>& MC, Preprocessing<T>&, Player& P,
             AstraOnlineBase<T>* protocol);
 
     void reset(int player);
-    void add_mine(const typename T::open_type& input, int n_bits = -1) final;
+    void add_mine(const typename T::OpenType& input, int n_bits = -1) final;
     void add_other(int player, int n_bits = -1) final;
 
     void exchange();
@@ -38,23 +38,23 @@ public:
 template<class T>
 class AstraPrepInput : public InputBase<T>
 {
-    typedef typename T::open_type open_type;
+    typedef typename T::OpenType OpenType;
 
     AstraPrepProtocol<T>& protocol;
     array<IteratorVector<T>, 3> results;
-    octetStream prep_os;
+    OctetStream prep_os;
     vector<int> n_inputs;
 
 public:
-    AstraPrepInput(SubProcessor<T>& proc, MAC_Check_Base<T>& MC);
+    AstraPrepInput(SubProcessor<T>& proc, MacCheckBase<T>& MC);
     AstraPrepInput(SubProcessor<T>* proc, Player& P);
-    AstraPrepInput(MAC_Check_Base<T>& MC, Preprocessing<T>&, Player& P,
+    AstraPrepInput(MacCheckBase<T>& MC, Preprocessing<T>&, Player& P,
             AstraPrepProtocol<T>* protocol);
 
     bool is_me(int player, int = -1);
 
     void reset(int player);
-    void add_mine(const typename T::open_type& input, int n_bits = -1) final;
+    void add_mine(const typename T::OpenType& input, int n_bits = -1) final;
     void add_other(int player, int n_bits = -1) final;
 
     void exchange();

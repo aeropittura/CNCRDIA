@@ -92,7 +92,7 @@ void Node::_start() {
 	_client->Broadcast(buffer);
 }
 
-void Node::NewMsg(ReceivedMsg& message, struct sockaddr_in* from) {
+void Node::NewMsg(ReceivedMessage& message, struct sockaddr_in* from) {
 	char* msg = message.data();
 	size_t len = message.size();
 #ifdef DEBUG_COMM
@@ -114,7 +114,7 @@ void Node::NewMsg(ReceivedMsg& message, struct sockaddr_in* from) {
 		_num_parties_identified++;
 		if(_num_parties_identified == _numparties-1) {
 			printf("Node:: received ALL_IDENTIFIED from ALL\n");
-			_updatable->NodeReady();
+			_updatable->node_ready();
 		}
 		return;
 	}
@@ -125,17 +125,17 @@ void Node::NewMsg(ReceivedMsg& message, struct sockaddr_in* from) {
 #endif
 }
 
-void Node::ClientsConnected() {
+void Node::clients_connected() {
 	printf("Node:: Clients connected!\n");
 }
 
-void Node::NodeAborted(struct sockaddr_in* from)
+void Node::node_aborted(struct sockaddr_in* from)
 {
 	printf("Node:: party %d has aborted\n",_clientsmap[from]);
 	Stop();
 }
 
-void Node::ConnectedToServers() {
+void Node::connected_to_servers() {
 	printf("Node:: Connected to all servers!\n");
 	_connected_to_servers = true;
 	_identify();
@@ -158,12 +158,12 @@ void Node::Broadcast(SendBuffer& msg) {
 #endif
 	_client->Broadcast(msg);
 }
-void Node::Broadcast2(SendBuffer& msg) {
+void Node::broadcast2(SendBuffer& msg) {
 #ifdef DEBUG_COMM
 	printf("Broadcast2 %d bytes at 0x%x\n", msg.size(), msg.data());
 	phex(msg.data(), 4);
 #endif
-	_client->Broadcast2(msg);
+	_client->broadcast2(msg);
 }
 
 void Node::_identify() {
@@ -229,6 +229,6 @@ void Node::print_waiting()
 	{
 		cout << "Waited " << _server->timers[i].elapsed()
 				<< " seconds for client "
-				<< _clientsmap[_server->get_client_addr(i)] << endl;
+				<< _clientsmap[_server->get_client_address(i)] << endl;
 	}
 }

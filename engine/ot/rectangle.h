@@ -60,8 +60,8 @@ public:
 	void to(T& result);
 	void to(Rectangle<U, V>& result) { result = *this; }
 
-	void pack(octetStream& o) const;
-	void unpack(octetStream& o);
+	void pack(OctetStream& o) const;
+	void unpack(OctetStream& o);
 
 	void print(int i, int j);
 };
@@ -75,6 +75,6 @@ using Z2kSquare = Rectangle<Z2<K>, Z2<K>>;
 template <class U, class V>
 ostream& operator<<(ostream& o, const Rectangle<U, V>&)
 {
-	throw not_implemented();
+	throw NotImplemented();
 	return o;
 }

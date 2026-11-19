@@ -38,7 +38,7 @@ ShareThread<T>::ShareThread(Preprocessing<T>& prep) :
 
 template<class T>
 ShareThread<T>::ShareThread(Preprocessing<T>& prep, Player& P,
-        typename T::mac_key_type mac_key) :
+        typename T::MacKeyType mac_key) :
         ShareThread(prep)
 {
     pre_run(P, mac_key);
@@ -55,14 +55,14 @@ ShareThread<T>::~ShareThread()
 }
 
 template<class T>
-void ShareThread<T>::pre_run(Player& P, typename T::mac_key_type mac_key)
+void ShareThread<T>::pre_run(Player& P, typename T::MacKeyType mac_key)
 {
     this->P = &P;
     if (singleton)
         throw runtime_error("there can only be one");
     singleton = this;
     protocol = new typename T::Protocol(*this->P);
-    MC = this->new_mc(mac_key);
+    MC = this->new_opener(mac_key);
     DataF.set_protocol(*this->protocol);
     this->protocol->init(DataF, *MC);
 }
@@ -170,7 +170,7 @@ void ShareThread<T>::and_(Processor<T>& processor,
     auto& protocol = this->protocol;
     auto& S = processor.S;
     processor.check_args(args, 4);
-    protocol->init_mul();
+    protocol->initialize_mult();
     T x_ext, y_ext;
 
     size_t total_bits = 0;
@@ -210,7 +210,7 @@ void ShareThread<T>::and_(Processor<T>& processor,
         {
             if (fast_mode)
                 for (auto x : info.full_block_input_range(S))
-                    protocol->prepare_mul_fast(x.first, x.second);
+                    protocol->prepare_mult_fast(x.first, x.second);
             else if (info.n_full_blocks())
                 for (auto x : info.full_block_input_range(S))
                     protocol->prepare_mul(x.first, x.second);
@@ -245,7 +245,7 @@ void ShareThread<T>::and_(Processor<T>& processor,
         {
             if (fast_mode)
                 for (auto& res : info.full_block_output_range(S))
-                    res = protocol->finalize_mul_fast();
+                    res = protocol->finalize_mult_fast();
             else if (info.n_full_blocks())
                 for (auto& res : info.full_block_output_range(S))
                     res = protocol->finalize_mul();
@@ -260,7 +260,7 @@ void ShareThread<T>::and_(Processor<T>& processor,
     if (OnlineOptions::singleton.has_option("always_check"))
         protocol->check();
 
-    protocol->init_mul();
+    protocol->initialize_mult();
     protocol->set_fast_mode(false);
 }
 
@@ -270,7 +270,7 @@ void ShareThread<T>::andrsvec(Processor<T>& processor, const ArgVector& args)
     int N_BITS = T::default_length;
     auto& protocol = this->protocol;
     assert(protocol);
-    protocol->init_mul();
+    protocol->initialize_mult();
     auto it = args.begin();
     T x_ext, y_ext;
     int total_bits = 0;
@@ -343,7 +343,7 @@ void ShareThread<T>::xors(Processor<T>& processor, const ArgVector& args)
 }
 
 template<class T>
-TimerWithComm ShareThread<T>::prep_time()
+TimerWithCommunication ShareThread<T>::prep_time()
 {
     return DataF.total_time();
 }

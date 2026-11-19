@@ -12,7 +12,7 @@ template<class T>
 PrivateOutput<T>::PrivateOutput(SubProcessor<T>& proc) :
         proc(proc), MC(proc.MC.get_alphai())
 {
-    MC.init_open(proc.P);
+    MC.initialize_open(proc.P);
     MC.set_prep(proc.DataF);
 }
 
@@ -26,7 +26,7 @@ template<class T>
 void PrivateOutput<T>::prepare_sending(const T& source, int player)
 {
     assert (player < proc.P.num_players());
-    open_type mask;
+    OpenType mask;
     T res;
     proc.DataF.get_input(res, mask, player);
     res += source;

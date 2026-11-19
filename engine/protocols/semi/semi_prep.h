@@ -13,7 +13,7 @@ template<class T> class HemiPrep;
  * Semi-honest triple generation based on oblivious transfer
  */
 template<class T>
-class SemiPrep : public virtual OTPrep<T>, public virtual SemiHonestRingPrep<T>
+class SemiPrep : public virtual OtPrep<T>, public virtual SemiHonestRingPrep<T>
 {
     friend class HemiPrep<T>;
 

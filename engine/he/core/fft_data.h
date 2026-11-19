@@ -12,10 +12,10 @@
  */
 
 
-class FFT_Data
+class FftData
 {
   Ring    R;
-  Zp_Data prData;
+  ZpData pr_data;
 
   vector<modp> root;     // 2m'th Root of Unity mod pr and it's inverse
   vector<modp> roots;    // precomputed powers of root
@@ -37,31 +37,31 @@ class FFT_Data
   void compute_roots(int n);
 
   public:
-  typedef gfp T;
-  typedef bigint S;
-  typedef fixint<gfpvar::N_LIMBS> poly_type;
+  typedef Gfp T;
+  typedef Bigint S;
+  typedef Fixint<Gfpvar::N_LIMBS> poly_type;
 
-  void init(const Ring& Rg,const Zp_Data& PrD);
+  void init(const Ring& rg,const ZpData& pr_d);
 
-  void init_field() const { gfp::init_field(prData.pr); }
+  void initialize_field() const { Gfp::initialize_field(pr_data.pr); }
 
-  void hash(octetStream& o) const;
-  void pack(octetStream& o) const;
-  void unpack(octetStream& o);
+  void hash(OctetStream& o) const;
+  void pack(OctetStream& o) const;
+  void unpack(OctetStream& o);
 
-  FFT_Data();
-  FFT_Data(const Ring& Rg,const Zp_Data& PrD)
-    { init(Rg,PrD); }
+  FftData();
+  FftData(const Ring& rg,const ZpData& pr_d)
+    { init(rg,pr_d); }
 
-  const Zp_Data& get_prD() const        { return prData; }
-  const bigint&  get_prime() const      { return prData.pr; }
+  const ZpData& get_pr_d() const        { return pr_data; }
+  const Bigint&  get_prime() const      { return pr_data.pr; }
 
   int phi_m() const                     { return R.phi_m(); }
   int m()     const                     { return R.m();   }
   int num_slots() const                 { return R.phi_m(); }
 
   int p(int i)      const        { return R.p(i);     }
-  int p_inv(int i)  const        { return R.p_inv(i); }
+  int p_inverse(int i)  const        { return R.p_inverse(i); }
   const vector<int>& Phi() const { return R.Phi();    }
 
   int get_twop() const           { return twop;       }
@@ -71,10 +71,10 @@ class FFT_Data
 
   const Ring& get_R() const      { return R; }
 
-  void write_setup(const string& dir) const { prData.write_setup(dir); }
+  void write_setup(const string& dir) const { pr_data.write_setup(dir); }
 
-  bool operator==(const FFT_Data& other) const { return not (*this != other); }
-  bool operator!=(const FFT_Data& other) const;
+  bool operator==(const FftData& other) const { return not (*this != other); }
+  bool operator!=(const FftData& other) const;
 
-  friend void BFFT(vector<modp>& ans,const vector<modp>& a,const FFT_Data& FFTD,bool forward);
+  friend void BFFT(vector<modp>& ans,const vector<modp>& a,const FftData& FFTD,bool forward);
 };

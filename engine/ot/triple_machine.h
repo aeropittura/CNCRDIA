@@ -14,16 +14,16 @@
 
 class GeneratorThread;
 
-class TripleMachine : public OfflineMachineBase, public MascotParams
+class TripleMachine : public OfflineMachineBase, public MascotParameters
 {
     Names N[2];
-    int nConnections;
+    int n_connections;
 
-    gf2n mac_key2;
-    gfpvar1 mac_keyp;
+    Gf2n mac_key2;
+    Gfpvar1 mac_keyp;
     Z2<128> mac_keyz;
 
-    bigint prime;
+    Bigint prime;
 
     Player* player;
 
@@ -31,13 +31,13 @@ class TripleMachine : public OfflineMachineBase, public MascotParams
     bool bonding;
     int z2k, z2s;
 
-    NetworkOptionsWithNumber network_opts;
+    NetworkOptionsWithNumber network_options;
 
 public:
     TripleMachine(int argc, const char** argv);
 
     template<class T, class U>
-    GeneratorThread* new_generator(OTTripleSetup& setup, int i,
+    GeneratorThread* new_generator(OtTripleSetup& setup, int i,
             U& mac_key);
 
     void run();

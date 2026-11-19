@@ -15,42 +15,42 @@ class Rep4 : public ProtocolBase<T>
 {
     friend class Rep4RingPrep<T>;
 
-    typedef typename T::open_type open_type;
-    typedef array<ElementPRNG<typename T::open_type>, 3> prngs_type;
+    typedef typename T::OpenType OpenType;
+    typedef array<ElementPRNG<typename T::OpenType>, 3> PrngsType;
 
-    octetStreams send_os;
-    octetStreams receive_os;
+    OctetStreams send_os;
+    OctetStreams receive_os;
     vector<vector<bool>> channels;
     array<array<Hash, 4>, 4> send_hashes, receive_hashes;
 
-    array<vector<open_type>, 5> add_shares;
-    array<open_type, 5> dotprod_shares;
+    array<vector<OpenType>, 5> add_shares;
+    array<OpenType, 5> dotprod_shares;
     vector<int> bit_lengths;
 
-    class ResTuple
+    class ResultTuple
     {
     public:
         T res;
-        open_type r;
+        OpenType r;
     };
 
-    PointerVector<ResTuple> results;
+    PointerVector<ResultTuple> results;
 
     int my_num;
 
     bool malicious;
 
-    array<open_type, 5> get_addshares(const T& x, const T& y);
+    array<OpenType, 5> get_addshares(const T& x, const T& y);
 
     void reset_joint_input(int n_inputs);
     void prepare_joint_input(int sender, int backup, int receiver,
-            int outsider, vector<open_type>& inputs);
+            int outsider, vector<OpenType>& inputs);
     void prepare_joint_input(int sender, int backup, int receiver, int outsider,
-            vector<open_type>& inputs, vector<ResTuple>& results);
+            vector<OpenType>& inputs, vector<ResultTuple>& results);
     void finalize_joint_input(int sender, int backup, int receiver,
             int outsider);
     void finalize_joint_input(int sender, int backup, int receiver,
-            int outsider, vector<ResTuple>& results);
+            int outsider, vector<ResultTuple>& results);
 
     int get_player(int offset);
 
@@ -61,28 +61,28 @@ class Rep4 : public ProtocolBase<T>
 
     void must_check();
 
-    void append_hashes(octetStreams& to_send);
-    void check_hashes(octetStreams& to_receive);
+    void append_hashes(OctetStreams& to_send);
+    void check_hashes(OctetStreams& to_receive);
 
 public:
     static const bool uses_triples = false;
 
-    prngs_type rep_prngs;
+    PrngsType rep_prngs;
     Player& P;
 
     Rep4(Player& P);
-    Rep4(Player& P, prngs_type& prngs);
+    Rep4(Player& P, PrngsType& prngs);
     ~Rep4();
 
     Rep4 branch();
 
-    void init_mul();
+    void initialize_mult();
     void prepare_mul(const T& x, const T& y, int n = -1);
     void exchange();
     T finalize_mul(int n = -1);
     void check();
 
-    void init_dotprod();
+    void initialize_dotprod();
     void prepare_dotprod(const T& x, const T& y);
     void next_dotprod();
     T finalize_dotprod(int length);

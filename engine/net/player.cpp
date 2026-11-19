@@ -32,12 +32,12 @@ Names::Names(int player, int nplayers, const string& servername, int pnb,
   Server::start_networking(*this, player, nplayers, servername, pnb, my_port);
 }
 
-void Names::init(int player,int pnb,vector<string> Nms)
+void Names::init(int player,int pnb,vector<string> nms)
 {
   player_no=player;
   portnum_base=pnb;
-  nplayers=Nms.size();
-  names=Nms;
+  nplayers=nms.size();
+  names=nms;
   setup_ports();
   setup_server();
 }
@@ -91,10 +91,10 @@ void Names::init(int player, int pnb, const string& filename, int nplayers_wante
   setup_server();
 }
 
-Names::Names(ez::ezOptionParser& opt, int argc, const char** argv,
+Names::Names(ez::EzOptionParser& opt, int argc, const char** argv,
     int default_nplayers) : Names()
 {
-  NetworkOptionsWithNumber network_opts(opt, argc, argv, default_nplayers, true);
+  NetworkOptionsWithNumber network_options(opt, argc, argv, default_nplayers, true);
   opt.add(
           "", // Default.
           1, // Required?
@@ -107,14 +107,14 @@ Names::Names(ez::ezOptionParser& opt, int argc, const char** argv,
   opt.parse(argc, argv);
   opt.get("-p")->getInt(player_no);
   vector<string> missing;
-  if (not opt.gotRequired(missing))
+  if (not opt.got_required(missing))
   {
       string usage;
       opt.getUsage(usage);
       cerr << usage;
       exit(1);
   }
-  network_opts.start_networking(*this, player_no);
+  network_options.start_networking(*this, player_no);
 }
 
 void Names::setup_ports()
@@ -142,7 +142,7 @@ void Names::setup_names(const char *servername, int my_port)
         string("cannot reach coordination server: ") + e.what());
   }
 
-  octetStream("P" + to_string(player_no)).Send(socket_num);
+  OctetStream("P" + to_string(player_no)).Send(socket_num);
 
   if (OnlineOptions::singleton.has_option("debug_networking"))
     cerr << "Sent " << player_no << " to " << servername << ":" << pn << endl;
@@ -152,8 +152,8 @@ void Names::setup_names(const char *servername, int my_port)
   socklen_t size = sizeof address;
   getsockname(socket_num, (sockaddr*)&address, &size);
   char* my_name = inet_ntoa(address.sin_addr);
-  octetStream(my_name).Send(socket_num);
-  send(socket_num,(octet*)&my_port,4);
+  OctetStream(my_name).Send(socket_num);
+  send(socket_num,(Octet*)&my_port,4);
 
   if (OnlineOptions::singleton.has_option("debug_networking"))
     {
@@ -164,7 +164,7 @@ void Names::setup_names(const char *servername, int my_port)
   // Now get the set of names
   try
   {
-    octetStream os;
+    OctetStream os;
     os.Receive(socket_num);
     os.get(names);
     os.get(ports);
@@ -224,33 +224,33 @@ Names::~Names()
 }
 
 
-Player::Player(const Names& Nms) :
-        PlayerBase(Nms.my_num()), N(Nms)
+Player::Player(const Names& nms) :
+        PlayerBase(nms.my_num()), N(nms)
 {
-  nplayers=Nms.nplayers;
-  player_no=Nms.player_no;
-  thread_stats.resize(nplayers);
+  nplayers=nms.nplayers;
+  player_no=nms.player_no;
+  thread_statistics.resize(nplayers);
 }
 
 
 template<class T>
-MultiPlayer<T>::MultiPlayer(const Names& Nms, const string& id) :
-        Player(Nms), id(id), send_to_self_socket(0)
+MultiPlayer<T>::MultiPlayer(const Names& nms, const string& id) :
+        Player(nms), id(id), send_to_self_socket(0)
 {
-  sockets.resize(Nms.num_players());
+  sockets.resize(nms.num_players());
 }
 
 
-PlainPlayer::PlainPlayer(const Names& Nms, const string& id) :
-        MultiPlayer<int>(Nms, id)
+PlainPlayer::PlainPlayer(const Names& nms, const string& id) :
+        MultiPlayer<int>(nms, id)
 {
-  if (Nms.num_players() > 1)
-    setup_sockets(Nms.names, Nms.ports, id, *Nms.server);
+  if (nms.num_players() > 1)
+    setup_sockets(nms.names, nms.ports, id, *nms.server);
 }
 
 
-PlainPlayer::PlainPlayer(const Names& Nms, int id_base) :
-        PlainPlayer(Nms, to_string(id_base))
+PlainPlayer::PlainPlayer(const Names& nms, int id_base) :
+        PlainPlayer(nms, to_string(id_base))
 {
 }
 
@@ -273,7 +273,7 @@ MultiPlayer<T>::~MultiPlayer()
 Player::~Player()
 {
 #ifdef VERBOSE
-  for (auto& x : thread_stats)
+  for (auto& x : thread_statistics)
     x.print();
 #endif
   for (auto child : children)
@@ -283,7 +283,7 @@ Player::~Player()
 PlayerBase::~PlayerBase()
 {
 #ifdef VERBOSE
-  comm_stats.print();
+  communication_statistics.print();
   if (timer.elapsed() > 0)
     cerr << "Receiving took " << timer.elapsed() << " seconds" << endl;
 #endif
@@ -327,7 +327,7 @@ void PlainPlayer::setup_sockets(const vector<string>& names,
 #endif
           set_up_client_socket(sockets[i],names[i].c_str(),ports[i]);
         }
-        octetStream(pn).Send(sockets[i]);
+        OctetStream(pn).Send(sockets[i]);
     }
     send_to_self_socket = sockets[player_no];
     // Setting up the server side
@@ -374,8 +374,8 @@ vector<int> Player::balanced_others() const
 template<class T>
 void MultiPlayer<T>::send_long(int i, long a) const
 {
-  TimeScope ts(comm_stats["Sending by number"].add(sizeof(long)));
-  send(sockets[i], (octet*)&a, sizeof(long));
+  TimeScope ts(communication_statistics["Sending by number"].add(sizeof(long)));
+  send(sockets[i], (Octet*)&a, sizeof(long));
   sent += sizeof(long);
 }
 
@@ -383,39 +383,39 @@ template<class T>
 long MultiPlayer<T>::receive_long(int i) const
 {
   long res;
-  receive(sockets[i], (octet*)&res, sizeof(long));
+  receive(sockets[i], (Octet*)&res, sizeof(long));
   return res;
 }
 
 
 
-void Player::send_to(int player,const octetStream& o) const
+void Player::send_to(int player,const OctetStream& o) const
 {
-  TimeScope ts(comm_stats["Sending directly"].add(o, player));
-  send_to_no_stats(player, o);
+  TimeScope ts(communication_statistics["Sending directly"].add(o, player));
+  send_to_no_statistics(player, o);
   sent += o.get_length();
 }
 
 template<class T>
-void MultiPlayer<T>::send_to_no_stats(int player,const octetStream& o) const
+void MultiPlayer<T>::send_to_no_statistics(int player,const OctetStream& o) const
 {
   T socket = socket_to_send(player);
   o.Send(socket);
 }
 
 
-void Player::send_all(const octetStream& o) const
+void Player::send_all(const OctetStream& o) const
 {
-  TimeScope ts(comm_stats["Sending to all"].add(o));
+  TimeScope ts(communication_statistics["Sending to all"].add(o));
   for (int i=0; i<nplayers; i++)
      { if (i!=player_no)
-         send_to_no_stats(i, o);
+         send_to_no_statistics(i, o);
      }
   sent += o.get_length() * (num_players() - 1);
 }
 
 
-void Player::send_all(const vector<octetStream>& os) const
+void Player::send_all(const vector<OctetStream>& os) const
 {
   for (int i=0; i<nplayers; i++)
      { if (i!=player_no)
@@ -424,7 +424,7 @@ void Player::send_all(const vector<octetStream>& os) const
 }
 
 
-void Player::receive_all(vector<octetStream>& os) const
+void Player::receive_all(vector<OctetStream>& os) const
 {
   os.resize(num_players());
   for (int j = 0; j < num_players(); j++)
@@ -433,15 +433,15 @@ void Player::receive_all(vector<octetStream>& os) const
 }
 
 
-void Player::receive_player(int i,octetStream& o) const
+void Player::receive_player(int i,OctetStream& o) const
 {
   TimeScope ts(timer);
-  receive_player_no_stats(i, o);
-  comm_stats["Receiving directly"].add(o, ts, i);
+  receive_player_no_statistics(i, o);
+  communication_statistics["Receiving directly"].add(o, ts, i);
 }
 
 template<class T>
-void MultiPlayer<T>::receive_player_no_stats(int i,octetStream& o) const
+void MultiPlayer<T>::receive_player_no_statistics(int i,OctetStream& o) const
 {
   o.reset_write_head();
   o.Receive(sockets[i]);
@@ -449,12 +449,12 @@ void MultiPlayer<T>::receive_player_no_stats(int i,octetStream& o) const
 
 void Player::receive_player(int i, FlexBuffer& buffer) const
 {
-  octetStream os;
+  OctetStream os;
   receive_player(i, os);
   buffer = os;
 }
 
-size_t PlainPlayer::send_no_stats(int player,
+size_t PlainPlayer::send_no_statistics(int player,
         const PlayerBuffer& buffer, bool block) const
 {
   if (block)
@@ -466,7 +466,7 @@ size_t PlainPlayer::send_no_stats(int player,
     return send_non_blocking(socket(player), buffer.data, buffer.size);
 }
 
-size_t PlainPlayer::recv_no_stats(int player,
+size_t PlainPlayer::receive_no_statistics(int player,
         const PlayerBuffer& buffer, bool block) const
 {
     if (block)
@@ -479,65 +479,65 @@ size_t PlainPlayer::recv_no_stats(int player,
 }
 
 
-void Player::send_relative(const vector<octetStream>& os) const
+void Player::send_relative(const vector<OctetStream>& os) const
 {
   assert((int)os.size() == num_players() - 1);
   for (int offset = 1; offset < num_players(); offset++)
     send_relative(offset, os[offset - 1]);
 }
 
-void Player::send_relative(int offset, const octetStream& o) const
+void Player::send_relative(int offset, const OctetStream& o) const
 {
   send_to(positive_modulo(my_num() + offset, num_players()), o);
 }
 
-void Player::receive_relative(vector<octetStream>& os) const
+void Player::receive_relative(vector<OctetStream>& os) const
 {
   assert((int)os.size() == num_players() - 1);
   for (int offset = 1; offset < num_players(); offset++)
     receive_relative(offset, os[offset - 1]);
 }
 
-void Player::receive_relative(int offset, octetStream& o) const
+void Player::receive_relative(int offset, OctetStream& o) const
 {
   receive_player(positive_modulo(my_num() + offset, num_players()), o);
 }
 
 template<class T>
-void MultiPlayer<T>::exchange_no_stats(int other, const octetStream& o, octetStream& to_receive) const
+void MultiPlayer<T>::exchange_no_statistics(int other, const OctetStream& o, OctetStream& to_receive) const
 {
   o.exchange(sockets[other], sockets[other], to_receive);
 }
 
-void Player::exchange(int other, const octetStream& o, octetStream& to_receive) const
+void Player::exchange(int other, const OctetStream& o, OctetStream& to_receive) const
 {
-  TimeScope ts(comm_stats["Exchanging"].add(o, other));
-  exchange_no_stats(other, o, to_receive);
+  TimeScope ts(communication_statistics["Exchanging"].add(o, other));
+  exchange_no_statistics(other, o, to_receive);
   sent += o.get_length();
 }
 
 
-void Player::exchange(int player, octetStream& o) const
+void Player::exchange(int player, OctetStream& o) const
 {
   exchange(player, o, o);
 }
 
-void Player::exchange_relative(int offset, octetStream& o) const
+void Player::exchange_relative(int offset, OctetStream& o) const
 {
   exchange(get_player(offset), o);
 }
 
 
 template<class T>
-void MultiPlayer<T>::pass_around_no_stats(const octetStream& o, octetStream& to_receive, int offset) const
+void MultiPlayer<T>::pass_around_no_statistics(const OctetStream& o, OctetStream& to_receive, int offset) const
 {
   o.exchange(sockets.at(get_player(offset)), sockets.at(get_player(-offset)), to_receive);
 }
 
-void Player::pass_around(octetStream& o, octetStream& to_receive, int offset) const
+void Player::pass_around(OctetStream& o, OctetStream& to_receive, int offset) const
 {
-  TimeScope ts(comm_stats["Passing around"].add(o));
-  pass_around_no_stats(o, to_receive, offset);
+  TimeScope ts(communication_statistics["Passing around"].add(o));
+  pass_around_no_statistics(o, to_receive, offset);
   sent += o.get_length();
 }
 
@@ -546,23 +546,23 @@ void Player::pass_around(octetStream& o, octetStream& to_receive, int offset) co
  * size getting in the way
  */
 template<class T>
-void MultiPlayer<T>::Broadcast_Receive_no_stats(vector<octetStream>& o) const
+void MultiPlayer<T>::broadcast_receive_no_statistics(vector<OctetStream>& o) const
 {
   vector<bool> parties(num_players(), true);
-  partial_broadcast_no_stats(parties, parties, o);
+  partial_broadcast_no_statistics(parties, parties, o);
 }
 
 
 template<class T>
-void MultiPlayer<T>::partial_broadcast_no_stats(
+void MultiPlayer<T>::partial_broadcast_no_statistics(
     const vector<bool>& senders, const vector<bool>& receivers,
-    vector<octetStream>& o) const
+    vector<OctetStream>& o) const
 {
   if (o.size() != sockets.size())
     throw runtime_error("player numbers don't match");
 
   vector<Exchanger<T>> exchangers;
-  octetStream empty;
+  OctetStream empty;
   for (int i=1; i<nplayers; i++)
     {
       int send_to = (my_num() + i) % num_players();
@@ -601,14 +601,14 @@ void MultiPlayer<T>::partial_broadcast_no_stats(
       throw runtime_error("unexpected information from " + to_string(i));
 }
 
-void Player::unchecked_broadcast(vector<octetStream>& o) const
+void Player::unchecked_broadcast(vector<OctetStream>& o) const
 {
-  TimeScope ts(comm_stats["Broadcasting"].add(o[player_no]));
-  Broadcast_Receive_no_stats(o);
+  TimeScope ts(communication_statistics["Broadcasting"].add(o[player_no]));
+  broadcast_receive_no_statistics(o);
   sent += o[player_no].get_length() * (num_players() - 1);
 }
 
-void Player::Broadcast_Receive(vector<octetStream>& o) const
+void Player::broadcast_receive(vector<OctetStream>& o) const
 {
   unchecked_broadcast(o);
     { for (int i=0; i<nplayers; i++)
@@ -617,31 +617,31 @@ void Player::Broadcast_Receive(vector<octetStream>& o) const
 }
 
 
-void Player::Check_Broadcast() const
+void Player::check_broadcast() const
 {
   if (ctx.size == 0)
     return;
-  vector<octetStream> h(nplayers);
+  vector<OctetStream> h(nplayers);
   h[player_no].concat(ctx.final());
 
   unchecked_broadcast(h);
   for (int i=0; i<nplayers; i++)
     { if (i!=player_no)
         { if (!h[i].equals(h[player_no]))
-	    { throw broadcast_invalid(); }
+	    { throw BroadcastInvalid(); }
         }
     }
   ctx.reset();
 }
 
-void Player::send_receive_all(const vector<octetStream>& to_send,
-    vector<octetStream>& to_receive) const
+void Player::send_receive_all(const vector<OctetStream>& to_send,
+    vector<OctetStream>& to_receive) const
 {
   send_receive_all(vector<vector<bool>>(), to_send, to_receive);
 }
 
 void Player::send_receive_all(const vector<bool>& senders,
-    const vector<octetStream>& to_send, vector<octetStream>& to_receive) const
+    const vector<OctetStream>& to_send, vector<OctetStream>& to_receive) const
 {
   vector<vector<bool>> channels;
   for (int i = 0; i < num_players(); i++)
@@ -650,8 +650,8 @@ void Player::send_receive_all(const vector<bool>& senders,
 }
 
 void Player::send_receive_all(const vector<vector<bool>>& channels,
-    const vector<octetStream>& to_send,
-    vector<octetStream>& to_receive) const
+    const vector<OctetStream>& to_send,
+    vector<OctetStream>& to_receive) const
 {
   size_t data = 0;
   for (int i = 0; i < num_players(); i++)
@@ -661,22 +661,22 @@ void Player::send_receive_all(const vector<vector<bool>>& channels,
         if (OnlineOptions::singleton.has_option("detailed_verbose_comm"))
           cerr << "Send " << to_send.at(i).get_length() << " bytes to " << i << endl;
       }
-  TimeScope ts(comm_stats["Sending/receiving"].add(data));
+  TimeScope ts(communication_statistics["Sending/receiving"].add(data));
   sent += data;
-  send_receive_all_no_stats(channels, to_send, to_receive);
+  send_receive_all_no_statistics(channels, to_send, to_receive);
 }
 
 void Player::partial_broadcast(const vector<bool>& senders,
-    const vector<bool>& receivers, vector<octetStream>& os) const
+    const vector<bool>& receivers, vector<OctetStream>& os) const
 {
-  TimeScope ts(comm_stats["Partial broadcasting"].add(os[my_num()]));
-  partial_broadcast_no_stats(senders, receivers, os);
+  TimeScope ts(communication_statistics["Partial broadcasting"].add(os[my_num()]));
+  partial_broadcast_no_statistics(senders, receivers, os);
 }
 
 template<class T>
-void MultiPlayer<T>::send_receive_all_no_stats(
-    const vector<vector<bool>>& channels, const vector<octetStream>& to_send,
-    vector<octetStream>& to_receive) const
+void MultiPlayer<T>::send_receive_all_no_statistics(
+    const vector<vector<bool>>& channels, const vector<OctetStream>& to_send,
+    vector<OctetStream>& to_receive) const
 {
   to_receive.resize(num_players());
   for (int offset = 1; offset < num_players(); offset++)
@@ -687,20 +687,20 @@ void MultiPlayer<T>::send_receive_all_no_stats(
       if (channels.empty() or channels[my_num()][send_to])
         {
           if (receive)
-            pass_around_no_stats(to_send[send_to], to_receive[receive_from], offset);
+            pass_around_no_statistics(to_send[send_to], to_receive[receive_from], offset);
           else
-            send_to_no_stats(send_to, to_send[send_to]);
+            send_to_no_statistics(send_to, to_send[send_to]);
         }
       else if (receive)
-        receive_player_no_stats(receive_from, to_receive[receive_from]);
+        receive_player_no_statistics(receive_from, to_receive[receive_from]);
     }
 }
 
 
-ThreadPlayer::ThreadPlayer(const Names& Nms, const string& id_base) :
-    PlainPlayer(Nms, id_base)
+ThreadPlayer::ThreadPlayer(const Names& nms, const string& id_base) :
+    PlainPlayer(nms, id_base)
 {
-  for (int i = 0; i < Nms.num_players(); i++)
+  for (int i = 0; i < nms.num_players(); i++)
     {
       receivers.push_back(new Receiver<int>(sockets[i], i));
       senders.push_back(new Sender<int>(socket_to_send(i), i));
@@ -724,23 +724,23 @@ ThreadPlayer::~ThreadPlayer()
     }
 }
 
-void ThreadPlayer::request_receive(int i, octetStream& o) const
+void ThreadPlayer::request_receive(int i, OctetStream& o) const
 {
   receivers[i]->request(o);
 }
 
-void ThreadPlayer::wait_receive(int i, octetStream& o) const
+void ThreadPlayer::wait_receive(int i, OctetStream& o) const
 {
   receivers[i]->wait(o);
 }
 
-void ThreadPlayer::receive_player_no_stats(int i, octetStream& o) const
+void ThreadPlayer::receive_player_no_statistics(int i, OctetStream& o) const
 {
   request_receive(i, o);
   wait_receive(i, o);
 }
 
-void ThreadPlayer::send_all(const octetStream& o) const
+void ThreadPlayer::send_all(const OctetStream& o) const
 {
   for (int i=0; i<nplayers; i++)
      { if (i!=player_no)
@@ -753,13 +753,13 @@ void ThreadPlayer::send_all(const octetStream& o) const
 }
 
 
-RealTwoPartyPlayer::RealTwoPartyPlayer(const Names& Nms, int other_player, const string& id) :
-        VirtualTwoPartyPlayer(*(P = new PlainPlayer(Nms, id + "2")), other_player)
+RealTwoPartyPlayer::RealTwoPartyPlayer(const Names& nms, int other_player, const string& id) :
+        VirtualTwoPartyPlayer(*(P = new PlainPlayer(nms, id + "2")), other_player)
 {
 }
 
-RealTwoPartyPlayer::RealTwoPartyPlayer(const Names& Nms, int other_player,
-        int id_base) : RealTwoPartyPlayer(Nms, other_player, to_string(id_base))
+RealTwoPartyPlayer::RealTwoPartyPlayer(const Names& nms, int other_player,
+        int id_base) : RealTwoPartyPlayer(nms, other_player, to_string(id_base))
 {
 }
 
@@ -768,30 +768,30 @@ RealTwoPartyPlayer::~RealTwoPartyPlayer()
   delete P;
 }
 
-void VirtualTwoPartyPlayer::send(octetStream& o) const
+void VirtualTwoPartyPlayer::send(OctetStream& o) const
 {
-  TimeScope ts(comm_stats["Sending one-to-one"].add(o));
-  P.send_to_no_stats(other_player, o);
-  comm_stats.sent += o.get_length();
+  TimeScope ts(communication_statistics["Sending one-to-one"].add(o));
+  P.send_to_no_statistics(other_player, o);
+  communication_statistics.sent += o.get_length();
 }
 
-void VirtualTwoPartyPlayer::receive(octetStream& o) const
+void VirtualTwoPartyPlayer::receive(OctetStream& o) const
 {
   TimeScope ts(timer);
-  P.receive_player_no_stats(other_player, o);
-  comm_stats["Receiving one-to-one"].add(o, ts);
+  P.receive_player_no_statistics(other_player, o);
+  communication_statistics["Receiving one-to-one"].add(o, ts);
 }
 
-void VirtualTwoPartyPlayer::send_receive_player(vector<octetStream>& o) const
+void VirtualTwoPartyPlayer::send_receive_player(vector<OctetStream>& o) const
 {
-  TimeScope ts(comm_stats["Exchanging one-to-one"].add(o[0]));
-  comm_stats.sent += o[0].get_length();
-  P.exchange_no_stats(other_player, o[0], o[1]);
+  TimeScope ts(communication_statistics["Exchanging one-to-one"].add(o[0]));
+  communication_statistics.sent += o[0].get_length();
+  P.exchange_no_statistics(other_player, o[0], o[1]);
 }
 
 VirtualTwoPartyPlayer::VirtualTwoPartyPlayer(Player& P, int other_player) :
-    TwoPartyPlayer(P.my_num()), P(P), other_player(other_player), comm_stats(
-        P.thread_stats.at(other_player))
+    TwoPartyPlayer(P.my_num()), P(P), other_player(other_player), communication_statistics(
+        P.thread_statistics.at(other_player))
 {
 }
 
@@ -803,48 +803,48 @@ VirtualTwoPartyPlayer::~VirtualTwoPartyPlayer()
 
 size_t VirtualTwoPartyPlayer::send(const PlayerBuffer& buffer, bool block) const
 {
-  auto sent = P.send_no_stats(other_player, buffer, block);
+  auto sent = P.send_no_statistics(other_player, buffer, block);
   lock.lock();
-  comm_stats.add_to_last_round("Sending one-to-one", sent);
-  comm_stats.sent += sent;
+  communication_statistics.add_to_last_round("Sending one-to-one", sent);
+  communication_statistics.sent += sent;
   lock.unlock();
   return sent;
 }
 
 size_t VirtualTwoPartyPlayer::recv(const PlayerBuffer& buffer, bool block) const
 {
-  auto received = P.recv_no_stats(other_player, buffer, block);
+  auto received = P.receive_no_statistics(other_player, buffer, block);
   lock.lock();
-  comm_stats.add_to_last_round("Receiving one-to-one", received);
+  communication_statistics.add_to_last_round("Receiving one-to-one", received);
   lock.unlock();
   return received;
 }
 
-void VirtualTwoPartyPlayer::exchange(octetStream& o)
+void VirtualTwoPartyPlayer::exchange(OctetStream& o)
 {
-  TimeScope ts(comm_stats["Exchanging one-to-one"].add(o));
-  comm_stats.sent += o.get_length();
-  P.exchange_no_stats(other_player, o, o);
+  TimeScope ts(communication_statistics["Exchanging one-to-one"].add(o));
+  communication_statistics.sent += o.get_length();
+  P.exchange_no_statistics(other_player, o, o);
 }
 
-void OffsetPlayer::send_receive_player(vector<octetStream>& o) const
+void OffsetPlayer::send_receive_player(vector<OctetStream>& o) const
 {
   P.exchange(P.get_player(offset), o[0], o[1]);
 }
 
-void TwoPartyPlayer::Broadcast_Receive(vector<octetStream>& o) const
+void TwoPartyPlayer::broadcast_receive(vector<OctetStream>& o) const
 {
-  vector<octetStream> os(2);
+  vector<OctetStream> os(2);
   os[0] = o[my_num()];
   send_receive_player(os);
   o[1 - my_num()] = os[1];
 }
 
-NamedCommStats::NamedCommStats() : sent(0)
+NamedCommunicationStatistics::NamedCommunicationStatistics() : sent(0)
 {
 }
 
-CommStats& CommStats::operator +=(const CommStats& other)
+CommunicationStatistics& CommunicationStatistics::operator +=(const CommunicationStatistics& other)
 {
   data += other.data;
   rounds += other.rounds;
@@ -852,22 +852,22 @@ CommStats& CommStats::operator +=(const CommStats& other)
   return *this;
 }
 
-NamedCommStats& NamedCommStats::operator +=(const NamedCommStats& other)
+NamedCommunicationStatistics& NamedCommunicationStatistics::operator +=(const NamedCommunicationStatistics& other)
 {
   sent += other.sent;
   for (auto it = other.begin(); it != other.end(); it++)
-    map<string, CommStats>::operator[](it->first) += it->second;
+    map<string, CommunicationStatistics>::operator[](it->first) += it->second;
   return *this;
 }
 
-NamedCommStats NamedCommStats::operator +(const NamedCommStats& other) const
+NamedCommunicationStatistics NamedCommunicationStatistics::operator +(const NamedCommunicationStatistics& other) const
 {
   auto res = *this;
   res += other;
   return res;
 }
 
-CommStats& CommStats::operator -=(const CommStats& other)
+CommunicationStatistics& CommunicationStatistics::operator -=(const CommunicationStatistics& other)
 {
   data -= other.data;
   rounds -= other.rounds;
@@ -875,16 +875,16 @@ CommStats& CommStats::operator -=(const CommStats& other)
   return *this;
 }
 
-NamedCommStats NamedCommStats::operator -(const NamedCommStats& other) const
+NamedCommunicationStatistics NamedCommunicationStatistics::operator -(const NamedCommunicationStatistics& other) const
 {
-  NamedCommStats res = *this;
+  NamedCommunicationStatistics res = *this;
   res.sent = sent - other.sent;
   for (auto it = other.begin(); it != other.end(); it++)
-    res.map<string, CommStats>::operator[](it->first) -= it->second;
+    res.map<string, CommunicationStatistics>::operator[](it->first) -= it->second;
   return res;
 }
 
-CommStats& CommStats::imax(const CommStats& other)
+CommunicationStatistics& CommunicationStatistics::imax(const CommunicationStatistics& other)
 {
   data = max(data, other.data);
   rounds = max(rounds, other.rounds);
@@ -892,15 +892,15 @@ CommStats& CommStats::imax(const CommStats& other)
   return *this;
 }
 
-NamedCommStats& NamedCommStats::imax(const NamedCommStats& other)
+NamedCommunicationStatistics& NamedCommunicationStatistics::imax(const NamedCommunicationStatistics& other)
 {
   sent = max(sent, other.sent);
   for (auto it = other.begin(); it != other.end(); it++)
-    map<string, CommStats>::operator[](it->first).imax(it->second);
+    map<string, CommunicationStatistics>::operator[](it->first).imax(it->second);
   return *this;
 }
 
-void NamedCommStats::print(bool newline, const NamedCommStats& max)
+void NamedCommunicationStatistics::print(bool newline, const NamedCommunicationStatistics& max)
 {
   for (auto it = begin(); it != end(); it++)
     if (it->second.data)
@@ -923,13 +923,13 @@ void NamedCommStats::print(bool newline, const NamedCommStats& max)
     cerr << endl;
 }
 
-void NamedCommStats::reset()
+void NamedCommunicationStatistics::reset()
 {
   clear();
   sent = 0;
 }
 
-Timer& NamedCommStats::add_to_last_round(const string& name, size_t length)
+Timer& NamedCommunicationStatistics::add_to_last_round(const string& name, size_t length)
 {
   if (name == last)
     return (*this)[name].add_length_only(length);
@@ -940,7 +940,7 @@ Timer& NamedCommStats::add_to_last_round(const string& name, size_t length)
     }
 }
 
-double NamedCommStats::total_time() const
+double NamedCommunicationStatistics::total_time() const
 {
   double res = 0;
   for (auto& x : *this)
@@ -948,19 +948,19 @@ double NamedCommStats::total_time() const
   return res;
 }
 
-Timer& CommStatsWithName::add_length_only(size_t length)
+Timer& CommunicationStatisticsWithName::add_length_only(size_t length)
 {
   if (OnlineOptions::singleton.has_option("verbose_comm"))
     fprintf(stderr, "%s %zu bytes in same round\n", name.c_str(), length);
-  return stats.add_length_only(length);
+  return statistics.add_length_only(length);
 }
 
-Timer& CommStatsWithName::add(const octetStream& os, int player)
+Timer& CommunicationStatisticsWithName::add(const OctetStream& os, int player)
 {
   return add(os.get_length(), player);
 }
 
-Timer& CommStatsWithName::add(size_t length, int player)
+Timer& CommunicationStatisticsWithName::add(size_t length, int player)
 {
   if (OnlineOptions::singleton.has_option("verbose_comm"))
     {
@@ -971,25 +971,25 @@ Timer& CommStatsWithName::add(size_t length, int player)
             player);
     }
 
-  return stats.add(length);
+  return statistics.add(length);
 }
 
-void Player::reset_stats()
+void Player::reset_statistics()
 {
-  comm_stats.reset();
-  for (auto& x : thread_stats)
+  communication_statistics.reset();
+  for (auto& x : thread_statistics)
       x.reset();
   for (auto child : children)
-      child.second->reset_stats();
+      child.second->reset_statistics();
 }
 
-NamedCommStats Player::total_comm() const
+NamedCommunicationStatistics Player::total_communication() const
 {
-  auto res = comm_stats;
-  for (auto& x : thread_stats)
+  auto res = communication_statistics;
+  for (auto& x : thread_statistics)
     res += x;
   for (auto child : children)
-    res += child.second->total_comm();
+    res += child.second->total_communication();
   return res;
 }
 
@@ -1018,4 +1018,4 @@ TwoPartyPlayer* VirtualTwoPartyPlayer::fork(string suffix)
 }
 
 template class MultiPlayer<int>;
-template class MultiPlayer<ssl_socket*> ;
+template class MultiPlayer<SslSocket*> ;

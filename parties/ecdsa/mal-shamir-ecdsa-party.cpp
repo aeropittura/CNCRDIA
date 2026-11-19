@@ -12,7 +12,7 @@
 
 int main(int argc, const char** argv)
 {
-    ez::ezOptionParser opt;
+    ez::EzOptionParser opt;
     ShamirOptions(opt, argc, argv);
     run<MaliciousShamirShare>(argc, argv);
 }

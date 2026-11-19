@@ -23,7 +23,7 @@ public:
     {
     }
 
-    edabitvec<T> read()
+    Edabitvec<T> read()
     {
         if (not BufferBase::file)
         {
@@ -34,7 +34,7 @@ public:
                                         "for example by running "
                                         "'./Fake-Offline.x -e "
                                 + to_string(n_bits)
-                                + T::template proto_fake_opts<typename T::clear>()
+                                + T::template protocol_fake_options<typename T::clear>()
                                 + " ...'?");
         }
 
@@ -45,7 +45,7 @@ public:
             this->try_rewind();
         }
 
-        edabitvec<T> eb;
+        Edabitvec<T> eb;
         eb.input(n_bits, buffer);
         if (buffer.fail())
             throw runtime_error("error reading edaBits");

@@ -15,7 +15,7 @@
 #include "support/flex_buffer.h"
 
 
-void octetStream::reset()
+void OctetStream::reset()
 {
     data = 0;
     data_end = 0;
@@ -23,82 +23,82 @@ void octetStream::reset()
     end = 0;
 }
 
-void octetStream::reset_reserve(size_t size)
+void OctetStream::reset_reserve(size_t size)
 {
 	reset_write_head();
 	reserve(size);
 }
 
-void octetStream::clear()
+void OctetStream::clear()
 {
     if (data)
         delete[] data;
     reset();
 }
 
-void octetStream::assign(const octetStream& os)
+void OctetStream::assign(const OctetStream& os)
 {
   auto read = os.get_ptr();
   if (os.get_length() >= get_max_length())
     {
       if (data)
         delete[] data;
-      data=new octet[os.get_max_length()];
+      data=new Octet[os.get_max_length()];
       set_max_length(os.get_max_length());
     }
   set_length(os.get_length());
-  memcpy(data,os.data,get_length()*sizeof(octet));
+  memcpy(data,os.data,get_length()*sizeof(Octet));
   ptr = data + read;
   bits = os.bits;
 }
 
 
-octetStream::octetStream(size_t maxlen)
+OctetStream::OctetStream(size_t maxlen)
 {
-  data=new octet[maxlen];
+  data=new Octet[maxlen];
   ptr=data;
   set_length(0);
   set_max_length(maxlen);
 }
 
-octetStream::octetStream(size_t len, const octet* source) :
-    octetStream(len)
+OctetStream::OctetStream(size_t len, const Octet* source) :
+    OctetStream(len)
 {
   append(source, len);
 }
 
-octetStream::octetStream(const string& other) :
-    octetStream(other.size(), (const octet*)other.data())
+OctetStream::OctetStream(const string& other) :
+    OctetStream(other.size(), (const Octet*)other.data())
 {
 }
 
-octetStream::octetStream(const octetStream& os)
+OctetStream::OctetStream(const OctetStream& os)
 {
-  data=new octet[os.get_max_length()];
+  data=new Octet[os.get_max_length()];
   set_length(os.get_length());
   set_max_length(os.get_max_length());
-  memcpy(data,os.data,get_length()*sizeof(octet));
+  memcpy(data,os.data,get_length()*sizeof(Octet));
   ptr = data + os.get_ptr();
   bits = os.bits;
 }
 
-octetStream::octetStream(FlexBuffer& buffer)
+OctetStream::OctetStream(FlexBuffer& buffer)
 {
-  data = (octet*)buffer.data();
+  data = (Octet*)buffer.data();
   set_length(buffer.size());
   set_max_length(buffer.capacity());
-  ptr = (octet*)buffer.ptr;
+  ptr = (Octet*)buffer.ptr;
   buffer.reset();
 }
 
 
-string octetStream::str() const
+string OctetStream::str() const
 {
   return string((char*) get_data(), get_length());
 }
 
 
-void octetStream::hash(octetStream& output) const
+void OctetStream::hash(OctetStream& output) const
 {
   output.resize(crypto_generichash_BYTES_MIN);
   crypto_generichash(output.data, crypto_generichash_BYTES_MIN, data,
@@ -107,35 +107,35 @@ void octetStream::hash(octetStream& output) const
 }
 
 
-octetStream octetStream::hash() const
+OctetStream OctetStream::hash() const
 {
-  octetStream h(crypto_generichash_BYTES_MIN);
+  OctetStream h(crypto_generichash_BYTES_MIN);
   hash(h);
   return h;
 }
 
 
-bigint octetStream::check_sum(int req_bytes) const
+Bigint OctetStream::check_sum(int req_bytes) const
 {
   auto hash = new unsigned char[req_bytes];
   crypto_generichash(hash, req_bytes, data, get_length(), NULL, 0);
 
-  bigint ans;
-  bigintFromBytes(ans,hash,req_bytes);
+  Bigint ans;
+  bigint_from_bytes(ans,hash,req_bytes);
   // cout << ans << "\n";
   delete[] hash;
   return ans;
 }
 
 
-bool octetStream::equals(const octetStream& a) const
+bool OctetStream::equals(const OctetStream& a) const
 {
   if (get_length()!=a.get_length()) { return false; }
   return memcmp(data, a.data, get_length()) == 0;
 }
 
 
-void octetStream::flush_bits()
+void OctetStream::flush_bits()
 {
   bits[0].n = 0;
   store_int<1>(bits[0].buffer);
@@ -143,45 +143,45 @@ void octetStream::flush_bits()
 }
 
 
-void octetStream::append_random(size_t num)
+void OctetStream::append_random(size_t num)
 {
   randombytes_buf(append(num), num);
 }
 
 
-void octetStream::concat(const octetStream& os)
+void OctetStream::concat(const OctetStream& os)
 {
-  memcpy(append(os.get_length()), os.data, os.get_length()*sizeof(octet));
+  memcpy(append(os.get_length()), os.data, os.get_length()*sizeof(Octet));
 }
 
 
-void octetStream::store_bytes(octet* x, const size_t l)
+void OctetStream::store_bytes(Octet* x, const size_t l)
 {
   encode_length(append(4), l, 4);
-  memcpy(append(l), x, l*sizeof(octet));
+  memcpy(append(l), x, l*sizeof(Octet));
 }
 
-void octetStream::get_bytes(octet* ans, size_t& length)
+void OctetStream::get_bytes(Octet* ans, size_t& length)
 {
   auto rec_length = get_int(4);
   if (rec_length != length)
     throw runtime_error("unexpected length");
-  memcpy(ans, consume(length), length * sizeof(octet));
+  memcpy(ans, consume(length), length * sizeof(Octet));
 }
 
-void octetStream::store(int l)
+void OctetStream::store(int l)
 {
   encode_length(append(4), l, 4);
 }
 
 
-void octetStream::get(int& l)
+void OctetStream::get(int& l)
 {
   l = get_int(4);
 }
 
 
-void octetStream::store(const bigint& x, long num)
+void OctetStream::store(const Bigint& x, long num)
 {
   *append(1) = x < 0;
 
@@ -191,21 +191,21 @@ void octetStream::store(const bigint& x, long num)
       encode_length(append(4), num, 4);
     }
 
-  bytesFromBigint(append(num), x, num);
+  bytes_from_bigint(append(num), x, num);
 }
 
 
-void octetStream::get(bigint& ans, long length)
+void OctetStream::get(Bigint& ans, long length)
 {
   int sign = *consume(1);
-  if (sign!=0 && sign!=1) { throw bad_value(); }
+  if (sign!=0 && sign!=1) { throw BadValue(); }
 
   if (length <= 0)
     length = get_int(4);
 
   if (length!=0)
     {
-      bigintFromBytes(ans, consume(length), length);
+      bigint_from_bytes(ans, consume(length), length);
       if (sign)
         mpz_neg(ans.get_mpz_t(), ans.get_mpz_t());
     }
@@ -214,14 +214,14 @@ void octetStream::get(bigint& ans, long length)
 }
 
 
-void octetStream::store(const string& str)
+void OctetStream::store(const string& str)
 {
   store(str.length());
-  append((const octet*) str.data(), str.length());
+  append((const Octet*) str.data(), str.length());
 }
 
 
-void octetStream::get(string& str)
+void OctetStream::get(string& str)
 {
   size_t size;
   get(size);
@@ -230,7 +230,7 @@ void octetStream::get(string& str)
 
 
 template<class T>
-void octetStream::exchange(T send_socket, T receive_socket, octetStream& receive_stream) const
+void OctetStream::exchange(T send_socket, T receive_socket, OctetStream& receive_stream) const
 {
   Exchanger<T> exchanger(send_socket, *this, receive_socket, receive_stream);
   while (exchanger.round())
@@ -239,7 +239,7 @@ void octetStream::exchange(T send_socket, T receive_socket, octetStream& receive
 
 
 
-void octetStream::input(const string& filename)
+void OctetStream::input(const string& filename)
 {
   ifstream s(filename);
   if (not s.good())
@@ -247,28 +247,28 @@ void octetStream::input(const string& filename)
   input(s);
 }
 
-void octetStream::input(istream& s)
+void OctetStream::input(istream& s)
 {
   size_t size;
   s.read((char*)&size, sizeof(size));
   if (not s.good())
-    throw IO_Error("not enough data");
+    throw IoError("not enough data");
   resize_min(size);
   s.read((char*)data, size);
   set_length(size);
   if (not s.good())
-    throw IO_Error("not enough data");
+    throw IoError("not enough data");
   reset_read_head();
 }
 
-void octetStream::output(ostream& s) const
+void OctetStream::output(ostream& s) const
 {
   auto len = get_length();
   s.write((char*)&len, sizeof(len));
   s.write((char*)data, len);
 }
 
-void octetStream::output(const string& filename)
+void OctetStream::output(const string& filename)
 {
   ofstream s(filename);
   output(s);
@@ -277,7 +277,7 @@ void octetStream::output(const string& filename)
   s.close();
 }
 
-ostream& operator<<(ostream& s,const octetStream& o)
+ostream& operator<<(ostream& s,const OctetStream& o)
 {
   for (size_t i=0; i<o.get_length(); i++)
     { int t0=o.data[i]&15;
@@ -287,17 +287,17 @@ ostream& operator<<(ostream& s,const octetStream& o)
   return s;
 }
 
-octetStreams::octetStreams(const Player& P)
+OctetStreams::OctetStreams(const Player& P)
 {
   reset(P);
 }
 
-void octetStreams::reset(const Player& P)
+void OctetStreams::reset(const Player& P)
 {
   resize(P.num_players());
   for (auto& o : *this)
     o.reset_write_head();
 }
 
-template void octetStream::exchange(int, int, octetStream&) const;
-template void octetStream::exchange(ssl_socket*, ssl_socket*, octetStream&) const;
+template void OctetStream::exchange(int, int, OctetStream&) const;
+template void OctetStream::exchange(SslSocket*, SslSocket*, OctetStream&) const;

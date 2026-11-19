@@ -21,8 +21,8 @@ Spdz2kPrep<T>::Spdz2kPrep(SubProcessor<T>* proc, DataPositions& usage) :
         RingOnlyPrep<T>(proc, usage)
 {
     this->params.amplify = false;
-    bit_MC = 0;
-    bit_proc = 0;
+    bit_opener = 0;
+    bit_processor = 0;
     bit_prep = 0;
 }
 
@@ -31,25 +31,25 @@ Spdz2kPrep<T>::~Spdz2kPrep()
 {
     if (bit_prep != 0)
     {
-        delete bit_proc;
+        delete bit_processor;
         delete bit_prep;
-        delete bit_MC;
+        delete bit_opener;
     }
 }
 
 template<class T>
 void Spdz2kPrep<T>::set_protocol(typename T::Protocol& protocol)
 {
-    OTPrep<T>::set_protocol(protocol);
+    OtPrep<T>::set_protocol(protocol);
     assert(this->proc != 0);
     auto& proc = this->proc;
-    bit_MC = new typename BitShare::MAC_Check(proc->MC.get_alphai());
+    bit_opener = new typename BitShare::MacCheck(proc->MC.get_alphai());
     // just dummies
-    bit_pos = DataPositions(proc->P.num_players());
-    bit_prep = new MascotTriplePrep<BitShare>(bit_proc, bit_pos);
+    bit_position = DataPositions(proc->P.num_players());
+    bit_prep = new MascotTriplePrep<BitShare>(bit_processor, bit_position);
     bit_prep->params.amplify = false;
-    bit_proc = new SubProcessor<BitShare>(*bit_MC, *bit_prep, proc->P);
-    bit_MC->set_prep(*bit_prep);
+    bit_processor = new SubProcessor<BitShare>(*bit_opener, *bit_prep, proc->P);
+    bit_opener->set_prep(*bit_prep);
 }
 
 template<class T>
@@ -60,15 +60,15 @@ void MaliciousRingPrep<T>::buffer_bits()
     RingPrep<T>::buffer_bits_without_check();
     assert(this->protocol != 0);
     auto& protocol = *this->protocol;
-    protocol.init_dotprod();
+    protocol.initialize_dotprod();
     auto one = T::constant(1, protocol.P.my_num(), this->proc->MC.get_alphai());
-    GlobalPRNG G(protocol.P);
+    GlobalPrng G(protocol.P);
     for (auto& bit : this->bits)
         // one of the two is not a zero divisor, so if the product is zero, one of them is too
-        protocol.prepare_dotprod(one - bit, bit * G.get<typename T::open_type>());
+        protocol.prepare_dotprod(one - bit, bit * G.get<typename T::OpenType>());
     protocol.next_dotprod();
     protocol.exchange();
-    this->proc->MC.CheckFor(0, {protocol.finalize_dotprod(this->bits.size())},
+    this->proc->MC.check_for(0, {protocol.finalize_dotprod(this->bits.size())},
             protocol.P);
 }
 
@@ -87,14 +87,14 @@ void bits_from_square_in_ring(vector<T>& bits, int buffer_size, U* bit_prep)
 {
     CODE_LOCATION
     buffer_size = BaseMachine::batch_size<T>(DATA_BIT, buffer_size);
-    typedef typename U::share_type BitShare;
-    typedef typename BitShare::open_type open_type;
+    typedef typename U::ShareType BitShare;
+    typedef typename BitShare::OpenType OpenType;
     assert(bit_prep != 0);
-    auto bit_proc = bit_prep->get_proc();
-    assert(bit_proc != 0);
-    auto bit_MC = &bit_proc->MC;
+    auto bit_processor = bit_prep->get_processor();
+    assert(bit_processor != 0);
+    auto bit_opener = &bit_processor->MC;
     vector<BitShare> squares, random_shares;
-    auto one = BitShare::constant(1, bit_proc->P.my_num(), bit_MC->get_alphai());
+    auto one = BitShare::constant(1, bit_processor->P.my_num(), bit_opener->get_alphai());
     BufferScope scope(*bit_prep, buffer_size);
     for (int i = 0; i < buffer_size; i++)
     {
@@ -103,17 +103,17 @@ void bits_from_square_in_ring(vector<T>& bits, int buffer_size, U* bit_prep)
         squares.push_back((a2 + a) * 4 + one);
         random_shares.push_back(a * 2 + one);
     }
-    vector<typename BitShare::open_type> opened;
-    bit_MC->POpen(opened, squares, bit_proc->P);
+    vector<typename BitShare::OpenType> opened;
+    bit_opener->POpen(opened, squares, bit_processor->P);
     for (int i = 0; i < buffer_size; i++)
     {
         auto& root = opened[i];
         if (root.get_bit(0) != 1)
             throw runtime_error("square not odd");
-        BitShare tmp = random_shares[i] * open_type(root.sqrRoot().invert()) + one;
+        BitShare tmp = random_shares[i] * OpenType(root.square_root().invert()) + one;
         bits.push_back(tmp >> 1);
     }
-    bit_MC->Check(bit_proc->P);
+    bit_opener->Check(bit_processor->P);
 }
 
 #ifdef SPDZ2K_BIT
@@ -121,7 +121,7 @@ template<class T>
 void Spdz2kPrep<T>::get_dabit(T& a, GC::TinySecret<T::s>& b)
 {
     this->get_one(DATA_BIT, a);
-    b.resize_regs(1);
+    b.resize_registers(1);
     b.get_reg(0) = Spdz2kShare<1, T::s>(a);
 }
 #endif
@@ -130,7 +130,7 @@ template<class T>
 void Spdz2kPrep<T>::buffer_dabits(ThreadQueues* queues)
 {
     assert(this->proc != 0);
-    vector<dabit<T>> check_dabits;
+    vector<Dabit<T>> check_dabits;
     int buffer_size = BaseMachine::batch_size<T>(DATA_DABIT, this->buffer_size);
     this->buffer_dabits_from_bits_without_check(check_dabits,
             dabit_sacrifice.minimum_n_inputs(buffer_size), queues);
@@ -168,8 +168,8 @@ void MaliciousRingPrep<T>::buffer_edabits_from_personal(bool strict, int n_bits,
 {
     CODE_LOCATION
     assert(this->proc != 0);
-    typedef typename T::bit_type::part_type bit_type;
-    vector<vector<bit_type>> bits;
+    typedef typename T::BitType::part_type BitType;
+    vector<vector<BitType>> bits;
     vector<T> sums;
 
     bool verbose = OnlineOptions::singleton.has_option("verbose_eda");
@@ -180,16 +180,16 @@ void MaliciousRingPrep<T>::buffer_edabits_from_personal(bool strict, int n_bits,
         timer.start();
     }
 
-    auto &party = GC::ShareThread<typename T::bit_type>::s();
-    SubProcessor<bit_type> bit_proc(party.MC->get_part_MC(),
+    auto &party = GC::ShareThread<typename T::BitType>::s();
+    SubProcessor<BitType> bit_processor(party.MC->get_part_opener(),
             this->proc->bit_prep, this->proc->P);
     int n_relevant = this->proc->protocol.get_n_relevant_players();
-    vector<vector<vector<bit_type>>> player_bits(n_bits);
+    vector<vector<vector<BitType>>> player_bits(n_bits);
     for (int i = 0; i < n_relevant; i++)
     {
         vector<T> tmp;
-        vector<vector<bit_type>> tmp_bits;
-        this->buffer_personal_edabits(n_bits, tmp, tmp_bits, bit_proc,
+        vector<vector<BitType>> tmp_bits;
+        this->buffer_personal_edabits(n_bits, tmp, tmp_bits, bit_processor,
                 i, strict, queues);
         assert(not tmp.empty());
         sums.resize(tmp.size());
@@ -199,7 +199,7 @@ void MaliciousRingPrep<T>::buffer_edabits_from_personal(bool strict, int n_bits,
             player_bits[j].push_back(tmp_bits[j]);
     }
     RunningTimer add_timer;
-    BitAdder().add(bits, player_bits, bit_proc, bit_type::default_length,
+    BitAdder().add(bits, player_bits, bit_processor, BitType::default_length,
             queues);
     player_bits.clear();
 
@@ -212,12 +212,12 @@ void MaliciousRingPrep<T>::buffer_edabits_from_personal(bool strict, int n_bits,
     }
 
     RunningTimer finalize_timer;
-    vector<edabit<T>> checked;
+    vector<Edabit<T>> checked;
     for (size_t i = 0; i < sums.size(); i++)
     {
         checked.push_back({sums[i], {}});
-        int i1 = i / bit_type::default_length;
-        int i2 = i % bit_type::default_length;
+        int i1 = i / BitType::default_length;
+        int i2 = i % BitType::default_length;
         checked.back().second.reserve(bits.at(i1).size());
         for (auto& x : bits.at(i1))
             checked.back().second.push_back(x.get_bit(i2));
@@ -252,12 +252,12 @@ void MaliciousRingPrep<T>::buffer_edabits(bool strict, int n_bits,
 #else
     assert(this->proc != 0);
     ShuffleSacrifice<T> shuffle_sacrifice;
-    typedef typename T::bit_type::part_type bit_type;
-    vector<vector<bit_type>> bits;
+    typedef typename T::BitType::part_type BitType;
+    vector<vector<BitType>> bits;
     vector<T> sums;
     this->buffer_edabits_without_check(n_bits, sums, bits,
             shuffle_sacrifice.minimum_n_inputs(), queues);
-    vector<edabit<T>>& checked = this->edabits[{strict, n_bits}];
+    vector<Edabit<T>>& checked = this->edabits[{strict, n_bits}];
     shuffle_sacrifice.edabit_sacrifice(checked, sums, bits,
             n_bits, *this->proc, strict, -1, queues);
     if (strict)

@@ -27,9 +27,9 @@ class MaliciousBitOnlyRepPrep : public virtual BufferPrep<T>
 protected:
     DataPositions honest_usage;
     ReplicatedRingPrep<typename T::Honest> honest_prep;
-    typename T::Honest::MAC_Check honest_mc;
-    SubProcessor<typename T::Honest>* honest_proc;
-    typename T::MAC_Check MC;
+    typename T::Honest::MacCheck honest_opener;
+    SubProcessor<typename T::Honest>* honest_processor;
+    typename T::MacCheck MC;
 
     void buffer_bits();
 
@@ -38,7 +38,7 @@ public:
     ~MaliciousBitOnlyRepPrep();
 
     void set_protocol(typename T::Protocol& protocol);
-    void init_honest(Player& P);
+    void initialize_honest(Player& P);
 };
 
 /**

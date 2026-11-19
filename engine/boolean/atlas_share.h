@@ -14,26 +14,26 @@ namespace GC
 
 class AtlasSecret;
 
-class AtlasShare : public ::AtlasShare<gf2n_<octet>>, public ShareSecret<AtlasSecret>
+class AtlasShare : public ::AtlasShare<Gf2n_<Octet>>, public ShareSecret<AtlasSecret>
 {
     typedef AtlasShare This;
 
 public:
-    typedef ::AtlasShare<gf2n_<octet>> super;
+    typedef ::AtlasShare<Gf2n_<Octet>> Super;
 
     typedef Atlas<This> Protocol;
-    typedef ShamirMC<This> MAC_Check;
-    typedef MAC_Check Direct_MC;
+    typedef ShamirOpener<This> MacCheck;
+    typedef MacCheck DirectOpener;
     typedef ShamirInput<This> Input;
     typedef ReplicatedPrep<This> LivePrep;
 
-    typedef This small_type;
+    typedef This SmallType;
 
     typedef Bit clear;
 
-    static MAC_Check* new_mc(mac_key_type)
+    static MacCheck* new_opener(MacKeyType)
     {
-        return new MAC_Check;
+        return new MacCheck;
     }
 
     AtlasShare()
@@ -42,7 +42,7 @@ public:
 
     template<class U>
     AtlasShare(const U& other) :
-            super(other)
+            Super(other)
     {
     }
 

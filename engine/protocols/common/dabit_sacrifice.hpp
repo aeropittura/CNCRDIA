@@ -20,7 +20,7 @@ DabitSacrifice<T>::DabitSacrifice() :
 }
 
 template<class T>
-dabit<T>& operator+=(dabit<T>& x, const dabit<T>& y)
+Dabit<T>& operator+=(Dabit<T>& x, const Dabit<T>& y)
 {
     x.first += y.first;
     x.second ^= y.second;
@@ -28,8 +28,8 @@ dabit<T>& operator+=(dabit<T>& x, const dabit<T>& y)
 }
 
 template<class T>
-void DabitSacrifice<T>::sacrifice_without_bit_check(vector<dabit<T> >& dabits,
-        vector<dabit<T> >& check_dabits, SubProcessor<T>& proc,
+void DabitSacrifice<T>::sacrifice_without_bit_check(vector<Dabit<T> >& dabits,
+        vector<Dabit<T> >& check_dabits, SubProcessor<T>& proc,
         ThreadQueues*)
 {
     CODE_LOCATION
@@ -41,8 +41,8 @@ void DabitSacrifice<T>::sacrifice_without_bit_check(vector<dabit<T> >& dabits,
     int n = check_dabits.size() - S;
     n_masks += S;
     assert(n > 0);
-    GlobalPRNG G(proc.P);
-    typedef typename T::bit_type::part_type BT;
+    GlobalPrng G(proc.P);
+    typedef typename T::BitType::part_type BT;
     vector<T> shares;
     vector<BT> bit_shares;
     if (T::clear::N_BITS <= 0)
@@ -50,7 +50,7 @@ void DabitSacrifice<T>::sacrifice_without_bit_check(vector<dabit<T> >& dabits,
                 S * (ceil(log2(n)) + S));
     for (int i = 0; i < S; i++)
     {
-        dabit<T> to_check;
+        Dabit<T> to_check;
         for (int j = 0; j < n; j++)
         {
             if (G.get_bit())
@@ -72,10 +72,10 @@ void DabitSacrifice<T>::sacrifice_without_bit_check(vector<dabit<T> >& dabits,
         bit_shares.push_back(to_check.second);
     }
     auto& MC = proc.MC;
-    auto& MCBB = *BT::new_mc(
-            GC::ShareThread<typename T::bit_type>::s().MC->get_alphai());
-    vector<typename T::open_type> opened;
-    vector<typename BT::open_type> bit_opened;
+    auto& MCBB = *BT::new_opener(
+            GC::ShareThread<typename T::BitType>::s().MC->get_alphai());
+    vector<typename T::OpenType> opened;
+    vector<typename BT::OpenType> bit_opened;
     MC.POpen(opened, shares, proc.P);
     MCBB.POpen(bit_opened, bit_shares, proc.P);
     for (int i = 0; i < S; i++)
@@ -89,7 +89,7 @@ void DabitSacrifice<T>::sacrifice_without_bit_check(vector<dabit<T> >& dabits,
         if (a != b.get())
         {
             cerr << a << " != " << b << endl;
-            throw Offline_Check_Error("daBit sacrifice");
+            throw OfflineCheckError("daBit sacrifice");
         }
     }
     dabits.insert(dabits.end(), check_dabits.begin(), check_dabits.begin() + n);
@@ -114,15 +114,15 @@ DabitSacrifice<T>::~DabitSacrifice()
 }
 
 template<class T>
-void DabitSacrifice<T>::sacrifice_and_check_bits(vector<dabit<T> >& dabits,
-        vector<dabit<T> >& check_dabits, SubProcessor<T>& proc,
+void DabitSacrifice<T>::sacrifice_and_check_bits(vector<Dabit<T> >& dabits,
+        vector<Dabit<T> >& check_dabits, SubProcessor<T>& proc,
         ThreadQueues* queues)
 {
     CODE_LOCATION
     if (OnlineOptions::singleton.has_option("verbose_dabit"))
         fprintf(stderr, "checking %zu daBits\n", check_dabits.size());
 
-    vector<dabit<T>> to_check;
+    vector<Dabit<T>> to_check;
     sacrifice_without_bit_check(to_check, check_dabits, proc, queues);
     typename T::Protocol protocol(proc.P);
     vector<pair<T, T>> multiplicands;
@@ -145,6 +145,6 @@ void DabitSacrifice<T>::sacrifice_and_check_bits(vector<dabit<T> >& dabits,
     vector<T> check_for_zero;
     for (auto& x : to_check)
         check_for_zero.push_back(x.first - products.next());
-    proc.MC.CheckFor(0, check_for_zero, proc.P);
+    proc.MC.check_for(0, check_for_zero, proc.P);
     dabits.insert(dabits.end(), to_check.begin(), to_check.end());
 }

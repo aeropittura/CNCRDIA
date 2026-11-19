@@ -20,7 +20,7 @@
 #include "boolean/rep_prep.hpp"
 
 template<class T>
-typename T::mac_key_type SpdzWisePrep<T>::get_mac_key(Player& P, bool)
+typename T::MacKeyType SpdzWisePrep<T>::get_mac_key(Player& P, bool)
 {
     if (T::get_mac_key() == 0)
         read_generate_write_mac_key<T>(P);
@@ -32,7 +32,7 @@ void SpdzWisePrep<T>::buffer_triples()
 {
     assert(this->protocol != 0);
     assert(this->proc != 0);
-    this->protocol->init_mul();
+    this->protocol->initialize_mult();
     generate_triples_initialized(this->triples,
             BaseMachine::batch_size<T>(DATA_TRIPLE, this->buffer_size),
             this->protocol);
@@ -57,17 +57,17 @@ template<class T>
 void SpdzWisePrep<T>::buffer_bits(false_type, false_type, true_type)
 {
     CODE_LOCATION
-    typedef MaliciousRep3Share<gf2n> part_type;
+    typedef MaliciousRep3Share<Gf2n> part_type;
     vector<typename part_type::Honest> bits;
     ProtocolSet<typename part_type::Honest> set(this->proc->P, {});
     auto& protocol = set.protocol;
     auto& prep = set.preprocessing;
     int buffer_size = BaseMachine::batch_size<
-            SpdzWiseShare<MaliciousRep3Share<gf2n>>>(DATA_BIT,
+            SpdzWiseShare<MaliciousRep3Share<Gf2n>>>(DATA_BIT,
             this->buffer_size);
     for (int i = 0; i < buffer_size; i++)
         bits.push_back(prep.get_bit());
-    protocol.init_mul();
+    protocol.initialize_mult();
     for (auto& bit : bits)
         protocol.prepare_mul(bit, this->proc->MC.get_alphai());
     protocol.exchange();
@@ -82,11 +82,11 @@ void buffer_bits_from_squares_in_ring(vector<SpdzWiseRingShare<K, S>>& bits,
     CODE_LOCATION
     assert(proc != 0);
     typedef SpdzWiseRingShare<K + 2, S> BitShare;
-    typename BitShare::MAC_Check MC(proc->MC.get_alphai());
+    typename BitShare::MacCheck MC(proc->MC.get_alphai());
     DataPositions usage;
     SquarePrep<BitShare> prep(usage);
-    SubProcessor<BitShare> bit_proc(MC, prep, proc->P, proc->Proc);
-    prep.set_proc(&bit_proc);
+    SubProcessor<BitShare> bit_processor(MC, prep, proc->P, proc->Proc);
+    prep.set_processor(&bit_processor);
     bits_from_square_in_ring(bits,
             BaseMachine::batch_size<SpdzWiseRingShare<K, S>>(DATA_BIT),
             &prep);
@@ -104,7 +104,7 @@ void SpdzWiseRingPrep<T>::buffer_bits()
 template<class T>
 void SpdzWisePrep<T>::buffer_bits()
 {
-    buffer_bits(T::share_type::variable_players, T::clear::prime_field,
+    buffer_bits(T::ShareType::variable_players, T::clear::prime_field,
             T::clear::characteristic_two);
 }
 
@@ -117,13 +117,13 @@ void SpdzWisePrep<T>::buffer_bits(true_type, true_type, false_type)
 template<class T>
 void SpdzWisePrep<T>::buffer_bits(false_type, false_type, false_type)
 {
-    super::buffer_bits();
+    Super::buffer_bits();
 }
 
 template<class T>
 void SpdzWisePrep<T>::buffer_bits(true_type, false_type, true_type)
 {
-    super::buffer_bits();
+    Super::buffer_bits();
 }
 
 template<class T>
@@ -136,7 +136,7 @@ void SpdzWisePrep<T>::buffer_inputs(int player)
             this->buffer_size));
     auto& P = this->proc->P;
     this->inputs.resize(P.num_players());
-    this->protocol->init_mul();
+    this->protocol->initialize_mult();
     for (auto& r : rs)
     {
         r = this->protocol->get_random();

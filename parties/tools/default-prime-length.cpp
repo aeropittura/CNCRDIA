@@ -7,5 +7,5 @@
 
 int main()
 {
-    std::cout << gfp0::MAX_N_BITS << endl;
+    std::cout << Gfp0::MAX_N_BITS << endl;
 }

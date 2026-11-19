@@ -28,8 +28,8 @@ template<class T>
 class Receiver : CommunicationThread
 {
     T socket;
-    WaitQueue<octetStream*> in;
-    WaitQueue<octetStream*> out;
+    WaitQueue<OctetStream*> in;
+    WaitQueue<OctetStream*> out;
     pthread_t thread;
 
     static void* run_thread(void* receiver);
@@ -53,6 +53,6 @@ public:
         return socket;
     }
 
-    void request(octetStream& os);
-    void wait(octetStream& os);
+    void request(OctetStream& os);
+    void wait(OctetStream& os);
 };

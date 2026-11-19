@@ -15,12 +15,12 @@ using namespace std;
 
 class CodeLocations
 {
-    typedef tuple<string, int, string> location_type;
+    typedef tuple<string, int, string> LocationType;
 
     static CodeLocations singleton;
 
     Lock lock;
-    set<location_type> done;
+    set<LocationType> done;
 
 public:
     static void maybe_output(const char* file, int line, const char* function);
