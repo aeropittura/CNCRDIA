@@ -97,6 +97,16 @@ clean-objects:
 	-rm -f $(shell find $(SOURCE_DIRS) -name '*.o' -o -name '*.d') \
 		*.x core.* *.a *.so static/*.x static/*.map
 
+# regression gate (tests/check.sh); STEP=build|compile|run|all
+check:
+	tests/check.sh $(or $(STEP),all)
+
+# compile_commands.json for clangd and the rename tools
+compdb:
+	python3 devtools/compile_commands.py
+
+.PHONY: check compdb clean clean-objects
+
 bmr-clean:
 	-rm -f $(shell find engine/garbled/bmr engine/boolean -name '*.o')
 
