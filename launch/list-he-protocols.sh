@@ -1,3 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
-echo hemi temi soho cowgear chaigear
+dir="$(dirname $0)"
+$dir/list-protocols-in.sh he

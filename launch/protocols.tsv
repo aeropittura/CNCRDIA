@@ -1,0 +1,64 @@
+# Protocols that launch/party.sh can run. Each <script>.sh in this
+# directory is a symbolic link to party.sh, and the link name selects a row.
+#
+# script        name of the launcher, <script>.sh
+# binary        executable that every party runs
+# parties       -          two parties unless PLAYERS or -N says otherwise
+#               fixed:n    n parties unless -N says otherwise
+#               default:n  n parties unless PLAYERS or -N says otherwise
+# list          the list-<list>-protocols.sh script that names it (or -)
+# options       comma-separated, or -
+#               threshold  pass -T $THRESHOLD if THRESHOLD is set
+#               args=X     append X to the arguments
+#               clean=G    delete the files matching G first
+#
+# Rows of one list appear in the order that list prints them.
+#
+# script              binary                        parties     list   options
+ring                  replicated-ring-party.x       fixed:3     ring   -
+semi2k                semi2k-party.x                -           ring   -
+brain                 brain-party.x                 fixed:3     ring   -
+mal-rep-ring          malicious-rep-ring-party.x    fixed:3     ring   -
+ps-rep-ring           ps-rep-ring-party.x           fixed:3     ring   -
+sy-rep-ring           sy-rep-ring-party.x           fixed:3     ring   -
+spdz2k                spdz2k-party.x                -           ring   -
+rep4-ring             rep4-ring-party.x             fixed:4     ring   -
+dealer-ring           dealer-ring-party.x           default:3   ring   -
+rep-field             replicated-field-party.x      fixed:3     field  -
+shamir                shamir-party.x                default:3   field  threshold
+mal-rep-field         malicious-rep-field-party.x   fixed:3     field  -
+ps-rep-field          ps-rep-field-party.x          fixed:3     field  -
+sy-rep-field          sy-rep-field-party.x          fixed:3     field  -
+atlas                 atlas-party.x                 default:3   field  threshold
+mal-shamir            malicious-shamir-party.x      default:3   field  threshold
+sy-shamir             sy-shamir-party.x             default:3   field  -
+semi                  semi-party.x                  -           field  -
+mascot                mascot-party.x                -           field  -
+hemi                  hemi-party.x                  -           he     -
+temi                  temi-party.x                  -           he     -
+soho                  soho-party.x                  -           he     -
+cowgear               cowgear-party.x               -           he     -
+chaigear              chaigear-party.x              -           he     -
+lowgear               lowgear-party.x               -           -      -
+highgear              highgear-party.x              -           -      -
+mama                  mama-party.x                  -           -      -
+ccd                   ccd-party.x                   default:3   -      -
+mal-ccd               malicious-ccd-party.x         default:3   -      -
+astra-online          astra-party.x                 fixed:2     -      -
+astra-prep            astra-prep-party.x            fixed:3     -      clean=Player-Data/3-astra-*/*
+trio-online           trio-party.x                  fixed:2     -      -
+trio-prep             trio-prep-party.x             fixed:3     -      clean=Player-Data/3-trio-*/*
+replicated            replicated-bin-party.x        fixed:3     -      -
+mal-rep-bin           malicious-rep-bin-party.x     fixed:3     -      -
+ps-rep-bin            ps-rep-bin-party.x            fixed:3     -      -
+semi-bin              semi-bin-party.x              -           -      -
+tiny                  tiny-party.x                  -           -      -
+tinier                tinier-party.x                -           -      -
+yao                   yao-party.x                   fixed:2     -      -
+real-bmr              real-bmr-party.x              -           -      -
+fake-spdz-real-bmr    real-bmr-party.x              -           -      args=-F
+semi-bmr              semi-bmr-party.x              -           -      -
+rep-bmr               rep-bmr-party.x               default:3   -      -
+mal-rep-bmr           mal-rep-bmr-party.x           default:3   -      -
+shamir-bmr            shamir-bmr-party.x            default:3   -      -
+mal-shamir-bmr        mal-shamir-bmr-party.x        default:3   -      -
