@@ -20,7 +20,7 @@
   "status": "error"
  },
  "aes [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: cannot create Array of <class 'Compiler.compilerLib.Compiler.build_vars.<locals>.dummy'>",
+  "message": "mpcl.core.exceptions.CompilerError: cannot create Array of <class 'mpcl.core.driver.Compiler.build_vars.<locals>.dummy'>",
   "status": "error"
  },
  "aes [-F 64 -X]": {
@@ -52,23 +52,23 @@
   "status": "ok"
  },
  "aes_circuit [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
   "status": "error"
  },
  "aes_circuit [-F 64 -X]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
   "status": "error"
  },
  "aes_circuit [-R 64 -Y]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
   "status": "error"
  },
  "aes_circuit [-R 64]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
   "status": "error"
  },
  "aes_circuit []": {
-  "message": "Compiler.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot download circuit descriptions. Make sure make and git are installed.",
   "status": "error"
  },
  "alex [-B 32]": {
@@ -576,7 +576,7 @@
    "Bytecode/alex-multithread1-90.bc": "9d4225194db3dfc3a4ab178a01548bce1e68a16d1bac93f3160ee41c07701767",
    "Bytecode/alex-multithread1-94.bc": "5f943872f68d0fa66b0b66aeac30c2d92d831ef649ccb1a1721fc1ecdcb30ae6",
    "Bytecode/alex-multithread1-96.bc": "34ad3b7cd7a95c0928e1fd34efb2bd90aac071416116dc69bbffad9b2f48fa51",
-   "Schedules/alex.sch": "27245349a6eb6986affe1b0055c3047593c702967aae0d4398edff2bfefa0f4b"
+   "Schedules/alex.sch": "e84b90eab86666759c775df0c55a9a730b4ac650c8b2437dd63a681a31bd3573"
   },
   "status": "ok"
  },
@@ -1586,7 +1586,7 @@
    "Bytecode/alex-multithread1-90.bc": "0e380f55a9a9d4af7c3d88d74b9ff274d062e56081a821290144f8b65d6c17e3",
    "Bytecode/alex-multithread1-94.bc": "3f4350a7b9cc26092de5bc6099c539f4710d5941e912ff5b6f25a60fde112613",
    "Bytecode/alex-multithread1-96.bc": "970567f85312b693dcc7b617e72236d9c21c11778b4ab05cef9ef1cd7a974964",
-   "Schedules/alex.sch": "31ce6f7e600a37ffe41690b3eb00d04c4fab45fd644404ea7068ad3f2e4fca1a"
+   "Schedules/alex.sch": "8650d2c5a1a543a8b95877af1d0dc405211068176da4263f3680bbaec53c5014"
   },
   "status": "ok"
  },
@@ -2091,7 +2091,7 @@
    "Bytecode/alex-multithread1-90.bc": "1f5bb3377b8c8cc237582bbbb42f1e762e8efa88f217d9abdf3b61478043c6b1",
    "Bytecode/alex-multithread1-94.bc": "5f943872f68d0fa66b0b66aeac30c2d92d831ef649ccb1a1721fc1ecdcb30ae6",
    "Bytecode/alex-multithread1-96.bc": "34ad3b7cd7a95c0928e1fd34efb2bd90aac071416116dc69bbffad9b2f48fa51",
-   "Schedules/alex.sch": "feb03974c8a48bcea3af83ba33ed55701ce377e6a31ed1e2b86a7d2c143c2cd6"
+   "Schedules/alex.sch": "6bb3e1c1815bf0aef13b052603694902309168558bedfac02f627d86e402a452"
   },
   "status": "ok"
  },
@@ -2106,7 +2106,7 @@
    "Bytecode/bankers_bonus-LTZ(1)_65-3.bc": "7f8f51320f0ef8ad7219c9b0c15aa5a9c6607842acacf222b2751c5c8fb4e549",
    "Bytecode/bankers_bonus-multithread-1.bc": "da464cbc418f31f903148b392884fa44ab4ab1c43017c9554bb1c5c6588eba11",
    "Bytecode/bankers_bonus-multithread-2.bc": "58825f472e2edf82f316dfde7bd1ba96e77333af3242183367d9c97886702ae3",
-   "Schedules/bankers_bonus.sch": "a34812632d86d7afda9f19126f97a35e5de8594a82a37afaee10c8df9ad2af1a"
+   "Schedules/bankers_bonus.sch": "05114c931d9d404cfe7822e0bb5e98b08780fc6be054929be4337ab84ab764e3"
   },
   "status": "ok"
  },
@@ -2128,7 +2128,7 @@
    "Bytecode/bankers_bonus-LTZ(1)_64-3.bc": "607599854b2c6677e7b74b694ebaa68b6025ee47221c001bbdfb393649882079",
    "Bytecode/bankers_bonus-multithread-1.bc": "da464cbc418f31f903148b392884fa44ab4ab1c43017c9554bb1c5c6588eba11",
    "Bytecode/bankers_bonus-multithread-2.bc": "58825f472e2edf82f316dfde7bd1ba96e77333af3242183367d9c97886702ae3",
-   "Schedules/bankers_bonus.sch": "9bfe4fa97783528afd3ba631331b7f7fff4e9452413406afe17e769eef52d11a"
+   "Schedules/bankers_bonus.sch": "ec24c2d547236182823e513dc98b1381db33fd9744d148fcf0b4e64fcb6c61e6"
   },
   "status": "ok"
  },
@@ -2139,7 +2139,7 @@
    "Bytecode/bankers_bonus-LTZ(1)_65-3.bc": "da95eae297aaf690827cda1ed84f3fc76e8400694fb2dceefcae0aae3a493d93",
    "Bytecode/bankers_bonus-multithread-1.bc": "da464cbc418f31f903148b392884fa44ab4ab1c43017c9554bb1c5c6588eba11",
    "Bytecode/bankers_bonus-multithread-2.bc": "58825f472e2edf82f316dfde7bd1ba96e77333af3242183367d9c97886702ae3",
-   "Schedules/bankers_bonus.sch": "6477b520d07a09f87b9b0002a8c4c099430c0765dc63f1c39b5a7e8fa191700d"
+   "Schedules/bankers_bonus.sch": "47f3a24a2c5133364d6f66182cca840f0acc6526f535944f3fd8c893e3f98b74"
   },
   "status": "ok"
  },
@@ -2769,7 +2769,7 @@
    "Bytecode/benchmark_priority_queue-multithread-97.bc": "005b658f32c1a4dfabe1dbcfc574393bae18a809799a6e505f3de7f251cb603e",
    "Bytecode/benchmark_priority_queue-multithread-98.bc": "a7214e363ab9fda1972af2563b2cdd9b912943f3ece07a48339d1dbcf6fee5fb",
    "Bytecode/benchmark_priority_queue-multithread-99.bc": "65eb0d4f276c61202abdd62373a23224e6e4f895246fdd6bbf78d6ac19db60c1",
-   "Schedules/benchmark_priority_queue.sch": "08e3a3ca2285758851b151357ab8cf98b25e2d1eb824941c0fe9331574fcbc12"
+   "Schedules/benchmark_priority_queue.sch": "482f128d9925a1739c3afaf8170a09fa6e07389c599a44f29947d9a17c3990cc"
   },
   "status": "ok"
  },
@@ -3319,7 +3319,7 @@
    "Bytecode/benchmark_priority_queue-multithread-97.bc": "f310de5debcd619c84bbce48830746ddae8d6b887d3cfc9ef72347eb5bab9077",
    "Bytecode/benchmark_priority_queue-multithread-98.bc": "6d145baee2ddeb7c732c4a2106aff7cc2980fe316335e8acc2766a76f0205d6f",
    "Bytecode/benchmark_priority_queue-multithread-99.bc": "874d85c8f24c10e9ffab34539b64c3d2846d34ca33a3c104a3e58e8b21b629b8",
-   "Schedules/benchmark_priority_queue.sch": "981ef5143859a529d40bf1ee4356ebf20936c2a0755da3ce5f18337d4a96de8c"
+   "Schedules/benchmark_priority_queue.sch": "19c2c9313b52df51c3ccfee3909bccfa9c48fef35597bf0639ae9d8f881b973a"
   },
   "status": "ok"
  },
@@ -4419,7 +4419,7 @@
    "Bytecode/benchmark_priority_queue-multithread-97.bc": "f310de5debcd619c84bbce48830746ddae8d6b887d3cfc9ef72347eb5bab9077",
    "Bytecode/benchmark_priority_queue-multithread-98.bc": "6d145baee2ddeb7c732c4a2106aff7cc2980fe316335e8acc2766a76f0205d6f",
    "Bytecode/benchmark_priority_queue-multithread-99.bc": "874d85c8f24c10e9ffab34539b64c3d2846d34ca33a3c104a3e58e8b21b629b8",
-   "Schedules/benchmark_priority_queue.sch": "42c8f801121f2d0659e1f5c0a2d555754f2118e5d171f46417dfadd1fb699f97"
+   "Schedules/benchmark_priority_queue.sch": "deac39ffd4fd0d1a36e2c86ac235276f1e6a351269cb558598af5e3896fefde0"
   },
   "status": "ok"
  },
@@ -4969,7 +4969,7 @@
    "Bytecode/benchmark_priority_queue-multithread-97.bc": "f310de5debcd619c84bbce48830746ddae8d6b887d3cfc9ef72347eb5bab9077",
    "Bytecode/benchmark_priority_queue-multithread-98.bc": "6d145baee2ddeb7c732c4a2106aff7cc2980fe316335e8acc2766a76f0205d6f",
    "Bytecode/benchmark_priority_queue-multithread-99.bc": "874d85c8f24c10e9ffab34539b64c3d2846d34ca33a3c104a3e58e8b21b629b8",
-   "Schedules/benchmark_priority_queue.sch": "3dc444f8afd4cc6ede26efe8daaf74fc3214773ec7871924e2955d0a0c9aacd6"
+   "Schedules/benchmark_priority_queue.sch": "b33d3a20e5f930859ad199b5faa4a80a46ff67c7876fbebff7c3c27908d9d717"
   },
   "status": "ok"
  },
@@ -4994,7 +4994,7 @@
   "status": "error"
  },
  "benchmark_sops_fixed_length [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: floating-point operations not supported with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: floating-point operations not supported with binary circuits",
   "status": "error"
  },
  "benchmark_sops_fixed_length [-F 64 -X]": {
@@ -5014,7 +5014,7 @@
   "status": "error"
  },
  "benchmark_sops_fixed_num_sops [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: floating-point operations not supported with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: floating-point operations not supported with binary circuits",
   "status": "error"
  },
  "benchmark_sops_fixed_num_sops [-F 64 -X]": {
@@ -5143,7 +5143,7 @@
    "Bytecode/breast_logistic-multithread-5.bc": "914dd9235a48b2840e9170d8b10b8955ea3ed6aa888769249cffa34fe13bf2d5",
    "Bytecode/breast_logistic-multithread-7.bc": "3d7b65247dc1f49ef54f0dff1d2817baeaa601f27dad9802f2755554514ebdfd",
    "Bytecode/breast_logistic-multithread-9.bc": "c7f2f57059b3bdd3cc46076f89ce2d4eae7a2b050b99fd6a92275bbb44d30fe3",
-   "Schedules/breast_logistic.sch": "4de5a775bc1560a4e005bbbdb0faabe8bb75f532d0a174417005cc3b8ba59b76"
+   "Schedules/breast_logistic.sch": "46c536726bcdac63f10027f7855c6053b1d412c6f96b82dbbd3b0840a7c2f6c8"
   },
   "status": "ok"
  },
@@ -5243,7 +5243,7 @@
    "Bytecode/breast_logistic-multithread-5.bc": "afe8e2a07c7a0dec0b725b2a35ccda538f99daf7a5e70e11f0913d933b21625c",
    "Bytecode/breast_logistic-multithread-7.bc": "3d7b65247dc1f49ef54f0dff1d2817baeaa601f27dad9802f2755554514ebdfd",
    "Bytecode/breast_logistic-multithread-9.bc": "e91bce88d858734e99fc1775b0303cb5ba4bde703259c55358fba0eff64e2f21",
-   "Schedules/breast_logistic.sch": "6cdaad7389a18223070127e6ae91cb85706684d4c6d28963822bfe2c0e739219"
+   "Schedules/breast_logistic.sch": "f1f2b6fa40a3c2387fa564ac47afa062e270f3e7c5e087e56733cdf8ad580f66"
   },
   "status": "ok"
  },
@@ -5293,7 +5293,7 @@
    "Bytecode/breast_logistic-multithread-5.bc": "914dd9235a48b2840e9170d8b10b8955ea3ed6aa888769249cffa34fe13bf2d5",
    "Bytecode/breast_logistic-multithread-7.bc": "3d7b65247dc1f49ef54f0dff1d2817baeaa601f27dad9802f2755554514ebdfd",
    "Bytecode/breast_logistic-multithread-9.bc": "c06c3589434acd4817444fe7295c983333077f19df79b6ff07404a449d3a159f",
-   "Schedules/breast_logistic.sch": "31c85a513141593c7bde5179a52d088caaef2fc6d5c59f10685f0b4edfe5e04d"
+   "Schedules/breast_logistic.sch": "33ffc13c7b3aa4a051320728fb1f61beacd4f9e40346fcd65daaa9ed17f75740"
   },
   "status": "ok"
  },
@@ -5354,7 +5354,7 @@
    "Bytecode/breast_tree-multithread1-37.bc": "a68dd04a6e9bd2757ff323ecc91adb3430cddd8685d07e02dcd02227cd5e15dc",
    "Bytecode/breast_tree-multithread1-40.bc": "a95e92cd15a4225c1a22e42872d3bf616bd981a9242d04af100fe1f215b50bff",
    "Bytecode/breast_tree-multithread1-43.bc": "de22304b3d38d49af8422cf570d839adf83932194a6a45e7c12f52f1b812d5ec",
-   "Schedules/breast_tree.sch": "bb684744cae6f668b11fc2b3ce2e8dc65de356a0eef2868f4c5970eab1da014f"
+   "Schedules/breast_tree.sch": "7855a7c8f35ffcf3aaefa8171a5861b1a4fe7670afc79e5755f2a03e2ba2d554"
   },
   "status": "ok"
  },
@@ -5468,7 +5468,7 @@
    "Bytecode/breast_tree-multithread1-37.bc": "d8ef458c1b1bbf12a866d0618b42bc7f5aea77746809255f3c3895b061cfb977",
    "Bytecode/breast_tree-multithread1-40.bc": "bf17cc32344fd499ff2c08d7e96639efb07e598bee2d6ba6be37c56e9577fe6b",
    "Bytecode/breast_tree-multithread1-43.bc": "d9a4cff52e4ebc5bb78aa8c1724f56605bde9d1745f4105b7056fb7bf3dd6aec",
-   "Schedules/breast_tree.sch": "2ea4922fd691d23a4352cf533971f67056712617b2dc2134bf95ce97f8f96155"
+   "Schedules/breast_tree.sch": "cb2f42a05ce65e5fae9bcdeadd97d30f2afa637318ac103132b4da573d13eab2"
   },
   "status": "ok"
  },
@@ -5525,7 +5525,7 @@
    "Bytecode/breast_tree-multithread1-37.bc": "a68dd04a6e9bd2757ff323ecc91adb3430cddd8685d07e02dcd02227cd5e15dc",
    "Bytecode/breast_tree-multithread1-40.bc": "a95e92cd15a4225c1a22e42872d3bf616bd981a9242d04af100fe1f215b50bff",
    "Bytecode/breast_tree-multithread1-43.bc": "de22304b3d38d49af8422cf570d839adf83932194a6a45e7c12f52f1b812d5ec",
-   "Schedules/breast_tree.sch": "f85e2d58a4830ddb6adca007a2e3854148b2d8860efa1afab88cfef80b5b8610"
+   "Schedules/breast_tree.sch": "9c4974534dc713f71d8deaafdb095eaef11a21284560a68f786c8697020c5591"
   },
   "status": "ok"
  },
@@ -5557,7 +5557,7 @@
    "Bytecode/diabetes-multithread-7.bc": "cc9a623e00cdccc904b6e2bcfd5add6e6615cd19ee17ecaad78eba669e47eaf6",
    "Bytecode/diabetes-multithread-8.bc": "8039515915d0f9b1d39125348735fb5c98ca71da274bee995283d6723e7c8f3d",
    "Bytecode/diabetes-multithread-9.bc": "ac2198001481105e1b000ed01cb4547132739831b95f5571c781dabdea930e93",
-   "Schedules/diabetes.sch": "c3f6615fc04e998fcd590f9f37a68afd059cccd941fde8c11bdf700295c9e534"
+   "Schedules/diabetes.sch": "2ea0e4f9e67cf72a2f7e46e0ed3cc31a393799d7af5c381ea22c3032695158fd"
   },
   "status": "ok"
  },
@@ -5613,7 +5613,7 @@
    "Bytecode/diabetes-multithread-7.bc": "cc9a623e00cdccc904b6e2bcfd5add6e6615cd19ee17ecaad78eba669e47eaf6",
    "Bytecode/diabetes-multithread-8.bc": "1a22cc94dd135f19ceb6a0d395f14e64eaad8a3eac404c69cc27b4bd78029eed",
    "Bytecode/diabetes-multithread-9.bc": "691ab518f71b515c293df0458220ca09d96600643f8f2a73085ac779c74f7853",
-   "Schedules/diabetes.sch": "3ba9d9c28ef17dd22723a44d58fa766627ad4b3e4792218be8020b33da81fe83"
+   "Schedules/diabetes.sch": "45d7e6c946b85db9f53c03d7edbac6c0d8f636060d8efcd401885c4fbf1abd43"
   },
   "status": "ok"
  },
@@ -5641,7 +5641,7 @@
    "Bytecode/diabetes-multithread-7.bc": "cc9a623e00cdccc904b6e2bcfd5add6e6615cd19ee17ecaad78eba669e47eaf6",
    "Bytecode/diabetes-multithread-8.bc": "8039515915d0f9b1d39125348735fb5c98ca71da274bee995283d6723e7c8f3d",
    "Bytecode/diabetes-multithread-9.bc": "ac2198001481105e1b000ed01cb4547132739831b95f5571c781dabdea930e93",
-   "Schedules/diabetes.sch": "f0a78ccedd27ad0728bafc240ad15b7df540ca0cfe14c7d7f4066a792656ab12"
+   "Schedules/diabetes.sch": "6b19a9b9e68210f90e93e0b0c9365921300c14e6f84d96bceadf40a6d9e9544f"
   },
   "status": "ok"
  },
@@ -5662,7 +5662,7 @@
    "Bytecode/dijkstra_example-EQZ(1)_64-7.bc": "71a9ed98d53e858ef225d21b52428fbbf4f8df4a526c6e41e482e7688c93f00a",
    "Bytecode/dijkstra_example-LTZ(1)_65-5.bc": "7f8f51320f0ef8ad7219c9b0c15aa5a9c6607842acacf222b2751c5c8fb4e549",
    "Bytecode/dijkstra_example-Trunc(1)_3_1_True-3.bc": "529d4a65ed11fe25cfb56e633936d509780f80901868d2fd3ca2b2d392247cdf",
-   "Schedules/dijkstra_example.sch": "93ec05356e9d3f3f123c73ca8a7859a15e4858af7d7d953f50aacdb49bd58e35"
+   "Schedules/dijkstra_example.sch": "4f2679651ece982e3251452aefda332c3fd763bab3f6069279ac066cb9807961"
   },
   "status": "ok"
  },
@@ -5684,7 +5684,7 @@
    "Bytecode/dijkstra_example-EQZ(1)_63-7.bc": "811e26f32e68e72faafe591d7730c0f5a16ff838e21808f6a0542f07c30f57ff",
    "Bytecode/dijkstra_example-LTZ(1)_64-5.bc": "607599854b2c6677e7b74b694ebaa68b6025ee47221c001bbdfb393649882079",
    "Bytecode/dijkstra_example-Trunc(1)_3_1_True-3.bc": "77fbb5c6aa67944e3e68e8714097c5de455acecbf4a29d27b70a4a423cea41b2",
-   "Schedules/dijkstra_example.sch": "db1017f46fada3893ddffb93ff2f4906c8d77d7b5ea64034a62cdf34106699ec"
+   "Schedules/dijkstra_example.sch": "9a2da2ea704d7a7a7d116d59af8a38d76b71e3a763afbc8cbde33ded5450c0bb"
   },
   "status": "ok"
  },
@@ -5695,7 +5695,7 @@
    "Bytecode/dijkstra_example-EQZ(1)_64-7.bc": "055df9eb58c158a68ce1056d5a41a00358892cba8475a956ba7c9617c814817e",
    "Bytecode/dijkstra_example-LTZ(1)_65-5.bc": "da95eae297aaf690827cda1ed84f3fc76e8400694fb2dceefcae0aae3a493d93",
    "Bytecode/dijkstra_example-Trunc(1)_3_1_True-3.bc": "529d4a65ed11fe25cfb56e633936d509780f80901868d2fd3ca2b2d392247cdf",
-   "Schedules/dijkstra_example.sch": "2e899129f56002666cf255c0d0702e368a9e6318dc694edfdad1eeb2fb13945f"
+   "Schedules/dijkstra_example.sch": "27a59d8b26551624d5d2d40a6f5446ded6ff949724007a0b56e1f134fd45fb94"
   },
   "status": "ok"
  },
@@ -5720,7 +5720,7 @@
   "status": "error"
  },
  "falcon_alex [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "falcon_alex [-F 64 -X]": {
@@ -6179,7 +6179,7 @@
    "Bytecode/falcon_alex-multithread1-91.bc": "f857886aeaf5eadd3ca67ba18cf8e06952a3e21ccf2ff8f00c32aa4f003769f5",
    "Bytecode/falcon_alex-multithread1-94.bc": "033a596102b73b61a0817b4b87d6076a475f9caad308f483ac6fabe46c4deb43",
    "Bytecode/falcon_alex-multithread1-99.bc": "d53441c668c411c293647c95a4bea694bdb60d07a8c7583d268dd39f5311195a",
-   "Schedules/falcon_alex.sch": "f3c94e703cdec667336e302a89aeb8e7c3013c405aef9e1257136a28aea83f0f"
+   "Schedules/falcon_alex.sch": "b0604e697bfbdaf9e7ba4798698f049877f9960d2fe789ecc4dcb9372c9fc277"
   },
   "status": "ok"
  },
@@ -7099,7 +7099,7 @@
    "Bytecode/falcon_alex-multithread1-91.bc": "b98a4c793262e250c4a0fcef29a9c54d5c24c4d25bee7b79ec856e902d292b10",
    "Bytecode/falcon_alex-multithread1-94.bc": "a7d14a28d19afccbf466ef7e4b81a82d094de1000d9598c69a083d9482c75133",
    "Bytecode/falcon_alex-multithread1-99.bc": "efe92430938b5315ea12a6329238392e2fddba34a173ae140e91749fb52fbe82",
-   "Schedules/falcon_alex.sch": "be577e00b553b1a7bb5d5ad8aba92029f552760e5393024fd70e76d709a3648c"
+   "Schedules/falcon_alex.sch": "c964c41e16b8f2979c405253c514f37b4c7b23d38bc90225fe7ab511cb0cd346"
   },
   "status": "ok"
  },
@@ -7559,7 +7559,7 @@
    "Bytecode/falcon_alex-multithread1-91.bc": "f857886aeaf5eadd3ca67ba18cf8e06952a3e21ccf2ff8f00c32aa4f003769f5",
    "Bytecode/falcon_alex-multithread1-94.bc": "033a596102b73b61a0817b4b87d6076a475f9caad308f483ac6fabe46c4deb43",
    "Bytecode/falcon_alex-multithread1-99.bc": "15f523bdb85dbec41bedb3726127dc3b5a8c65c0b3eb7bbe822bbe897e6d7b1b",
-   "Schedules/falcon_alex.sch": "9bd46b94039993a8b6f2102fe13c5010291c77d6e306029094e3abe3d00fa9a2"
+   "Schedules/falcon_alex.sch": "3f2834f0b82c59e893d8503bdf4cc31d3072198e3bb2c9845d2706f326a00efe"
   },
   "status": "ok"
  },
@@ -7578,7 +7578,7 @@
    "Bytecode/gale-shapley_tutorial-Mod2m(1)_48_12_False-11.bc": "9e66f9e04ced60015154cfe8d9e05d1ea7094d62cad584939ef28f026d20fdf5",
    "Bytecode/gale-shapley_tutorial-Mod2m(1)_5_2_False-3.bc": "8d9937dcd898fafb0bff2a408f17a4b15e31fe7ff4062b045bcdcef33edf3bc7",
    "Bytecode/gale-shapley_tutorial-Pow2(1)_48-9.bc": "2f1cbc87956cb43cab4caada403e3247fef188ca89ad681e7bc9bc007e421980",
-   "Schedules/gale-shapley_tutorial.sch": "c24041e4d58b973c53157287a689bb5d907d111b69e34e071e1f736901dd07af"
+   "Schedules/gale-shapley_tutorial.sch": "29ae76bce3c2a190d8ade49a8bffb893fe3df8822f28a6617444df6b25524d38"
   },
   "status": "ok"
  },
@@ -7596,7 +7596,7 @@
    "Bytecode/gale-shapley_tutorial-Mod2m(1)_48_12_False-11.bc": "189f46d1025c6df0cd792f90c103341fcf64ba3d8678a467433863c58a010c85",
    "Bytecode/gale-shapley_tutorial-Mod2m(1)_5_2_False-3.bc": "619bbcf79a07c237b8eb449647b5a270c514e7d5266133b13d822a67af935e2b",
    "Bytecode/gale-shapley_tutorial-Pow2(1)_48-9.bc": "96fe58583d01a5a2f37e15fb364294d5e3e6ab885f041dedc7212259e5a06c5d",
-   "Schedules/gale-shapley_tutorial.sch": "ef0cee813a1be90510e61432dc69837ee295a371989af5d2856811571d2e188e"
+   "Schedules/gale-shapley_tutorial.sch": "3342b7f26fc524fed39855bd23f67328eed92c936e30324451f38250fe4163a9"
   },
   "status": "ok"
  },
@@ -7634,7 +7634,7 @@
    "Bytecode/gale-shapley_tutorial-Mod2m(1)_5_2_False-3.bc": "955c9c1b81b69494b8f402f0a64a5e4e3478fc1751aa0c16a71d68d932f5a0c9",
    "Bytecode/gale-shapley_tutorial-Pow2(1)_48-9.bc": "81cc45b933262a2804c9a028f1ad597c820b93f6b84a4eb4edaf63412082f11f",
    "Bytecode/gale-shapley_tutorial-TruncInRing(1)_48-11.bc": "fc935a67ff238e17043b0231443ddd6a6b550a3433b29587a2aabba53735b69d",
-   "Schedules/gale-shapley_tutorial.sch": "6afd2d9c9deaa995f30e3532e4ac7c415d15280d29932b4963ebb9f4ad9cabb8"
+   "Schedules/gale-shapley_tutorial.sch": "5b2cf13c5136b67ddcde53c30b37707745fa6711840e1c0f031f14019df807ab"
   },
   "status": "ok"
  },
@@ -7652,7 +7652,7 @@
    "Bytecode/gale-shapley_tutorial-Mod2m(1)_48_12_False-11.bc": "9e66f9e04ced60015154cfe8d9e05d1ea7094d62cad584939ef28f026d20fdf5",
    "Bytecode/gale-shapley_tutorial-Mod2m(1)_5_2_False-3.bc": "a08b9f1d3daf633ccd49442a81003a38b9b7704fbdfef619f07bcf9d2ab0064b",
    "Bytecode/gale-shapley_tutorial-Pow2(1)_48-9.bc": "c966ae713ccd176dd734e2254f41cd3b69c6207d6540bd702042a5d03063d763",
-   "Schedules/gale-shapley_tutorial.sch": "38d8349dac46b969bd2f592228e5b91a4e64bb1d22244c97d4ca9bf9757d2eac"
+   "Schedules/gale-shapley_tutorial.sch": "148769e30842c036c8ce24879c7ddfe6c6c3a6a38163d4a5d6e9a99918b73491"
   },
   "status": "ok"
  },
@@ -7787,7 +7787,7 @@
   "status": "error"
  },
  "keras_cifar_lenet [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "keras_cifar_lenet [-F 64 -X]": {
@@ -8084,7 +8084,7 @@
    "Bytecode/keras_cifar_lenet-multithread1-73.bc": "3f2164e6a2ff86b5892d76583b3d346358c699f3f936c0efbf5823b4de76d46b",
    "Bytecode/keras_cifar_lenet-multithread1-8.bc": "d9fb986642abb8cfe785f2b9a20dfe6b03b78622efb1710872c37bba7a8f9ff8",
    "Bytecode/keras_cifar_lenet-multithread1-87.bc": "fa5a1097162df9b2a67919a58e27dd7d99f7daa9aca971f035fb85bf1b7ece9b",
-   "Schedules/keras_cifar_lenet.sch": "b340ca0e2bdec08ffa0e4ef549cdb82d3e1873504b9492824f24ba82f78819e6"
+   "Schedules/keras_cifar_lenet.sch": "8eb8e81b2f02c2ddf90b3b383fc09f72520272f9c12eb52ccbcdb1efbca1a41a"
   },
   "status": "ok"
  },
@@ -8680,7 +8680,7 @@
    "Bytecode/keras_cifar_lenet-multithread1-73.bc": "3f2164e6a2ff86b5892d76583b3d346358c699f3f936c0efbf5823b4de76d46b",
    "Bytecode/keras_cifar_lenet-multithread1-8.bc": "f26b4aaf6cd8a72b8a73b31f382060611451819141bb3aee8a49fda227925fab",
    "Bytecode/keras_cifar_lenet-multithread1-87.bc": "b771ba4a0779bd83a0dd81bc076b1a6697f7b6fdbe21bea2a0913b0fde881f54",
-   "Schedules/keras_cifar_lenet.sch": "c16b9711754ab9dc4bcc5d28a506ece85e274698a1524f9ba86a23f7463f360c"
+   "Schedules/keras_cifar_lenet.sch": "18c3cd7f41af0e07a74e8938ed677e5be7329fa145c5b12ef08df74577ba887f"
   },
   "status": "ok"
  },
@@ -8978,12 +8978,12 @@
    "Bytecode/keras_cifar_lenet-multithread1-73.bc": "3f2164e6a2ff86b5892d76583b3d346358c699f3f936c0efbf5823b4de76d46b",
    "Bytecode/keras_cifar_lenet-multithread1-8.bc": "d9fb986642abb8cfe785f2b9a20dfe6b03b78622efb1710872c37bba7a8f9ff8",
    "Bytecode/keras_cifar_lenet-multithread1-87.bc": "4db3d08d77309cc78ee9a60d71a0cebef68fb5af8984c88c93519a8dc941f2cf",
-   "Schedules/keras_cifar_lenet.sch": "2f627e8a83e921e3569e8b0ee57867bba1357ed81931835c92b2573b2cf8b34c"
+   "Schedules/keras_cifar_lenet.sch": "87eb24ad0efa5e5c56d515f5a7123d619197b1f49fe5a6af3906206bdbb190a6"
   },
   "status": "ok"
  },
  "keras_mnist_dense [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "keras_mnist_dense [-F 64 -X]": {
@@ -9147,7 +9147,7 @@
    "Bytecode/keras_mnist_dense-multithread-92.bc": "efdedc71cad95c0c9d54076c75e47f34f07a5fc6a6ed6596eb14604c8e808249",
    "Bytecode/keras_mnist_dense-multithread-93.bc": "7c6ea427324dda74554e15f5c3ce80cfad97017c2d26c89ad302f1aaf1cf0645",
    "Bytecode/keras_mnist_dense-multithread-96.bc": "31ad5d8feddddbb7deabf1f2791f171e2355427e77d4c0b0be0843e68d683386",
-   "Schedules/keras_mnist_dense.sch": "e56f4868d633cce309a6c7fa3d719e76821b75562b419595f7ccab322f2565f3"
+   "Schedules/keras_mnist_dense.sch": "60dd0b807df518d612bda04eb298b017bf6877cb12981bc449ec47f994a24708"
   },
   "status": "ok"
  },
@@ -9477,7 +9477,7 @@
    "Bytecode/keras_mnist_dense-multithread-92.bc": "f2f47c593bf73728b6bc1a3cc4b0b12f45ee29d32e9a6c721ccdc8e3c1c8d5a2",
    "Bytecode/keras_mnist_dense-multithread-93.bc": "c69593e1516b65383f80486f8fce77b07f8f79699fc605f8d9237e0d8b2de99e",
    "Bytecode/keras_mnist_dense-multithread-96.bc": "6238a219e389b297ce14ccc082f695d863d623d11b976187597c3006f0df2ead",
-   "Schedules/keras_mnist_dense.sch": "639fd779f4a1628e2bbf686303de6fb5c7fb804fcf8fc2afaa6b0d98886d42a5"
+   "Schedules/keras_mnist_dense.sch": "ff808084b524fff28ee3185f457f847e3217beb5a0a68d9659c95dbe9eaac017"
   },
   "status": "ok"
  },
@@ -9642,12 +9642,12 @@
    "Bytecode/keras_mnist_dense-multithread-92.bc": "efdedc71cad95c0c9d54076c75e47f34f07a5fc6a6ed6596eb14604c8e808249",
    "Bytecode/keras_mnist_dense-multithread-93.bc": "7c6ea427324dda74554e15f5c3ce80cfad97017c2d26c89ad302f1aaf1cf0645",
    "Bytecode/keras_mnist_dense-multithread-96.bc": "31ad5d8feddddbb7deabf1f2791f171e2355427e77d4c0b0be0843e68d683386",
-   "Schedules/keras_mnist_dense.sch": "090cb77f50c5ef8c1924a444d0ed174e9e6a69ef31f67242510e627a0f8249a5"
+   "Schedules/keras_mnist_dense.sch": "b8a0d3739def8c1c6481b94fc7eac5038a37250ffe5a829a996fae01583d00d7"
   },
   "status": "ok"
  },
  "keras_mnist_dense_predict [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "keras_mnist_dense_predict [-F 64 -X]": {
@@ -9705,7 +9705,7 @@
    "Bytecode/keras_mnist_dense_predict-multithread-51.bc": "812617c893ac99c18e3a344a3ab0f85f548f939719039767c85b6a4f78b14e4c",
    "Bytecode/keras_mnist_dense_predict-multithread-52.bc": "2998c6a4e1c4387e8a6c1e1880b3826bab482f1b979e7a3277f62eeb2e915c05",
    "Bytecode/keras_mnist_dense_predict-multithread-7.bc": "491e4239be42edaed0f1c3d1c79f9a7e4b4952e1f61e297cd50c1e3c2d07a4c8",
-   "Schedules/keras_mnist_dense_predict.sch": "9d192e3e5123b94723f962b3ff552c9da42ec6d6752b973d7e2a4aa88f6b7dcb"
+   "Schedules/keras_mnist_dense_predict.sch": "d0bbe2b686a5353c3c40d275711248e630fe86905ccaeb86edd22dc078f2ac16"
   },
   "status": "ok"
  },
@@ -9823,7 +9823,7 @@
    "Bytecode/keras_mnist_dense_predict-multithread-51.bc": "812617c893ac99c18e3a344a3ab0f85f548f939719039767c85b6a4f78b14e4c",
    "Bytecode/keras_mnist_dense_predict-multithread-52.bc": "3ed890510194e6401c99ea357d351cc704ef24df06e320ea22f7ded2e7001f48",
    "Bytecode/keras_mnist_dense_predict-multithread-7.bc": "2264b028d583cc96a74eda01265053da39032d71b95a3955193c61d494b2bfd5",
-   "Schedules/keras_mnist_dense_predict.sch": "9b2c178da562f6966c4762f16cd0fbfef01e280c5079b796a503cc1e215c0706"
+   "Schedules/keras_mnist_dense_predict.sch": "15105e7971cab2e40e73fc958cfc2359c76c946afea57bd20fcac3f2a1b3a0aa"
   },
   "status": "ok"
  },
@@ -9882,12 +9882,12 @@
    "Bytecode/keras_mnist_dense_predict-multithread-51.bc": "812617c893ac99c18e3a344a3ab0f85f548f939719039767c85b6a4f78b14e4c",
    "Bytecode/keras_mnist_dense_predict-multithread-52.bc": "1ee4f5d6ba7b5258c0ced7fb45ec5dee1649560e0bd06a045613f6fb85ec0547",
    "Bytecode/keras_mnist_dense_predict-multithread-7.bc": "164b85d327980a7bf411c0c66c4e35084bef421c9651d309011ef45fd172396b",
-   "Schedules/keras_mnist_dense_predict.sch": "7c26f4c72a6d893b0c3d8ba846c3e32793667b8b961c141cfc149bc2b2bbb1fe"
+   "Schedules/keras_mnist_dense_predict.sch": "2892c31b39208cc808e447420a63a4aeca73df6cd9b9c7ec8bc9c69fcab513f8"
   },
   "status": "ok"
  },
  "keras_mnist_lenet [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "keras_mnist_lenet [-F 64 -X]": {
@@ -10055,7 +10055,7 @@
    "Bytecode/keras_mnist_lenet-multithread-93.bc": "ac675243a59810768ef892db9499cf4a659ae3af92e013d62bd63da104383313",
    "Bytecode/keras_mnist_lenet-multithread-94.bc": "33071ca56c43835403c3e4c2a768e11090f645e1b60278d32bed57f20b84036b",
    "Bytecode/keras_mnist_lenet-multithread-95.bc": "5f8e80a0448184c17ae8c8c49985ea0aedfaa09ccfb050d2cb66480c3949a735",
-   "Schedules/keras_mnist_lenet.sch": "1cee7b2f54683c870c2572731b117075247da4c059ba11de2f3d2232e0ef440c"
+   "Schedules/keras_mnist_lenet.sch": "6fb30cc3d54fdaa27e4688bc145adece69b1e8189123418ee26ae9f46877d26b"
   },
   "status": "ok"
  },
@@ -10393,7 +10393,7 @@
    "Bytecode/keras_mnist_lenet-multithread-93.bc": "ac675243a59810768ef892db9499cf4a659ae3af92e013d62bd63da104383313",
    "Bytecode/keras_mnist_lenet-multithread-94.bc": "2b0dda32423de32a9d8fe0b7bf1632e3e3b434964790d3e79714b2406bdfc0d1",
    "Bytecode/keras_mnist_lenet-multithread-95.bc": "85f7a71cba34b2d4263ce60f7d77f1be6ae8131b140b5da4fa6d572c065771eb",
-   "Schedules/keras_mnist_lenet.sch": "cd4d4b922259558dafe6aa8a226b4bddcb065fd532ba978793c6e4411e3c5b08"
+   "Schedules/keras_mnist_lenet.sch": "ffbc15f6e8d4b5eb5a432a5a9cdd7e5327ba79277d23889bcb8498e0c2504c02"
   },
   "status": "ok"
  },
@@ -10562,12 +10562,12 @@
    "Bytecode/keras_mnist_lenet-multithread-93.bc": "ac675243a59810768ef892db9499cf4a659ae3af92e013d62bd63da104383313",
    "Bytecode/keras_mnist_lenet-multithread-94.bc": "33071ca56c43835403c3e4c2a768e11090f645e1b60278d32bed57f20b84036b",
    "Bytecode/keras_mnist_lenet-multithread-95.bc": "e2e3bd46229647711e1e1ee6830018b2ebdc22965e289510fb57c378b731bc3c",
-   "Schedules/keras_mnist_lenet.sch": "8bfabeca8a5001c0eccf35ea39f34e798de2b5a45b4b60fe1840ca19ddcf3461"
+   "Schedules/keras_mnist_lenet.sch": "8ee17e313ba6162b896e5a26035bf1acc7bdd88bf417b7198b4200c2186911d0"
   },
   "status": "ok"
  },
  "keras_mnist_lenet_avgpool [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "keras_mnist_lenet_avgpool [-F 64 -X]": {
@@ -10733,7 +10733,7 @@
    "Bytecode/keras_mnist_lenet_avgpool-multithread-95.bc": "4c6ca1b61aee470958db78786597fe2b32820aaf7d762058085504e5a2825bb0",
    "Bytecode/keras_mnist_lenet_avgpool-multithread-96.bc": "f1da20c8ad16004e0f2bacbf3191c21b8203c641157ec5c25b7fd2f216573fb3",
    "Bytecode/keras_mnist_lenet_avgpool-multithread-97.bc": "73216db51460db09d072ad1287a5aa559a92784c99825972b73f208c62e3290c",
-   "Schedules/keras_mnist_lenet_avgpool.sch": "4293b91f8dcf349904320a46fc600b21ec635c1db38182a42ef195742b3e8049"
+   "Schedules/keras_mnist_lenet_avgpool.sch": "73033443cb806c3ab3b46a096f3f2bb8ca10dd5b9c2d2bcda0b81b07b4d30a18"
   },
   "status": "ok"
  },
@@ -11067,7 +11067,7 @@
    "Bytecode/keras_mnist_lenet_avgpool-multithread-95.bc": "f5dbc5935bf79967249f8d20e7be4122e7035f5b8e3b960d1463b98c69092c80",
    "Bytecode/keras_mnist_lenet_avgpool-multithread-96.bc": "2297a5ed4966676ce0a2e14834e878d732aa01ebf8e745630b133ea4104ac30d",
    "Bytecode/keras_mnist_lenet_avgpool-multithread-97.bc": "e7b1fc2fb807417b53367f1974e3c77ad49224a3b1fcd312756663e6a49efc4e",
-   "Schedules/keras_mnist_lenet_avgpool.sch": "df18a187122bd76060b60c60083a559ae0ca7484a0983d3beaabbf1b4f9a6100"
+   "Schedules/keras_mnist_lenet_avgpool.sch": "f9116c1bc765bb00f4295d3d7af4314a0cc0443606bae8fef1b875c5f1bcbbaa"
   },
   "status": "ok"
  },
@@ -11234,12 +11234,12 @@
    "Bytecode/keras_mnist_lenet_avgpool-multithread-95.bc": "4c6ca1b61aee470958db78786597fe2b32820aaf7d762058085504e5a2825bb0",
    "Bytecode/keras_mnist_lenet_avgpool-multithread-96.bc": "f1da20c8ad16004e0f2bacbf3191c21b8203c641157ec5c25b7fd2f216573fb3",
    "Bytecode/keras_mnist_lenet_avgpool-multithread-97.bc": "ed5e3d149e6dc07dac31a9277102ae0c99556f87dc1321eba684870ef962e747",
-   "Schedules/keras_mnist_lenet_avgpool.sch": "bbc6010cce210c770b75d2cfe7462f80288c0b41970e9f3073efc6f1b67b8ab9"
+   "Schedules/keras_mnist_lenet_avgpool.sch": "4f692044b6d84162c0591de50374d5d76a5af4d401154b9ab19b89491521ec3f"
   },
   "status": "ok"
  },
  "keras_mnist_lenet_predict [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "keras_mnist_lenet_predict [-F 64 -X]": {
@@ -11277,7 +11277,7 @@
    "Bytecode/keras_mnist_lenet_predict-multithread-24.bc": "5be554e5c4317849fe2dd5837d7872390aae9ddc6afd84ab9f300f48f2a764e0",
    "Bytecode/keras_mnist_lenet_predict-multithread-3.bc": "b9852a30ac5f186a63308b8bde7de42684a6ae733d6fa505f20c2d134319d9a4",
    "Bytecode/keras_mnist_lenet_predict-multithread-8.bc": "6685e90f278224362c5ad2a5a1ea2dc5991df04b783be3fe23ef3a2cac92094d",
-   "Schedules/keras_mnist_lenet_predict.sch": "9226834656a3ba8d9b929cccbd766442d3e17fd80fd4ffaa124c8e5bd3faa896"
+   "Schedules/keras_mnist_lenet_predict.sch": "71b9999a8aeaf43a0cac3d22958918fb081f0bc948783b9e02b6c21678834d32"
   },
   "status": "ok"
  },
@@ -11355,7 +11355,7 @@
    "Bytecode/keras_mnist_lenet_predict-multithread-24.bc": "2762c7cd11c3c285d623820b89f9aa93460fcef424338090fd0afcee2c0a55df",
    "Bytecode/keras_mnist_lenet_predict-multithread-3.bc": "ebddc7e35ce93a404935077eec24786f231cfafc815833a93eb7b62257efa670",
    "Bytecode/keras_mnist_lenet_predict-multithread-8.bc": "cae12e2b2737be967685acb355f9aa3f7a6ddc963fe245bf955fb2c5f67f9110",
-   "Schedules/keras_mnist_lenet_predict.sch": "d9f105e897d3d5a511023acb5ef6ded9ecc29e4ed3103cbcdf36e93ff2cad020"
+   "Schedules/keras_mnist_lenet_predict.sch": "08a5155b3449fa91a14e97dcc1ae0596d63d6aff7a89d4abebd5040d87c38115"
   },
   "status": "ok"
  },
@@ -11394,7 +11394,7 @@
    "Bytecode/keras_mnist_lenet_predict-multithread-24.bc": "7970ed541862d991f6b0eafb25c2e41cd9082260d7d49881be04c78175545aa4",
    "Bytecode/keras_mnist_lenet_predict-multithread-3.bc": "b9852a30ac5f186a63308b8bde7de42684a6ae733d6fa505f20c2d134319d9a4",
    "Bytecode/keras_mnist_lenet_predict-multithread-8.bc": "82d3759814d0ab61fac754033767a38cfe3268781bca0647b55feaa7bb65f5b5",
-   "Schedules/keras_mnist_lenet_predict.sch": "7e89250ccede726bcc3da6dcda20c69073ac4a6fa368bb01bfa3bf0eaab3d10f"
+   "Schedules/keras_mnist_lenet_predict.sch": "a217b22d1fd555b4e4e1f1d9b6dcb8088103a1493c9467cdb09279993d5231d5"
   },
   "status": "ok"
  },
@@ -11410,7 +11410,7 @@
   "files": {
    "Bytecode/l2h_comparison-0.bc": "60bd46a0c2d6033c71de20168468aa191d9e2642d97db5fe49a113ac3ffcf18e",
    "Bytecode/l2h_comparison-LTZ(1)_65-1.bc": "7f8f51320f0ef8ad7219c9b0c15aa5a9c6607842acacf222b2751c5c8fb4e549",
-   "Schedules/l2h_comparison.sch": "7ae145fb79afa80a404b24a4bbf56a10952f970fc4566fc8b6175fb3a3ca2968"
+   "Schedules/l2h_comparison.sch": "e8b13471763156a49668966558b99ab7c2618c369dfcfc07e9a4ebd244da1006"
   },
   "status": "ok"
  },
@@ -11426,7 +11426,7 @@
   "files": {
    "Bytecode/l2h_comparison-0.bc": "7bedafc1393a491c2ae63b2fd09873fb9bdc959171d1722a101a1881c584c42a",
    "Bytecode/l2h_comparison-LTZ(1)_64-1.bc": "607599854b2c6677e7b74b694ebaa68b6025ee47221c001bbdfb393649882079",
-   "Schedules/l2h_comparison.sch": "37e771cc7cddae38c77d90b2e40f76a4558b4b91f949d52b3561ec36649c39b7"
+   "Schedules/l2h_comparison.sch": "4d286d565ec613f1a707510d8b05651c37810735de4d59cc0b552c94e2bedd3d"
   },
   "status": "ok"
  },
@@ -11434,7 +11434,7 @@
   "files": {
    "Bytecode/l2h_comparison-0.bc": "7481be5518f8bc8e8dd75f2e3c85c2d350e5687d388221208557e83caccad979",
    "Bytecode/l2h_comparison-LTZ(1)_65-1.bc": "da95eae297aaf690827cda1ed84f3fc76e8400694fb2dceefcae0aae3a493d93",
-   "Schedules/l2h_comparison.sch": "525b489140a112d85cc7285103111611cab7e064f686088e739becde1581b2a9"
+   "Schedules/l2h_comparison.sch": "0869aeb72468226e072fb0e8f17b8e191c3227fd554f48932845ba484fd738df"
   },
   "status": "ok"
  },
@@ -11515,7 +11515,7 @@
   "status": "error"
  },
  "mnist_A [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "mnist_A [-F 64 -X]": {
@@ -11622,7 +11622,7 @@
    "Bytecode/mnist_A-multithread-93.bc": "ef594ac7eeccbc305147f4f9a46c59d1f238a922d7f4466005079cba704d3479",
    "Bytecode/mnist_A-multithread-95.bc": "c51bde475c74477d96f0e21dfa55f2b61ca77120283ea678191b2aa7393cb81f",
    "Bytecode/mnist_A-multithread-97.bc": "774d304bd27f8465d208d6e58794d11d08682a879adef69ca3a1531292480824",
-   "Schedules/mnist_A.sch": "d3ff39ab7a4791d5ccbe9010a529737fbc87786f74084d270e5928247422f6fb"
+   "Schedules/mnist_A.sch": "ec6cda61a79cfdd64c65b068a9c6ab040ec5dc7c32b10e7fdd0595576e644270"
   },
   "status": "ok"
  },
@@ -11838,7 +11838,7 @@
    "Bytecode/mnist_A-multithread-93.bc": "4d08efaf63d7365aceccc825d322c0634fd225116067c9060b405abc7ca1939d",
    "Bytecode/mnist_A-multithread-95.bc": "c51bde475c74477d96f0e21dfa55f2b61ca77120283ea678191b2aa7393cb81f",
    "Bytecode/mnist_A-multithread-97.bc": "f0e981766920f3a5e7b77aa3646b6759b62ebab2e95c1826ba4e1e3723e408fd",
-   "Schedules/mnist_A.sch": "051bc1404698c1d0563db0c9e12824a0d394b7c30b093b58a21aab27d2ad6dc4"
+   "Schedules/mnist_A.sch": "ded9bf9ca6bde9c73d687561bfc4df41099b2698bce9277c851d32b4f0e7659b"
   },
   "status": "ok"
  },
@@ -11946,12 +11946,12 @@
    "Bytecode/mnist_A-multithread-93.bc": "ef594ac7eeccbc305147f4f9a46c59d1f238a922d7f4466005079cba704d3479",
    "Bytecode/mnist_A-multithread-95.bc": "c51bde475c74477d96f0e21dfa55f2b61ca77120283ea678191b2aa7393cb81f",
    "Bytecode/mnist_A-multithread-97.bc": "0f4df8fa0025e653e8c284463fdfd725eb66b948618f745826f0fa516e731e30",
-   "Schedules/mnist_A.sch": "a0ce69677ceffe0bfe89af45a63096573be41ca4809ad48f26ff34f097fc3775"
+   "Schedules/mnist_A.sch": "96c77799d99c747a8cfe9828c7818fff3992039cd06d057d3ebf73d6e291066e"
   },
   "status": "ok"
  },
  "mnist_full_A [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "mnist_full_A [-F 64 -X]": {
@@ -12060,7 +12060,7 @@
    "Bytecode/mnist_full_A-multithread-94.bc": "6cc6d8fa7d333d009cc4a6660366ea5a9a6c2659e873948267c490b72c3ec1b1",
    "Bytecode/mnist_full_A-multithread-95.bc": "bcda5fb081f2ba7e663f64e19a4e09c1ac9fd735e2749a382c1cb9b2dc3414e7",
    "Bytecode/mnist_full_A-multithread-98.bc": "df877d2e8eaf76dae20866bb47f18a6eff9677c562d2ca3ff672fc34201015d4",
-   "Schedules/mnist_full_A.sch": "13dd657f3c6c3f9a87b4b400bce6819761bfa6c37240885c2230c19e45afbe95"
+   "Schedules/mnist_full_A.sch": "38f10cae1241d347baa92340605479cdef1218489f7bf64bdffd35f77ef1460d"
   },
   "status": "ok"
  },
@@ -12280,7 +12280,7 @@
    "Bytecode/mnist_full_A-multithread-94.bc": "a945c437938c9839a92159abe9ff1cad9f40f1206bb57edb24f04f83d3dda405",
    "Bytecode/mnist_full_A-multithread-95.bc": "f52a718e15ae494397bcbffd9bdee315268b65fceb4e765ea617048ba410e918",
    "Bytecode/mnist_full_A-multithread-98.bc": "d85384403f530f9bba08cf7f089e5273551cda6a38bee0b66ba5fa249dce1e84",
-   "Schedules/mnist_full_A.sch": "abfa1f20cf0f62d09e3801864416f69d744af396c5887bd6c4e9d6f5be3d2a32"
+   "Schedules/mnist_full_A.sch": "6ac3c4ceff47c16ce009838c589a337f8b34c9c4f415de55c15bff3f484f5bff"
   },
   "status": "ok"
  },
@@ -12390,12 +12390,12 @@
    "Bytecode/mnist_full_A-multithread-94.bc": "6cc6d8fa7d333d009cc4a6660366ea5a9a6c2659e873948267c490b72c3ec1b1",
    "Bytecode/mnist_full_A-multithread-95.bc": "bcda5fb081f2ba7e663f64e19a4e09c1ac9fd735e2749a382c1cb9b2dc3414e7",
    "Bytecode/mnist_full_A-multithread-98.bc": "df877d2e8eaf76dae20866bb47f18a6eff9677c562d2ca3ff672fc34201015d4",
-   "Schedules/mnist_full_A.sch": "d240ee3e8c72963ee154cf2b382a1d6a73b1bd32787431409a472643e9ab326d"
+   "Schedules/mnist_full_A.sch": "b0095839e4108e5dee52289fb1deca69dc72b05ebcdb29f53a112525f0a21170"
   },
   "status": "ok"
  },
  "mnist_full_B [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "mnist_full_B [-F 64 -X]": {
@@ -12549,7 +12549,7 @@
    "Bytecode/mnist_full_B-multithread-95.bc": "a8a07f230a0227bdb7821205b54fdfa4619983550631f4e69f88e5ba1b33449e",
    "Bytecode/mnist_full_B-multithread-98.bc": "e3fbae45602bfff68ea968ef6a704c0a0592a7715b094748d05355dc9f86791d",
    "Bytecode/mnist_full_B-multithread-99.bc": "b0d6ec53be5ae19c9d57d1ad735e4c7c5f7a71282705d19badaef2826f14d2c2",
-   "Schedules/mnist_full_B.sch": "0812a7e9ea8e39d6484523aade1de88033b8d8679aeacdd066f7f484c36c54bf"
+   "Schedules/mnist_full_B.sch": "b6af45b217aea49ef8640c2ff3ff26234a0c7c67da8e532125f043da4a220c49"
   },
   "status": "ok"
  },
@@ -12859,7 +12859,7 @@
    "Bytecode/mnist_full_B-multithread-95.bc": "85fe395a6be0bd00b39b692d04c5c4fbc9bfafe3ae3926f0c2d38f03abfe3ada",
    "Bytecode/mnist_full_B-multithread-98.bc": "e3fbae45602bfff68ea968ef6a704c0a0592a7715b094748d05355dc9f86791d",
    "Bytecode/mnist_full_B-multithread-99.bc": "a3821d3f8905246c7799e1797fec5f70fccf2b05f8074799faa3e1c0f73ae4c1",
-   "Schedules/mnist_full_B.sch": "56494692df531cbdaac8d294fdd104bc0edd62f40f7cdff71fc9fd8b1899fa8c"
+   "Schedules/mnist_full_B.sch": "f50ad222a654d1313f675c4035b9e7711f1ff149d32b9aec1eda89169a5b3b21"
   },
   "status": "ok"
  },
@@ -13014,12 +13014,12 @@
    "Bytecode/mnist_full_B-multithread-95.bc": "a8a07f230a0227bdb7821205b54fdfa4619983550631f4e69f88e5ba1b33449e",
    "Bytecode/mnist_full_B-multithread-98.bc": "e3fbae45602bfff68ea968ef6a704c0a0592a7715b094748d05355dc9f86791d",
    "Bytecode/mnist_full_B-multithread-99.bc": "b0d6ec53be5ae19c9d57d1ad735e4c7c5f7a71282705d19badaef2826f14d2c2",
-   "Schedules/mnist_full_B.sch": "707ee7e6ba2e6dde384650acc795db904e17945732f7825572dfaac83e004d48"
+   "Schedules/mnist_full_B.sch": "43c3b68d3dc17403e5ee7f24fa5c8ca60f814d29b1069680e389a54994cf5d87"
   },
   "status": "ok"
  },
  "mnist_full_C [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "mnist_full_C [-F 64 -X]": {
@@ -13171,7 +13171,7 @@
    "Bytecode/mnist_full_C-multithread-95.bc": "4708e8b5d7136dfe6cd2de6cc1554793df62e3b1cd055ee17cce26b749d39ac2",
    "Bytecode/mnist_full_C-multithread-98.bc": "f84597b6a1ee1a7ac29609bec3e4f1bd8d27b3d74426cff66be3c939001e53e6",
    "Bytecode/mnist_full_C-multithread-99.bc": "c0beb27bcf48176cdcfdc75a9502accbbbae1bdb27f3e6b943986a3429b1c8bb",
-   "Schedules/mnist_full_C.sch": "332f0958eaef52ffb3b8a5e09b910911eda1d9b02400c3a3e3728e4f95511e7a"
+   "Schedules/mnist_full_C.sch": "d184bf0d5b7bab60bc6d418e1c32a1a9a5b8a1ad15e17a4c56326e1ca24c1691"
   },
   "status": "ok"
  },
@@ -13477,7 +13477,7 @@
    "Bytecode/mnist_full_C-multithread-95.bc": "98e45a81bba2bba74230f4eb8e763266af301cf03062c9c24850aab6dad3b4c3",
    "Bytecode/mnist_full_C-multithread-98.bc": "f84597b6a1ee1a7ac29609bec3e4f1bd8d27b3d74426cff66be3c939001e53e6",
    "Bytecode/mnist_full_C-multithread-99.bc": "c0beb27bcf48176cdcfdc75a9502accbbbae1bdb27f3e6b943986a3429b1c8bb",
-   "Schedules/mnist_full_C.sch": "28e525a5199c900c51061bd30f32b4f1f7161184bcd6258801a03b20a4db206d"
+   "Schedules/mnist_full_C.sch": "22c62793f6a5063036ce9e5445fd8f7adb5d9bf67d0bc03db4a596b11a89795b"
   },
   "status": "ok"
  },
@@ -13630,7 +13630,7 @@
    "Bytecode/mnist_full_C-multithread-95.bc": "4708e8b5d7136dfe6cd2de6cc1554793df62e3b1cd055ee17cce26b749d39ac2",
    "Bytecode/mnist_full_C-multithread-98.bc": "f84597b6a1ee1a7ac29609bec3e4f1bd8d27b3d74426cff66be3c939001e53e6",
    "Bytecode/mnist_full_C-multithread-99.bc": "c0beb27bcf48176cdcfdc75a9502accbbbae1bdb27f3e6b943986a3429b1c8bb",
-   "Schedules/mnist_full_C.sch": "49456f52d40bf80a49c9d30b42f88b41f3626e1a87bcd12d92f29c2582bad399"
+   "Schedules/mnist_full_C.sch": "a8c66ff6965fb684bf221e3ff1b380b5c379a3c57a593388c6243d32f0a86f55"
   },
   "status": "ok"
  },
@@ -13655,7 +13655,7 @@
   "status": "error"
  },
  "mnist_logreg [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: machine learning code not compatible with binary circuits",
+  "message": "mpcl.core.exceptions.CompilerError: machine learning code not compatible with binary circuits",
   "status": "error"
  },
  "mnist_logreg [-F 64 -X]": {
@@ -13691,7 +13691,7 @@
    "Bytecode/mnist_logreg-multithread-30.bc": "6eb7a621079a115f99680ffa6bfb6e11f591f9cd9cb0f09a8689fb850f3d738b",
    "Bytecode/mnist_logreg-multithread-5.bc": "599e6a7c10c6b057084acd0ae3fdc34b5efa353b8ab65f9c9db99bc7ad1dc2de",
    "Bytecode/mnist_logreg-multithread-8.bc": "650214580a7a86c9cf6a6e969ba32fc5d71b4b29ca67a1ed2b45a319d9e43c9b",
-   "Schedules/mnist_logreg.sch": "3b0af706e3977beacdf94c6d3fe9d68c34ca187f698c6c0e5b2520201f398c75"
+   "Schedules/mnist_logreg.sch": "105e22d16a4b5ad1353a990315b87a3e3e9d88c387def544d95762fecf6688f4"
   },
   "status": "ok"
  },
@@ -13765,7 +13765,7 @@
    "Bytecode/mnist_logreg-multithread-30.bc": "f85c48d0ad237754b01aac496c356e32445351894e649bde60b23aebd56e615f",
    "Bytecode/mnist_logreg-multithread-5.bc": "b4c680ca4de8bfd57c16d4eecb088df43c60b7f512eab03b9b868753d78f97ca",
    "Bytecode/mnist_logreg-multithread-8.bc": "650214580a7a86c9cf6a6e969ba32fc5d71b4b29ca67a1ed2b45a319d9e43c9b",
-   "Schedules/mnist_logreg.sch": "a22393688e8ae4b497d68a79e36b07950a4013c46ea18ae7c43f0882a2068dd0"
+   "Schedules/mnist_logreg.sch": "982f4acb3451b452bdfa393d9d2fd8e9fc1cdd03dc58e76f9877ac2cb0b5ed2f"
   },
   "status": "ok"
  },
@@ -13802,7 +13802,7 @@
    "Bytecode/mnist_logreg-multithread-30.bc": "0e91a55914f4791562f088a6c71e407a72f65d229cc2a29a34afc9e53a7952da",
    "Bytecode/mnist_logreg-multithread-5.bc": "599e6a7c10c6b057084acd0ae3fdc34b5efa353b8ab65f9c9db99bc7ad1dc2de",
    "Bytecode/mnist_logreg-multithread-8.bc": "650214580a7a86c9cf6a6e969ba32fc5d71b4b29ca67a1ed2b45a319d9e43c9b",
-   "Schedules/mnist_logreg.sch": "22a5ba71a55007d26b6ae65d8070fa5cfd5bd654c58a16aa03246131b867e68f"
+   "Schedules/mnist_logreg.sch": "6518e75551affff13d74d21ffd2c70e6c8e12b5ff404154b08bf8e62428395b4"
   },
   "status": "ok"
  },
@@ -13833,7 +13833,7 @@
    "Bytecode/oram_tutorial-Pow2(2)_10-26.bc": "04b1dc8fb451bcc52046c50d6fcecd5d8c44c562a9d1d59e6ea02d4129e21a85",
    "Bytecode/oram_tutorial-multithread-1.bc": "3c520a68a57debcd718512691e8e1d55a4dc199605b807ecd07830ec449ab908",
    "Bytecode/oram_tutorial-multithread1-4.bc": "42348d98ffbcdcdc69bd4f1a7ae23c079945c2b7c7f69d0eec2e4d88b3402313",
-   "Schedules/oram_tutorial.sch": "236187b7fcbd2a498a816bcb45a502089be2a8c9461c28e703ae9711bd4e1830"
+   "Schedules/oram_tutorial.sch": "26dba2c05c3321ba2fabb5b0b9f94af1fa3a1b6593d06389077fd42d5bba8880"
   },
   "status": "ok"
  },
@@ -13887,7 +13887,7 @@
    "Bytecode/oram_tutorial-TruncInRing(2)_10-31.bc": "6934ba978625a48a064f2627db7f8c86de5ed729671c804df4ac82fa28af551d",
    "Bytecode/oram_tutorial-multithread-1.bc": "12e3a43ba3cf6120ad0e1cbdd7de0af08d2e585eeb02e208af48da4140e177bb",
    "Bytecode/oram_tutorial-multithread1-4.bc": "3259374f536a140798c241e28ad3f14de16884d8234224cfb34af24e27842284",
-   "Schedules/oram_tutorial.sch": "d97e556a1408692b457321a9834c8523874f0f0104292b79ead1c498400d0f43"
+   "Schedules/oram_tutorial.sch": "c48941b94e9cee83a1d1a57e9836ce43f8a738202d8a9ed9ac31c070a9d0ca9b"
   },
   "status": "ok"
  },
@@ -13911,12 +13911,12 @@
    "Bytecode/oram_tutorial-Pow2(2)_10-26.bc": "7f425df074294a0c4fa8199eeea2d055361cf12200c8d5b84f5b164a201d3c9d",
    "Bytecode/oram_tutorial-multithread-1.bc": "3536d30d456ed6b34a472577d4fb4f87770c4c73e1d343a318a038dc867204dc",
    "Bytecode/oram_tutorial-multithread1-4.bc": "e6b8640abec6f9774f0525a94d589f80f1c374dbe4c479442eec71cb75e257bc",
-   "Schedules/oram_tutorial.sch": "53082043da85a2e59b4a3481512c7749290f9e009d3e08de739486f3d62f49de"
+   "Schedules/oram_tutorial.sch": "b8ef5c0ee92940902cdf32b73881e9bee1ab1687034af6070b56a68416e70f7e"
   },
   "status": "ok"
  },
  "prep_aes [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: cannot create Array of <class 'Compiler.compilerLib.Compiler.build_vars.<locals>.dummy'>",
+  "message": "mpcl.core.exceptions.CompilerError: cannot create Array of <class 'mpcl.core.driver.Compiler.build_vars.<locals>.dummy'>",
   "status": "error"
  },
  "prep_aes [-F 64 -X]": {
@@ -14040,23 +14040,23 @@
   "status": "error"
  },
  "test_args [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
   "status": "error"
  },
  "test_args [-F 64 -X]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
   "status": "error"
  },
  "test_args [-R 64 -Y]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
   "status": "error"
  },
  "test_args [-R 64]": {
-  "message": "Compiler.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
   "status": "error"
  },
  "test_args []": {
-  "message": "Compiler.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
+  "message": "mpcl.core.exceptions.CompilerError: Cannot have more than one compiler instance. It's not possible to run direct compilation programs with compile.py or compile-run.py.",
   "status": "error"
  },
  "test_dot [-B 32]": {
@@ -14202,7 +14202,7 @@
    "Bytecode/test_path_oblivious_heap-LTZ(2)_65-5.bc": "994e3113e420bd50d33df9662b752d6aea3ffbcb3d3c0287cd1c721a5cda150d",
    "Bytecode/test_path_oblivious_heap-LTZ(3)_65-11.bc": "95034c434be48c0e5cefe141a479c931fcf99d02f19680f55bc114d3b507438f",
    "Bytecode/test_path_oblivious_heap-LTZ(36)_65-14.bc": "c412574d8ff7c6eb8116ceaf7c39e549aaa04e9a374e0569c635282fcf6ee64d",
-   "Schedules/test_path_oblivious_heap.sch": "404f51c7b98e5444282ea4b75c0e518b202e9969d357649a96cc909b0d68b456"
+   "Schedules/test_path_oblivious_heap.sch": "88e44e4de4d447e37dbc5c5de469c86fee967b433c3871db3e8eb45cf1f82137"
   },
   "status": "ok"
  },
@@ -14236,7 +14236,7 @@
    "Bytecode/test_path_oblivious_heap-LTZ(2)_64-5.bc": "e24119e576b338f31db78394cad1377c5fd9dbdde11188e887afb7fb5d15b079",
    "Bytecode/test_path_oblivious_heap-LTZ(3)_64-11.bc": "93c19b54739b54fc7f1bb2c67fcfdd625e38810735af8f6aba2c430d7354e236",
    "Bytecode/test_path_oblivious_heap-LTZ(36)_64-14.bc": "3a5a99b4ed497ba346da06c076afd82104331deeab63a8b294a5d6289a3dcffd",
-   "Schedules/test_path_oblivious_heap.sch": "b31196cea5949277e01b477d4351b88c2937003dfef150e6ba3672031d4cfb4c"
+   "Schedules/test_path_oblivious_heap.sch": "ddc66603f94deec8b386dbc924a518877e4cfc570966f17fa09539da8218c99e"
   },
   "status": "ok"
  },
@@ -14253,12 +14253,12 @@
    "Bytecode/test_path_oblivious_heap-LTZ(2)_65-5.bc": "5d6ac2449043446891f543df5b164d6575850b850a32eeb004d56ae671acea5c",
    "Bytecode/test_path_oblivious_heap-LTZ(3)_65-11.bc": "ea841b44ed7381b0f659de74bfca4ea07ce63fb402f65eb0b96cf658a1b5a86d",
    "Bytecode/test_path_oblivious_heap-LTZ(36)_65-14.bc": "efb482aedaca60d6776e133ab53ddd916d476b187f2d6dd4658b9fda117b0515",
-   "Schedules/test_path_oblivious_heap.sch": "151079f65efb2082b5b209f67b0319119c004717e59a3dc08d0eae69f154b90c"
+   "Schedules/test_path_oblivious_heap.sch": "cde98e42cffc2c8418fed02247e99c7ae453c359e657d655ebd349b1d2db2263"
   },
   "status": "ok"
  },
  "test_permute [-B 32]": {
-  "message": "Compiler.exceptions.CompilerError: cint not available with binary circuits. See https://mp-spdz.readthedocs.io/en/latest/Compiler.html#Compiler.types.cint",
+  "message": "mpcl.core.exceptions.CompilerError: cint not available with binary circuits. See https://mp-spdz.readthedocs.io/en/latest/Compiler.html#Compiler.types.cint",
   "status": "error"
  },
  "test_permute [-F 64 -X]": {
@@ -14712,7 +14712,7 @@
    "Bytecode/tpmpc_tutorial-EQZ(100)_32-3.bc": "61197b0bd9d5da3e49b4fa626c2903ba785a56dbcf96146776e63ecf96748c6e",
    "Bytecode/tpmpc_tutorial-FPDiv(1)_31_16-6.bc": "427841fa522513e423c008a86c6941c6f748cc7b12962e0272aca88a23cd916c",
    "Bytecode/tpmpc_tutorial-LTZ(1)_33-1.bc": "d9b1e0011f8fb4cfad1e767baabd664e8823f2ae1e043fa5a797ec17a3415986",
-   "Schedules/tpmpc_tutorial.sch": "1e775bdd87f919396738633d36dd2e0b2d3ef53ecb75850c11d3b42003ddf6e5"
+   "Schedules/tpmpc_tutorial.sch": "4e4148932a44711053f2fd31881e24329294ad1b8d76f373c3b69d3ebb4540be"
   },
   "status": "ok"
  },
@@ -14734,7 +14734,7 @@
    "Bytecode/tpmpc_tutorial-EQZ(100)_32-3.bc": "230dfb0d0ba4ecdf3b95905282a47cf6a61d6442a01629591c46e43325d79c01",
    "Bytecode/tpmpc_tutorial-FPDiv(1)_31_16-6.bc": "5cbc28416238bf78f2d889805b692ecde15d9aa1084c6fe9bfc39cc5e5ab39d1",
    "Bytecode/tpmpc_tutorial-LTZ(1)_33-1.bc": "f3b26f4e86c9da0289f9320e3d9d05669e73d63968b5d74bbaa8f1c605e87d92",
-   "Schedules/tpmpc_tutorial.sch": "976b1cc87c04a9fc7b34c7ba21caf00971cd66d7382fa460ebc35fd2d4b8b92b"
+   "Schedules/tpmpc_tutorial.sch": "99d3ea45d53d2b3d97358eadf31a76deeb328d295c00a03855ec4d415ee9d72d"
   },
   "status": "ok"
  },
@@ -14745,7 +14745,7 @@
    "Bytecode/tpmpc_tutorial-EQZ(100)_32-3.bc": "54ff8a0630e661bf9d83ddcaf0f8c1f4a4e3d5834f4ce04db5f3e9f1ed3015b8",
    "Bytecode/tpmpc_tutorial-FPDiv(1)_31_16-6.bc": "5f0e4c11faefe90650c4133cb9fbc4ce4acf44a40c983ee9248bf499ec61035f",
    "Bytecode/tpmpc_tutorial-LTZ(1)_33-1.bc": "6f9c49453965a4a69117f7e5f391a63036b826c6e04e0d809aec7d4b6ab729ae",
-   "Schedules/tpmpc_tutorial.sch": "c377d35e66e771aa997c084d14c70c583eb8f90459e860591f40904df359b855"
+   "Schedules/tpmpc_tutorial.sch": "085555621337e1af26a2de766700ac0d866ba51a315f3f4e38d5be7ea6e56188"
   },
   "status": "ok"
  },
@@ -14781,7 +14781,7 @@
    "Bytecode/tutorial-TruncPr(1)_47_16-9.bc": "d81788e7632209c2669f997838164087084cdd76c6156aa4277cb326a5cb543c",
    "Bytecode/tutorial-TruncPr(3)_47_16-17.bc": "1f3cc3b74e26d1b4e4415b28d3285aacd1a9f951cdcd4cd60cd1d2959451da27",
    "Bytecode/tutorial-TruncPr(6)_47_16-19.bc": "3e5026a9a045dac249abce3fcb481ac5c1d67db980c0f0fcc975b053dec353d7",
-   "Schedules/tutorial.sch": "2443e07b4c5fe4a0c8187f16c4a62ff398b7665c6f32f162e96d64a7e83b3896"
+   "Schedules/tutorial.sch": "c1e112874fa8ca08a751d270de21e309a491a2126e2bf0411e777a0b676da84e"
   },
   "status": "ok"
  },
@@ -14817,7 +14817,7 @@
    "Bytecode/tutorial-TruncPr(1)_47_16-9.bc": "f71d94e26e383d1dcaa3793eefc16720cc335dfe947de4698197bce89020332b",
    "Bytecode/tutorial-TruncPr(3)_47_16-17.bc": "de9a967be3d187871f69666c06e2bd8ed6f2373b30c183389a78da1ab49db850",
    "Bytecode/tutorial-TruncPr(6)_47_16-19.bc": "e48047b9b496dee017138418d068c71b18447ab834a0e7495dd87c97b333f20f",
-   "Schedules/tutorial.sch": "a7a575305fc26ab7227d31d38b96e06a616ba3d13a007c09bc8fcd07d247b340"
+   "Schedules/tutorial.sch": "4151590327d6bd9c88d0b4b5102af0ed6bc34d036ce2db1a248b633a4c25ce71"
   },
   "status": "ok"
  },
@@ -14835,7 +14835,7 @@
    "Bytecode/tutorial-TruncPr(1)_47_16-9.bc": "d81788e7632209c2669f997838164087084cdd76c6156aa4277cb326a5cb543c",
    "Bytecode/tutorial-TruncPr(3)_47_16-17.bc": "1f3cc3b74e26d1b4e4415b28d3285aacd1a9f951cdcd4cd60cd1d2959451da27",
    "Bytecode/tutorial-TruncPr(6)_47_16-19.bc": "3e5026a9a045dac249abce3fcb481ac5c1d67db980c0f0fcc975b053dec353d7",
-   "Schedules/tutorial.sch": "7e0c1684f1c0bd03b3253f2097ace440af22c9c2293031694ad14af3df0754d8"
+   "Schedules/tutorial.sch": "5cbd234a05160ed397e88c26e0ebbfc077dacd55c03a088626d5a71c94b94375"
   },
   "status": "ok"
  },
@@ -14851,23 +14851,23 @@
   "files": {
    "Bytecode/vickrey-0.bc": "a00e0658517194aedefcbd7b27272843eb05fcc2466a50f580ff49bec7914a45",
    "Bytecode/vickrey-thread-1.bc": "61ddd19c3634f7d672491546af845e28aa29d24da69ebc10c6476d7a633cbf6d",
-   "Schedules/vickrey.sch": "1429d33feb9aaf70f337ccb3b9b23b540c1af917c72c0787121e7929ec16f22c"
+   "Schedules/vickrey.sch": "bb8088b6852b6e0873d6f13c7b748e5e7dbb9c14d73badda0fcd71b397aecb2a"
   },
   "status": "ok"
  },
  "vickrey [-R 64 -Y]": {
-  "message": "Compiler.exceptions.CompilerError: ring size too small for comparison, compile with '-R 65' or more (maybe '-R 128' as it is supported by default)",
+  "message": "mpcl.core.exceptions.CompilerError: ring size too small for comparison, compile with '-R 65' or more (maybe '-R 128' as it is supported by default)",
   "status": "error"
  },
  "vickrey [-R 64]": {
-  "message": "Compiler.exceptions.CompilerError: ring size too small for comparison, compile with '-R 65' or more (maybe '-R 128' as it is supported by default)",
+  "message": "mpcl.core.exceptions.CompilerError: ring size too small for comparison, compile with '-R 65' or more (maybe '-R 128' as it is supported by default)",
   "status": "error"
  },
  "vickrey []": {
   "files": {
    "Bytecode/vickrey-0.bc": "eade6fb528425c4a68e8f4b2bae79257c7d3895cbcb01adb88b3c923f358a730",
    "Bytecode/vickrey-thread-1.bc": "08d308372a491f53af5bda7a12da8e1b2f85a6dba1fb42376b9f3bffe101a8bd",
-   "Schedules/vickrey.sch": "32580c28d383bc61fd6125223692a74fcc787e508c5a74a5a5260bba02eeb6c7"
+   "Schedules/vickrey.sch": "ca287de21782559c02f0361cf4bc7b569aaa6a09ec2db9e7c7aa0295ed2bb2b5"
   },
   "status": "ok"
  }

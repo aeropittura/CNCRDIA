@@ -498,7 +498,7 @@ class Program(object):
         else:
             sch_file.write("lgp:%s" % req)
         sch_file.write("\n")
-        sch_file.write("opts: %s\n" % " ".join(self.relevant_opts))
+        sch_file.write("opts: %s\n" % " ".join(sorted(self.relevant_opts)))
         sch_file.write("sec:%d\n" % self.used_security)
         req2 = set(x.req_bit_length["2"] for x in self.tapes)
         req2.add(0)

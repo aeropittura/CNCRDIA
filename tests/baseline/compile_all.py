@@ -52,6 +52,11 @@ def fingerprint_tree(root):
                 # location of compile.py; make it independent of the checkout
                 content = content.replace(
                     os.path.join(REPO, 'compile.py').encode(), b'compile.py')
+                # older compilers wrote the options in set order
+                content = re.sub(
+                    rb'(?m)^opts: (.*)$',
+                    lambda m: b'opts: ' + b' '.join(sorted(m.group(1).split())),
+                    content)
             digests[sub + '/' + name] = hashlib.sha256(content).hexdigest()
     return digests
 
