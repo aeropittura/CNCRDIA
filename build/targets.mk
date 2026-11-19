@@ -90,7 +90,10 @@ $(RELEASE_LIB): $(MALREP_OPTIONS) $(VM_CORE_OBJS) $(CORE_OBJS) \
 		$(TINIER_OBJS) $(BOOLEAN_OBJS)
 	$(AR) -csr $@ $^
 
-clean: clean-deps
+# clean-objects keeps the third-party builds, which take long to redo
+clean: clean-objects clean-deps
+
+clean-objects:
 	-rm -f $(shell find $(SOURCE_DIRS) -name '*.o' -o -name '*.d') \
 		*.x core.* *.a *.so static/*.x static/*.map
 

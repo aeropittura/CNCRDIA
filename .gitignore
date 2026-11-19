@@ -126,3 +126,4 @@ docs/readme.md
 docs/xml
 .venv/
 local/
+compile_commands.json
