@@ -596,15 +596,15 @@ class PositionMap(Generic[T, B]):
             if debug:
                 lib.print_ln(
                     'Initializing LinearPositionMap at depth %s of size %s', k, n)
-            res = LinearPositionMap(permutation, value_type, k=k)
+            result = LinearPositionMap(permutation, value_type, k=k)
         else:
             if debug:
                 lib.print_ln(
                     'Initializing RecursivePositionMap at depth %s of size %s', k, n)
-            res = RecursivePositionMap(permutation, period, value_type, k=k,
+            result = RecursivePositionMap(permutation, period, value_type, k=k,
                                        **kwargs)
 
-        return res
+        return result
 
 
 class RecursivePositionMap(PositionMap[T, B], SqrtOram[T, B]):

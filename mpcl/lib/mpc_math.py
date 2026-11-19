@@ -200,9 +200,9 @@ def scos(w, s):
     v = w
     v_2 = v ** 2
     # calculate the cos using polynomial evaluation
-    tmp = p_eval(p_3508, v_2)
+    temp = p_eval(p_3508, v_2)
     # adjust sign according to the movement in the reduction
-    local_cos = s.if_else(-tmp, tmp)
+    local_cos = s.if_else(-temp, temp)
     return local_cos
 
 
@@ -276,12 +276,12 @@ def exp2_fx(a, zero_output=False, as19=False):
         # improve precision
         my_fix.set_precision(a.k - 2, a.k)
         n_shift = a.k - 2 - a.f
-        res_k = 2 * a.k - n_shift
+        result_k = 2 * a.k - n_shift
         x = my_fix._new(frac.v << n_shift)
         # evaluates fractional part of a in p_1045
         e = p_eval(p_1045, x)
         g = a._new(whole_exp.TruncMul(e.v, 2 * a.k, n_shift,
-                                           nearest=a.round_nearest), res_k, a.f)
+                                           nearest=a.round_nearest), result_k, a.f)
         return g
     # how many bits to use from integer part
     n_int_bits = int(math.ceil(math.log(a.k - a.f, 2)))
@@ -427,10 +427,10 @@ def mux_exp(x, y, block_size=8, neg_only=False, time=False, debug=False):
         for j in range(len(one_hot)):
             try:
                 if neg_only:
-                    pos = i < len(bits) - block_size
+                    position = i < len(bits) - block_size
                 else:
-                    pos = j < len(one_hot) / 2 or i < len(bits) - block_size
-                if pos:
+                    position = j < len(one_hot) / 2 or i < len(bits) - block_size
+                if position:
                     entry = j * 2 ** (i - y.f)
                 else:
                     entry = (j - len(one_hot)) * 2 ** (i - y.f)
@@ -440,11 +440,11 @@ def mux_exp(x, y, block_size=8, neg_only=False, time=False, debug=False):
         if debug:
             print('table values in block %d (%d):' % (i, len(exp)),
                   [e * 2 ** -y.f for e in exp])
-        max_res = 2 ** (y.k - 1)
-        bin_part = [0] * max(x.bit_length() for x in exp if x < max_res)
+        max_result = 2 ** (y.k - 1)
+        bin_part = [0] * max(x.bit_length() for x in exp if x < max_result)
         for j in range(len(bin_part)):
             for k, (a, b) in enumerate(zip(one_hot, exp)):
-                if b < max_res and b != 0:
+                if b < max_result and b != 0:
                     bin_part[j] ^= a if util.bit_decompose(b, len(bin_part))[j] \
                         else 0
             if util.is_zero(bin_part[j]):
@@ -460,10 +460,10 @@ def mux_exp(x, y, block_size=8, neg_only=False, time=False, debug=False):
     if time:
         library.stop_timer(2)
         library.start_timer(3)
-    res = util.tree_reduce(operator.mul, parts)
+    result = util.tree_reduce(operator.mul, parts)
     if time:
         library.stop_timer(3)
-    return res
+    return result
 
 
 @types.vectorize
@@ -795,8 +795,8 @@ def lin_app_SQ(b, k, f):
     # normalization factor W* 1/2 ^{f/2}
     w = w * W * types.cfix(1.0 / (2 ** (f / 2.0)))
     # now we need to  elminate an additional root of 2 in case m was odd
-    sqr_2 = types.cfix((2 ** (1 / 2.0)))
-    w = (1 - m) * w + sqr_2 * w * m
+    square_2 = types.cfix((2 ** (1 / 2.0)))
+    w = (1 - m) * w + square_2 * w * m
 
     return w
 
@@ -868,8 +868,8 @@ def sqrt(x, k=None, f=None):
         return sqrt_simplified_fx(x)
         # raise OverflowError("bound for precision violated: 3 * k - 2 * f <  x.f ")
     else:
-        param = trunc(x *(2 ** (f)))
-        return sqrt_fx(param ,k ,f)
+        parameter = trunc(x *(2 ** (f)))
+        return sqrt_fx(parameter ,k ,f)
 
 
 @instructions_base.sfix_cisc
@@ -974,12 +974,12 @@ def SqrtComp(z, old=False, sfix=types.sfix):
     c1 = sfix(2 ** ((f + 1) / 2 + 1))
     c0 = sfix(2 ** (f / 2 + 1))
     a = [z[2 * i].bit_or(z[2 * i + 1]) for i in range(k_prime)]
-    tmp = sfix._new(types.sint.bit_compose(reversed(a[:2 * f_prime])))
+    temp = sfix._new(types.sint.bit_compose(reversed(a[:2 * f_prime])))
     if old:
         b = sum(types.sint.conv(zi).if_else(i, 0) for i, zi in enumerate(z)) % 2
     else:
         b = util.tree_reduce(lambda x, y: x.bit_xor(y), z[::2])
-    return types.sint.conv(b).if_else(c1, c0) * tmp
+    return types.sint.conv(b).if_else(c1, c0) * temp
 
 @types.vectorize
 @instructions_base.sfix_cisc

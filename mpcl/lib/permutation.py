@@ -94,10 +94,10 @@ def configure_waksman(perm, n_iter=[0]):
     O = [None] * (n//2)
     p0 = [None] * (n//2)
     p1 = [None] * (n//2)
-    inv_perm = [0] * n
+    inverse_permutation = [0] * n
 
     for i, p in enumerate(perm):
-        inv_perm[p] = i
+        inverse_permutation[p] = i
 
     while True:
         try:
@@ -112,7 +112,7 @@ def configure_waksman(perm, n_iter=[0]):
             n_iter[0] += 1
             #print '    I[%d] = %d' % (inv_perm[j]/2, ((inv_perm[j] % 2) + via) % 2)
 
-            i = inv_perm[j]
+            i = inverse_permutation[j]
             #print '    p0[%d] = %d' % (inv_perm[j]/2, j/2)
             p0[i//2] = j//2
 

@@ -101,27 +101,27 @@ ot_cost = 64
 spdz2k_sec = 64
 
 def lowgear_cipher_length(l):
-    res = (30 + 2 * l) // 8
-    return res
+    result = (30 + 2 * l) // 8
+    return result
 
 def highgear_cipher_lengths(l):
-    res = 71 + 16 * l, 57 + 8 * l
-    return res
+    result = 71 + 16 * l, 57 + 8 * l
+    return result
 
 def highgear_cipher_limbs(l):
-    res = sum(int(math.ceil(x / 64)) for x in highgear_cipher_lengths(l))
-    return res
+    result = sum(int(math.ceil(x / 64)) for x in highgear_cipher_lengths(l))
+    return result
 
 def highgear_decrypt_length(l):
     return highgear_cipher_lengths(l)[0] / 8 + 1
 
 def hemi_cipher_length(l):
-    res = 16 * l + 77
-    return res
+    result = 16 * l + 77
+    return result
 
 def hemi_cipher_limbs(l):
-    res = int(math.ceil(hemi_cipher_length(l) / 64))
-    return res
+    result = int(math.ceil(hemi_cipher_length(l) / 64))
+    return result
 
 variable = {
     '^shamir': lambda N: N * (N - 1) // 2,
@@ -342,9 +342,9 @@ def expected_communication(protocol, req_num, length, n_parties=None,
     from mpcl.core.program import Tape
     get_int = lambda x: req_num.get(('modp', x), 0)
     get_bit = lambda x: req_num.get(('bit', x), 0)
-    res = Comm()
+    result = Comm()
     if not protocol:
-        return res
+        return result
     if not n_parties:
         try:
             if get_match(fixed, protocol):
@@ -373,16 +373,16 @@ def expected_communication(protocol, req_num, length, n_parties=None,
     n_mults = get_int('simple multiplication')
     matrix_cost = apply_length(
         get_match_variable(matrix_triples, protocol, n_parties), length)
-    use_diag_matrix = get_match(diag_matrix, protocol)
+    use_diagonal_matrix = get_match(diag_matrix, protocol)
     use_triple_number = False
     if find_match(cheap_dot_product, protocol):
         n_mults += get_int('dot product')
-    elif (not matrix_cost and not use_diag_matrix) or force_triple_use:
+    elif (not matrix_cost and not use_diagonal_matrix) or force_triple_use:
         use_triple_number = True
         n_mults = get_int('triple')
     and_cost = get_and_cost(protocol, n_parties)
     if and_cost:
-        res += Comm(and_cost) * my_ceil(get_bit('triple') / 8)
+        result += Comm(and_cost) * my_ceil(get_bit('triple') / 8)
     else:
         n_mults += get_bit('triple') / (length * 8)
     bit_cost = Comm(apply_length(
@@ -407,9 +407,9 @@ def expected_communication(protocol, req_num, length, n_parties=None,
             return Comm(0, (unit[1] or unit[0]) + sum(
                 apply_length(output_cost, l)))
     square_cost = apply_length(square_unit, length)
-    res += square_cost * get_int('square')
+    result += square_cost * get_int('square')
     if bit_cost:
-        res += bit_cost * get_int('bit')
+        result += bit_cost * get_int('bit')
     elif get_match_variable(bits_from_squares, protocol, n_parties):
         if square_cost:
             if get_match(ring, protocol):
@@ -420,30 +420,30 @@ def expected_communication(protocol, req_num, length, n_parties=None,
         else:
             bit_cost = Comm(0, offline=sum(
                 unit + random_cost + length * output_cost))
-        res += bit_cost * get_int('bit')
+        result += bit_cost * get_int('bit')
     else:
         bit_cost = Comm(0, offline=sum(
             threshold * unit + (threshold + 1) * input_cost))
-        res += bit_cost * get_int('bit')
-    res += unit * n_mults
+        result += bit_cost * get_int('bit')
+    result += unit * n_mults
     if not unit:
         sh_protocol = re.sub('mal-', '', protocol)
         sh_unit = get_mul_cost(sh_protocol, n_parties)
         sh_random_unit = get_match_variable(
             variable_random, sh_protocol, n_parties)
         if sh_unit:
-            res += length * Comm(
+            result += length * Comm(
                 sum(2 * output_cost * n_mults),
                 my_floor(n_mults * (3 * sh_random_unit + 2 * sh_unit + \
                                     2 * sum(output_cost))))
-    res += Comm(get_match(trunc_pr, protocol)) * length * \
+    result += Comm(get_match(trunc_pr, protocol)) * length * \
         get_int('probabilistic truncation')
-    res += Comm(bit2a.get(x)) * length * get_int('bit2A')
-    res += output_cost * length * get_int('open')
-    res += output_cost * get_bit('open')
-    res += get_match(dabit_from_bit, protocol) * bit_cost * get_int('dabit')
-    res += random_cost * get_int('random')
-    res += get_int('cut random') * apply_length(
+    result += Comm(bit2a.get(x)) * length * get_int('bit2A')
+    result += output_cost * length * get_int('open')
+    result += output_cost * get_bit('open')
+    result += get_match(dabit_from_bit, protocol) * bit_cost * get_int('dabit')
+    result += random_cost * get_int('random')
+    result += get_int('cut random') * apply_length(
         get_match(fixed_randoms, protocol), length)
     shuffle_correction = not find_match(shuffle_application, protocol)
     def get_node():
@@ -453,15 +453,15 @@ def expected_communication(protocol, req_num, length, n_parties=None,
     for x in req_num:
         if len(x) >= 3 and x[0] == 'modp':
             if x[1] == 'input':
-                res += input_cost * req_num[x]
+                result += input_cost * req_num[x]
             elif x[1] == 'shuffle application':
                 shuffle_cost = apply_length(
                     get_match(shuffle_application, protocol), length)
                 if shuffle_cost:
-                    res += Comm(shuffle_cost) * req_num[x] * x[2]
+                    result += Comm(shuffle_cost) * req_num[x] * x[2]
                 elif find_match(cheap_dot_product, protocol) or \
                      'dealer' in protocol:
-                    res += shuffle_base.n_swaps(x[2] // x[3]) * \
+                    result += shuffle_base.n_swaps(x[2] // x[3]) * \
                         (threshold + 1) * req_num[x] * unit * (x[3] + malicious)
                 elif shuffle_correction:
                     node = get_node()
@@ -473,12 +473,12 @@ def expected_communication(protocol, req_num, length, n_parties=None,
                     shuffle_base.add_apply_usage(
                         node, x[2], x[3], add_shuffles=False,
                         malicious=malicious, n_relevant_parties=threshold + 1)
-                    res += req_num[x] * \
+                    result += req_num[x] * \
                         expected_communication(protocol, node.num, length,
                                                force_triple_use=True)
             elif x[1] == 'shuffle generation':
                 if 'dealer' in protocol:
-                    res += Comm(
+                    result += Comm(
                         req_num[x] * shuffle_base.n_swaps(x[2]) * length)
                 else:
                     req_node = get_node()
@@ -490,28 +490,28 @@ def expected_communication(protocol, req_num, length, n_parties=None,
                             req_node, x[2], add_shuffles=False,
                             malicious=malicious,
                             n_relevant_parties=threshold + 1)
-                    res += req_num[x] * \
+                    result += req_num[x] * \
                         expected_communication(protocol, req_node.num, length)
         elif x[0] == 'matmul':
             mm_unit = Comm()
-            if use_diag_matrix:
-                dims = list(x[1])
-                if dims[0] > dims[2]:
-                    dims[0::2] = dims[2::-2]
+            if use_diagonal_matrix:
+                dimensions = list(x[1])
+                if dimensions[0] > dimensions[2]:
+                    dimensions[0::2] = dimensions[2::-2]
                 mm_unit += Comm(
-                    offline=use_diag_matrix(n_parties, length, dims))
+                    offline=use_diagonal_matrix(n_parties, length, dimensions))
                 matrix_cost = Comm(unit.online / 2)
-            for idx in ((0, 1), (1, 2)):
+            for index in ((0, 1), (1, 2)):
                 mm_unit += Comm(matrix_cost.online) * \
-                    x[1][idx[0]] * x[1][idx[1]]
+                    x[1][index[0]] * x[1][index[1]]
             mm_unit += Comm(offline=matrix_cost.offline) * x[1][0] * x[1][2]
-            res += mm_unit * req_num[x]
+            result += mm_unit * req_num[x]
         elif re.search('edabit', x[0]):
             edabit = get_match_variable(variable_edabit, protocol, n_parties)
             if edabit:
-                res += Comm(offline=edabit(x[1])(length)) * req_num[x]
+                result += Comm(offline=edabit(x[1])(length)) * req_num[x]
         elif len(x) > 1 and x[0] == 'bit' and x[1] == 'shuffle':
-            res += my_ceil(req_num[x] * x[3] / 128) * x[2] * 32 * 2 * 2 * \
+            result += my_ceil(req_num[x] * x[3] / 128) * x[2] * 32 * 2 * 2 * \
                 Comm(0, ot_cost) * (1 + 1 / 16)
-    res.n_parties = n_parties
-    return res
+    result.n_parties = n_parties
+    return result

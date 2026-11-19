@@ -57,14 +57,14 @@ class BlockAllocator:
                     block_size = 0
         if block_size >= size:
             available = self.by_size(block_size)
-            addr = min(available)
-            available.remove(addr)
-            del self.by_address[addr]
+            address = min(available)
+            available.remove(address)
+            del self.by_address[address]
             diff = block_size - size
             if diff:
-                self.by_size(diff).add(addr + size)
-                self.by_address[addr + size] = diff
-            return addr
+                self.by_size(diff).add(address + size)
+                self.by_address[address + size] = diff
+            return address
 
 class AllocRange:
     def __init__(self, base=0):
@@ -78,12 +78,12 @@ class AllocRange:
         if self.pool[size]:
             return self.pool[size].pop()
         elif self.grow or self.top + size <= self.limit:
-            res = self.top
+            result = self.top
             self.top += size
             self.limit = max(self.limit, self.top)
             if self.top >= REG_MAX:
                 raise RegisterOverflowError(size, self.top, location)
-            return res
+            return result
 
     def free(self, base, size):
         assert self.base <= base < self.top
@@ -93,20 +93,20 @@ class AllocRange:
         self.grow = False
 
     def consolidate(self):
-        regs = []
+        registers = []
         for size, pool in self.pool.items():
             for base in pool:
-                regs.append((base, size))
-        for base, size in reversed(sorted(regs)):
+                registers.append((base, size))
+        for base, size in reversed(sorted(registers)):
             if base + size == self.top:
                 self.top -= size
                 self.pool[size].remove(base)
-                regs.pop()
+                registers.pop()
             else:
                 if program.Program.prog.verbose:
                     print('cannot free %d register blocks '
                           'by a gap of %d at %d' %
-                          (len(regs), self.top - size - base, base))
+                          (len(registers), self.top - size - base, base))
                 break
 
 class AllocPool:
@@ -117,10 +117,10 @@ class AllocPool:
 
     def alloc(self, reg_type, size, location=None):
         for r in self.ranges[reg_type]:
-            res = r.alloc(size, location=location)
-            if res is not None:
-                self.by_base[reg_type, res] = r
-                return res
+            result = r.alloc(size, location=location)
+            if result is not None:
+                self.by_base[reg_type, result] = r
+                return result
 
     def free(self, reg):
         try:
@@ -176,8 +176,8 @@ class StraightlineAllocator:
 
         reg_type = reg.reg_type
         size = base.size
-        res = free.alloc(reg_type, size, location=block.name)
-        self.alloc[base] = res
+        result = free.alloc(reg_type, size, location=block.name)
+        self.alloc[base] = result
 
         base.i = self.alloc[base]
 
@@ -233,7 +233,7 @@ class StraightlineAllocator:
         alloc_pool = block.alloc_pool
         self.update_usage(alloc_pool)
         for k,i in enumerate(reversed(program)):
-            unused_regs = []
+            unused_registers = []
             for j in i.get_def():
                 if j.vectorbase in self.alloc:
                     if j in self.defined:
@@ -243,15 +243,15 @@ class StraightlineAllocator:
                 else:
                     # unused register
                     self.alloc_reg(j, block)
-                    unused_regs.append(j)
-            if unused_regs and len(unused_regs) == len(list(i.get_def())) and \
+                    unused_registers.append(j)
+            if unused_registers and len(unused_registers) == len(list(i.get_def())) and \
                self.program.verbose:
                 # only report if all assigned registers are unused
                 self.unused[type(i).__name__] += 1
                 if self.program.verbose > 1:
                     print(
                         "Register(s) %s never used, assigned by '%s' in %s" % \
-                        (unused_regs,i,format_trace(i.caller)))
+                        (unused_registers,i,format_trace(i.caller)))
 
             if i.read_after_write:
                 for j in i.get_used():
@@ -457,15 +457,15 @@ class Merger:
         reg_nodes = {}
         last_def = defaultdict_by_id(lambda: -1)
         last_read = defaultdict_by_id(list)
-        last_mem_write = []
-        last_mem_read = []
-        last_mem_write_of = defaultdict(list)
-        last_mem_read_of = defaultdict(list)
+        last_memory_write = []
+        last_memory_read = []
+        last_memory_write_of = defaultdict(list)
+        last_memory_read_of = defaultdict(list)
         last_print_str = None
         last = defaultdict(lambda: defaultdict(lambda: None))
         last_open = deque()
         last_input = defaultdict(lambda: [None, None])
-        mem_scopes = defaultdict_by_id(lambda: MemScope())
+        memory_scopes = defaultdict_by_id(lambda: MemScope())
 
         depths = [0] * len(block.instructions)
         self.depths = depths
@@ -510,7 +510,7 @@ class Merger:
                 if this[-1] < other[0]:
                     del this[:]
             this.append(n)
-            if id(last_access_this_kind) == id(last_mem_write_of):
+            if id(last_access_this_kind) == id(last_memory_write_of):
                 insts = itertools.chain(other, this)
             else:
                 insts = other
@@ -518,13 +518,13 @@ class Merger:
                 add_edge(inst, n)
 
         def mem_access(n, instr, last_access_this_kind, last_access_other_kind):
-            addr = instr.args[1]
+            address = instr.args[1]
             reg_type = instr.args[0].reg_type
             budget = block.parent.program.budget
-            if isinstance(addr, int):
+            if isinstance(address, int):
                 for i in range(min(instr.get_size(), budget)):
-                    addr_i = addr + i
-                    handle_mem_access(addr_i, reg_type, last_access_this_kind,
+                    address_i = address + i
+                    handle_mem_access(address_i, reg_type, last_access_this_kind,
                                       last_access_other_kind)
                 if block.warn_about_mem and \
                    not block.parent.warned_about_mem and \
@@ -533,7 +533,7 @@ class Merger:
                         'not preserved due to long vector, errors possible')
                     block.parent.warned_about_mem = True
             else:
-                handle_mem_access(addr, reg_type, last_access_this_kind,
+                handle_mem_access(address, reg_type, last_access_this_kind,
                                   last_access_other_kind)
             if block.warn_about_mem and \
                not block.parent.warned_about_mem and \
@@ -548,7 +548,7 @@ class Merger:
                last_other_kind[-1] > last_this_kind[-1]:
                 last_this_kind[:] = []
             last_this_kind.append(n)
-            if last_this_kind == last_mem_write:
+            if last_this_kind == last_memory_write:
                 insts = itertools.chain(last_other_kind, last_this_kind)
             else:
                 insts = last_other_kind
@@ -617,22 +617,22 @@ class Merger:
                 keep_merged_order(instr, n, RawInputInstruction)
             elif isinstance(instr, matmulsm_class):
                 if options.preserve_mem_order:
-                    strict_mem_access(n, last_mem_read, last_mem_write)
+                    strict_mem_access(n, last_memory_read, last_memory_write)
                 else:
                     if instr.indices_values is not None and instr.first_factor_base_addresses is not None and instr.second_factor_base_addresses is not None:
                         # Determine which values get accessed by the MATMULSM instruction and only add the according dependencies.
-                        for matmul_idx in range(len(instr.first_factor_base_addresses)):
+                        for matmul_index in range(len(instr.first_factor_base_addresses)):
                             start_time = time.time()
-                            first_base = instr.first_factor_base_addresses[matmul_idx]
-                            second_base = instr.second_factor_base_addresses[matmul_idx]
+                            first_base = instr.first_factor_base_addresses[matmul_index]
+                            second_base = instr.second_factor_base_addresses[matmul_index]
 
-                            first_factor_row_indices = instr.indices_values[4 * matmul_idx]
-                            first_factor_column_indices = instr.indices_values[4 * matmul_idx + 1]
-                            second_factor_row_indices = instr.indices_values[4 * matmul_idx + 2]
-                            second_factor_column_indices = instr.indices_values[4 * matmul_idx + 3]
+                            first_factor_row_indices = instr.indices_values[4 * matmul_index]
+                            first_factor_column_indices = instr.indices_values[4 * matmul_index + 1]
+                            second_factor_row_indices = instr.indices_values[4 * matmul_index + 2]
+                            second_factor_column_indices = instr.indices_values[4 * matmul_index + 3]
 
-                            first_factor_row_length = instr.args[12 * matmul_idx + 10]
-                            second_factor_row_length = instr.args[12 * matmul_idx + 11]
+                            first_factor_row_length = instr.args[12 * matmul_index + 10]
+                            second_factor_row_length = instr.args[12 * matmul_index + 11]
 
                             # Due to the potentially very large number of inputs on large matrices, adding dependencies to
                             # all inputs may take a long time. Therefore, we only partially build the dependencies on
@@ -640,8 +640,8 @@ class Merger:
                             # The threshold of 2_250_000 values per matrix is equivalent to multiplying two 1500x1500
                             # matrices. Experiments showed that multiplying two 1700x1700 matrices requires roughly 10 seconds on an i7-1370P,
                             # so this threshold should lead to acceptable compile times even on slower processors.
-                            first_factor_total_number_of_values = instr.args[12 * matmul_idx + 3] * instr.args[12 * matmul_idx + 4]
-                            second_factor_total_number_of_values = instr.args[12 * matmul_idx + 4] * instr.args[12 * matmul_idx + 5]
+                            first_factor_total_number_of_values = instr.args[12 * matmul_index + 3] * instr.args[12 * matmul_index + 4]
+                            second_factor_total_number_of_values = instr.args[12 * matmul_index + 4] * instr.args[12 * matmul_index + 5]
                             max_dependencies_per_matrix = \
                                 self.block.parent.program.budget
                             if first_factor_total_number_of_values > max_dependencies_per_matrix or second_factor_total_number_of_values > max_dependencies_per_matrix:
@@ -652,17 +652,17 @@ class Merger:
                             # Add dependencies to the first factor.
                             # If the size of the matrix exceeds the max_dependencies_per_matrix, only a limited number
                             # of rows will be processed.
-                            for i in range(min(instr.args[12 * matmul_idx + 3], max_dependencies_per_matrix // instr.args[12 * matmul_idx + 4] + 1)):
-                                for k in range(instr.args[12 * matmul_idx + 4]):
-                                    first_factor_addr = first_base + \
+                            for i in range(min(instr.args[12 * matmul_index + 3], max_dependencies_per_matrix // instr.args[12 * matmul_index + 4] + 1)):
+                                for k in range(instr.args[12 * matmul_index + 4]):
+                                    first_factor_address = first_base + \
                                                         first_factor_row_length * first_factor_row_indices[i] + \
                                                         first_factor_column_indices[k]
-                                    handle_mem_access(first_factor_addr, 's', last_mem_read_of, last_mem_write_of)
+                                    handle_mem_access(first_factor_address, 's', last_memory_read_of, last_memory_write_of)
 
                             # Add dependencies to the second factor.
                             # If the size of the matrix exceeds the max_dependencies_per_matrix, only a limited number
                             # of rows will be processed.
-                            for k in range(min(instr.args[12 * matmul_idx + 4], max_dependencies_per_matrix // instr.args[12 * matmul_idx + 5] + 1)):
+                            for k in range(min(instr.args[12 * matmul_index + 4], max_dependencies_per_matrix // instr.args[12 * matmul_index + 5] + 1)):
                                 if (time.time() - start_time) > 10:
                                     # Abort building the dependencies if that takes too much time.
                                     if block.warn_about_mem and not block.parent.warned_about_mem:
@@ -670,14 +670,14 @@ class Merger:
                                         block.parent.warned_about_mem = True
                                     break
 
-                                for j in range(instr.args[12 * matmul_idx + 5]):
-                                    second_factor_addr = second_base + \
+                                for j in range(instr.args[12 * matmul_index + 5]):
+                                    second_factor_address = second_base + \
                                                          second_factor_row_length * second_factor_row_indices[k] + \
                                                          second_factor_column_indices[j]
-                                    handle_mem_access(second_factor_addr, 's', last_mem_read_of, last_mem_write_of)
+                                    handle_mem_access(second_factor_address, 's', last_memory_read_of, last_memory_write_of)
                     else:
                         # If the accessed values cannot be determined, be cautious I guess.
-                        for i in last_mem_write_of.values():
+                        for i in last_memory_write_of.values():
                             for j in i:
                                 add_edge(j, n)
 
@@ -707,20 +707,20 @@ class Merger:
 
             if isinstance(instr, ReadMemoryInstruction):
                 if options.preserve_mem_order:
-                    strict_mem_access(n, last_mem_read, last_mem_write)
+                    strict_mem_access(n, last_memory_read, last_memory_write)
                 elif instr._protect:
-                    scope = mem_scopes[instr._protect]
+                    scope = memory_scopes[instr._protect]
                     strict_mem_access(n, scope.read, scope.write)
                 if not options.preserve_mem_order:
-                    mem_access(n, instr, last_mem_read_of, last_mem_write_of)
+                    mem_access(n, instr, last_memory_read_of, last_memory_write_of)
             elif isinstance(instr, WriteMemoryInstruction):
                 if options.preserve_mem_order:
-                    strict_mem_access(n, last_mem_write, last_mem_read)
+                    strict_mem_access(n, last_memory_write, last_memory_read)
                 elif instr._protect:
-                    scope = mem_scopes[instr._protect]
+                    scope = memory_scopes[instr._protect]
                     strict_mem_access(n, scope.write, scope.read)
                 if not options.preserve_mem_order:
-                    mem_access(n, instr, last_mem_write_of, last_mem_read_of)
+                    mem_access(n, instr, last_memory_write_of, last_memory_read_of)
             # keep I/O instructions in order
             elif isinstance(instr, IOInstruction):
                 if last_print_str is not None:
@@ -764,7 +764,7 @@ class Merger:
         merge_nodes = self.open_nodes
         count = 0
         open_count = 0
-        stats = defaultdict(lambda: 0)
+        statistics = defaultdict(lambda: 0)
         for i,inst in zip(range(len(instructions) - 1, -1, -1), reversed(instructions)):
             if inst is None:
                 continue
@@ -785,7 +785,7 @@ class Merger:
             def eliminate(i):
                 G.remove_node(i)
                 merge_nodes.discard(i)
-                stats[type(instructions[i]).__name__] += 1
+                statistics[type(instructions[i]).__name__] += 1
                 for reg in instructions[i].get_def():
                     self.block.parent.program.base_addresses.pop(reg)
                 instructions[i] = None
@@ -794,7 +794,7 @@ class Merger:
                 count += 1
         if count > 0 and self.block.parent.program.verbose:
             print('Eliminated %d dead instructions, among which %d opens: %s' \
-                % (count, open_count, dict(stats)))
+                % (count, open_count, dict(statistics)))
 
     def print_graph(self, filename):
         f = open(filename, 'w')
@@ -838,20 +838,20 @@ class RegintOptimizer:
                         len(inst.args[0]), self.cache[inst.args[1]]
             elif isinstance(inst, movint_class):
                 if inst.args[1] in self.cache:
-                    res = self.cache[inst.args[1]]
-                    self.cache[inst.args[0]] = res
-                    instructions[i] = ldint(inst.args[0], res,
+                    result = self.cache[inst.args[1]]
+                    self.cache[inst.args[0]] = result
+                    instructions[i] = ldint(inst.args[0], result,
                                             add_to_prog=False)
                 if inst.args[1] in self.offset_cache:
                     self.offset_cache[inst.args[0]] = \
                         self.offset_cache[inst.args[1]]
             elif isinstance(inst, IntegerInstruction):
                 if inst.args[1] in self.cache and inst.args[2] in self.cache:
-                    res = inst.op(self.cache[inst.args[1]],
+                    result = inst.op(self.cache[inst.args[1]],
                                   self.cache[inst.args[2]])
-                    if abs(res) < 2 ** 31:
-                        self.cache[inst.args[0]] = res
-                        instructions[i] = ldint(inst.args[0], res,
+                    if abs(result) < 2 ** 31:
+                        self.cache[inst.args[0]] = result
+                        instructions[i] = ldint(inst.args[0], result,
                                                 add_to_prog=False)
                 elif isinstance(inst, addint_class):
                     def f(base, delta_reg):
@@ -895,18 +895,18 @@ class RegintOptimizer:
                     instructions[i]._protect = inst._protect
                 elif inst.args[1] in self.offset_cache:
                     base, offset, mult = self.offset_cache[inst.args[1]]
-                    addr = self.rev_offset_cache[base.i, offset, mult]
-                    inst.args[1] = addr
+                    address = self.rev_offset_cache[base.i, offset, mult]
+                    inst.args[1] = address
                 elif inst.args[1] in self.range_cache:
                     size, base = self.range_cache[inst.args[1]]
                     if size == len(inst.args[0]):
                         instructions[i] = inst.get_direct(base)
             elif type(inst) == convint_class:
                 if inst.args[1] in self.cache:
-                    res = self.cache[inst.args[1]]
-                    self.cache[inst.args[0]] = res
-                    if abs(res) < 2 ** 31:
-                        instructions[i] = ldi(inst.args[0], res,
+                    result = self.cache[inst.args[1]]
+                    self.cache[inst.args[0]] = result
+                    if abs(result) < 2 ** 31:
+                        instructions[i] = ldi(inst.args[0], result,
                                               add_to_prog=False)
             elif isinstance(inst, mulm_class):
                 if inst.args[2] in self.cache:

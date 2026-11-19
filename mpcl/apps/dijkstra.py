@@ -69,8 +69,8 @@ class HeapORAM(object):
     def __setitem__(self, index, value):
         self.oram.access(index, value.data(), True, new_empty=value.empty)
     def access(self, index, value, write):
-        tmp = self.oram.access(index, value.data(), write)
-        return self.make_entry(*tmp)
+        temp = self.oram.access(index, value.data(), write)
+        return self.make_entry(*temp)
     def delete(self, index, for_real):
         self.oram.delete(index, for_real)
     def read_and_maybe_remove(self, index):
@@ -442,33 +442,33 @@ class Vector(object):
     """ Works like a vector. """
     def __add__(self, other):
         print('add', type(self))
-        res = type(self)(len(self))
+        result = type(self)(len(self))
         @for_range(len(self))
         def f(i):
-            res[i] = self[i] + other[i]
-        return res
+            result[i] = self[i] + other[i]
+        return result
     def __sub__(self, other):
         print('sub', type(other))
-        res = type(other)(len(self))
+        result = type(other)(len(self))
         @for_range(len(self))
         def f(i):
-            res[i] = self[i] - other[i]
-        return res
+            result[i] = self[i] - other[i]
+        return result
     def __mul__(self, other):
         if isinstance(other, Vector):
-            res = type(self)(1)
-            res[0] = ExtInt(0)
+            result = type(self)(1)
+            result[0] = ExtInt(0)
             @for_range(len(self))
             def f(i):
-                res[0] += self[i] * other[i]
-            return res[0]
+                result[0] += self[i] * other[i]
+            return result[0]
         else:
             print('mul', type(self))
-            res = type(self)(len(self))
+            result = type(self)(len(self))
             @for_range_parallel(1024, len(self))
             def f(i):
-                res[i] = self[i] * other
-            return res
+                result[i] = self[i] * other
+            return result
     __rmul__ = __mul__
 
 class VectorList(Vector, list):

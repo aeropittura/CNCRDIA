@@ -45,32 +45,32 @@ class SortPerm:
         if 'sort' in (program.options.keep_cisc or ()):
             class FakeSort():
                 delete = lambda *args: None
-            res = FakeSort()
-            res.key = x.get_vector().pre_mul()
-            return res
-            res = Array.create_from(sint(regint.inc(len(x))))
-            assert maybe_fake_sort(x, res, reverse=True)
-            return res
-        perm = gen_bit_perm(x, n_threads=n_threads, get_array=True)
+            result = FakeSort()
+            result.key = x.get_vector().pre_mul()
+            return result
+            result = Array.create_from(sint(regint.inc(len(x))))
+            assert maybe_fake_sort(x, result, reverse=True)
+            return result
+        permutation = gen_bit_perm(x, n_threads=n_threads, get_array=True)
         if get_program().use_binary_shuffle:
-            tmp = sbitintvec.get_type(util.log2(len(x))).Array(len(x))
+            temp = sbitintvec.get_type(util.log2(len(x))).Array(len(x))
             @multithread(n_threads, len(x))
             def _(base, size):
-                tmp.assign_vector(tmp.value_type.from_right_length(
-                    perm.get_vector(base=base, size=size)), base=base)
-            perm = tmp
-        return perm
+                temp.assign_vector(temp.value_type.from_right_length(
+                    permutation.get_vector(base=base, size=size)), base=base)
+            permutation = temp
+        return permutation
     def __init__(self, x, n_threads=None):
         self.perm = self.get_perm(x, n_threads=n_threads)
         self.n_threads = n_threads
     def apply(self, x):
-        res = Array.create_from(x)
-        reveal_sort(self.perm, res, False, n_threads=self.n_threads)
-        return res
+        result = Array.create_from(x)
+        reveal_sort(self.perm, result, False, n_threads=self.n_threads)
+        return result
     def unapply(self, x):
-        res = Array.create_from(x)
-        reveal_sort(self.perm, res, True, n_threads=self.n_threads)
-        return res
+        result = Array.create_from(x)
+        reveal_sort(self.perm, result, True, n_threads=self.n_threads)
+        return result
 
 class LocalSortPerm:
     def __init__(self, x, n_threads=None):
@@ -94,19 +94,19 @@ def Sort(keys, *to_sort, n_bits=None, time=False):
         bs = [sbitintvec.get_type(1).from_vec([x]) for x in bs]
     bs = Matrix.create_from(bs)
     get_vec = lambda x: x[:] if isinstance(x, Array) else x
-    res = Matrix.create_from(get_vec(x).v if isinstance(get_vec(x), sfix) else x
+    result = Matrix.create_from(get_vec(x).v if isinstance(get_vec(x), sfix) else x
                              for x in to_sort)
-    res = res.transpose()
+    result = result.transpose()
     if time:
         start_timer(11)
-    radix_sort_from_matrix(bs, res)
+    radix_sort_from_matrix(bs, result)
     if time:
         stop_timer(11)
         stop_timer(1)
-    res = res.transpose()
+    result = result.transpose()
     return [sfix._new(get_vec(x), k=get_vec(y).k, f=get_vec(y).f)
             if isinstance(get_vec(y), sfix)
-            else x for (x, y) in zip(res, to_sort)]
+            else x for (x, y) in zip(result, to_sort)]
 
 def VectMax(key, *data, debug=False):
     def reducer(x, y):
@@ -118,10 +118,10 @@ def VectMax(key, *data, debug=False):
         key = list(key)
         data = [list(x) for x in data]
         print_ln('vect max key=%s data=%s', util.reveal(key), util.reveal(data))
-    res = util.tree_reduce(reducer, zip(key, *data))[1:]
+    result = util.tree_reduce(reducer, zip(key, *data))[1:]
     if debug:
-        print_ln('vect max res=%s', util.reveal(res))
-    return res
+        print_ln('vect max res=%s', util.reveal(result))
+    return result
 
 def GroupSum(g, x, n_threads=None):
     assert len(g) == len(x)
@@ -129,10 +129,10 @@ def GroupSum(g, x, n_threads=None):
         class GS(instructions.cisc, instructions.base.Instruction):
             arg_format = ['str','int','int','sw','s','s']
             has_var_args = staticmethod(lambda: True)
-        res = types.sint(size=len(g))
+        result = types.sint(size=len(g))
         x = x.get_vector()
-        GS('GroupSum', 5, len(g), res, g.get_vector(), x.pre_mul())
-        return x._new(res)
+        GS('GroupSum', 5, len(g), result, g.get_vector(), x.pre_mul())
+        return x._new(result)
     p = PrefixSumR(x) * g
     pi = SortPerm(g.get_vector().bit_not(), n_threads=n_threads)
     p1 = pi.apply(p)
@@ -205,7 +205,7 @@ def ModifiedGini(g, y, debug=False):
     ws = sum(w)
     uqs = u[0] ** 2 + u[1] ** 2
     wqs = w[0] ** 2 + w[1] ** 2
-    res = sfix(uqs) / us + sfix(wqs) / ws
+    result = sfix(uqs) / us + sfix(wqs) / ws
     if debug:
         print_ln('g=%s y=%s s=%s',
                  util.reveal(g), util.reveal(y),
@@ -219,8 +219,8 @@ def ModifiedGini(g, y, debug=False):
         print_ln('uqs=%s', util.reveal(uqs))
         print_ln('wqs=%s', util.reveal(wqs))
     if debug:
-        print_ln('gini %s %s', type(res), util.reveal(res))
-    return res
+        print_ln('gini %s %s', type(result), util.reveal(result))
+    return result
 
 MIN_VALUE = -10000
 
@@ -652,11 +652,11 @@ class TreeClassifier:
         :returns: sint array
 
         """
-        res = sint.Array(len(X))
+        result = sint.Array(len(X))
         @for_range(len(X))
         def _(i):
-            res[i] = run_decision_tree(self.tree, X[i])
-        return res
+            result[i] = run_decision_tree(self.tree, X[i])
+        return result
 
     def output(self):
         """ Output decision tree. """
@@ -673,26 +673,26 @@ def preprocess_pandas(data):
     """
     import pandas
     import numpy
-    res = []
+    result = []
     types = []
     for i, t in enumerate(data.dtypes):
         if pandas.api.types.is_int64_dtype(t):
-            res.append(data.iloc[:,i].to_numpy())
+            result.append(data.iloc[:,i].to_numpy())
             types.append('c')
         elif pandas.api.types.is_object_dtype(t):
             values = list(filter(lambda x: isinstance(x, str),
                                  list(data.iloc[:,i].unique())))
             print('converting the following to unary from %d: %s' %
-                  (len(res), values))
+                  (len(result), values))
             if len(values) == 2:
-                res.append(data.iloc[:,i].to_numpy() == values[1])
+                result.append(data.iloc[:,i].to_numpy() == values[1])
                 types.append('b')
             else:
                 for value in values:
-                    res.append(data.iloc[:,i].to_numpy() == value)
+                    result.append(data.iloc[:,i].to_numpy() == value)
                     types.append('b')
         else:
             raise CompilerError('unknown pandas type: ' + t)
-    res = numpy.array(res)
-    res = numpy.swapaxes(res, 0, 1)
-    return res, types
+    result = numpy.array(result)
+    result = numpy.swapaxes(result, 0, 1)
+    return result, types

@@ -31,16 +31,16 @@ def vectorize(function):
     def vectorized_function(*args, **kwargs):
         if len(args) > 0 and 'size' in dir(args[0]):
             instructions_base.set_global_vector_size(args[0].size)
-            res = function(*args, **kwargs)
+            result = function(*args, **kwargs)
             instructions_base.reset_global_vector_size()
         elif 'size' in kwargs:
             instructions_base.set_global_vector_size(kwargs['size'])
             del kwargs['size']
-            res = function(*args, **kwargs)
+            result = function(*args, **kwargs)
             instructions_base.reset_global_vector_size()
         else:
-            res = function(*args, **kwargs)
-        return res
+            result = function(*args, **kwargs)
+        return result
     vectorized_function.__name__ = function.__name__
     copy_doc(vectorized_function, function)
     return vectorized_function
@@ -52,11 +52,11 @@ def set_instruction_type(function):
                 instructions_base.set_global_instruction_type('gf2n')
             else:
                 instructions_base.set_global_instruction_type('modp')                
-            res = function(*args, **kwargs)
+            result = function(*args, **kwargs)
             instructions_base.reset_global_instruction_type()
         else:
-            res = function(*args, **kwargs)
-        return res
+            result = function(*args, **kwargs)
+        return result
     instruction_typed_function.__name__ = function.__name__
     return instruction_typed_function
 
@@ -96,35 +96,35 @@ def print_str(s, *args, print_secrets=False):
         print_plain_str(ss)
         if i < len(args):
             if isinstance(args[i], MemValue):
-                val = args[i].read()
+                value = args[i].read()
             else:
-                val = args[i]
-            if isinstance(val, Tape.Register):
+                value = args[i]
+            if isinstance(value, Tape.Register):
                 from mpcl.boolean.types import sbits
-                if val.is_clear:
-                    val.print_reg_plain()
-                elif print_secrets and isinstance(val, (_secret, sbits)):
-                    val.output()
+                if value.is_clear:
+                    value.print_reg_plain()
+                elif print_secrets and isinstance(value, (_secret, sbits)):
+                    value.output()
                 else:
                     secret_error(args[i])
-            elif isinstance(val, cfix):
-                val.print_plain()
-            elif isinstance(val, sfix) or isinstance(val, sfloat):
+            elif isinstance(value, cfix):
+                value.print_plain()
+            elif isinstance(value, sfix) or isinstance(value, sfloat):
                 if print_secrets:
-                    val.output()
+                    value.output()
                 else:
                     secret_error(args[i])
-            elif isinstance(val, cfloat):
-                val.print_float_plain()
-            elif isinstance(val, (list, tuple)):
-                print_str(*_expand_to_print(val), print_secrets=print_secrets)
-            elif isinstance(val, (Array, SubMultiArray)):
-                val.output(print_secrets=print_secrets)
+            elif isinstance(value, cfloat):
+                value.print_float_plain()
+            elif isinstance(value, (list, tuple)):
+                print_str(*_expand_to_print(value), print_secrets=print_secrets)
+            elif isinstance(value, (Array, SubMultiArray)):
+                value.output(print_secrets=print_secrets)
             else:
                 try:
-                    val.output()
+                    value.output()
                 except (AttributeError, TypeError):
-                    print_plain_str(str(val))
+                    print_plain_str(str(value))
 
 def print_ln(s='', *args, **kwargs):
     """ Print line, with optional args for adding variables/registers
@@ -177,14 +177,14 @@ def print_str_if(cond, ss, *args):
             cond = cond._v
         for i, s in enumerate(subs):
             if i != 0:
-                val = args[i - 1]
+                value = args[i - 1]
                 try:
-                    val.output_if(cond)
+                    value.output_if(cond)
                 except:
-                    if isinstance(val, (list, tuple, Array)):
-                        print_str_if(cond, *_expand_to_print(val))
+                    if isinstance(value, (list, tuple, Array)):
+                        print_str_if(cond, *_expand_to_print(value))
                     else:
-                        print_str_if(cond, str(val))
+                        print_str_if(cond, str(value))
             s = bytearray(s, 'utf8')
             s += b'\0' * ((-len(s)) % 4)
             while s:
@@ -261,9 +261,9 @@ def crash(condition=None):
 
 def public_input():
     """ Public input read from ``Programs/Public-Input/<progname>``. """
-    res = cint()
-    pubinput(res)
-    return res
+    result = cint()
+    pubinput(result)
+    return result
 
 # mostly obsolete functions
 # use the equivalent from types.py
@@ -300,41 +300,41 @@ def reveal(secret):
         if secret.is_clear:
             return secret
         if secret.is_gf2n:
-            res = cgf2n()
+            result = cgf2n()
         else:
-            res = cint()
-        instructions.asm_open(True, res, secret)
-        return res
+            result = cint()
+        instructions.asm_open(True, result, secret)
+        return result
 
 @vectorize
 def get_thread_number():
     """ Returns the thread number. """
-    res = regint()
-    ldtn(res)
-    return res
+    result = regint()
+    ldtn(result)
+    return result
 
 @vectorize
 def get_arg():
     """ Returns the thread argument. """
-    res = regint()
-    ldarg(res)
-    return res
+    result = regint()
+    ldarg(result)
+    return result
 
 def get_cmdline_arg(idx):
     """ Return run-time command-line argument. """
-    res = regint()
-    cmdlinearg(res, regint.conv(idx))
-    return localint(res)
+    result = regint()
+    cmdlinearg(result, regint.conv(idx))
+    return localint(result)
 
 def make_array(l, t=None):
     if isinstance(l, types._structure):
-        res = Array(len(l), t or type(l))
-        res[:] = l
+        result = Array(len(l), t or type(l))
+        result[:] = l
     else:
         l = list(l)
-        res = Array(len(l), t or type(l[0]) if l else cint)
-        res.assign(l)
-    return res
+        result = Array(len(l), t or type(l[0]) if l else cint)
+        result.assign(l)
+    return result
 
 
 class FunctionTapeCall:
@@ -632,8 +632,8 @@ def method_call_tape(function):
             f.__name__ = '%s-%s' % (type(self).__name__, function.__name__)
             tapes[key] = function_call_tape(f)
         members = tuple(self.__dict__[x] for x in member_key)
-        res = tapes[key](*(members + args), **kwargs)
-        return res
+        result = tapes[key](*(members + args), **kwargs)
+        return result
     return wrapper
 
 def function(function):
@@ -770,27 +770,27 @@ def cond_swap(x, y, key_indices=None):
         return list(zip(*[b.cond_swap(xx, yy) for xx, yy in zip(x, y)]))
     b = x < y
     if isinstance(x, sfloat):
-        res = ([], [])
+        result = ([], [])
         for i,j in enumerate(('v','p','z','s')):
             xx = x.__getattribute__(j)
             yy = y.__getattribute__(j)
             bx = b * xx
             by = b * yy
-            res[0].append(bx + yy - by)
-            res[1].append(xx - bx + by)
-        return sfloat(*res[0]), sfloat(*res[1])
+            result[0].append(bx + yy - by)
+            result[1].append(xx - bx + by)
+        return sfloat(*result[0]), sfloat(*result[1])
     return b.cond_swap(y, x)
 
 def sort(a):
     print("WARNING: you're using bubble sort")
 
-    res = a
+    result = a
     
     for i in range(len(a)):
         for j in reversed(list(range(i))):
-            res[j], res[j+1] = cond_swap(res[j], res[j+1])
+            result[j], result[j+1] = cond_swap(result[j], result[j+1])
 
-    return res
+    return result
 
 def odd_even_merge(a):
     if len(a) == 2:
@@ -871,9 +871,9 @@ def loopy_odd_even_merge_sort(a, sorted_length=1, n_parallel=32,
                                 go = base + step < len(a)
                                 x = a.maybe_get(go, base)
                                 y = a.maybe_get(go, base + step)
-                                tmp = cond_swap(x, y, key_indices=key_indices)
-                                for i, idx in enumerate((base, base + step)):
-                                    a.maybe_set(go, idx, tmp[i])
+                                temp = cond_swap(x, y, key_indices=key_indices)
+                                for i, index in enumerate((base, base + step)):
+                                    a.maybe_set(go, index, temp[i])
                         if k == 2:
                             swap(base, step)
                         else:
@@ -934,8 +934,8 @@ def _range_prep(start, stop, step):
 def range_loop(loop_body, start, stop=None, step=None, **kwargs):
     start, stop, step = _range_prep(start, stop, step)
     def loop_fn(i):
-        res = loop_body(i)
-        return util.if_else(res == 0, stop, i + step)
+        result = loop_body(i)
+        return util.if_else(result == 0, stop, i + step)
     if isinstance(step, int):
         if step > 0:
             condition = lambda x: x < stop
@@ -1125,13 +1125,13 @@ def map_reduce_single(n_parallel, n_loops, initializer=lambda *x: [],
         else:
             if is_zero(n_loops):
                 return
-            n_opt_loops_reg = regint(0)
-            n_opt_loops_inst = get_block().instructions[-1]
+            n_optimized_loops_register = regint(0)
+            n_optimized_loops_instruction = get_block().instructions[-1]
             parent_block = get_block()
             prevent_breaks = get_program().prevent_breaks
             get_program().prevent_breaks = False
             get_program().reading('loop optimization', 'Keller24')
-            @while_do(lambda x: x + n_opt_loops_reg <= n_loops, regint(0))
+            @while_do(lambda x: x + n_optimized_loops_register <= n_loops, regint(0))
             def _(i):
                 state = tuplify(initializer())
                 k = 0
@@ -1150,7 +1150,7 @@ def map_reduce_single(n_parallel, n_loops, initializer=lambda *x: [],
                 write_state_to_memory(r)
                 global n_opt_loops
                 n_opt_loops = k
-                n_opt_loops_inst.args[1] = k
+                n_optimized_loops_instruction.args[1] = k
                 return i + k
             my_n_parallel = n_opt_loops
             loop_rounds = n_loops // my_n_parallel
@@ -1360,8 +1360,8 @@ def map_reduce(n_threads, n_parallel, n_loops, initializer, reducer, \
                 return lambda loop_body: loop_body(0, n_loops)
         dec = map_reduce_single(n_parallel, n_loops, initializer, reducer, **kwargs)
         if thread_mem_req:
-            thread_mem = Array(thread_mem_req[regint], regint)
-            return lambda loop_body: dec(lambda i: loop_body(i, thread_mem))
+            thread_memory = Array(thread_mem_req[regint], regint)
+            return lambda loop_body: dec(lambda i: loop_body(i, thread_memory))
         else:
             return dec
     def decorator(loop_body):
@@ -1418,19 +1418,19 @@ def map_reduce(n_threads, n_parallel, n_loops, initializer, reducer, \
             prog.prevent_breaks = False
             tape = prog.new_tape(f, (0,), 'multithread')
             for i in range(n_threads - remainder):
-                mem_state = make_array(initializer())
+                memory_state = make_array(initializer())
                 args[remainder + i][0] = i * thread_rounds
-                if len(mem_state):
-                    args[remainder + i][1] = mem_state.address
+                if len(memory_state):
+                    args[remainder + i][1] = memory_state.address
                 thread_args.append((tape, remainder + i))
         if remainder:
             prog.prevent_breaks = False
             tape1 = prog.new_tape(f, (1,), 'multithread1')
             for i in range(remainder):
-                mem_state = make_array(initializer())
+                memory_state = make_array(initializer())
                 args[i][0] = (n_threads - remainder + i) * thread_rounds + i
-                if len(mem_state):
-                    args[i][1] = mem_state.address
+                if len(memory_state):
+                    args[i][1] = memory_state.address
                 thread_args.append((tape1, i))
         prog.n_running_threads = None
         prog.prevent_breaks = False
@@ -1645,8 +1645,8 @@ def _run_and_link(function, g=None, lock_lists=True, allow_return=False):
                 if isinstance(g[x], list):
                     g[x] = A(g[x])
     pre = copy.copy(g)
-    res = function()
-    if res is not None and not allow_return:
+    result = function()
+    if result is not None and not allow_return:
         if get_program().options.flow_optimization:
             suffix = ' and avoid -l/--flow-optimization to keep ' \
                 'compile-time branching'
@@ -1655,7 +1655,7 @@ def _run_and_link(function, g=None, lock_lists=True, allow_return=False):
         raise CompilerError('Conditional blocks cannot return values. '
                             'Use if_else instead: https://mp-spdz.readthedocs.io/en/latest/Compiler.html#Compiler.types.regint.if_else' + suffix)
     _link(pre, g)
-    return res
+    return result
 
 def _link(pre, g):
     if g:
@@ -1864,30 +1864,30 @@ def else_(body):
 
 def and_(*terms):
     def load_result():
-        res = regint(0)
+        result = regint(0)
         for term in terms:
             if_then(term())
-        old_res = res
-        res = regint(1)
-        res.link(old_res)
+        old_result = result
+        result = regint(1)
+        result.link(old_result)
         for term in terms:
             else_then()
             end_if()
-        return res
+        return result
     return load_result
 
 def or_(*terms):
     def load_result():
-        res = regint(1)
+        result = regint(1)
         for term in terms:
             if_then(term())
             else_then()
-        old_res = res
-        res = regint(0)
-        res.link(old_res)
+        old_result = result
+        result = regint(0)
+        result.link(old_result)
         for term in terms:
             end_if()
-        return res
+        return result
     return load_result
 
 def not_(term):
@@ -1934,9 +1934,9 @@ def get_number_of_players():
     :return: the number of players
     :rtype: regint
     """
-    res = regint()
-    nplayers(res)
-    return res
+    result = regint()
+    nplayers(result)
+    return result
 
 def get_threshold():
     """ The threshold is the maximal number of corrupted
@@ -1944,17 +1944,17 @@ def get_threshold():
 
     :rtype: regint
     """
-    res = regint()
-    threshold(res)
-    return res
+    result = regint()
+    threshold(result)
+    return result
 
 def get_player_id():
     """
     :return: player number
     :rtype: localint (cannot be used for computation) """
-    res = localint()
-    playerid(res._v)
-    return res
+    result = localint()
+    playerid(result._v)
+    return result
 
 def listen_for_clients(port):
     """ Listen for clients on specific port base.
@@ -1971,18 +1971,18 @@ def accept_client_connection(port, players=None):
     :returns: client id
 
     """
-    res = regint()
+    result = regint()
     if players is None:
-        instructions.acceptclientconnection(res, regint.conv(port))
+        instructions.acceptclientconnection(result, regint.conv(port))
     else:
         @if_e(sum(regint(players) ==
                  get_player_id()._v.expand_to_vector(len(players))))
         def _():
-            res.update(accept_client_connection(port))
+            result.update(accept_client_connection(port))
         @else_
         def _():
-            res.update(-1)
-    return res
+            result.update(-1)
+    return result
 
 def init_client_connection(host, port, my_id, relative_port=True):
     """ Initiate connection to another party as client.
@@ -1996,10 +1996,10 @@ def init_client_connection(host, port, my_id, relative_port=True):
     """
     if relative_port:
         port = (port + get_player_id())._v
-    res = regint()
+    result = regint()
     instructions.initclientconnection(
-        res, regint.conv(port), regint.conv(my_id), host)
-    return res
+        result, regint.conv(port), regint.conv(my_id), host)
+    return result
 
 def break_point(name=''):
     """
@@ -2034,23 +2034,23 @@ def approximate_reciprocal(divisor, k, f, theta):
 
         twos_result = cint(0)
         for i in range(k):
-            val = twos_result
-            val <<= 1
-            val += 1 - bits[i]
-            twos_result = val
+            value = twos_result
+            value <<= 1
+            value += 1 - bits[i]
+            twos_result = value
 
         return twos_result + 1
 
     bits = divisor.bit_decompose(k)[::-1]
 
     flag = regint(0)
-    cnt_leading_zeros = regint(0)
+    count_leading_zeros = regint(0)
     normalized_divisor = divisor
 
     for i in range(k):
         flag = flag | bits[i]
         flag_zero = flag.bit_not()
-        cnt_leading_zeros += flag_zero
+        count_leading_zeros += flag_zero
         normalized_divisor <<= flag_zero
 
     q = two_power(k)
@@ -2060,9 +2060,9 @@ def approximate_reciprocal(divisor, k, f, theta):
         q += (q * e) >> k
         e = (e * e) >> k
 
-    res = q >> cint(2*k - 2*f - cnt_leading_zeros)
+    result = q >> cint(2*k - 2*f - count_leading_zeros)
 
-    return res
+    return result
 
 
 def cint_cint_division(a, b, k, f):
@@ -2145,21 +2145,21 @@ def FPDiv(a, b, k, f, simplex_flag=False, nearest=False):
     if get_program().options.binary:
         # no probabilistic truncation in binary circuits
         nearest = True
-    res_f = f
+    result_f = f
     min_f = (k - nearest) // 2 + 1
-    max_length = lambda f: k + 3 * f - res_f
+    max_length = lambda f: k + 3 * f - result_f
 
     if get_program().options.ring:
-        max_f = (int(get_program().options.ring) - k + res_f) // 3
-        if max_f < res_f:
-            min_ring = int(math.ceil(max_length(res_f) / 64) * 64)
+        max_f = (int(get_program().options.ring) - k + result_f) // 3
+        if max_f < result_f:
+            min_ring = int(math.ceil(max_length(result_f) / 64) * 64)
             print('WARNING: Reducing precision of fixed-point division. '
                   'Increase ring size for full precision, '
                   "maybe using '-R %d'." % min_ring)
         else:
-            max_f = res_f
+            max_f = result_f
     else:
-        max_f = res_f
+        max_f = result_f
 
     f = max(min_f, max_f)
     assert 2 * f > k - nearest
@@ -2188,7 +2188,7 @@ def FPDiv(a, b, k, f, simplex_flag=False, nearest=False):
 
     x = x.extend(2 * k)
     y = y.extend(l_y) * (alpha + x).extend(l_y)
-    y = y.round(l_y, 3 * f - res_f, nearest, signed=True)
+    y = y.round(l_y, 3 * f - result_f, nearest, signed=True)
     return y
 
 @instructions_base.ret_cisc
@@ -2219,10 +2219,10 @@ def Norm(b, k, f, simplex_flag=False):
         temp = cint(0)
 
     sign = 1 - 2 * temp # 1 - 2 * [b < 0]
-    absolute_val = sign * b
+    absolute_value = sign * b
 
     #next 2 lines actually compute the SufOR for little indian encoding
-    bits = absolute_val.bit_decompose(k, maybe_mixed=True)[::-1]
+    bits = absolute_value.bit_decompose(k, maybe_mixed=True)[::-1]
     suffixes = PreOR(bits)[::-1]
 
     z = [0] * k
@@ -2232,7 +2232,7 @@ def Norm(b, k, f, simplex_flag=False):
 
     acc = b.bit_compose(reversed(z))
 
-    part_reciprocal = absolute_val * acc
+    part_reciprocal = absolute_value * acc
     signed_acc = sign * acc
 
     return part_reciprocal, signed_acc

@@ -616,20 +616,20 @@ class Compiler:
             print("Cost:", 0 if self.prog.req_num is None else self.prog.req_num.cost())
             print("Memory size:", dict(self.prog.allocated_mem))
 
-        comm = self.prog.expected_communication()
-        if sum(comm):
+        communication = self.prog.expected_communication()
+        if sum(communication):
             print(
                 "Expected communication is %g MB online and %g MB offline." % \
-                (comm[0] / 1e6, comm[1] / 1e6))
+                (communication[0] / 1e6, communication[1] / 1e6))
 
         if self.prog.options.variable_cost:
             from sympy import Symbol, simplify
-            comm = expected_communication(self.options.execute, self.prog.req_num,
+            communication = expected_communication(self.options.execute, self.prog.req_num,
                                           length=Symbol('L') / 8, n_parties=Symbol('N'))
             print(
                 "Expected communication is %s bits online and %s bits offline, "
                 "where L denotes the bit length of the domain and "
-                "N the number of parties." % tuple(simplify(x * 8) for x in comm))
+                "N the number of parties." % tuple(simplify(x * 8) for x in communication))
 
         return self.prog
 
@@ -705,40 +705,40 @@ class Compiler:
         lockfile = ".transfer.lock"
 
         def run(i):
-            dest = destinations[i]
+            destination = destinations[i]
             connection = connections[i]
             connection.run(
                 "mkdir -p %s/{Player-Data,Programs/{Bytecode,Schedules}} " % \
-                dest)
-            dest_lockfile = "%s/%s" % (dest, lockfile)
+                destination)
+            destination_lockfile = "%s/%s" % (destination, lockfile)
             try:
                 connection.run("test -e %s && exit 1; touch %s" % (
-                    (dest_lockfile,) * 2))
+                    (destination_lockfile,) * 2))
             except:
                 raise Exception(
                     "Problem with %s on %s. You cannot use the same directory "
                     "for several instances (including the control instance). "
                     "Remove %s on %s if this has been left behind from an "
-                    "aborted exection." % ((dest_lockfile, hostnames[i]) * 2))
+                    "aborted exection." % ((destination_lockfile, hostnames[i]) * 2))
             # executable
-            connection.put("%s/static/%s" % (self.root, vm), dest)
+            connection.put("%s/static/%s" % (self.root, vm), destination)
             # program
-            dest += "/"
+            destination += "/"
             connection.put("Programs/Schedules/%s.sch" % self.prog.name,
-                           dest + "Programs/Schedules")
+                           destination + "Programs/Schedules")
             for filename in glob.glob(
                     "Programs/Bytecode/%s-*.bc" % self.prog.name):
-                connection.put(filename, dest + "Programs/Bytecode")
+                connection.put(filename, destination + "Programs/Bytecode")
             # inputs
             for filename in glob.glob("Player-Data/Input*-P%d-*" % i):
-                connection.put(filename, dest + "Player-Data")
+                connection.put(filename, destination + "Player-Data")
             # key and certificates
             for suffix in ('key', 'pem'):
                 connection.put("Player-Data/P%d.%s" % (i, suffix),
-                               dest + "Player-Data")
+                               destination + "Player-Data")
             for filename in glob.glob("Player-Data/*.0"):
-                connection.put(filename, dest + "Player-Data")
-            connection.run("rm %s" % dest_lockfile)
+                connection.put(filename, destination + "Player-Data")
+            connection.run("rm %s" % destination_lockfile)
 
         def run_with_error(i):
             try:

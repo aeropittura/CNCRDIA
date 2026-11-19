@@ -75,14 +75,14 @@ def require_ring_size(k, op, suffix='', slack=0):
     diff = slack * (not program.allow_tight_parameters)
     k += diff
     if int(program.options.ring) < k:
-        msg = 'ring size too small for %s, compile ' \
+        message = 'ring size too small for %s, compile ' \
             'with \'-R %d\' or more' % (op, k)
         if k > 64 and k < 128:
-            msg += ' (maybe \'-R 128\' as it is supported by default)'
+            message += ' (maybe \'-R 128\' as it is supported by default)'
         if int(program.options.ring) >= k - diff:
-            msg += ", alternatively set " \
+            message += ", alternatively set " \
                 "'program.allow_tight_parameters=True' in the program"
-        raise CompilerError(msg + suffix)
+        raise CompilerError(message + suffix)
     program.curr_tape.require_bit_length(k)
 
 @instructions_base.cisc
@@ -92,19 +92,19 @@ def LTZ(s, a, k, **kwargs):
 
     k: bit length of a
     """
-    res = program.non_linear.ltz(a, k, **kwargs)
+    result = program.non_linear.ltz(a, k, **kwargs)
     if s is None:
-        return res
+        return result
     else:
-        program.curr_block.replace_last_reg(s, res)
+        program.curr_block.replace_last_reg(s, result)
 
 def LtzRing(a, k, maybe_mixed=False):
     from mpcl.core.types import sintbit
-    res = LtzRingRaw(a, k)
+    result = LtzRingRaw(a, k)
     if maybe_mixed:
-        return res
+        return result
     else:
-        return sintbit.conv(res)
+        return sintbit.conv(result)
 
 def LtzRingRaw(a, k):
     from mpcl.core.types import sint, _bitint
@@ -122,8 +122,8 @@ def LtzRingRaw(a, k):
         m = k - 1
         shift = int(program.options.ring) - k
         r_prime, r_bin = MaskingBitsInRing(k)
-        tmp = a - r_prime
-        c_prime = (tmp << shift).reveal(False) >> shift
+        temp = a - r_prime
+        c_prime = (temp << shift).reveal(False) >> shift
         a = r_bin[0].bit_decompose_clear(c_prime, m)
         b = r_bin[:m]
         u = CarryOutRaw(a[::-1], b[::-1])
@@ -134,9 +134,9 @@ def LessThanZero(a, k, maybe_mixed=False):
     if maybe_mixed:
         return LTZ(None, a, k, maybe_mixed=True)
     else:
-        res = types.sintbit()
-        LTZ(res, a, k)
-        return res
+        result = types.sintbit()
+        LTZ(result, a, k)
+        return result
 
 @instructions_base.cisc
 def Trunc(d, a, k, m, signed):
@@ -181,32 +181,32 @@ def TruncRing(d, a, k, m, signed):
             else:
                 mid_carry = CarryOutRawLE(x[1][:m], x[0][:m])
                 low = sint.conv(mid_carry) + sint.conv(x[0][m])
-                tmp = util.tree_reduce(carry, (sbitint.half_adder(xx, yy)
+                temp = util.tree_reduce(carry, (sbitint.half_adder(xx, yy)
                                                for xx, yy in zip(x[1][m:-1],
                                                                  x[0][m:-1])))
-                top_carry = sint.conv(carry([None, mid_carry], tmp, False)[1])
+                top_carry = sint.conv(carry([None, mid_carry], temp, False)[1])
                 high = top_carry + sint.conv(x[0][-1])
         shifted = sint()
         shrsi(shifted, a, m)
-        res = shifted + sint.conv(low) - (high << (length - m))
+        result = shifted + sint.conv(low) - (high << (length - m))
         if signed:
-            res -= (1 << (k - m - 1))
+            result -= (1 << (k - m - 1))
     else:
         a_prime = Mod2mRing(None, a, k, m, signed)
         a -= a_prime
-        res = TruncLeakyInRing(a, k, m, signed)
+        result = TruncLeakyInRing(a, k, m, signed)
     if d is not None:
-        movs(d, res)
-    return res
+        movs(d, result)
+    return result
 
 def TruncZeros(a, k, m, signed):
     if program.options.ring:
         return TruncLeakyInRing(a, k, m, signed)
     else:
         from mpcl.core import types
-        tmp = types.cint()
-        inv2m(tmp, m)
-        return a * tmp
+        temp = types.cint()
+        inv2m(temp, m)
+        return a * temp
 
 def TruncLeakyInRing(a, k, m, signed):
     """
@@ -232,10 +232,10 @@ def TruncLeakyInRing(a, k, m, signed):
     masked = shifted >> n_shift
     u = sint()
     BitLTL(u, masked, r_bits[:n_bits])
-    res = (u << n_bits) + masked - r
+    result = (u << n_bits) + masked - r
     if signed:
-        res -= (1 << (n_bits - 1))
-    return res
+        result -= (1 << (n_bits - 1))
+    return result
 
 def TruncRoundNearest(a, k, m, signed=False):
     """
@@ -265,14 +265,14 @@ def Mod2mRing(a_prime, a, k, m, signed):
     from mpcl.core.types import sint, intbitint, cint
     shift = int(program.options.ring) - m
     r_prime, r_bin = MaskingBitsInRing(m, True)
-    tmp = a + r_prime
-    c_prime = (tmp << shift).reveal(False) >> shift
+    temp = a + r_prime
+    c_prime = (temp << shift).reveal(False) >> shift
     u = sint()
     BitLTL(u, c_prime, r_bin[:m])
-    res = (u << m) + c_prime - r_prime
+    result = (u << m) + c_prime - r_prime
     if a_prime is not None:
-        movs(a_prime, res)
-    return res
+        movs(a_prime, result)
+    return result
 
 def Mod2mField(a_prime, a, k, m, signed):
     program.reading('modulo', 'CdH10', 'Protocol 3.2')
@@ -332,8 +332,8 @@ def PRandM(r_dprime, r_prime, b, k, m, use_dabit=True):
     from mpcl.core.types import sint
     if program.use_edabit() and not const_rounds:
         movs(r_dprime, sint.get_edabit(k + kappa - m, True)[0])
-        tmp, b[:] = sint.get_edabit(m, True)
-        movs(r_prime, tmp)
+        temp, b[:] = sint.get_edabit(m, True)
+        movs(r_prime, temp)
         return
     t = [[program.curr_block.new_reg('s') for j in range(2)] for i in range(m)]
     t[0][1] = b[-1]
@@ -379,10 +379,10 @@ def BitLTC1(u, a, b):
     if instructions_base.get_global_vector_size() == 1:
         a_ = a_bits
         a_bits = program.curr_block.new_reg('c', size=k)
-        b_vec = program.curr_block.new_reg('s', size=k)
+        b_vector = program.curr_block.new_reg('s', size=k)
         for i in range(k):
             movc(a_bits.vec[i], a_[i])
-            movs(b_vec.vec[i], b[i])
+            movs(b_vector.vec[i], b[i])
         d = program.curr_block.new_reg('s', size=k)
         s = program.curr_block.new_reg('s', size=k)
         t = [program.curr_block.new_reg('s', size=k) for j in range(5)]
@@ -394,8 +394,8 @@ def BitLTC1(u, a, b):
         c = [[program.curr_block.new_reg('c') for i in range(k)] for j in range(4)]
     if instructions_base.get_global_vector_size() == 1:
         vmulci(k, c[2], a_bits, 2)
-        vmulm(k, t[0], b_vec, c[2])
-        vaddm(k, t[1], b_vec, a_bits)
+        vmulm(k, t[0], b_vector, c[2])
+        vaddm(k, t[1], b_vector, a_bits)
         vsubs(k, d, t[1], t[0])
         vaddsi(k, t[2], d, 1)
         t[2].create_vector_elements()
@@ -501,9 +501,9 @@ def CarryOutRawLE(a, b, c=0):
 def CarryOutLE(a, b, c=0):
     """ Little-endian version """
     from mpcl.core import types
-    res = types.sint()
-    CarryOut(res, a[::-1], b[::-1], c)
-    return res
+    result = types.sint()
+    CarryOut(result, a[::-1], b[::-1], c)
+    return result
 
 def BitLTL(res, a, b):
     """
@@ -533,10 +533,10 @@ def PreMulC_with_inverses_and_vectors(p, a):
     sint = _types[a[0].reg_type]
     cint = sint.clear_type
     k = len(p)
-    a_vec = sint(size=k)
+    a_vector = sint(size=k)
     r = sint(size=k)
     w = sint(size=k)
-    w_tmp = sint(size=k)
+    w_temp = sint(size=k)
     z = sint(size=k)
     m = cint(size=k)
     t = [sint(size=k) for i in range(1)]
@@ -545,16 +545,16 @@ def PreMulC_with_inverses_and_vectors(p, a):
     if do_precomp:
         vinverse(k, r, z)
     else:
-        vprep(k, 'PreMulC', r, z, w_tmp)
+        vprep(k, 'PreMulC', r, z, w_temp)
     for i in range(1,k):
         if do_precomp:
             muls(w.vec[i], r[i], z[i-1])
         else:
-            movs(w.vec[i], w_tmp[i])
-        movs(a_vec.vec[i], a[i])
+            movs(w.vec[i], w_temp[i])
+        movs(a_vector.vec[i], a[i])
     movs(w.vec[0], r[0])
-    movs(a_vec.vec[0], a[0])
-    vmuls(k, t[0], w, a_vec)
+    movs(a_vector.vec[0], a[0])
+    vmuls(k, t[0], w, a_vector)
     vasm_open(k, True, m, t[0])
     PreMulC_end(p, a, c, m, z)
 
@@ -607,7 +607,7 @@ def PreMulC_without_inverses(p, a):
     m = [cint() for i in range(k)]
     t = [[sint() for i in range(k)] for i in range(2)]
     #tt = [[sint() for i in range(k)] for i in range(4)]
-    u_inv = [cint() for i in range(k)]
+    u_inverse = [cint() for i in range(k)]
     c = [cint() for i in range(k)]
     # warning: computer scientists count from 0
     for i in range(k):
@@ -622,13 +622,13 @@ def PreMulC_without_inverses(p, a):
     one = cint()
     ldi(one, 1)
     for i in range(k):
-        divc(u_inv[i], one, u[i])
+        divc(u_inverse[i], one, u[i])
         # avoid division by zero, just for benchmarking
         #divc(u_inv[i], u[i], one)
     for i in range(1,k):
-        maybe_mulm(w[i], v[i-1], u_inv[i-1])
+        maybe_mulm(w[i], v[i-1], u_inverse[i-1])
     for i in range(1,k):
-        maybe_mulm(z[i], s[i], u_inv[i])
+        maybe_mulm(z[i], s[i], u_inverse[i])
     for i in range(k):
         muls(t[1][i], w[i], a[i])
         asm_open(True, m[i], t[1][i])

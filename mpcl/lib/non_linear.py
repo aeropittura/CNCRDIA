@@ -34,17 +34,17 @@ class NonLinear:
                 prog.curr_tape.require_bit_length(k + prog.security)
             if not signed:
                 a -= (1 << (k - 1))
-            res = sint()
-            trunc_pr(res, a, k, m)
+            result = sint()
+            trunc_pr(result, a, k, m)
             if not signed:
-                res += (1 << (k - m - 1))
-            return res
+                result += (1 << (k - m - 1))
+            return result
         return self._trunc_pr(a, k, m, signed)
 
     def trunc_round_nearest(self, a, k, m, signed):
-        res = sint()
-        comparison.Trunc(res, a + (1 << (m - 1)), k + 1, m, signed)
-        return res
+        result = sint()
+        comparison.Trunc(result, a + (1 << (m - 1)), k + 1, m, signed)
+        return result
 
     def trunc(self, a, k, m, signed):
         if m == 0:
@@ -60,21 +60,21 @@ class Masking(NonLinear):
         d = [None]*k
         for i,b in enumerate(r[0].bit_decompose_clear(c, k)):
             d[i] = r[i].bit_xor(b)
-        res = self.kor(d).bit_not()
+        result = self.kor(d).bit_not()
         if maybe_mixed:
-            return res
+            return result
         else:
-            return types.sintbit.conv(res)
+            return types.sintbit.conv(result)
 
 class Prime(Masking):
     """ Non-linear functionality modulo a prime with statistical masking. """
     def _mod2m(self, a, k, m, signed):
-        res = sint()
+        result = sint()
         if m == 1:
-            Mod2(res, a, k, signed)
+            Mod2(result, a, k, signed)
         else:
-            Mod2mField(res, a, k, m, signed)
-        return res
+            Mod2mField(result, a, k, m, signed)
+        return result
 
     def _mask(self, a, k):
         return maskField(a, k)
@@ -84,9 +84,9 @@ class Prime(Masking):
 
     def _trunc(self, a, k, m, signed=None):
         a_prime = self.mod2m(a, k, m, signed)
-        tmp = cint()
-        inv2m(tmp, m)
-        return (a - a_prime) * tmp
+        temp = cint()
+        inv2m(temp, m)
+        return (a - a_prime) * temp
 
     def ltz(self, a, k, **kwargs):
         if program.Program.prog.use_split():
@@ -132,10 +132,10 @@ class KnownPrime(NonLinear):
         if signed:
             a += cint(1) << (k - 1)
             k += 1
-        res = self._trunc(a, k, m, False)
+        result = self._trunc(a, k, m, False)
         if signed:
-            res -= cint(1) << (k - m - 2)
-        return res
+            result -= cint(1) << (k - m - 2)
+        return result
 
     def bit_dec(self, a, k, m, maybe_mixed=False):
         assert k <= self.prime.bit_length()
@@ -168,9 +168,9 @@ class Ring(Masking):
         self.ring_size = ring_size
 
     def _mod2m(self, a, k, m, signed):
-        res = sint()
-        Mod2mRing(res, a, k, m, signed)
-        return res
+        result = sint()
+        Mod2mRing(result, a, k, m, signed)
+        return result
 
     def _mask(self, a, k):
         return maskRing(a, k)
@@ -193,8 +193,8 @@ class Ring(Masking):
     def trunc_round_nearest(self, a, k, m, signed):
         if k == self.ring_size:
             # cannot work with bit length k+1
-            tmp = TruncRing(None, a, k, m - 1, signed)
-            return TruncRing(None, tmp + 1, k - m + 1, 1, signed)
+            temp = TruncRing(None, a, k, m - 1, signed)
+            return TruncRing(None, temp + 1, k - m + 1, 1, signed)
         else:
             return super(Ring, self).trunc_round_nearest(a, k, m, signed)
 

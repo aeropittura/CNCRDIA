@@ -50,9 +50,9 @@ class Counter(object):
     def decrement(self, b):
         """ Decrement counter by a secret bit """
         if self.value_type is sgf2n:
-            inv_2 = cgf2n(1) / cgf2n(2)
+            inverse_2 = cgf2n(1) / cgf2n(2)
             prod = self.value * b
-            self.value = (inv_2*prod + self.value - prod)
+            self.value = (inverse_2*prod + self.value - prod)
         self._used = True
 
     def reset(self):
@@ -378,13 +378,13 @@ class PathORAM(TreeORAM):
         merged_entries = buckets + [stash]
         
         merged_entries = [m for sl in merged_entries for m in sl]
-        me_len = len(merged_entries)
+        me_length = len(merged_entries)
         while len(merged_entries) & (len(merged_entries)-1) != 0:
             merged_entries.append(None)
         # sort taking into account stash etc. (GF(2^n) ONLY atm)
         permutation.odd_even_merge_sort(merged_entries, lambda a,b: a[0].empty() * (a[-1] - 1 + b[-1]) + 1 - a[-1])
         
-        merged_entries = merged_entries[:me_len]
+        merged_entries = merged_entries[:me_length]
 
         # and sort assigned positions by emptiness (non-empty first)
         empty_bits_and_levels = [[0]*self.bucket_size for i in range(self.D+1)]
@@ -481,8 +481,8 @@ class PathORAM(TreeORAM):
         @for_range(self.temp_size)
         def f(i):
             level = regint(levels_array[i])
-            sz = regint(bucket_sizes[level])
-            self.temp_storage[level*self.bucket_size + sz] = entries_ram[i]
+            size = regint(bucket_sizes[level])
+            self.temp_storage[level*self.bucket_size + size] = entries_ram[i]
             bucket_sizes[level] += 1
 
         if evict_debug:
@@ -643,9 +643,9 @@ class PathORAM(TreeORAM):
         for i in range(self.D)[:limit]:
             # find first position where bits differ (i.e. first 0 in 1 - a XOR b)
             t = 1 - XOR(a_bits[i], b_bits[i])
-            prev_nf = not_found
+            previous_nf = not_found
             not_found *= t
-            found[i] = prev_nf - not_found
+            found[i] = previous_nf - not_found
         
         if self.use_shuffle_evict:
             return None, found + [not_found]
@@ -657,7 +657,7 @@ class PathORAM(TreeORAM):
 
     def compute_pos(self, entry, lev, levstar, leaf):
         """ Clear integer lev, secret gf2n levstar (rep. as power of 2 with Counter object). """
-        pos = 0
+        position = 0
         a = 0
         b = 0
 
@@ -699,8 +699,8 @@ class PathORAM(TreeORAM):
                 #if c.reveal() == 1:
                 #    print 'writing block %d at level %d on path to %d' % (i,j,leaf)
                 #    print 'writing', entry*c + bucket.ram[i]*(1 - c)
-                prev = self.path_regs[i + j*self.bucket_size]
-                new = c * (entry - prev) + prev
+                previous = self.path_regs[i + j*self.bucket_size]
+                new = c * (entry - previous) + previous
                 self.path_regs[i + j*self.bucket_size] = new
 
                 self.size_bits[j][i] += c

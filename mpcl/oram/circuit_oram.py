@@ -10,9 +10,9 @@ def first_diff(a_bits, b_bits):
     for i in range(length):
         # find first position where bits differ (i.e. first 0 in 1 - a XOR b)
         t = 1 - XOR(a_bits[i], b_bits[i])
-        prev_nf = not_found
+        previous_nf = not_found
         not_found *= t
-        level_bits[i] = prev_nf - not_found
+        level_bits[i] = previous_nf - not_found
     return level_bits, not_found
 
 def find_deeper(a, b, path, start, length, compute_level=True):
@@ -145,14 +145,14 @@ class CircuitORAM(PathORAM):
     def prepare_deepest(self, path):
         deepest = [None] * (self.D + 2)
         deepest_index = [None] * (self.D + 2)
-        src = Value()
+        source = Value()
         stash_empty = self.stash.ram.is_empty()
         level, _, index = find_deepest(self.stash.ram.get_value_array(0), path, 0, self.D)
         goal = if_else(stash_empty, ValueTuple([0] * len(level)), unary_to_binary(level))
-        src = if_else(stash_empty, src, Value(0))
-        src_index = if_else(stash_empty, 0, index)
+        source = if_else(stash_empty, source, Value(0))
+        source_index = if_else(stash_empty, 0, index)
         buckets = [self.get_bucket_ram(path, i) for i in range(self.L + 1)]
-        bucket_deepest = [(goal, src, src_index, None)]
+        bucket_deepest = [(goal, source, source_index, None)]
         for i in range(1, self.L):
             l, _, index = find_deepest(buckets[i].get_value_array(0), path, i - 1, self.D)
             bucket_deepest.append((unary_to_binary(l), Value(i), index, i))
@@ -163,37 +163,37 @@ class CircuitORAM(PathORAM):
             replace = high * (1 - low) * (1 - buckets[i].is_empty())
             goal = if_else(replace, bit_compose(l), \
                            bit_compose(goal)).bit_decompose(len(goal))
-            src = if_else(replace, secret_i, src)
-            src_index = if_else(replace, index, src_index)
+            src = if_else(replace, secret_i, source)
+            src_index = if_else(replace, index, source_index)
             return goal, src, src_index, i
         preop_bucket_deepest = self.value_type.PreOp(op, bucket_deepest)
         for i in range(1, self.L + 1):
-            goal, src, src_index, _ = preop_bucket_deepest[i-1]
+            goal, source, source_index, _ = preop_bucket_deepest[i-1]
             high, low = comp_binary(goal, bit_decompose(i, len(goal)))
             cond = 1 - low * (1 - high)
-            deepest[i] = if_else(cond, src, Value())
-            deepest_index[i] = if_else(cond, src_index, 0)
+            deepest[i] = if_else(cond, source, Value())
+            deepest_index[i] = if_else(cond, source_index, 0)
         return deepest, deepest_index
     def prepare_target(self, path, deepest):
         deepest, deepest_index = deepest
-        dest = Value()
-        src = Value()
-        src_index = 0
+        destination = Value()
+        source = Value()
+        source_index = 0
         target = [None] * (self.L + 1)
         target_index = [None] * (self.L + 1)
         for i in range(self.L, -1 , -1):
-            i_eq_src = src.equal(i, self.logD + 1)
-            target[i] = if_else(i_eq_src, dest, Value())
-            target_index[i] = if_else(i_eq_src, src_index, 0)
-            dest = if_else(i_eq_src, Value(), dest)
-            src = if_else(i_eq_src, Value(), src)
+            i_eq_source = source.equal(i, self.logD + 1)
+            target[i] = if_else(i_eq_source, destination, Value())
+            target_index[i] = if_else(i_eq_source, source_index, 0)
+            destination = if_else(i_eq_source, Value(), destination)
+            source = if_else(i_eq_source, Value(), source)
             if i == 0:
                 break
-            cond = or_op(dest.empty * self.get_bucket_ram(path, i).has_empty_entry(), \
+            cond = or_op(destination.empty * self.get_bucket_ram(path, i).has_empty_entry(), \
                    (1 - target[i].empty)) * (1 - deepest[i].empty)
-            src = if_else(cond, deepest[i], src)
-            src_index = if_else(cond, deepest_index[i], src_index)
-            dest = if_else(cond, Value(i), dest)
+            source = if_else(cond, deepest[i], source)
+            source_index = if_else(cond, deepest_index[i], source_index)
+            destination = if_else(cond, Value(i), destination)
         return target, target_index
     def evict_once(self, path):
         deepest = self.prepare_deepest(path)
@@ -209,19 +209,19 @@ class CircuitORAM(PathORAM):
         empty_entry = Entry.get_empty(*self.internal_entry_size(), \
                                       index_size=self.index_size)
         hold = empty_entry
-        dest = Value()
+        destination = Value()
         towrite = [None] * (self.L + 1)
         for i in range(self.L + 1):
-            cond = (1 - hold.is_empty) * (dest.equal(i, self.logD + 1))
+            cond = (1 - hold.is_empty) * (destination.equal(i, self.logD + 1))
             towrite[i] = if_else(cond, hold, empty_entry)
             hold = if_else(cond, empty_entry, hold)
-            dest = if_else(cond, Value(), dest)
+            destination = if_else(cond, Value(), destination)
             cond = 1 - target[i].empty
             bucket = self.get_bucket_oram(path, i)
             if i != self.L:
                 index = target_index[i].bit_decompose(bucket.size)
                 hold = if_else(cond, bucket.read_and_remove_by_public(index), hold)
-                dest = if_else(cond, target[i], dest)
+                destination = if_else(cond, target[i], destination)
             if i == 1:
                 yield
         yield towrite

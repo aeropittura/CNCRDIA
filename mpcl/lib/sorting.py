@@ -32,12 +32,12 @@ def gen_bit_perm(k, n_threads=None, time=False, get_array=False):
         timer.next()
         t = k.get_vector().if_else(s[1], s[0])
         timer.next()
-        res = t - 1
+        result = t - 1
         timer.end()
         if get_array:
-            return types.Array.create_from(res)
+            return types.Array.create_from(result)
         else:
-            return res
+            return result
     else:
         multithread = library.multithread
         timer = library.MultiTimer(time)
@@ -52,7 +52,7 @@ def gen_bit_perm(k, n_threads=None, time=False, get_array=False):
         timer.next()
         s = [types.Array.create_from(ff[:].prefix_sum()) for ff in f]
         timer.next()
-        res = k.get_type(util.log2(len(k))).Array(len(k))
+        result = k.get_type(util.log2(len(k))).Array(len(k))
         @multithread(n_threads, len(k), max_size=max_size)
         def _(base, size):
             s[1].assign_vector(s[1].get_vector(base=base, size=size) + \
@@ -61,14 +61,14 @@ def gen_bit_perm(k, n_threads=None, time=False, get_array=False):
         @multithread(n_threads, len(k), max_size=max_size)
         def _(base, size):
             gv = lambda x: x.get_vector(base=base, size=size)
-            res.assign_vector(gv(f[1]).if_else(gv(s[1]), gv(s[0])) - 1, base=base)
+            result.assign_vector(gv(f[1]).if_else(gv(s[1]), gv(s[0])) - 1, base=base)
         timer.end()
         for x in sum((f, s), []):
             x.delete()
         if get_array:
-            return res
+            return result
         else:
-            return (res[:], res.delete())[0]
+            return (result[:], result.delete())[0]
 
 def gen_multi_bit_perm(x, l, time=None, maybe_mixed=True, n_threads=None):
     """ GenMultiBitSort by `Asharov et
@@ -113,9 +113,9 @@ def gen_multi_bit_perm(x, l, time=None, maybe_mixed=True, n_threads=None):
                         base=base, size=size) * f_for_sum[i].get_vector(
                             base=base, size=size), base=base)
         timer.next()
-        res = sum(s)
+        result = sum(s)
     else:
-        res = types.sint.Array(len(x))
+        result = types.sint.Array(len(x))
         @library.multithread(n_threads, len(x))
         def _(base, size):
             all_ops = [], []
@@ -123,18 +123,18 @@ def gen_multi_bit_perm(x, l, time=None, maybe_mixed=True, n_threads=None):
                 for j, operand in enumerate((s, f_for_sum)):
                     all_ops[j].append(
                         operand[i].get_vector(base=base, size=size))
-            res.assign_vector(
+            result.assign_vector(
                 types.sint.dot_product(*all_ops), base=base)
     f_for_sum.delete()
     s.delete()
-    res -= 1
+    result -= 1
     timer.next()
     if maybe_mixed and isinstance(x, GC_types.sbitvec):
         bit_length = util.log2(len(x))
-        res = types.Array.create_from(res).to_binary_with_right_length(
+        result = types.Array.create_from(result).to_binary_with_right_length(
             bit_length, n_threads=n_threads)[:]
     timer.end()
-    return res
+    return result
 
 def reveal_sort(k, D, reverse=False, n_threads=None, time=False,
                 return_shuffle=False, shuffle=None, debug=False):
@@ -169,9 +169,9 @@ def reveal_sort(k, D, reverse=False, n_threads=None, time=False,
             D.value_type().default_bit_length()))
         @library.multithread(n_threads, D.total_size())
         def _(base, size):
-            tmp = D.value_type.from_right_length(
+            temp = D.value_type.from_right_length(
                 D_input.get_vector(base=base, size=size))
-            D.assign_vector(tmp, base=base)
+            D.assign_vector(temp, base=base)
         timer.next()
     library.break_point('reveal_sort')
     if shuffle is None:
@@ -179,7 +179,7 @@ def reveal_sort(k, D, reverse=False, n_threads=None, time=False,
     timer.next()
     k_prime = types.Array.create_from(k.get_vector().secure_permute(shuffle))
     timer.next()
-    idx = types.regint.Array(len(k))
+    index = types.regint.Array(len(k))
     @library.multithread(n_threads, len(k),
                          max_size=library.get_program().memory_budget)
     def _(base, size):
@@ -188,12 +188,12 @@ def reveal_sort(k, D, reverse=False, n_threads=None, time=False,
         R = library.get_program().options.ring
         if R and int(R) < 64:
             tmp = tmp.to_regint(0)
-        idx.assign_vector(tmp, base=base)
+        index.assign_vector(tmp, base=base)
     timer.next()
     if debug:
-        library.print_ln('k=%s idx=%s D=%s', k.reveal(), idx, D.reveal())
+        library.print_ln('k=%s idx=%s D=%s', k.reveal(), index, D.reveal())
     if reverse:
-        D.permute(idx, n_threads=n_threads)
+        D.permute(index, n_threads=n_threads)
         timer.next()
         if debug:
             library.print_ln('permuted D %s', D.reveal())
@@ -205,7 +205,7 @@ def reveal_sort(k, D, reverse=False, n_threads=None, time=False,
         if debug:
             library.print_ln('shuffled D %s', D.reveal())
         library.break_point('reveal_sort3')
-        D.permute(idx, reverse=True, n_threads=n_threads)
+        D.permute(index, reverse=True, n_threads=n_threads)
     if mixed:
         timer.next()
         D_input.from_binary(D, signed=True, n_threads=n_threads)
@@ -213,9 +213,9 @@ def reveal_sort(k, D, reverse=False, n_threads=None, time=False,
     library.break_point('reveal_sort4')
     k_prime.delete()
     if return_shuffle:
-        return idx, shuffle
+        return index, shuffle
     else:
-        idx.delete()
+        index.delete()
         D.value_type.int_type.delete_shuffle(shuffle)
 
 class EmulatorBitDecomposer:
@@ -238,13 +238,13 @@ class EmulatorBitDecomposer:
         return self.cache
 
     def cache_bit(self, i):
-        res = types.sint(size=self.x.size)
+        result = types.sint(size=self.x.size)
         class Bite(instructions.cisc, instructions.base.Instruction):
             arg_format = ['str','int','int','sw','s','ci']
             has_var_args = staticmethod(lambda: True)
-        inst = Bite('bite', 5, res.size, res, self.x.pre_mul(),
+        inst = Bite('bite', 5, result.size, result, self.x.pre_mul(),
                     types.regint.conv(i))
-        self.cache[:] = res
+        self.cache[:] = result
         if self.signed:
             @library.if_((self.n != 1) * (i == self.n - 1))
             def _():
@@ -297,16 +297,16 @@ def radix_sort(k, D=None, n_bits=None, signed=True, n_threads=None, l=2,
     @library.multithread(n_threads, len(k),
                          max_size=library.get_program().budget)
     def _(base, size):
-        tmp = k.get_vector(base=base, size=size).bit_decompose(n_bits)
-        for i, x in enumerate(tmp):
+        temp = k.get_vector(base=base, size=size).bit_decompose(n_bits)
+        for i, x in enumerate(temp):
             bs[i].assign(x, base=base)
     if signed and len(bs) > 1:
         sign_bit = min(n_bits, k[0].default_bit_length()) - 1
         bs[-1][:] = bs[sign_bit][:].bit_not()
-    res = radix_sort_from_matrix(bs, D, n_threads=n_threads, l=l, **kwargs)
+    result = radix_sort_from_matrix(bs, D, n_threads=n_threads, l=l, **kwargs)
     bs.delete()
     k.delete()
-    return res
+    return result
 
 def radix_sort_from_matrix(bs, D=None, time=False, n_threads=None, l=1,
                            only_perm=False, maybe_mixed=True, debug=False,
@@ -345,16 +345,16 @@ def radix_sort_from_matrix(bs, D=None, time=False, n_threads=None, l=1,
             bits = [bs[l * i + j][:] for j in range(l)]
             b = bits[0].get_type(l).bit_compose(bits)
             b = types.Array.create_from(b)
-        perm = types.regint.Array(n)
+        permutation = types.regint.Array(n)
         shuffle = shuffles[i]
         @library.if_(i > 0, split_factor=(n_loops - 1) / n_loops)
         def _():
-            tmp = reveal_sort(h, b, reverse=False, n_threads=n_threads,
+            temp = reveal_sort(h, b, reverse=False, n_threads=n_threads,
                               time=10 * timer.timer_id, return_shuffle=True,
                               shuffle=shuffle)
-            perm.assign(tmp[0])
-            shuffle.update(tmp[1])
-            tmp[0].delete()
+            permutation.assign(temp[0])
+            shuffle.update(temp[1])
+            temp[0].delete()
         timer.next()
         if l == 1 and not maybe_mixed:
             c = gen_bit_perm(b, n_threads=n_threads, time=10 * timer.timer_id)
@@ -370,7 +370,7 @@ def radix_sort_from_matrix(bs, D=None, time=False, n_threads=None, l=1,
             c.delete()
         @library.if_(i > 0, split_factor=(n_loops - 1) / n_loops)
         def _():
-            h.permute(perm, reverse=False)
+            h.permute(permutation, reverse=False)
             h.secure_permute(shuffle, reverse=True)
         shuffle_type.delete_shuffle(shuffle)
         timer.end()
@@ -409,75 +409,75 @@ def quicksort(k, n_bits, debug=False, verbose=False, time=False,
     from mpcl.core.types import Array, regint, MemValue, sint
     from mpcl.lib.library import while_do, for_range, if_e, if_, else_, print_ln, MultiTimer, multithread
     t = MultiTimer(time)
-    tmp = Array.create_from(k)
-    shuffle = tmp.secure_shuffle(n_threads=n_threads,
+    temp = Array.create_from(k)
+    shuffle = temp.secure_shuffle(n_threads=n_threads,
                                  get_shuffle=return_permutation)
-    loglen = util.log2(len(tmp))
-    @multithread(n_threads, len(tmp))
+    loglen = util.log2(len(temp))
+    @multithread(n_threads, len(temp))
     def _(base, size):
-        x = tmp.get_vector(base=base, size=size) << loglen
+        x = temp.get_vector(base=base, size=size) << loglen
         x += regint.inc(size, base)
-        tmp.assign_vector(x, base=base)
-    g = regint.Array(len(tmp))
+        temp.assign_vector(x, base=base)
+    g = regint.Array(len(temp))
     g.assign_all(0, n_threads=n_threads)
     g[0] = 1
     n_rounds = MemValue(0)
     t.next()
     if return_permutation:
-        res_perm = Array.create_from(regint.inc(len(k)))
+        result_permutation = Array.create_from(regint.inc(len(k)))
     # generous upper limit for usage prediction
-    @for_range(int(3 * math.log(len(tmp), 2)), disable_index_checks=True)
+    @for_range(int(3 * math.log(len(temp), 2)), disable_index_checks=True)
     def _(i):
         if verbose:
             print_ln('round %s', i)
         n_rounds.write(i + 1)
         timer = MultiTimer(10 * t.timer_id)
-        addresses = regint(size=len(tmp))
-        instructions.groupsumint(addresses, g[:], regint.inc(len(tmp)) * g[:])
-        pivots = Array.create_from(tmp.get(addresses))
+        addresses = regint(size=len(temp))
+        instructions.groupsumint(addresses, g[:], regint.inc(len(temp)) * g[:])
+        pivots = Array.create_from(temp.get(addresses))
         timer.next()
         if debug:
-            pre_perm = tmp[:]
-        c = regint.Array(len(tmp))
-        @multithread(n_threads, len(tmp))
+            pre_permutation = temp[:]
+        c = regint.Array(len(temp))
+        @multithread(n_threads, len(temp))
         def _(base, size):
             c.assign_vector(pivots.get_vector(base=base, size=size).less_than(
-                tmp.get_vector(base=base, size=size),
+                temp.get_vector(base=base, size=size),
                 bit_length=n_bits + loglen,
                 maybe_mixed=True).reveal_to_regint_by_bit(), base=base)
         if not debug:
             pivots.delete()
         g_in = g[:]
         timer.next()
-        g_out, perm = [regint(size=len(tmp)) for i in range(2)]
-        instructions.qs_perm(perm, g_out, g_in, c[:])
+        g_out, permutation = [regint(size=len(temp)) for i in range(2)]
+        instructions.qs_perm(permutation, g_out, g_in, c[:])
         if not debug:
             c.delete()
         g[:] = g_out
-        perm = Array.create_from(perm)
-        tmp.permute(perm, n_threads=n_threads)
+        permutation = Array.create_from(permutation)
+        temp.permute(permutation, n_threads=n_threads)
         if return_permutation:
-            res_perm.permute(perm, n_threads=n_threads)
+            result_permutation.permute(permutation, n_threads=n_threads)
         if not debug:
-            perm.delete()
+            permutation.delete()
         if debug:
-            print_ln('pre_perm=%s', pre_perm.reveal())
+            print_ln('pre_perm=%s', pre_permutation.reveal())
             print_ln('g_in=%s', g_in.reveal())
             print_ln('pivots=%s', pivots.reveal())
             print_ln('c=%s', c)
-            print_ln('perm=%s', perm)
+            print_ln('perm=%s', permutation)
             print_ln('g_out=%s', g.reveal())
-            print_ln('tmp=%s', tmp.reveal())
+            print_ln('tmp=%s', temp.reveal())
         timer.end()
-        return g.sum() < len(tmp)
+        return g.sum() < len(temp)
     t.next()
     if not return_permutation:
-        @multithread(n_threads, len(tmp))
+        @multithread(n_threads, len(temp))
         def _(base, size):
             k.assign_vector(
-                tmp.get_vector(base=base, size=size) >> loglen, base=base)
+                temp.get_vector(base=base, size=size) >> loglen, base=base)
     t.end()
     if verbose:
         print_ln('done after %s rounds', n_rounds)
     if return_permutation:
-        return shuffle, res_perm
+        return shuffle, result_permutation

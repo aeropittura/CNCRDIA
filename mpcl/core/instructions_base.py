@@ -416,13 +416,13 @@ def gf2n(instruction):
 
     GF2N_Instruction.__name__ = 'g' + instruction_cls.__name__
     if vectorized:
-        vec_GF2N = vectorize(GF2N_Instruction, global_dict)
+        vector_gf2n = vectorize(GF2N_Instruction, global_dict)
 
     @functools.wraps(instruction)
     def maybe_gf2n_instruction(*args, **kwargs):
         if get_global_instruction_type() == 'gf2n':
             if vectorized:
-                return vec_GF2N(*args, **kwargs)
+                return vector_gf2n(*args, **kwargs)
             else:
                 return GF2N_Instruction(*args, **kwargs)
         else:
@@ -430,7 +430,7 @@ def gf2n(instruction):
     
     # If instruction is vectorized, new GF2N instruction must also be
     if vectorized:
-        global_dict[GF2N_Instruction.__name__] = vec_GF2N
+        global_dict[GF2N_Instruction.__name__] = vector_gf2n
     else:
         global_dict[GF2N_Instruction.__name__] = GF2N_Instruction
 
@@ -579,10 +579,10 @@ def cisc(function, n_outputs=1):
                 from mpcl.core import types
                 @library.function_block
                 def f():
-                    res = [arg.new(size) for arg in args[:n_outputs]]
+                    result = [arg.new(size) for arg in args[:n_outputs]]
                     self.new_instructions(
-                        size, res + [arg.load() for arg in args[n_outputs:]])
-                    for reg, arg in zip(res, args):
+                        size, result + [arg.load() for arg in args[n_outputs:]])
+                    for reg, arg in zip(result, args):
                         arg.store(reg)
                 f.name = self.get_name(key)
                 self.functions[key] = f, args
@@ -615,9 +615,9 @@ def cisc(function, n_outputs=1):
                 self.functions[key] = f
             f = self.functions[key]
             in_args = filter(lambda arg: arg.is_real(), args[n_outputs:])
-            res = util.tuplify(f(*(arg.load() for arg in in_args)))
+            result = util.tuplify(f(*(arg.load() for arg in in_args)))
             for i in range(n_outputs):
-                new_regs[i].link(res[i])
+                new_regs[i].link(result[i])
 
         def expand_merged(self, skip):
             if function.__name__ in skip:
@@ -640,42 +640,42 @@ def cisc(function, n_outputs=1):
             tape = program.curr_tape
             tape.start_new_basicblock(name='pre-' + self.name())
             size = sum(call[0][0].vector_size() for call in self.calls)
-            new_regs = []
+            new_registers = []
             for i, arg in enumerate(self.args[n_outputs:]):
                 i += n_outputs
                 try:
-                    new_regs.append(type(arg).concat(
+                    new_registers.append(type(arg).concat(
                         call[0][i] for call in self.calls))
-                    assert new_regs[-1].vector_size() == size
+                    assert new_registers[-1].vector_size() == size
                 except (TypeError, AttributeError):
                     if not isinstance(arg, (int, type(None))):
                         raise
-                    new_regs.append(None)
+                    new_registers.append(None)
                 except:
                     print([call[0][0].vector_size() for call in self.calls])
                     raise
             budget = program.memory_budget
             if size <= budget:
-                new_regs = self.expand_chunk(size, new_regs)
+                new_registers = self.expand_chunk(size, new_registers)
             else:
                 all_outputs = []
                 for base in range(0, size, budget):
                     chunk_size = min(budget, size - base)
-                    chunk_regs = []
-                    for arg in new_regs:
+                    chunk_registers = []
+                    for arg in new_registers:
                         if isinstance(arg, (int, type(None))):
-                            chunk_regs.append(None)
+                            chunk_registers.append(None)
                         else:
-                            chunk_regs.append(
+                            chunk_registers.append(
                                 arg.get_vector(base=base, size=chunk_size))
-                    outputs = self.expand_chunk(chunk_size, chunk_regs)
+                    outputs = self.expand_chunk(chunk_size, chunk_registers)
                     all_outputs.append(outputs)
-                new_regs = [output[0].concat(output) for output in zip(*all_outputs)]
+                new_registers = [output[0].concat(output) for output in zip(*all_outputs)]
             base = 0
             for call in self.calls:
                 for i in range(n_outputs):
                     reg = call[0][i]
-                    reg.copy_from_part(new_regs[i], base, reg.vector_size())
+                    reg.copy_from_part(new_registers[i], base, reg.vector_size())
                 base += reg.vector_size()
             tape.start_new_basicblock(name='post-' + self.name())
 
@@ -699,19 +699,19 @@ def cisc(function, n_outputs=1):
 
         def get_bytes(self):
             assert len(self.kwargs) < 2
-            res = LongArgFormat.encode(opcodes['CISC'])
-            res += int_to_bytes(sum(len(x[0]) + 2 for x in self.calls) + 1)
+            result = LongArgFormat.encode(opcodes['CISC'])
+            result += int_to_bytes(sum(len(x[0]) + 2 for x in self.calls) + 1)
             name = self.function.__name__
             String.check(name)
-            res += String.encode(name)
+            result += String.encode(name)
             for call in self.calls:
                 call[1].pop('nearest', None)
                 assert not call[1]
-                res += int_to_bytes(len(call[0]) + 2)
-                res += int_to_bytes(call[0][0].size)
+                result += int_to_bytes(len(call[0]) + 2)
+                result += int_to_bytes(call[0][0].size)
                 for arg in call[0]:
-                    res += self.arg_to_bytes(arg)
-            return bytearray(res)
+                    result += self.arg_to_bytes(arg)
+            return bytearray(result)
 
         @classmethod
         def arg_to_bytes(self, arg):
@@ -760,11 +760,11 @@ def ret_cisc(function):
             return function(*args, **kwargs)
         for arg in args:
             if isinstance(arg, types._secret):
-                res_type = type(arg)
+                result_type = type(arg)
                 break
-        res = res_type(size=args[0].size)
-        instruction(res, *args, **kwargs)
-        return res
+        result = result_type(size=args[0].size)
+        instruction(result, *args, **kwargs)
+        return result
     return wrapper
 
 def sfix_cisc(function):
@@ -787,9 +787,9 @@ def sfix_cisc(function):
             assert args[0].size == args[0].v.size
             k = args[0].k
             f = args[0].f
-            res = sfix._new(sint(size=args[0].size), k=k, f=f)
-            instruction(res.v, args[0].v, k, f, *args[1:])
-            return res
+            result = sfix._new(sint(size=args[0].size), k=k, f=f)
+            instruction(result.v, args[0].v, k, f, *args[1:])
+            return result
         else:
             return function(*args, **kwargs)
     copy_doc(wrapper, function)
@@ -808,9 +808,9 @@ def bit_cisc(function):
             instruction.__name__ = '%s(%d)' % (function.__name__, m)
             bit_instructions[key] = cisc(instruction, m)
         from mpcl.core.types import sintbit
-        res = [sintbit() for i in range(m)]
-        bit_instructions[function, m](*res, a, k, m, *args, **kwargs)
-        return res
+        result = [sintbit() for i in range(m)]
+        bit_instructions[function, m](*result, a, k, m, *args, **kwargs)
+        return result
     return wrapper
 
 class RegType(object):
@@ -826,11 +826,11 @@ class RegType(object):
     @staticmethod
     def create_dict(init_value_fn):
         """ Create a dictionary with all the RegTypes as keys """
-        res = defaultdict(init_value_fn)
+        result = defaultdict(init_value_fn)
         # initialization for legacy
         for t in RegType.Types:
-            res[t]
-        return res
+            result[t]
+        return result
 
 class ArgFormat(object):
     is_reg = False
@@ -964,8 +964,8 @@ class String(ArgFormat):
         return bytearray(arg, 'ascii') + b'\0' * (cls.length - len(arg))
 
     def __init__(self, f):
-        tmp = f.read(16)
-        self.str = str(tmp[0:tmp.find(b'\0')], 'ascii')
+        temp = f.read(16)
+        self.str = str(temp[0:temp.find(b'\0')], 'ascii')
 
     def __str__(self):
         return self.str
@@ -1142,8 +1142,8 @@ class Instruction(object):
         if self.is_vec() and self.get_size() != 1:
             for arg in self.args:
                 arg.create_vector_elements()
-                res = sum(list(zip(*self.args)), ())
-                return list(res)
+                result = sum(list(zip(*self.args)), ())
+                return list(result)
         else:
             return self.args
 
@@ -1192,11 +1192,11 @@ class Instruction(object):
     def __str__(self):
         
         if self.has_var_args():
-            varargCount = str(len(self.args)) + ', '
+            vararg_count = str(len(self.args)) + ', '
         else:
-            varargCount = ''
+            vararg_count = ''
 
-        return self.__class__.__name__ + ' ' + self.get_pre_arg() + varargCount + ', '.join(str(a) for a in self.args)
+        return self.__class__.__name__ + ' ' + self.get_pre_arg() + vararg_count + ', '.join(str(a) for a in self.args)
 
     def __repr__(self):
         return self.__class__.__name__ + '(' + self.get_pre_arg() + ','.join(str(a) for a in self.args) + ')'
@@ -1250,13 +1250,13 @@ class ParsedInstruction:
 
     def __str__(self):
         name = self.type.__name__
-        res = name + ' '
+        result = name + ' '
         if self.size > 1:
-            res = 'v' + res + str(self.size) + ', '
+            result = 'v' + result + str(self.size) + ', '
         if self.var_args:
-            res += str(len(self.args)) + ', '
-        res += ', '.join(str(arg) for arg in self.args)
-        return res
+            result += str(len(self.args)) + ', '
+        result += ', '.join(str(arg) for arg in self.args)
+        return result
 
     def get_usage(self):
         return self.type.get_usage(self.args)

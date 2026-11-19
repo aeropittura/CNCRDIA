@@ -88,8 +88,8 @@ def get_limit(x):
 
 def sanitize(x, raw, lower, upper):
     limit = get_limit(x)
-    res = (x > limit).if_else(upper, raw)
-    return (x < -limit).if_else(lower, res)
+    result = (x > limit).if_else(upper, raw)
+    return (x < -limit).if_else(lower, result)
 
 def sigmoid(x):
     """ Sigmoid function.
@@ -159,10 +159,10 @@ def argmax(x):
     def op(a, b):
         comp = b[1].less_than(a[1], sync=False)
         return comp.if_else(a[0], b[0]), comp.if_else(a[1], b[1])
-    res = tree_reduce(op, enumerate(x))[0]
-    if isinstance(res, regint):
-        res = cint(res)
-    return res
+    result = tree_reduce(op, enumerate(x))[0]
+    if isinstance(result, regint):
+        result = cint(result)
+    return result
 
 def softmax(x):
     """ Softmax.
@@ -201,9 +201,9 @@ def set_n_threads(n_threads):
 def _no_mem_warnings(function):
     def wrapper(*args, **kwargs):
         get_program().warn_about_mem.append(False)
-        res = function(*args, **kwargs)
+        result = function(*args, **kwargs)
         get_program().warn_about_mem.pop()
-        return res
+        return result
     copy_doc(wrapper, function)
     return wrapper
 
@@ -214,9 +214,9 @@ def _layer_method_call_tape(function):
         if self.inputs and len(self.inputs) == 1:
             backup = self.inputs
             del self.inputs
-            res = function(self, *args, **kwargs)
+            result = function(self, *args, **kwargs)
             self.inputs = backup
-            return res
+            return result
         else:
             return function(self, *args, **kwargs)
     return wrapper
@@ -317,9 +317,9 @@ class Output(OutputBase):
 
     @classmethod
     def from_args(cls, N, program):
-        res = cls(N, approx='approx' in program.args)
-        res.compute_loss = not 'no_loss' in program.args
-        return res
+        result = cls(N, approx='approx' in program.args)
+        result.compute_loss = not 'no_loss' in program.args
+        return result
 
     def __init__(self, N, debug=False, approx=False):
         self.N = N
@@ -524,16 +524,16 @@ class MultiOutputBase(NoVariableLayer):
     @staticmethod
     def from_args(program, N, n_output):
         if 'relu_out' in program.args:
-            res = ReluMultiOutput(N, n_output)
+            result = ReluMultiOutput(N, n_output)
         else:
-            res = MultiOutput(N, n_output, approx='approx' in program.args)
-            res.cheaper_loss = 'mse' in program.args
-        res.compute_loss = not 'no_loss' in program.args
+            result = MultiOutput(N, n_output, approx='approx' in program.args)
+            result.cheaper_loss = 'mse' in program.args
+        result.compute_loss = not 'no_loss' in program.args
         for arg in program.args:
             m = re.match('approx=(.*)', arg)
             if m:
-                res.approx = float(m.group(1))
-        return res
+                result.approx = float(m.group(1))
+        return result
 
 class MultiOutput(MultiOutputBase):
     """
@@ -560,7 +560,7 @@ class MultiOutput(MultiOutputBase):
     def _forward(self, batch):
         N = len(batch)
         d_out = self.X.sizes[1]
-        tmp = self.losses
+        temp = self.losses
         @for_range_opt_multithread(self.n_threads, N)
         def _(i):
             if self.approx:
@@ -575,7 +575,7 @@ class MultiOutput(MultiOutputBase):
                 if self.compute_loss:
                     if self.cheaper_loss:
                         s = sum(relus)
-                        tmp[i] = sum((self.Y[batch[i]][j] * s - relus[j]) ** 2
+                        temp[i] = sum((self.Y[batch[i]][j] * s - relus[j]) ** 2
                                      for j in range(d_out)) / s ** 2 * 0.5
                     else:
                         div = relus / sum(relus).expand_to_vector(d_out)
@@ -586,9 +586,9 @@ class MultiOutput(MultiOutputBase):
                 self.exp[i].assign_vector(e)
                 if self.compute_loss:
                     true_X = sfix.dot_product(self.Y[batch[i]], self.X[i])
-                    tmp[i] = m + log_e(sum(e)) - true_X
+                    temp[i] = m + log_e(sum(e)) - true_X
                     self.true_X[i] = true_X
-        self.l.write(sum(tmp.get_vector(0, N)) / N)
+        self.l.write(sum(temp.get_vector(0, N)) / N)
 
     def eval(self, N, top=False):
         d_out = self.X.sizes[1]
@@ -622,26 +622,26 @@ class MultiOutput(MultiOutputBase):
                 if self.cheaper_loss:
                     s = sum(self.relus[i])
                     ss = s * s * s
-                    inv = 1 / ss
+                    inverse = 1 / ss
                     @for_range_opt(d_out)
                     def _(j):
-                        res = 0
+                        result = 0
                         for k in range(d_out):
                             relu = self.relus[i][k]
                             summand = relu - self.Y[batch[i]][k] * s
                             summand *= (sfix.from_sint(j == k) - relu)
-                            res += summand
+                            result += summand
                         fallback = -self.Y[batch[i]][j]
-                        res *= inv
-                        self.nabla_X[i][j] = self.positives[i][j].if_else(res, fallback)
+                        result *= inverse
+                        self.nabla_X[i][j] = self.positives[i][j].if_else(result, fallback)
                     return
                 relus = self.relus[i].get_vector()
                 if isinstance(self.approx, float):
                     relus += self.approx
                 positives = self.positives[i].get_vector()
-                inv = (1 / sum(relus)).expand_to_vector(d_out)
+                inverse = (1 / sum(relus)).expand_to_vector(d_out)
                 truths = self.Y[batch[i]].get_vector()
-                raw = truths / relus - inv
+                raw = truths / relus - inverse
                 self.nabla_X[i] = -positives.if_else(raw, truths)
             self.maybe_debug_backward(batch)
             return
@@ -714,10 +714,10 @@ class ReluMultiOutput(MultiOutputBase):
             positives = self.X[i].get_vector() > 0
             relus = positives.if_else(self.X[i].get_vector(), 0)
             s = sum(relus)
-            inv = 1 / s
-            prod = relus * inv
-            res = prod - self.Y[batch[i]].get_vector()
-            self.nabla_X[i].assign_vector(res)
+            inverse = 1 / s
+            prod = relus * inverse
+            result = prod - self.Y[batch[i]].get_vector()
+            self.nabla_X[i].assign_vector(result)
 
 class DenseBase(Layer):
     thetas = lambda self: (self.W, self.b)
@@ -731,7 +731,7 @@ class DenseBase(Layer):
         if reshape:
             trans = self.W.transpose()
             O = trans.sizes[0]
-            tmp = MultiArray([O] + reshape,
+            temp = MultiArray([O] + reshape,
                              value_type=self.W.value_type,
                              address=trans.address)
             X, Y, C = reshape
@@ -739,7 +739,7 @@ class DenseBase(Layer):
             def _(i):
                 @for_range(C)
                 def _(j):
-                    part = tmp.get_vector_by_indices(i, None, None, j)
+                    part = temp.get_vector_by_indices(i, None, None, j)
                     part.reveal().binary_output()
         else:
             self.W.transpose().reveal_to_binary_output()
@@ -748,7 +748,7 @@ class DenseBase(Layer):
 
     def backward_params(self, f_schur_Y, batch):
         N = len(batch)
-        tmp = Matrix(self.d_in, self.d_out, unreduced_sfix)
+        temp = Matrix(self.d_in, self.d_out, unreduced_sfix)
 
         # A (f_schur_Y/nabla_Y) is stored at sequential batch indices [0, 1, ..., N-1]
         A = sfix.Matrix(N * self.d, self.d_out, address=f_schur_Y.address)
@@ -764,10 +764,10 @@ class DenseBase(Layer):
             def _(i):
                 # batch[i] gives the actual sample index in the full dataset
                 # For Dense with d>1, we need to map to flattened indices
-                actual_sample_idx = batch[i]
+                actual_sample_index = batch[i]
                 @for_range(self.d)
                 def _(d_idx):
-                    batch_d_indices[i * self.d + d_idx] = actual_sample_idx * self.d + d_idx
+                    batch_d_indices[i * self.d + d_idx] = actual_sample_index * self.d + d_idx
 
             mp = B.direct_trans_mul(A, reduce=False,
                                     indices=(regint.inc(size, base),
@@ -775,7 +775,7 @@ class DenseBase(Layer):
                                              regint.inc(N * self.d),
                                              regint.inc(self.d_out)))
 
-            tmp.assign_part_vector(mp, base)
+            temp.assign_part_vector(mp, base)
 
         progress('nabla W (matmul)')
 
@@ -783,14 +783,14 @@ class DenseBase(Layer):
                      max_size=get_program().budget)
         def _(base, size):
             self.nabla_W.assign_vector(
-                tmp.get_vector(base, size).reduce_after_mul(), base=base)
+                temp.get_vector(base, size).reduce_after_mul(), base=base)
 
         if self.print_random_update:
             print_ln('backward %s', self)
             i = regint.get_random(64) % self.d_in
             j = regint.get_random(64) % self.d_out
             print_ln('%s at (%s, %s): before=%s after=%s A=%s B=%s',
-                     str(self.nabla_W), i, j, tmp[i][j].v.reveal(),
+                     str(self.nabla_W), i, j, temp[i][j].v.reveal(),
                      self.nabla_W[i][j].reveal(),
                      A.get_column(j).reveal(),
                      B.get_column_by_row_indices(
@@ -1307,14 +1307,14 @@ class Gelu(ElementWiseLayer):
     def f_prime_part_approx(self, base, size):
         # what we compute here is all derivatives
         # we need to compute the derivative of the function at the point
-        poly_prime_f_0_0 = self.poly_f_0_1
-        poly_prime_f_0_1 = self.poly_f_0_2 * 2
-        poly_prime_f_0_2 = self.poly_f_0_3 * 3
+        polynomial_prime_f_0_0 = self.poly_f_0_1
+        polynomial_prime_f_0_1 = self.poly_f_0_2 * 2
+        polynomial_prime_f_0_2 = self.poly_f_0_3 * 3
 
-        poly_prime_f_1_0 = self.poly_f_1_1
-        poly_prime_f_1_1 = self.poly_f_1_2 * 2
-        poly_prime_f_1_3 = self.poly_f_1_4 * 4
-        poly_prime_f_1_5 = self.poly_f_1_6 * 6
+        polynomial_prime_f_1_0 = self.poly_f_1_1
+        polynomial_prime_f_1_1 = self.poly_f_1_2 * 2
+        polynomial_prime_f_1_3 = self.poly_f_1_4 * 4
+        polynomial_prime_f_1_5 = self.poly_f_1_6 * 6
 
         x1 = self.X.get_vector(base, size)
         x2 = self.x2s.get_vector(base, size)
@@ -1322,8 +1322,8 @@ class Gelu(ElementWiseLayer):
         x4 = self.x4s.get_vector(base, size)
         x5 = x4 * x1
 
-        f_0_prime = poly_prime_f_0_0 + poly_prime_f_0_1 * x1 + poly_prime_f_0_2 * x2
-        f_1_prime = poly_prime_f_1_0 + poly_prime_f_1_1 * x1 + poly_prime_f_1_3 * x3 + poly_prime_f_1_5 * x5
+        f_0_prime = polynomial_prime_f_0_0 + polynomial_prime_f_0_1 * x1 + polynomial_prime_f_0_2 * x2
+        f_1_prime = polynomial_prime_f_1_0 + polynomial_prime_f_1_1 * x1 + polynomial_prime_f_1_3 * x3 + polynomial_prime_f_1_5 * x5
 
         z0 = self.z0s.get_vector(base, size)
         z1 = self.z1s.get_vector(base, size)
@@ -1353,9 +1353,9 @@ class Tanh(ElementWiseLayer):
 
     def f_part(self, base, size):
         x = self.X.get_vector(base, size)
-        res = self.tanh(x)
-        self.tanh_computations.assign_vector(res, base)
-        return res
+        result = self.tanh(x)
+        self.tanh_computations.assign_vector(result, base)
+        return result
 
     def tanh(self, x):
         return 2 * sigmoid(2 * x) - 1
@@ -1492,9 +1492,9 @@ class MaxPool(PoolBase):
                     in zip(pool, self.comparisons[bi][k][i][j]):
                     hh = h * h_in
                     ww = w * w_in
-                    res = h_in * w_in * c * self.nabla_Y[bi][i][j][k]
+                    result = h_in * w_in * c * self.nabla_Y[bi][i][j][k]
                     get_program().protect_memory(True)
-                    self.nabla_X[bi][hh][ww][k] += res
+                    self.nabla_X[bi][hh][ww][k] += result
                     get_program().protect_memory(False)
         self.traverse(batch, process)
 
@@ -1575,9 +1575,9 @@ class Add(NoVariableLayer):
         @multithread(self.n_threads, self.Y[0].total_size())
         def _(base, size):
             for bb in batch:
-                tmp = sum(inp.Y[bb].get_vector(base, size)
+                temp = sum(inp.Y[bb].get_vector(base, size)
                           for inp in self.inputs)
-                self.Y[bb].assign_vector(tmp, base)
+                self.Y[bb].assign_vector(temp, base)
 
     def backward(self, compute_nabla_X=True, batch=None):
         if compute_nabla_X:
@@ -1603,9 +1603,9 @@ class FusedBatchNorm(Layer):
     def input_from(self, player, **kwargs):
         self.weights.input_from(player, **kwargs)
         self.bias.input_from(player, **kwargs)
-        tmp = sfix.Array(len(self.bias))
-        tmp.input_from(player, **kwargs)
-        tmp.input_from(player, **kwargs)
+        temp = sfix.Array(len(self.bias))
+        temp.input_from(player, **kwargs)
+        temp.input_from(player, **kwargs)
 
     def _forward(self, batch=[0]):
         assert len(batch) == 1
@@ -1668,8 +1668,8 @@ class BatchNorm(Layer):
         @for_range_opt_multithread(self.n_threads,
                                    [len(batch), self.X.sizes[1]])
         def _(i, j):
-            tmp = (self.X[i][j][:] - mu[:]) * factor[:]
-            self.my_Y[i][j][:] = self.bias[:] + tmp
+            temp = (self.X[i][j][:] - mu[:]) * factor[:]
+            self.my_Y[i][j][:] = self.bias[:] + temp
 
     @_layer_method_call_tape
     def forward(self, batch, training=False):
@@ -1721,10 +1721,10 @@ class BatchNorm(Layer):
         d_in = self.X.sizes[2]
         @for_range_opt_multithread(self.n_threads, [len(batch), d])
         def _(i, j):
-            tmp = self.weights[:] * self.nabla_Y[i][j][:]
-            gamnY[i][j] = tmp
-            gamnYd[i][j] = tmp * (self.X[i][j][:] - self.mu[:])
-            mynYf[i][j] = tmp * factor[:]
+            temp = self.weights[:] * self.nabla_Y[i][j][:]
+            gamnY[i][j] = temp
+            gamnYd[i][j] = temp * (self.X[i][j][:] - self.mu[:])
+            mynYf[i][j] = temp * factor[:]
             nYdf[i][j] = self.nabla_Y[i][j][:] * \
                     (self.X[i][j][:] - self.mu[:]) * factor[:]
         @map_sum_simple(self.n_threads, [len(batch), d], sfix, d_in)
@@ -1767,8 +1767,8 @@ class BatchNorm(Layer):
                      self.nabla_X[i][j][k].reveal())
 
     def reveal_parameters_to_binary(self):
-        for param in self.thetas() + (self.mu_hat, self.var_hat):
-            param.reveal().binary_output()
+        for parameter in self.thetas() + (self.mu_hat, self.var_hat):
+            parameter.reveal().binary_output()
 
 class LayerNorm(Layer):  # Changed class name
     """ Fixed-point layer normalization layer.
@@ -1833,8 +1833,8 @@ class LayerNorm(Layer):  # Changed class name
                 sel_Y = sel_Y[ar]
                 mu_sel = mu_sel[ar]
                 fac_sel = fac_sel[ar]
-            tmp = self.weights[:] * (sel_X[:] - mu_sel) * fac_sel  # Removed self.mu reference
-            sel_Y[:] = self.bias[:] + tmp
+            temp = self.weights[:] * (sel_X[:] - mu_sel) * fac_sel  # Removed self.mu reference
+            sel_Y[:] = self.bias[:] + temp
 
     @_layer_method_call_tape
     def forward(self, batch, training=False):
@@ -1849,17 +1849,17 @@ class LayerNorm(Layer):  # Changed class name
             sel = X_batch
             for ar in arg:
                 sel = sel[ar]
-            res = sum(sel[:])
+            result = sum(sel[:])
             if len(arg) == 2:
-                self.mu[arg[0]][arg[1]] = res
+                self.mu[arg[0]][arg[1]] = result
             else:
                 raise NotImplementedError("Only 3D tensors supported")
 
         @multithread(self.n_threads, self.mu.total_size())
         def _(base, size):
-            total_dim = self.X.sizes[-1]
+            total_dimension = self.X.sizes[-1]
             self.mu.assign_vector(
-                self.mu.get_vector(base, size) / total_dim, base)
+                self.mu.get_vector(base, size) / total_dimension, base)
 
         @for_range_opt_multithread(self.n_threads, batch_shape)
         def _(*arg):
@@ -2165,13 +2165,13 @@ class ConvBase(BaseLayer):
         n_outputs = batch_length * reduce(operator.mul, self.output_shape[1:])
         @multithread(self.n_threads, n_outputs, max_size=program.budget)
         def _(base, n_per_thread):
-            res = self.input_squant().unreduced(
+            result = self.input_squant().unreduced(
                 sint.load_mem(unreduced.address + base,
                               size=n_per_thread),
                 self.weight_squant(),
                 self.output_squant.params,
                 n_summands).reduce_after_mul()
-            res.store_in_mem(self.Y.address + base)
+            result.store_in_mem(self.Y.address + base)
         #stop_timer(2)
 
     def temp_shape(self):
@@ -2222,21 +2222,21 @@ class Conv2d(ConvBase):
                     weights = self.weights.get_part_vector(j)
                 inputs = inputs.pre_mul()
                 weights = weights.pre_mul()
-                res = sint(size = output_h * output_w * part_size)
-                conv2ds(res, inputs, weights, output_h, output_w,
+                result = sint(size = output_h * output_w * part_size)
+                conv2ds(result, inputs, weights, output_h, output_w,
                         inputs_h, inputs_w, weights_h, weights_w,
                         stride_h, stride_w, n_channels_in, padding_h, padding_w,
                         part_size)
                 if self.use_bias:
                     if self.bias_before_reduction:
-                        res += self.bias.expand_to_vector(j, res.size).v
+                        result += self.bias.expand_to_vector(j, result.size).v
                     else:
-                        res += self.bias.expand_to_vector(j, res.size).v << \
+                        result += self.bias.expand_to_vector(j, result.size).v << \
                             self.weight_squant.f
-                addresses = regint.inc(res.size,
+                addresses = regint.inc(result.size,
                                        self.unreduced[i * part_size].address + j,
                                        n_channels_out)
-                res.store_in_mem(addresses)
+                result.store_in_mem(addresses)
             self.reduction(len(batch))
             if self.debug_output:
                 print_ln('%s weights %s', self, self.weights.reveal_nested())
@@ -2358,11 +2358,11 @@ class FixConv2d(Conv2d, FixBase):
             rep_out = regint.inc(output_h * output_w * N, 0, 1, 1, N) * \
                 reduce(operator.mul, self.output_shape[1:])
             nabla_outputs = sfix.load_mem(rep_out + b).pre_mul()
-            res = sint(size = weights_h * weights_w)
-            conv2ds(res, inputs, nabla_outputs, weights_h, weights_w, inputs_h,
+            result = sint(size = weights_h * weights_w)
+            conv2ds(result, inputs, nabla_outputs, weights_h, weights_w, inputs_h,
                     inputs_w, output_h, output_w, -stride_h, -stride_w, N,
                     padding_h, padding_w, 1)
-            reduced = unreduced_sfix._new(res).reduce_after_mul()
+            reduced = unreduced_sfix._new(result).reduce_after_mul()
             self.nabla_weights.assign_vector_by_indices(reduced, j, None, None, i)
 
         if compute_nabla_X:
@@ -2455,12 +2455,12 @@ class QuantDepthwiseConv2d(QuantConvBase, Conv2d):
                                                              j)
                 inputs = inputs.pre_mul()
                 weights = weights.pre_mul()
-                res = sint(size = output_h * output_w)
-                conv2ds(res, inputs, weights, output_h, output_w,
+                result = sint(size = output_h * output_w)
+                conv2ds(result, inputs, weights, output_h, output_w,
                         inputs_h, inputs_w, weights_h, weights_w,
                         stride_h, stride_w, 1, padding_h, padding_w, 1)
-                res += self.bias.expand_to_vector(j, res.size).v
-                self.unreduced.assign_vector_by_indices(res, 0, None, None, j)
+                result += self.bias.expand_to_vector(j, result.size).v
+                self.unreduced.assign_vector_by_indices(result, 0, None, None, j)
             self.reduction()
             return
         else:
@@ -2649,9 +2649,9 @@ class FixAveragePool2d(PoolBase, FixBase):
                 for x, h_in, w_in, h, w in pool:
                     hh = h * h_in
                     ww = w * w_in
-                    res = h_in * w_in * part
+                    result = h_in * w_in * part
                     get_program().protect_memory(True)
-                    self.nabla_X[bi][hh][ww][k] += res
+                    self.nabla_X[bi][hh][ww][k] += result
                     get_program().protect_memory(False)
         self.traverse(batch, process)
 
@@ -2957,13 +2957,13 @@ class BertOutput(BertBase):
         self.dropout.forward(batch, training)
 
         if input_tensor_batch is not None:
-            input_tensor_batch_arr = MultiArray([len(batch), input_tensor.sizes[1], input_tensor.sizes[2]], sfix)
-            input_tensor_batch_arr.assign_vector(input_tensor.get_slice_vector(input_tensor_batch))
+            input_tensor_batch_array = MultiArray([len(batch), input_tensor.sizes[1], input_tensor.sizes[2]], sfix)
+            input_tensor_batch_array.assign_vector(input_tensor.get_slice_vector(input_tensor_batch))
             @multithread(self.n_threads, len(batch))
             def _(base, size):
                 self.layer_norm.X.assign_part_vector(
                     self.layer_norm.X.get_part_vector(base, size) +
-                    input_tensor_batch_arr.get_part_vector(base, size), base)
+                    input_tensor_batch_array.get_part_vector(base, size), base)
         else:
             @multithread(self.n_threads, len(batch))
             def _(base, size):
@@ -3071,8 +3071,8 @@ class MultiHeadAttention(BertBase):
                 query_sub[k] = self.wq.Y[i][k].get_part_vector(j * self.attention_head_size, self.attention_head_size)
                 key_sub[k] = self.wk.Y[i][k].get_part_vector(j * self.attention_head_size, self.attention_head_size)
 
-            res = query_sub.direct_mul_trans(key_sub)
-            self.attention_scores[i].assign_part_vector(res, j)
+            result = query_sub.direct_mul_trans(key_sub)
+            self.attention_scores[i].assign_part_vector(result, j)
 
         if self.debug_output:
             print_ln('forward layer attention_scores %s', self.attention_scores[0][0].reveal())
@@ -3146,24 +3146,24 @@ class MultiHeadAttention(BertBase):
         # Backprop context
         @for_range_opt_multithread(self.n_threads, [N, self.num_attention_heads])
         def _(i, j):
-            res = sfix.Matrix(self.seq_len, self.attention_head_size)
+            result = sfix.Matrix(self.seq_len, self.attention_head_size)
             value_sub = sfix.Matrix(self.seq_len, self.attention_head_size)
 
             @for_range_opt([self.seq_len])
             def _(k):
                 # dout_bth
-                res[k].assign_vector(self.nabla_context[i][k].get_part_vector(j * self.attention_head_size, self.attention_head_size)) # nabla_Y
+                result[k].assign_vector(self.nabla_context[i][k].get_part_vector(j * self.attention_head_size, self.attention_head_size)) # nabla_Y
                 # value_t2
                 value_sub[k] = self.wv.Y[i][k].get_part_vector(j * self.attention_head_size, self.attention_head_size)
 
             nabla_value_sub = sfix.Matrix(self.seq_len, self.attention_head_size)
 
             # dvalue_t2 = dout_bth * att_bth
-            nabla_value_sub.assign_vector(self.dropout.Y[i][j].direct_trans_mul(res))
+            nabla_value_sub.assign_vector(self.dropout.Y[i][j].direct_trans_mul(result))
             # nabla_value_sub.assign_vector(self.context[i][j].direct_trans_mul(res))
 
             # datt_bth = dout_bth * value_t2
-            self.dropout.nabla_Y[i][j].assign_vector(res.direct_mul_trans(value_sub))
+            self.dropout.nabla_Y[i][j].assign_vector(result.direct_mul_trans(value_sub))
 
             @for_range_opt([self.seq_len])
             def _(k):
@@ -3268,20 +3268,20 @@ class Optimizer:
     @staticmethod
     def from_args(program, layers):
         if 'adam' in program.args or 'adamapprox' in program.args:
-            res = Adam(layers, 1, approx='adamapprox' in program.args)
+            result = Adam(layers, 1, approx='adamapprox' in program.args)
         elif 'amsgrad' in program.args:
-            res = Adam(layers, approx=True, amsgrad=True)
+            result = Adam(layers, approx=True, amsgrad=True)
         elif 'amsgradprec' in program.args:
-            res = Adam(layers, approx=False, amsgrad=True)
+            result = Adam(layers, approx=False, amsgrad=True)
         elif 'quotient' in program.args:
-            res = Adam(layers, approx=True, amsgrad=True, normalize=True)
+            result = Adam(layers, approx=True, amsgrad=True, normalize=True)
         else:
-            res = SGD(layers, 1)
-        res.early_division = 'early_div' in program.args
-        res.output_diff = 'output_diff' in program.args
-        res.output_grad = 'output_grad' in program.args
-        res.output_stats = 'output_stats' in program.args
-        return res
+            result = SGD(layers, 1)
+        result.early_division = 'early_div' in program.args
+        result.output_diff = 'output_diff' in program.args
+        result.output_grad = 'output_grad' in program.args
+        result.output_stats = 'output_stats' in program.args
+        return result
 
     def __init__(self, layers=[], report_loss=None, time_layers=False,
                  program=None):
@@ -3317,11 +3317,11 @@ class Optimizer:
         """ Construct linear graph from list of layers. """
         self._layers = layers
         self.thetas = []
-        prev = None
+        previous = None
         for layer in layers:
-            if not layer.inputs and prev is not None:
-                layer.inputs = [prev]
-            prev = layer
+            if not layer.inputs and previous is not None:
+                layer.inputs = [previous]
+            previous = layer
             self.thetas.extend(layer.thetas())
 
     def set_layers_with_inputs(self, layers):
@@ -3469,17 +3469,17 @@ class Optimizer:
         @multithread(cls.n_threads, total)
         def _(base, size):
             tn = get_thread_number() - 1
-            tmp = Array.create_from(
+            temp = Array.create_from(
                 tensor.get_vector(base, size).reveal())
             @for_range_opt(size, budget=1000)
             def _(i):
-                zero[tn] += tmp[i] == 0
-                neg[tn] += tmp[i] < 0
-                small[tn] += abs(tmp[i]) < 2 ** (-tmp[i].f / 2)
-                s[tn] += tmp[i]
-                mx[tn] = util.max(mx[tn], tmp[i])
-                mn[tn] = util.min(mn[tn], tmp[i])
-            tmp.delete()
+                zero[tn] += temp[i] == 0
+                neg[tn] += temp[i] < 0
+                small[tn] += abs(temp[i]) < 2 ** (-temp[i].f / 2)
+                s[tn] += temp[i]
+                mx[tn] = util.max(mx[tn], temp[i])
+                mn[tn] = util.min(mn[tn], temp[i])
+            temp.delete()
         print_str(
             ' %s 0:%s/%s, <0:%s/%s, >0:%s/%s, ~0:%s/%s sum:%s max:%s min:%s ',
             name, sum(zero), total, sum(neg), total,
@@ -3511,7 +3511,7 @@ class Optimizer:
                         nabla.get_vector().reveal().binary_output()
                         break_point()
         if self.output_stats:
-            old_params = []
+            old_parameters = []
             @if_((i_batch % self.output_stats == 0).bit_or(i_epoch == 0))
             def _():
                 for i, layer in enumerate(self.layers[:-1]):
@@ -3528,7 +3528,7 @@ class Optimizer:
                     for theta in layer.thetas():
                         self.stat(' %d param' % i, theta)
                         if theta.total_size() < 1000:
-                            old_params.append(theta.get_vector())
+                            old_parameters.append(theta.get_vector())
         if self.time_layers:
             start_timer(1000)
         self._update(i_epoch, MemValue(i_batch), batch)
@@ -3542,8 +3542,8 @@ class Optimizer:
                         if theta.total_size() < 1000:
                             print_ln(layer)
                             self.stat(' %d diff' % i, Array.create_from(
-                                theta.get_vector() - old_params[0]))
-                            del old_params[0]
+                                theta.get_vector() - old_parameters[0]))
+                            del old_parameters[0]
 
     @_no_mem_warnings
     def run(self, batch_size=None, stop_on_loss=0):
@@ -3639,12 +3639,12 @@ class Optimizer:
             if self.time_training:
                 time()
             i.iadd(1)
-            res = True
+            result = True
             if self.tol > 0:
-                res *= (1 - (loss_sum >= 0) * \
+                result *= (1 - (loss_sum >= 0) * \
                         (loss_sum < self.tol * n_per_epoch)).reveal()
-            self.stopped_on_low_loss.write(1 - res)
-            return res
+            self.stopped_on_low_loss.write(1 - result)
+            return result
 
     def reveal_correctness(self, data, truth, batch_size=128, running=False):
         """ Test correctness by revealing results.
@@ -4054,9 +4054,9 @@ class SGD(Optimizer):
                 theta.assign_vector(theta.get_vector(base, size) +
                                     delta_theta.get_vector(base, size), base)
             if self.print_update_average:
-                vec = abs(delta_theta.get_vector().reveal())
+                vector = abs(delta_theta.get_vector().reveal())
                 print_ln('update average: %s (%s)',
-                         sum(vec) * cfix(1 / len(vec)), len(vec))
+                         sum(vector) * cfix(1 / len(vector)), len(vector))
             if self.debug:
                 limit = int(self.debug)
                 d = delta_theta.get_vector().reveal()
@@ -4105,10 +4105,10 @@ def apply_padding(input_shape, kernel_size, strides, padding):
         input_shape = [input_shape[i] + 2*padding[i] for i in range(len(input_shape))]
         padding = 'valid'
     if padding.lower() == 'valid':
-        res = (input_shape[0] - kernel_size[0]) // strides[0] + 1, \
+        result = (input_shape[0] - kernel_size[0]) // strides[0] + 1, \
             (input_shape[1] - kernel_size[1]) // strides[1] + 1,
-        assert min(res) > 0, (input_shape, kernel_size, strides, padding)
-        return res
+        assert min(result) > 0, (input_shape, kernel_size, strides, padding)
+        return result
     elif padding.lower() == 'same':
         return (input_shape[0]) // strides[0], \
             (input_shape[1]) // strides[1],
@@ -4262,40 +4262,40 @@ class keras:
                         layers.append(MultiOutput(*shape))
                 if self.optimizer[1]:
                     raise Exception('use keyword arguments for optimizer')
-                opt = self.optimizer[0]
-                opts = self.optimizer[2]
-                if opt == 'sgd':
-                    opt = SGD(layers, 1)
-                    momentum = opts.pop('momentum', None)
+                option = self.optimizer[0]
+                options = self.optimizer[2]
+                if option == 'sgd':
+                    option = SGD(layers, 1)
+                    momentum = options.pop('momentum', None)
                     if momentum != None:
-                        opt.momentum = momentum
-                elif opt == 'adam':
-                    opt = Adam(layers, amsgrad=opts.pop('amsgrad', None),
-                               approx=opts.pop('approx', True))
-                    beta1 = opts.pop('beta_1', None)
-                    beta2 = opts.pop('beta_2', None)
-                    epsilon = opts.pop('epsilon', None)
+                        option.momentum = momentum
+                elif option == 'adam':
+                    option = Adam(layers, amsgrad=options.pop('amsgrad', None),
+                               approx=options.pop('approx', True))
+                    beta1 = options.pop('beta_1', None)
+                    beta2 = options.pop('beta_2', None)
+                    epsilon = options.pop('epsilon', None)
                     if beta1 != None:
-                        opt.beta1 = beta1
+                        option.beta1 = beta1
                     if beta2:
-                        opt.beta2 = beta2
+                        option.beta2 = beta2
                     if epsilon:
-                        if epsilon < opt.epsilon:
+                        if epsilon < option.epsilon:
                             print('WARNING: epsilon smaller than default might '
                                   'cause overflows')
-                        opt.epsilon = epsilon
-                elif opt == 'inference':
-                    opt = Optimizer()
-                    opt.layers = layers
+                        option.epsilon = epsilon
+                elif option == 'inference':
+                    option = Optimizer()
+                    option.layers = layers
                 else:
-                    raise Exception(opt + ' not supported')
-                lr = opts.pop('learning_rate', None)
+                    raise Exception(option + ' not supported')
+                lr = options.pop('learning_rate', None)
                 if lr != None:
-                    opt.set_learning_rate(lr)
-                if opts:
-                    raise Exception(opts + ' not supported')
+                    option.set_learning_rate(lr)
+                if options:
+                    raise Exception(options + ' not supported')
                 self.batch_size = batch_size
-                self.opt = opt
+                self.opt = option
 
             def fit(self, x, y, batch_size, epochs=1, validation_data=None):
                 assert len(x) == len(y)
@@ -4815,10 +4815,10 @@ def solve_linear_diag_precond(A, b, x, r, n_iterations, progress=False,
         x[:] = x[:] + alpha * d[:]
         r_norm = sfix.dot_product(r, mr)
         r[:] = r[:] - alpha * Ad
-        tmp = m * r[:]
-        beta = (r_norm == 0).if_else(0, sfix.dot_product(r, tmp) / r_norm)
-        mr[:] = tmp
-        d[:] = tmp + beta * d
+        temp = m * r[:]
+        beta = (r_norm == 0).if_else(0, sfix.dot_product(r, temp) / r_norm)
+        mr[:] = temp
+        d[:] = temp + beta * d
         if progress:
             print_ln('%s alpha=%s beta=%s r_norm=%s d_norm=%s', i,
                      alpha.reveal(), beta.reveal(), r_norm.reveal(),
@@ -4856,11 +4856,11 @@ def var(x):
     def _(i):
         mean.iadd(x[i])
     mean /= len(x)
-    res = MemValue(type(x[0])(0))
+    result = MemValue(type(x[0])(0))
     @for_range_opt(len(x))
     def _(i):
-        res.iadd((x[i] - mean.read()) ** 2)
-    return res.read()
+        result.iadd((x[i] - mean.read()) ** 2)
+    return result.read()
 
 def cholesky(A, reveal_diagonal=False):
     """ Cholesky decomposition.
@@ -4872,7 +4872,7 @@ def cholesky(A, reveal_diagonal=False):
     assert A.shape[0] == A.shape[1]
     L = A.same_shape()
     L.assign_all(0)
-    diag_inv = A.value_type.Array(A.shape[0])
+    diagonal_inverse = A.value_type.Array(A.shape[0])
     @for_range(A.shape[0])
     def _(i):
         @for_range(i + 1)
@@ -4882,13 +4882,13 @@ def cholesky(A, reveal_diagonal=False):
             @if_e(i == j)
             def _():
                 L[i][j] = mpc_math.sqrt(A[i][i] - sum)
-                diag_inv[i] = 1 / L[i][j]
+                diagonal_inverse[i] = 1 / L[i][j]
                 if reveal_diagonal:
                     print_ln('L[%s][%s] = %s = sqrt(%s - %s)', i, j,
                              L[i][j].reveal(), A[i][j].reveal(), sum.reveal())
             @else_
             def _():
-                L[i][j] = (diag_inv[j] * (A[i][j] - sum))
+                L[i][j] = (diagonal_inverse[j] * (A[i][j] - sum))
     return L
 
 def solve_lower(A, b):
@@ -4897,12 +4897,12 @@ def solve_lower(A, b):
     assert A.shape[0] == A.shape[1]
     assert len(b) == A.shape[0]
     b = Array.create_from(b)
-    res = sfix.Array(len(b))
+    result = sfix.Array(len(b))
     @for_range(len(b))
     def _(i):
-        res[i] = b[i] / A[i][i]
-        b[:] -= res[i] * A.get_column(i)
-    return res
+        result[i] = b[i] / A[i][i]
+        b[:] -= result[i] * A.get_column(i)
+    return result
 
 def solve_upper(A, b):
     """ Linear solver where :py:obj:`A` is upper triangular quadratic. """
@@ -4910,12 +4910,12 @@ def solve_upper(A, b):
     assert A.shape[0] == A.shape[1]
     assert len(b) == A.shape[0]
     b = Array.create_from(b)
-    res = sfix.Array(len(b))
+    result = sfix.Array(len(b))
     @for_range(len(b) - 1, -1, -1)
     def _(i):
-        res[i] = b[i] / A[i][i]
-        b[:] -= res[i] * A.get_column(i)
-    return res
+        result[i] = b[i] / A[i][i]
+        b[:] -= result[i] * A.get_column(i)
+    return result
 
 def solve_cholesky(A, b, debug=False):
     """ Linear solver using Cholesky decomposition. """

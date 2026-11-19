@@ -1589,9 +1589,9 @@ class inputmixed(inputmixed_base):
     def add_usage(self, req_node):
         for i, t in self.bases(iter(self.args)):
             player = self.args[i + sum(self.types[t]) + 1]
-            n_dest = self.types[t][0]
+            n_destination = self.types[t][0]
             req_node.increment((self.field_type, 'input', player), \
-                               n_dest * self.get_size())
+                               n_destination * self.get_size())
 
     def get_players(self):
         for i, t in self.bases(iter(self.args)):
@@ -2603,9 +2603,9 @@ class dotprods(base.VarArgsInstruction, base.DataInstruction,
     def __init__(self, *args):
         flat_args = []
         for i in range(0, len(args), 3):
-            res, x, y = args[i:i+3]
+            result, x, y = args[i:i+3]
             assert len(x) == len(y)
-            flat_args += [2 * len(x) + 2, res]
+            flat_args += [2 * len(x) + 2, result]
             for x, y in zip(x, y):
                 flat_args += [x, y]
         base.Instruction.__init__(self, *flat_args)

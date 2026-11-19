@@ -63,10 +63,10 @@ class Block(object):
         self.value = self.value_type.hard_conv(value)
         self.lengths = tuplify(lengths)
     def get_slice(self):
-        res = []
+        result = []
         for length,start in  zip(self.lengths, series(self.lengths)):
-            res.append(util.bit_compose((self.bits[start:start+length])))
-        return res
+            result.append(util.bit_compose((self.bits[start:start+length])))
+        return result
     def __repr__(self):
         return '<' + str(self.value) + '>'
 
@@ -94,16 +94,16 @@ class intBlock(Block):
             self.bits = self.slice.bit_decompose(total_length)
             return super(intBlock, self).get_slice()
         else:
-            res = []
+            result = []
             remainder = self.slice
             for length,start in zip(self.lengths[:-1],series(self.lengths)):
-                res.append(remainder.mod2m(length, total_length - start,
+                result.append(remainder.mod2m(length, total_length - start,
                                            signed=False))
-                remainder -= res[-1]
+                remainder -= result[-1]
                 remainder = remainder.trunc_zeros(length,
                                                   total_length - start, False)
-            res.append(remainder)
-            return res
+            result.append(remainder)
+            return result
     def set_slice(self, value):
         value = sum(v << start for v,start in zip(value, series(self.lengths)))
         self.value = self.upper + self.lower + value * self.shift
@@ -131,8 +131,8 @@ class gf2nBlock(Block):
             l = log2(entries_per_block)
             start_bits = bit_decompose(start, l)
             choice_bits = demux(start_bits)
-            inv_bits = [1 - bit for bit in floatingpoint.PreOR(choice_bits, None)]
-            mask_bits = sum(([x] * length for x in inv_bits), [])
+            inverse_bits = [1 - bit for bit in floatingpoint.PreOR(choice_bits, None)]
+            mask_bits = sum(([x] * length for x in inverse_bits), [])
             lower_bits = list(map(operator.mul, value_bits, mask_bits))
             self.lower = sum(bit << i for i,bit in enumerate(lower_bits))
             self.bits = [sum(map(operator.mul, choice_bits, value_bits[i::length])) \
@@ -150,8 +150,8 @@ class gf2nBlock(Block):
             bits = bit_decompose(power_start, entries_per_block)
             adjust = sum(bit << (i * length) for i,bit in enumerate(bits))
             pre_bits = floatingpoint.PreOpL(lambda x,y,z=None: x + y, bits)
-            inv_bits = [1 - bit for bit in pre_bits]
-            mask_bits = sum(([x] * length for x in inv_bits), [])
+            inverse_bits = [1 - bit for bit in pre_bits]
+            mask_bits = sum(([x] * length for x in inverse_bits), [])
             lower_bits = list(map(operator.mul, value_bits, mask_bits))
             masked = self.value - sum(bit << i for i,bit in enumerate(lower_bits))
             self.lower = sum(bit << i for i,bit in enumerate(lower_bits))
@@ -210,21 +210,21 @@ def demux_list(x):
     n_a = len(a)
     a *= len(b)
     b = reduce(operator.add, ([i] * n_a for i in b))
-    res = list(map(util.bit_and, a, b))
-    return res
+    result = list(map(util.bit_and, a, b))
+    return result
 
 def demux_array(x, res=None, n_threads=None):
-    tmp = demux_matrix(x, n_threads=n_threads).array
+    temp = demux_matrix(x, n_threads=n_threads).array
     if res:
         try:
             assert issubclass(x.value_type, _register)
-            res[:] = tmp[:]
+            res[:] = temp[:]
         except:
             @for_range(len(res))
             def _(i):
-                res[i] = tmp[i]
+                res[i] = temp[i]
     else:
-        res = tmp
+        res = temp
     return res
 
 def demux_matrix(x, n_threads=None):
@@ -246,17 +246,17 @@ def demux_matrix(x, n_threads=None):
     else:
         assert isinstance(x, (list, tuple))
         t = type(x[0])
-    res = t.Matrix(2**n, m)
+    result = t.Matrix(2**n, m)
     if n == 1:
         if have_matrix:
             @multithread(n_threads, m)
             def _(base, size):
                 part = x[0].get_vector(base=base, size=size)
-                res[0].assign_vector(part.bit_not(), base=base)
-                res[1].assign_vector(part, base=base)
+                result[0].assign_vector(part.bit_not(), base=base)
+                result[1].assign_vector(part, base=base)
         else:
-            res[0] = util.bit_not(x[0], 1)
-            res[1] = x[0]
+            result[0] = util.bit_not(x[0], 1)
+            result[1] = x[0]
     else:
         if have_matrix:
             a = demux_matrix(x.get_part(start=0, size=n // 2))
@@ -273,7 +273,7 @@ def demux_matrix(x, n_threads=None):
                 @for_range_opt(len(b))
                 def f(j):
                     kwargs = {'base': base, 'size': size}
-                    res[j * len(a) + i].assign_vector(
+                    result[j * len(a) + i].assign_vector(
                         a[i].get_vector(**kwargs) * b[j].get_vector(**kwargs),
                         base=base)
         # in a function block, a and b are used again on every call,
@@ -281,7 +281,7 @@ def demux_matrix(x, n_threads=None):
         if Program.prog.curr_block.alloc_pool.parent is None:
             a.delete()
             b.delete()
-    return res
+    return result
 
 def decompose_demux(x, n_bits, n_threads=None):
     r""" Bit decomposition followed by :py:func:`demux_matrix`.
@@ -291,12 +291,12 @@ def decompose_demux(x, n_bits, n_threads=None):
     :param n_threads: number of threads (default is running in same thread)
     :returns: :math:`2^n \times m`-matrix of secret bits
     """
-    tmp = Array.create_from(x)
-    bits = tmp.value_type.bit_type.Matrix(n_bits, len(x))
+    temp = Array.create_from(x)
+    bits = temp.value_type.bit_type.Matrix(n_bits, len(x))
     @multithread(n_threads, len(x))
     def _(base, size):
         for i, part in enumerate(
-                tmp.get_vector(base=base, size=size).bit_decompose(n_bits)):
+                temp.get_vector(base=base, size=size).bit_decompose(n_bits)):
             bits[i].assign_vector(part, base=base)
     return demux_matrix(bits, n_threads=n_threads)
 
@@ -377,17 +377,17 @@ class Entry(object):
     """ An (O)RAM entry with empty bit, index, and value. """
     @staticmethod
     def get_empty(value_type, entry_size, apply_type=True, index_size=None):
-        res = {}
+        result = {}
         for i,tt in enumerate((value_type, value_type.default_type)):
             if apply_type:
                 apply = lambda length, x: value_type.get_type(length)(x)
             else:
                 apply = lambda length, x: x
-            res[i] = Entry(apply(index_size, 0), \
+            result[i] = Entry(apply(index_size, 0), \
                            tuple(apply(l, 0) for l in entry_size), \
                            apply(1, True), value_type)
-        res[0].defaults = res[1]
-        return res[0]
+        result[0].defaults = result[1]
+        return result[0]
     def __init__(self, v, x=None, empty=None, value_type=None):
         self.created_non_empty = False
         if x is None:
@@ -504,13 +504,13 @@ class RefRAM(object):
         return tree_reduce(operator.mul, list(self.get_empty_bits()))
     def reveal(self):
         Program.prog.curr_tape.start_new_basicblock()
-        res = RAM(self.size, [t.clear_type for t in self.entry_type], \
+        result = RAM(self.size, [t.clear_type for t in self.entry_type], \
                   lambda *args: Array(*args), self.index)
         for i,a in enumerate(self.l):
             for j,x in enumerate(a):
-                res.l[i][j] = x.reveal()
+                result.l[i][j] = x.reveal()
         Program.prog.curr_tape.start_new_basicblock()
-        return res
+        return result
     def output(self):
         print_ln('%s', [x.reveal() for x in self])
     def print_reg(self):
@@ -539,9 +539,9 @@ class AbstractORAM(object):
     def get_array(size, t, *args, **kwargs):
         return t.dynamic_array(size, t, *args, **kwargs)
     def read(self, index):
-        res = self._read(self.index_type.hard_conv(index))
-        res = [self.value_type._new(x) for x in res]
-        return res
+        result = self._read(self.index_type.hard_conv(index))
+        result = [self.value_type._new(x) for x in result]
+        return result
     def write(self, index, value):
         value = util.tuplify(value)
         value = [self.value_type.conv(x) for x in value]
@@ -595,10 +595,10 @@ class AbstractORAM(object):
         self.access(index, (self.value_type(0),) * self.value_length, \
                         for_real, True)
     def __getitem__(self, index):
-        res, empty = self.read(index)
-        if len(res) == 1:
-            res = res[0]
-        return res
+        result, empty = self.read(index)
+        if len(result) == 1:
+            result = result[0]
+        return result
     __setitem__ = write
 
 class EmptyException(Exception):
@@ -1204,10 +1204,10 @@ class TreeORAM(AbstractORAM):
             new_path = regint.get_random(self.D)
             l_star = self.index_type(new_path)
         self.state.write(l_star)
-        res = self.index.update(u, l_star, evict=False).reveal()
-        if isinstance(res, types._clear):
-            res = regint(cint.conv(res))
-        return res
+        result = self.index.update(u, l_star, evict=False).reveal()
+        if isinstance(result, types._clear):
+            result = regint(cint.conv(result))
+        return result
     @method_block
     def read_and_remove_levels(self, u, read_path):
         u = MemValue(u)
@@ -1406,7 +1406,7 @@ class TreeORAM(AbstractORAM):
             sz.iadd(1)
             end_if()
 
-        pos_bits = self.value_type.Matrix(self.bucket_size * nleaves, 2)
+        position_bits = self.value_type.Matrix(self.bucket_size * nleaves, 2)
 
         @for_range_opt(nleaves)
         def _(i):
@@ -1431,16 +1431,16 @@ class TreeORAM(AbstractORAM):
                                                 self.bucket_size)[0]
             assert len(bucket_bits) == self.bucket_size
             for j, b in enumerate(bucket_bits):
-                pos_bits[i * self.bucket_size + j] = [b, leaf]
+                position_bits[i * self.bucket_size + j] = [b, leaf]
         
         # sort to get empty positions first
-        pos_bits.sort(n_bits=1)
+        position_bits.sort(n_bits=1)
 
         # now assign positions to empty entries
         @for_range(len(entries) - m)
         def _(i):
             vtype, vlength = self.internal_value_type()
-            leaf = vtype(pos_bits[i][1])
+            leaf = vtype(position_bits[i][1])
             # set leaf in empty entry for assigning after shuffle
             value = tuple([leaf] + [vtype(0) for j in range(vlength - 1)])
             entry = Entry(vtype(0), value, vtype.hard_conv(True), vtype)
@@ -1516,12 +1516,12 @@ def get_parallel(index_size, value_type, value_length):
     value_size = get_value_size(value_type)
     if value_type == sint:
         value_size *= 2
-    res = max(1, min(50 * 32 // (value_length * value_size), \
+    result = max(1, min(50 * 32 // (value_length * value_size), \
                          800 * 32 // (value_length * index_size)))
     if comparison.const_rounds:
-        res = max(1, res // 2)
-    print('Reading %d buckets in parallel' % res)
-    return res
+        result = max(1, result // 2)
+    print('Reading %d buckets in parallel' % result)
+    return result
 
 class PackedIndexStructure(object):
     """ Abstract class for ORAM using bit packing. """
@@ -1656,24 +1656,24 @@ class PackedIndexStructure(object):
             self.pack = pack
             self.a = index
         def read(self, block):
-            res = []
+            result = []
             for element,sizes in zip(block,self.pack.split_sizes):
                 bits = element.bit_decompose(sum(sizes))
                 for size in sizes:
-                    res.append(sum(bit << i \
+                    result.append(sum(bit << i \
                                        for i,bit in enumerate(bits[-size:])))
                     del bits[-size:]
-            return tuple(res)
+            return tuple(result)
         def write(self, value):
-            res = []
+            result = []
             i = 0
             for sizes in self.pack.split_sizes:
-                res.append(0)
+                result.append(0)
                 for size in sizes:
-                    res[-1] <<= size
-                    res[-1] += value[i]
+                    result[-1] <<= size
+                    result[-1] += value[i]
                     i += 1
-            return res
+            return result
     def get_slicer(self, index):
         if self.log_entries_per_element < 0:
             return self.MultiSlicer(self, index)
@@ -1744,13 +1744,13 @@ class PackedORAMWithEmpty(AbstractORAM, PackedIndexStructure):
         self.value_length = len(self.entry_size)
     @method_block
     def _read(self, index):
-        res = PackedIndexStructure.__getitem__(self, index)
-        return res[1:], 1 - res[0]
+        result = PackedIndexStructure.__getitem__(self, index)
+        return result[1:], 1 - result[0]
     def access(self, index, new_value, write, new_empty=False, evict=True):
-        res = PackedIndexStructure.access(self, index, (1 - new_empty,) + \
+        result = PackedIndexStructure.access(self, index, (1 - new_empty,) + \
                                               tuplify(new_value), write, \
                                           evict=evict)
-        return res[1:], 1 - res[0]
+        return result[1:], 1 - result[0]
     def read_and_maybe_remove(self, index):
         return self.read(index), 0
     def add(self, entry, state=None, evict=True):

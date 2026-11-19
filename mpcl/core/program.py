@@ -357,8 +357,8 @@ class Program(object):
         from mpcl.lib.non_linear import Ring
 
         for tape in self.tapes:
-            prev = tape.req_bit_length["p"]
-            if prev and prev != ring_size:
+            previous = tape.req_bit_length["p"]
+            if previous and previous != ring_size:
                 raise CompilerError("cannot have different ring sizes")
         self.bit_length = ring_size - 1
         self.non_linear = Ring(ring_size)
@@ -522,10 +522,10 @@ class Program(object):
 
     def finalize_tape(self, tape):
         if not tape.purged:
-            curr_tape = self.curr_tape
+            current_tape = self.curr_tape
             self.curr_tape = tape
             tape.optimize(self.options)
-            self.curr_tape = curr_tape
+            self.curr_tape = current_tape
             tape.write_bytes()
             if self.options.asmoutfile:
                 tape.write_str(self.options.asmoutfile + "-" + tape.name)
@@ -572,34 +572,34 @@ class Program(object):
             else:
                 raise CompilerError("cannot allocate memory " "outside main thread")
         blocks = self.free_mem_blocks[mem_type]
-        addr = blocks.pop(size) if use_freed else None
-        if addr is not None:
+        address = blocks.pop(size) if use_freed else None
+        if address is not None:
             self.saved += size
         else:
-            addr = self.allocated_mem[mem_type]
+            address = self.allocated_mem[mem_type]
             self.allocated_mem[mem_type] += size
-            if len(str(addr)) != len(str(addr + size)) and self.verbose:
-                print("Memory of type '%s' now of size %d" % (mem_type, addr + size))
-            if (self.verbose or addr > 10 ** 9) and size > 0.1 * addr:
+            if len(str(address)) != len(str(address + size)) and self.verbose:
+                print("Memory of type '%s' now of size %d" % (mem_type, address + size))
+            if (self.verbose or address > 10 ** 9) and size > 0.1 * address:
                 print("adding %d to memory of type '%s' at size %d in block %s" % (
-                    size, mem_type, addr, self.curr_block.name))
-            if addr + size >= MEM_MAX:
+                    size, mem_type, address, self.curr_block.name))
+            if address + size >= MEM_MAX:
                 raise CompilerError(
                     "allocation exceeded for type '%s' after adding %d to %d" \
-                    % (mem_type, size, addr))
-        self.allocated_mem_blocks[addr, mem_type] = size, self.curr_block.alloc_pool
+                    % (mem_type, size, address))
+        self.allocated_mem_blocks[address, mem_type] = size, self.curr_block.alloc_pool
         if single_size:
             from mpcl.lib.library import get_arg, runtime_error_if
             bak = self.curr_tape.active_basicblock
             self.curr_tape.active_basicblock = self.curr_tape.basicblocks[0]
             arg = get_arg()
             runtime_error_if(arg >= self.n_running_threads, "malloc")
-            res = addr + single_size * arg
+            result = address + single_size * arg
             self.curr_tape.active_basicblock = bak
-            self.base_addresses[res] = addr
-            return res
+            self.base_addresses[result] = address
+            return result
         else:
-            return addr
+            return address
 
     def free(self, addr, mem_type):
         """Free memory"""
@@ -617,9 +617,9 @@ class Program(object):
             self.later_mem_blocks[mem_type].append((addr, size))
 
     def free_later(self):
-        for mem_type in self.later_mem_blocks:
-            for block in self.later_mem_blocks[mem_type]:
-                self.free_mem_blocks[mem_type].push(*block)
+        for memory_type in self.later_mem_blocks:
+            for block in self.later_mem_blocks[memory_type]:
+                self.free_mem_blocks[memory_type].push(*block)
         self.later_mem_blocks.clear()
 
     def finalize(self):
@@ -656,16 +656,16 @@ class Program(object):
         # reset register counter to 0
         if not self.options.noreallocate:
             self.curr_tape.init_registers()
-        for mem_type, size in sorted(self.allocated_mem.items()):
+        for memory_type, size in sorted(self.allocated_mem.items()):
             if size and (not self.options.garbled or \
-                         mem_type not in ('s', 'sg', 'c', 'cg')):
+                         memory_type not in ('s', 'sg', 'c', 'cg')):
                 # print "Memory of type '%s' of size %d" % (mem_type, size)
-                if mem_type in self.types:
-                    self.types[mem_type].load_mem(size - 1, mem_type)
+                if memory_type in self.types:
+                    self.types[memory_type].load_mem(size - 1, memory_type)
                 else:
                     from mpcl.core.types import _get_type
 
-                    _get_type(mem_type).load_mem(size - 1, mem_type)
+                    _get_type(memory_type).load_mem(size - 1, memory_type)
         if self.verbose:
             if self.saved:
                 print("Saved %s memory units through reallocation" % self.saved)
@@ -717,9 +717,9 @@ class Program(object):
         self.to_merge += [gc.xors]
 
     def get_tape_counter(self):
-        res = self.tape_counter
+        result = self.tape_counter
         self.tape_counter += 1
-        return res
+        return result
 
     @property
     def use_trunc_pr(self):
@@ -1118,11 +1118,11 @@ class Tape:
                 inst.expand_merged(skip)
             self.instructions = tape.active_basicblock.instructions
             if start_block == tape.basicblocks[-1]:
-                res = self
+                result = self
             else:
-                res = start_block
+                result = start_block
             tape.basicblocks[-1] = self
-            return res
+            return result
 
         def replace_last_reg(self, new_reg, last_reg):
             args = self.instructions[-1].args
@@ -1322,9 +1322,9 @@ class Tape:
             allocator = al.StraightlineAllocator(REG_MAX, self.program)
 
             # make addresses available in functions
-            for addr in self.program.base_addresses:
-                if addr.program == self and self.basicblocks:
-                    allocator.alloc_reg(addr, self.basicblocks[-1])
+            for address in self.program.base_addresses:
+                if address.program == self and self.basicblocks:
+                    allocator.alloc_reg(address, self.basicblocks[-1])
 
             for reg in self.return_values:
                 allocator.alloc_reg(reg, self.basicblocks[-1])
@@ -1542,45 +1542,45 @@ class Tape:
             super(Tape.ReqNum, self).__init__(lambda: 0, init)
 
         def __add__(self, other):
-            res = Tape.ReqNum()
+            result = Tape.ReqNum()
             for i, count in list(self.items()):
-                res[i] += count
+                result[i] += count
             for i, count in list(other.items()):
-                res[i] += count
-            return res
+                result[i] += count
+            return result
 
         def __mul__(self, other):
-            res = Tape.ReqNum()
+            result = Tape.ReqNum()
             if other == 0:
-                return res
+                return result
             for i in self:
-                res[i] = other * self[i]
-            return res
+                result[i] = other * self[i]
+            return result
 
         __rmul__ = __mul__
 
         def __neg__(self):
-            res = Tape.ReqNum()
+            result = Tape.ReqNum()
             for i, count in list(self.items()):
-                res[i] = -count
-            return res
+                result[i] = -count
+            return result
 
         def set_all(self, value):
             if Program.prog.options.verbose and \
                value == float("inf") and self["all", "inv"] > 0:
                 print("Going to unknown from %s" % self)
-            res = Tape.ReqNum()
+            result = Tape.ReqNum()
             for i in self:
-                res[i] = value
-            return res
+                result[i] = value
+            return result
 
         def max(self, other):
-            res = Tape.ReqNum()
+            result = Tape.ReqNum()
             for i in self:
-                res[i] = max(self[i], other[i])
+                result[i] = max(self[i], other[i])
             for i in other:
-                res[i] = max(self[i], other[i])
-            return res
+                result[i] = max(self[i], other[i])
+            return result
 
         def cost(self):
             return sum(
@@ -1605,30 +1605,30 @@ class Tape:
                 except:
                     return str(num)
 
-            res = []
+            result = []
             for req, num in self.items():
                 domain = t(req[0])
                 if num < 0:
                     num = float('inf')
                 n = f(num)
                 if req[1] == "input":
-                    res += ["%s %s inputs from player %d" % (n, domain, req[2])]
+                    result += ["%s %s inputs from player %d" % (n, domain, req[2])]
                 elif domain.endswith("edabit"):
                     if domain == "sedabit":
                         eda = "strict edabits"
                     else:
                         eda = "loose edabits"
-                    res += ["%s %s of length %d" % (n, eda, req[1])]
+                    result += ["%s %s of length %d" % (n, eda, req[1])]
                 elif domain == "matmul":
-                    res += [
+                    result += [
                         "%s matrix multiplications (%dx%d * %dx%d)"
                         % (n, req[1][0], req[1][1], req[1][1], req[1][2])
                     ]
                 elif req[0] != "all":
-                    res += ["%s %s %ss" % (n, domain, req[1])]
+                    result += ["%s %s %ss" % (n, domain, req[1])]
             if self["all", "round"]:
-                res += ["%s virtual machine rounds" % f(self["all", "round"])]
-            return res
+                result += ["%s virtual machine rounds" % f(self["all", "round"])]
+            return result
 
         def __str__(self):
             return ", ".join(self.pretty())
@@ -1658,13 +1658,13 @@ class Tape:
             self.num = Tape.ReqNum()
             for block in self.blocks:
                 block.add_usage(self)
-            res = reduce(
+            result = reduce(
                 lambda x, y: x + y.aggregate(self.name), self.children, self.num
             )
             if self.recursion:
-                res *= float('inf')
-            self.aggregated = res
-            return res
+                result *= float('inf')
+            self.aggregated = result
+            return result
 
         def increment(self, data_type, num=1):
             self.num[data_type] += num
@@ -1683,11 +1683,11 @@ class Tape:
             self.parent = parent
 
         def aggregate(self, name):
-            res = self.aggregator([node.aggregate() for node in self.nodes])
+            result = self.aggregator([node.aggregate() for node in self.nodes])
             try:
                 n_reps = self.aggregator([1])
-                n_rounds = res["all", "round"]
-                n_invs = res["all", "inv"]
+                n_rounds = result["all", "round"]
+                n_invs = result["all", "inv"]
                 if (n_invs / n_rounds) * 1000 < n_reps and Program.prog.verbose:
                     print(
                         self.nodes[0].blocks[0].name,
@@ -1696,7 +1696,7 @@ class Tape:
                     )
             except Exception:
                 pass
-            return res
+            return result
 
         def add_node(self, tape, name):
             new_node = Tape.ReqNode(name)
@@ -1877,11 +1877,11 @@ class Tape:
                 return self
             if size == 1:
                 return self[base]
-            res = self._new_by_number(self.i + base, size=size)
-            res.set_vectorbase(self)
+            result = self._new_by_number(self.i + base, size=size)
+            result.set_vectorbase(self)
             self.create_vector_elements()
-            res.vector = self.vector[base : base + size]
-            return res
+            result.vector = self.vector[base : base + size]
+            return result
 
         @property
         def vec(self):

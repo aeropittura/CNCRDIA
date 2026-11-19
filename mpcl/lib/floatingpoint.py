@@ -17,10 +17,10 @@ def two_power(n):
         return 2**n
     else:
         max = types.cint(1) << 31
-        res = 2**(n%31)
+        result = 2**(n%31)
         for i in range(n // 31):
-            res *= max
-        return res
+            result *= max
+        return result
 
 def shift_two(n, pos):
     return n >> pos
@@ -68,23 +68,23 @@ def EQZ(a, k, maybe_mixed=False):
 def bits(a,m):
     """ Get the bits of an int """
     if isinstance(a, int):
-        res = [None]*m
+        result = [None]*m
         for i in range(m):
-            res[i] = a & 1
+            result[i] = a & 1
             a >>= 1
     else:
-        res = []
+        result = []
         from mpcl.core.types import regint, cint
         while m > 0:
             aa = regint()
             convmodp(aa, a, 0, bitlength=0)
-            res += [cint(x) for x in aa.bit_decompose(min(64, m))]
+            result += [cint(x) for x in aa.bit_decompose(min(64, m))]
             m -= 64
             if m > 0:
                 aa = cint()
                 shrci(aa, a, 64)
                 a = aa
-    return res
+    return result
 
 def carry(b, a, compute_p=True):
     """ Carry propagation:
@@ -124,10 +124,10 @@ def PreORC(a, m=None, raw=False):
         if isinstance(a[0], types.sgf2n):
             b = comparison.PreMulC([3 - a[i] for i in range(k)])
             for i in range(m):
-                tmp = b[k-1-i]
+                temp = b[k-1-i]
                 if not raw:
-                    tmp = tmp.bit_decompose()[0]
-                p[m-1-i] = 1 - tmp
+                    temp = temp.bit_decompose()[0]
+                p[m-1-i] = 1 - temp
         else:
             t = [types.sint() for i in range(m)]
             b = comparison.PreMulC([a[i] + 1 for i in range(k)])
@@ -219,10 +219,10 @@ def PreOpL2_vec(op, *items):
         w = op([x.get_vector(base=0, size=other_half) for x in v],
                [x.get_vector(base=2, size=other_half, skip=2) for x in items])
     if half == other_half:
-        res = [type(x).zip(x, y) for x, y in zip(v, w)]
-        for i in range(len(res)):
-            res[i] = type(res[i]).concat((items[i].get_vector(base=0, size=1),
-                                          res[i]))
+        result = [type(x).zip(x, y) for x, y in zip(v, w)]
+        for i in range(len(result)):
+            result[i] = type(result[i]).concat((items[i].get_vector(base=0, size=1),
+                                          result[i]))
     else:
         if other_half:
             for i in range(len(w)):
@@ -230,11 +230,11 @@ def PreOpL2_vec(op, *items):
                                           w[i]))
         else:
             w = [x.get_vector(base=0, size=1) for x in items]
-        res = [type(x).zip(x, y) for x, y in zip(w, v)]
-    assert len(res) == len(items)
-    for x in res:
+        result = [type(x).zip(x, y) for x, y in zip(w, v)]
+    assert len(result) == len(items)
+    for x in result:
         assert len(x) == k
-    return res
+    return result
 
 def PreOpN(op, items):
     """ Naive PreOp algorithm """
@@ -377,14 +377,14 @@ def BitDecFieldRaw(a, k, m, bits_to_compute=None):
     kappa = program.Program.prog.security
     pow2 = two_power(k + kappa)
     asm_open(True, c, pow2 + two_power(k) + a - two_power(m)*r_dprime - r_prime)
-    res = r[0].bit_adder(r, list(r[0].bit_decompose_clear(c,m)))
+    result = r[0].bit_adder(r, list(r[0].bit_decompose_clear(c,m)))
     instructions_base.reset_global_vector_size()
-    return res
+    return result
 
 @instructions_base.bit_cisc
 def BitDecField(a, k, m, bits_to_compute=None):
-    res = BitDecFieldRaw(a, k, m, bits_to_compute)
-    return [types.sintbit.conv(bit) for bit in res]
+    result = BitDecFieldRaw(a, k, m, bits_to_compute)
+    return [types.sintbit.conv(bit) for bit in result]
 
 
 @instructions_base.ret_cisc
@@ -440,9 +440,9 @@ def Trunc(a, l, m, compute_modulo=False, signed=False):
     prog = program.Program.prog
     if util.is_constant(m) and not compute_modulo:
         # cheaper
-        res = type(a)(size=a.size)
-        comparison.Trunc(res, a, l, m, signed=signed)
-        return res
+        result = type(a)(size=a.size)
+        comparison.Trunc(result, a, l, m, signed=signed)
+        return result
     if l == 1:
         if compute_modulo:
             return a * m, 1 + m
@@ -548,14 +548,14 @@ def FLRound(x, mode):
     a = types.sint()
     comparison.LTZ(a, p1, k)
     b = p1.less_than(-l + 1, k)
-    v2, inv_2pow_p1 = Trunc(v1, l, -a * (1 - b) * x.p, compute_modulo=True)
+    v2, inverse_2pow_p1 = Trunc(v1, l, -a * (1 - b) * x.p, compute_modulo=True)
     c = EQZ(v2, l)
     if mode == -1:
         away_from_zero = 0
         mode = x.s
     else:
         away_from_zero = mode + s1 - 2 * mode * s1
-    v = v1 - v2 + (1 - c) * inv_2pow_p1 * away_from_zero
+    v = v1 - v2 + (1 - c) * inverse_2pow_p1 * away_from_zero
     d = v.equal(two_power(l), l + 1)
     v = d * two_power(l-1) + (1 - d) * v
     v = a * ((1 - b) * v + b * away_from_zero * two_power(l-1)) + (1 - a) * v1
@@ -594,8 +594,8 @@ def TruncPrRing(a, k, m, signed=True):
         if signed:
             a += (1 << (k - 1))
         if False:
-            res = sint()
-            trunc_pr(res, a, k, m)
+            result = sint()
+            trunc_pr(result, a, k, m)
         else:
             prog.reading('probabilistic truncation', 'CdH10-fixed',
                          'Protocol 3.1')
@@ -612,15 +612,15 @@ def TruncPrRing(a, k, m, signed=True):
                 upper = sint.bit_compose(r_bits[m:k])
                 msb = r_bits[-1]
             n_shift = n_ring - (k + 1)
-            tmp = a + r
-            masked = (tmp << n_shift).reveal(False)
+            temp = a + r
+            masked = (temp << n_shift).reveal(False)
             shifted = (masked << 1 >> (n_shift + m + 1))
             overflow = msb.bit_xor(masked >> (n_ring - 1))
-            res = shifted - upper + \
+            result = shifted - upper + \
                   (overflow << (k - m))
         if signed:
-            res -= (1 << (k - m - 1))
-        return res
+            result -= (1 << (k - m - 1))
+        return result
 
 def TruncPrField(a, k, m):
     if m == 0:

@@ -70,17 +70,17 @@ class Circuit:
                 f = function_block
             self.functions[n] = f(lambda *args: self.compile(*args))
             self.functions[n].name = '%s(%d)' % (self.name, inputs[0].v[0].n)
-        flat_res = self.functions[n](*itertools.chain(*(
+        flat_result = self.functions[n](*itertools.chain(*(
             sbitvec.from_vec(x).v for x in inputs)))
-        res = []
+        result = []
         i = 0
         for l in self.n_output_wires:
             v = []
             for j in range(l):
-                v.append(flat_res[i])
+                v.append(flat_result[i])
                 i += 1
-            res.append(sbitvec.from_vec(v))
-        return util.untuplify(res)
+            result.append(sbitvec.from_vec(v))
+        return util.untuplify(result)
 
     def compile(self, *all_inputs):
         f = open(self.filename)
@@ -195,13 +195,13 @@ def sha3_256(x):
     P_flat[-1] = ~P_flat[-1] # set last bit to 1
 
     def flatten(S):
-        res = [None] * 1600
+        result = [None] * 1600
         for y in range(5):
             for x in range(5):
                 for i in range(w):
                     j = (5 * y + x) * w + i // 8 * 8 + 7 - i % 8
-                    res[1600 - 1 - j] = S[x][y][i]
-        return res
+                    result[1600 - 1 - j] = S[x][y][i]
+        return result
 
     def unflatten(S_flat):
         res = [[[None] * w for j in range(5)] for i in range(5)]
@@ -371,22 +371,22 @@ class ieee_float:
         return ieee_float(self.circuit('div')(self.value, other.value))
 
     def __eq__(self, other):
-        res = sbitvec.from_vec(self.circuit('eq')(self.value,
+        result = sbitvec.from_vec(self.circuit('eq')(self.value,
                                                   other.value).v[:1])
-        if res.v[0].n == 1:
-            return res.elements()[0]
+        if result.v[0].n == 1:
+            return result.elements()[0]
         else:
-            return res
+            return result
 
     def sqrt(self):
         return ieee_float(self.circuit('sqrt')(self.value))
 
     def to_int(self):
-        res = sbitintvec.from_vec(self.circuit('f2i')(self.value))
-        if res.v[0].n == 1:
-            return res.elements()[0]
+        result = sbitintvec.from_vec(self.circuit('f2i')(self.value))
+        if result.v[0].n == 1:
+            return result.elements()[0]
         else:
-            return res
+            return result
 
     def reveal(self):
         assert self.value.v[0].n == 1

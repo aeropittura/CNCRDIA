@@ -42,7 +42,7 @@ class SparseMatrix:
         :param dry: don't process data, only use sizes
 
         """
-        rows, cols = ([[] for j in range(len(graph))] for i in range(2))
+        rows, columns = ([[] for j in range(len(graph))] for i in range(2))
         nodes = list(sorted(graph))
         if randomize:
             random.shuffle(nodes)
@@ -51,9 +51,9 @@ class SparseMatrix:
             for x in graph[node]:
                 j = rev[x]
                 rows[i].append([j, 1, 1])
-                cols[j].append([i, 1, 1])
+                columns[j].append([i, 1, 1])
         ms = [None] * 2
-        for i, l in enumerate((rows, cols)):
+        for i, l in enumerate((rows, columns)):
             m = max(len(x) for x in l)
             ms[i] = m
             if not dry:
@@ -62,14 +62,14 @@ class SparseMatrix:
                     while len(x) < m:
                         x += [[random.randrange(len(nodes))
                                if randomize else 0, 0, 0]]
-        res = cls()
+        result = cls()
         if dry:
-            res.rows = sint.Tensor((len(rows), ms[0], 3))
-            res.cols = sint.Tensor((len(cols), ms[1], 3))
+            result.rows = sint.Tensor((len(rows), ms[0], 3))
+            result.cols = sint.Tensor((len(columns), ms[1], 3))
         else:
-            res.rows = sint.input_tensor_via(0, rows)
-            res.cols = sint.input_tensor_via(0, cols)
-        return res
+            result.rows = sint.input_tensor_via(0, rows)
+            result.cols = sint.input_tensor_via(0, columns)
+        return result
 
     def __init__(self, n_rows=None, n_cols=None, max_non_zero=None):
         if max_non_zero:
@@ -113,7 +113,7 @@ class SparseMatrix:
         if balance_rows:
             avg_output_limit = avg_output_limit or (max_window + 1)
             max_window += 1
-        res_length = m * max_window
+        result_length = m * max_window
         if time:
             start_timer(1)
         timer = library.MultiTimer(time * 10)
@@ -134,7 +134,7 @@ class SparseMatrix:
             new_Z = sint.Matrix(
                 avg_output_limit * max(len(self.cols), len(other.rows)), 4)
             new_Z.assign_all(0)
-            factor = res_length / new_Z.sizes[0]
+            factor = result_length / new_Z.sizes[0]
             max_size = 10 ** 7 // max_window
             real_threads = n_heavy_threads or 1
             use_sizes = regint.Matrix(
@@ -171,9 +171,9 @@ class SparseMatrix:
                 if time_part:
                     timer.next()
                 if program.use_binary_shuffle:
-                    tmp = part.to_binary_with_right_length(64)
-                    tmp.secure_shuffle()
-                    part.from_binary(tmp)
+                    temp = part.to_binary_with_right_length(64)
+                    temp.secure_shuffle()
+                    part.from_binary(temp)
                 else:
                     part.secure_shuffle()
                 if time_part:
@@ -187,8 +187,8 @@ class SparseMatrix:
                 use_base = part.sizes[0] - use_size
                 if time_part:
                     timer.next()
-                tmp = part.get_part_vector(base=use_base, size=use_size)
-                new_Z.assign_part_vector(tmp, base=store_base)
+                temp = part.get_part_vector(base=use_base, size=use_size)
+                new_Z.assign_part_vector(temp, base=store_base)
                 if debug:
                     print_ln('sizes %s/%s base %s factor %s',
                              use_size, size, store_base, factor)
@@ -207,10 +207,10 @@ class SparseMatrix:
                 if time_part:
                     timer.end()
             Z = new_Z
-            del res_length
+            del result_length
         else:
             max_size = 0
-            Z = sint.Matrix(res_length, 4)
+            Z = sint.Matrix(result_length, 4)
             Z.assign_all(0)
             l = MemValue(0)
             @for_range(m)
@@ -322,14 +322,14 @@ class SparseMatrix:
         places = Z.get_column(3)
         n_places = len(Z) - places.sum().reveal()
         places = Array.create_from(places.reveal())
-        res = sint.Matrix(len(Z), 3)
+        result = sint.Matrix(len(Z), 3)
         i = MemValue(0)
         @for_range_opt(len(Z))
         def _(k):
-            res[i] = places[k].if_else(res[i], Z[k][:3])
+            result[i] = places[k].if_else(result[i], Z[k][:3])
             i.iadd(1 - places[k])
-        res.sizes = [n_places, 3]
-        return res
+        result.sizes = [n_places, 3]
+        return result
 
     @staticmethod
     def reveal_check_rows(Z, n_rows):
@@ -378,8 +378,8 @@ class SparseMatrix:
         """
         program.reading('graph cycle detection', 'Keller26')
         assert len(self.rows) == len(self.cols)
-        res = sint.Matrix(max_cycle - 1, len(self.rows))
-        res.assign_all(0)
+        result = sint.Matrix(max_cycle - 1, len(self.rows))
+        result.assign_all(0)
         if debug:
             print_ln('input %s', self.rows.reveal())
         def follow_output(prod):
@@ -391,11 +391,11 @@ class SparseMatrix:
                 @for_range(len(row))
                 def _(j):
                     entry = row[j]
-                    col = entry[0].reveal()
+                    column = entry[0].reveal()
                     for k in tuplify(follow):
-                        @if_(col == k)
+                        @if_(column == k)
                         def _():
-                            print_ln('in row %s col %s/%s: %s, %s', i, col, k,
+                            print_ln('in row %s col %s/%s: %s, %s', i, column, k,
                                      util.reveal(entry), list(entry),
                                      print_secrets=True)
         def step(i, prod, reduced=None):
@@ -426,7 +426,7 @@ class SparseMatrix:
                 col2 = row.get_column(2)
                 diagonal = (row.get_column(0) == j).bit_and(col2)
                 for k in range(len(row)):
-                    res[i][j] = diagonal[k].if_else(col2[k], res[i][j])
+                    result[i][j] = diagonal[k].if_else(col2[k], result[i][j])
                 col2 = diagonal.if_else(0, col2)
                 row.set_column(2, col2)
                 row.set_column(0, row.get_column(0) * col2)
@@ -434,11 +434,11 @@ class SparseMatrix:
             timer.next()
             if output:
                 i = MemValue(i)
-                @map_sum_opt(n_threads, len(res[i]), [sint])
+                @map_sum_opt(n_threads, len(result[i]), [sint])
                 def _(j):
-                    return res[i][j] != 0
+                    return result[i][j] != 0
                 print_ln('%s/%s nodes in cycles of length %s',
-                         res[i].sum().reveal(), _().reveal(), i + 2)
+                         result[i].sum().reveal(), _().reveal(), i + 2)
                 if follow is not None:
                     print_ln('after diagonal')
                     follow_output(prod)
@@ -450,9 +450,9 @@ class SparseMatrix:
             prod = step(0, self)
             @for_range(1, max_cycle - 1)
             def _(i):
-                tmp = step(i, prod, reduced=reduced)
-                prod.rows.assign(tmp.rows, n_threads=n_threads)
-                tmp.rows.delete()
+                temp = step(i, prod, reduced=reduced)
+                prod.rows.assign(temp.rows, n_threads=n_threads)
+                temp.rows.delete()
         else:
             prod = self
             for i in range(max_cycle - 1):
@@ -460,7 +460,7 @@ class SparseMatrix:
                     prod = step(i, prod)
                 else:
                     prod = step(i, prod, reduced=reduced)
-        return res
+        return result
 
 class CellSparseMatrix:
     """ Cell-wise sparse matrix contain tuples of row index, column
@@ -525,10 +525,10 @@ class CellSparseMatrix:
             print_ln('counts = %s', counts.reveal())
         if time:
             timer.next()
-        perm = decision_tree.SortPerm(g[:].bit_not(), n_threads=n_threads)
+        permutation = decision_tree.SortPerm(g[:].bit_not(), n_threads=n_threads)
         g.delete()
-        sorted_counts = perm.apply(counts)
-        perm.perm.delete()
+        sorted_counts = permutation.apply(counts)
+        permutation.perm.delete()
         if time:
             timer.next()
         factor = len(content) // self.n_rows
@@ -574,9 +574,9 @@ class CellSparseMatrix:
                     0, bit_length=util.log2(factor) + 1), base=base)
         if time:
             timer.next()
-        perm = decision_tree.LocalSortPerm(ltz[:], n_threads=n_threads)
-        perm.apply(indices)
-        perm.apply(ltz)
+        permutation = decision_tree.LocalSortPerm(ltz[:], n_threads=n_threads)
+        permutation.apply(indices)
+        permutation.apply(ltz)
         if time:
             timer.next()
         sorted_content = Matrix.create_from(content, n_threads=n_threads) \
@@ -618,19 +618,19 @@ class CellSparseMatrix:
             timer.next()
         max_non_zero = max_non_zero or factor
         assert factor <= max_non_zero
-        res = SparseMatrix(self.n_rows, max_non_zero=max_non_zero)
-        res.cols = (None,) * self.n_cols
+        result = SparseMatrix(self.n_rows, max_non_zero=max_non_zero)
+        result.cols = (None,) * self.n_cols
         if max_non_zero != factor:
-            res.rows.assign_all(0, n_threads=n_threads)
+            result.rows.assign_all(0, n_threads=n_threads)
         @for_range_opt_multithread(n_threads, self.n_rows,
                                    disable_index_checks=True)
         def _(i):
             base = i * factor
             valid = sorted_content.get_column(
                 3, base=base, size=factor).bit_not()
-            res.rows[i].set_column(2, valid)
+            result.rows[i].set_column(2, valid)
             for j in range(2):
-                res.rows[i].set_column(j, valid * sorted_content.get_column(
+                result.rows[i].set_column(j, valid * sorted_content.get_column(
                     j + 1, base=base, size=factor))
             if fail:
                 @for_range_opt(factor)
@@ -644,13 +644,13 @@ class CellSparseMatrix:
                     runtime_error_if(valid_invalid, 'invalid bit %s at %s, %s',
                                      valid, i, j)
             if sort:
-                res.rows[i].sort(key_indices=2, n_bits=1, key_prep=util.bit_not)
+                result.rows[i].sort(key_indices=2, n_bits=1, key_prep=util.bit_not)
         if sorted_content is not self.content:
             sorted_content.delete()
         if time:
             timer.end()
         combo_timer.end()
-        return res
+        return result
 
     def output_above(self, threshold):
         shuffled = Matrix.create_from(self.content)
@@ -697,23 +697,23 @@ def cycle_run(G, n_cycles, program, reveal=False, arg_base=None, fail=False,
 
     print(M.rows.sizes, M.cols.sizes)
 
-    res = M.find_cycles(n_cycles, avg_output_limit=avg_output_limit,
+    result = M.find_cycles(n_cycles, avg_output_limit=avg_output_limit,
                         time=True, debug=False, fail=fail,
                         n_threads=n_threads, n_heavy_threads=n_heavy_threads,
                         output=reveal, reduced=M_red)
 
     if reveal:
-        secret_res = res
-        res = res.reveal()
+        secret_result = result
+        result = result.reveal()
 
-        @for_range(len(res))
+        @for_range(len(result))
         def _(i):
-            part = res[i]
+            part = result[i]
             @for_range(len(part))
             def _(j):
                 print_ln_if(part[j], 'size %s at %s', i + 2, j)
 
-        @for_range_opt(len(res))
+        @for_range_opt(len(result))
         def _(i):
-            print_ln('%s nodes in length %s', secret_res[i].sum().reveal(),
+            print_ln('%s nodes in length %s', secret_result[i].sum().reveal(),
                      i + 2)
